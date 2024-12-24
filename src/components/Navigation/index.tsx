@@ -20,6 +20,9 @@ const Navigation = () => {
           <Link to="/">Home</Link>
         </li>
         <li>
+          <Link to="/profile">Moj Profil</Link>
+        </li>
+        <li>
           <span className="cursor-pointer" onClick={onLogout}>
             Logout
           </span>

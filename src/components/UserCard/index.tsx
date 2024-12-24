@@ -1,6 +1,7 @@
 import { truncateString } from '../../utils/truncateString';
 import Button from '../Button';
 import Avatar from 'react-avatar';
+import Card from '../Card';
 export interface IUser {
   avatar: string;
   email: string;
@@ -39,7 +40,7 @@ const getUserLocation = ({ location }: { location: string }) => {
 
 const UserCard = ({ user }: IUserCardProps) => {
   return (
-    <div className=" bg-white rounded-lg shadow-sm p-6 flex space-x-4">
+    <Card>
       <Avatar
         name={`${user.firstName} ${user.lastName}`}
         src={user.avatar}
@@ -59,7 +60,7 @@ const UserCard = ({ user }: IUserCardProps) => {
           Pogledaj profil
         </Button>
       </div>
-    </div>
+    </Card>
   );
 };
 
