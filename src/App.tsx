@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import './App.css';
 import AppLayout from './components/AppLayout';
 import { getAllUsers } from './api/users';
-import UserCard, { User } from './components/UserCard';
+import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
@@ -37,10 +37,10 @@ function App() {
   }
 
   const allUsersWithCurrentUser = allUsers?.data.filter(
-    (user: User) => user.id !== currentUser?.data.id
+    (user: IUser) => user.id !== currentUser?.data.id
   );
 
-  const filteredUsers = allUsersWithCurrentUser?.filter((user: User) => {
+  const filteredUsers = allUsersWithCurrentUser?.filter((user: IUser) => {
     if (selectValue.value === 'firstName') {
       return user.firstName.toLowerCase().includes(search.toLowerCase());
     }
@@ -75,7 +75,7 @@ function App() {
         setSearch={setSearch}
       />
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
-        {renderedUsers.map((user: User) => (
+        {renderedUsers.map((user: IUser) => (
           <UserCard key={user.id} user={user} />
         ))}
       </ul>

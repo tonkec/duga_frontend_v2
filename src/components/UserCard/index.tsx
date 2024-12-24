@@ -1,7 +1,7 @@
 import { truncateString } from '../../utils/truncateString';
 import Button from '../Button';
 import Avatar from 'react-avatar';
-export interface User {
+export interface IUser {
   avatar: string;
   email: string;
   lastName: string;
@@ -18,7 +18,7 @@ export interface User {
 }
 
 interface IUserCardProps {
-  user: User;
+  user: IUser;
 }
 
 const getUserBio = (bio: string) => {
@@ -33,6 +33,7 @@ const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return <p className="text-gray-600">Lokacija: Nepoznato</p>;
   }
+
   return <p className="text-gray-600">Lokacija: {location}</p>;
 };
 
