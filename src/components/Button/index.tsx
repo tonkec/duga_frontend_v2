@@ -5,7 +5,7 @@ interface IButtonProps {
   type: 'primary' | 'secondary' | 'tertiary';
 }
 
-const defaultStyles = `text-white font-bold py-2 px-4 rounded`;
+const defaultStyles = `text-white py-2 px-4 rounded text-sm`;
 
 const getBackgroundColor = (type: IButtonProps['type']) => {
   switch (type) {
