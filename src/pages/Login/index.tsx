@@ -42,7 +42,7 @@ const LoginPage = () => {
         />
         {errors.email && <span>Upiši ispravan email</span>}
         <Input placeholder="Lozinka" {...register('password', { required: true })} />
-        {errors.password && <span>Upiši ispravno ime</span>}
+        {errors.password && <span>Upiši ispravnu lozinku</span>}
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>
