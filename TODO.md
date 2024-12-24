@@ -1,7 +1,11 @@
 # Next to do
 
-- filteri na all users
+- maknut na all users samog sebe
 - loaderi
+
+### Sljedeci veliki feature
+
+- edit profile page
 
 ### Layout
 
@@ -16,4 +20,5 @@
 
 ### Gotovo
 
+- filteri na all users
 - dodat logo na svaku stranicu
