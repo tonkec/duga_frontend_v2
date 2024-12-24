@@ -1,7 +1,6 @@
 import { truncateString } from '../../utils/truncateString';
 import Button from '../Button';
 import Avatar from 'react-avatar';
-
 export interface User {
   avatar: string;
   email: string;

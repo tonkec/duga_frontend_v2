@@ -1,8 +1,10 @@
 # Next to do
 
+- filteri na all users
+- loaderi
+
 ### Layout
 
-- dodat logo na svaku stranicu
 - React helmet
 - footer
 
@@ -11,3 +13,7 @@
 - verification email? => treba postavit mailove
 - forgot password => treba postavit mailove
 - reset password => treba postavit mailove
+
+### Gotovo
+
+- dodat logo na svaku stranicu
