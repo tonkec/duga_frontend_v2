@@ -5,6 +5,7 @@ import Input from '../../components/ui/Input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useLoginUser } from './hooks';
 
 type Inputs = {
   email: string;
@@ -17,6 +18,7 @@ const schema = z.object({
 });
 
 const LoginPage = () => {
+  const { loginUser } = useLoginUser();
   const {
     register,
     handleSubmit,
@@ -25,7 +27,9 @@ const LoginPage = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    loginUser(data);
+  };
 
   return (
     <AuthLayout>
