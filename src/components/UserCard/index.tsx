@@ -23,7 +23,7 @@ interface IUserCardProps {
 
 const getUserBio = (bio: string) => {
   if (!bio) {
-    return 'Ovaj korisnik još nije postavio biografiju.';
+    return 'Biografije još nije postavljena.';
   }
 
   return truncateString(bio, 100);
