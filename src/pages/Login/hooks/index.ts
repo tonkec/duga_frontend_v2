@@ -14,6 +14,7 @@ interface IUserProps {
 function useLoginUser() {
   const navigate = useNavigate();
   const [, saveAuthToken] = useLocalStorage('token', null);
+  const [, saveUserId] = useLocalStorage('userId', null);
 
   const {
     mutate: loginUser,
@@ -24,6 +25,7 @@ function useLoginUser() {
     mutationFn: ({ email, password }: IUserProps) => login(email, password),
     onSuccess: (data) => {
       saveAuthToken(data.data.token);
+      saveUserId(data.data.id);
       toast.success('Uspješno si se ulogirao_la!', toastConfig);
       navigate('/');
     },

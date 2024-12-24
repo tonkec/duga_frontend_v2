@@ -5,6 +5,8 @@ import { getAllUsers } from './api/users';
 import UserCard, { User } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useState } from 'react';
+import { useLocalStorage } from '@uidotdev/usehooks';
+import { useGetUserById } from './hooks/useGetUserById';
 
 const useGetAllUsers = () => {
   const {
@@ -20,6 +22,9 @@ const useGetAllUsers = () => {
 };
 
 function App() {
+  const [userId] = useLocalStorage('userId');
+  const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
+
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [selectValue, setSelectValue] = useState({
     value: '',
@@ -27,11 +32,15 @@ function App() {
   });
   const [search, setSearch] = useState('');
 
-  if (isAllUsersLoading) {
+  if (isAllUsersLoading || isUserLoading) {
     return <AppLayout>Loading...</AppLayout>;
   }
 
-  const filteredUsers = allUsers?.data.filter((user: User) => {
+  const allUsersWithCurrentUser = allUsers?.data.filter(
+    (user: User) => user.id !== currentUser?.data.id
+  );
+
+  const filteredUsers = allUsersWithCurrentUser?.filter((user: User) => {
     if (selectValue.value === 'firstName') {
       return user.firstName.toLowerCase().includes(search.toLowerCase());
     }
@@ -55,7 +64,7 @@ function App() {
     }
   });
 
-  const renderedUsers = search ? filteredUsers : allUsers?.data;
+  const renderedUsers = search ? filteredUsers : allUsersWithCurrentUser;
 
   return (
     <AppLayout>
