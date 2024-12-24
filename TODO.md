@@ -14,7 +14,7 @@
 
 ### Easy wins
 
-- loaderi za slike
+- loaderi za slike => poslije editing profile
 - loader za lodanje data
 - umjesto rijeci logout stavit ikonicu
 
