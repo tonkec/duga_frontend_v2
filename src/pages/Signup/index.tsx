@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
-import AuthLayout from '../../components/ui/AuthLayout';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import AuthLayout from '../../components/AuthLayout';
+import Button from '../../components/Button';
+import Input from '../../components/Input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
