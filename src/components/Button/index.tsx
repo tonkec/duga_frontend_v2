@@ -5,12 +5,12 @@ interface IButtonProps {
   type: 'primary' | 'secondary' | 'tertiary';
 }
 
-const defaultStyles = `text-white hover:bg-pink-dark text-white font-bold py-2 px-4 rounded`;
+const defaultStyles = `text-white font-bold py-2 px-4 rounded`;
 
 const getBackgroundColor = (type: IButtonProps['type']) => {
   switch (type) {
     case 'primary':
-      return 'bg-pink';
+      return 'bg-pink hover:bg-pink-dark';
     case 'secondary':
       return 'bg-green';
     case 'tertiary':
