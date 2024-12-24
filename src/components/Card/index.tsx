@@ -1,8 +1,11 @@
 interface ICardProps {
   children: React.ReactNode;
+  className?: string;
 }
-const Card = ({ children }: ICardProps) => {
-  return <div className="bg-white rounded-lg shadow-sm p-6 flex space-x-4">{children}</div>;
+
+const defaultCardStyles = 'bg-white rounded-lg shadow-sm p-6 flex';
+const Card = ({ children, className }: ICardProps) => {
+  return <div className={`${className} ${defaultCardStyles}`}>{children}</div>;
 };
 
 export default Card;

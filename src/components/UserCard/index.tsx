@@ -22,7 +22,7 @@ interface IUserCardProps {
   user: IUser;
 }
 
-const getUserBio = (bio: string) => {
+export const getUserBio = (bio: string) => {
   if (!bio) {
     return 'Biografija još nije postavljena.';
   }
@@ -40,7 +40,7 @@ const getUserLocation = ({ location }: { location: string }) => {
 
 const UserCard = ({ user }: IUserCardProps) => {
   return (
-    <Card>
+    <Card className="space-x-4">
       <Avatar
         name={`${user.firstName} ${user.lastName}`}
         src={user.avatar}
