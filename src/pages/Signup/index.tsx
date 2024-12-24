@@ -8,8 +8,8 @@ const SignupPage = () => {
     <AuthLayout>
       <form className="w-[400px]">
         <h1 className="text-center">Prijavi se!</h1>
-        <Input placeholder="Email" value="" className="mb-2 mt-2" />
-        <Input placeholder="Lozinka" value="" />
+        <Input placeholder="Email" className="mb-2 mt-2" />
+        <Input placeholder="Lozinka" />
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
           Prijavi se
         </Button>

@@ -36,9 +36,9 @@ const LoginPage = () => {
           className="mb-2 mt-2"
           {...register('email', { required: true })}
         />
-        {errors.email && <span>Ovo polje je obavezno</span>}
+        {errors.email && <span>Upiši ispravan email</span>}
         <Input placeholder="Lozinka" {...register('password', { required: true })} />
-        {errors.password && <span>Ovo polje je obavezno</span>}
+        {errors.password && <span>Upiši ispravno ime</span>}
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>
