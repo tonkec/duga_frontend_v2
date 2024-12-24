@@ -12,7 +12,7 @@ interface IUserProps {
   lastName: string;
 }
 
-function useCreateUser() {
+export const useCreateUser = () => {
   const navigate = useNavigate();
   const {
     mutate: createUser,
@@ -32,6 +32,4 @@ function useCreateUser() {
   });
 
   return { isCreating, createUser, isSignupError, isSuccess };
-}
-
-export { useCreateUser };
+};
