@@ -23,10 +23,17 @@ interface IUserCardProps {
 
 const getUserBio = (bio: string) => {
   if (!bio) {
-    return 'Biografije još nije postavljena.';
+    return 'Biografija još nije postavljena.';
   }
 
   return truncateString(bio, 100);
+};
+
+const UserLocation = ({ location }: { location: string }) => {
+  if (!location) {
+    return <p className="text-gray-600">Lokacija: Nepoznato</p>;
+  }
+  return <p className="text-gray-600">Lokacija: {location}</p>;
 };
 
 const UserCard = ({ user }: IUserCardProps) => {
@@ -39,13 +46,15 @@ const UserCard = ({ user }: IUserCardProps) => {
         round
         color="#2D46B9"
       />
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800">
-          {user.firstName} {user.lastName}
-        </h3>
-        {user.location && <p className="text-gray-600">{user.location}</p>}
-        <p className="text-gray-600 mt-2">{getUserBio(user.bio)}</p>
-        <Button onClick={() => {}} type="primary" className="mt-4">
+      <div className="flex flex-col justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">
+            {user.firstName} {user.lastName}
+          </h3>
+          {<UserLocation location={user.location} />}
+          <p className="text-gray-600 mt-2">{getUserBio(user.bio)}</p>
+        </div>
+        <Button onClick={() => {}} type="primary" className="mt-4 max-w-[150px]">
           Pogledaj profil
         </Button>
       </div>

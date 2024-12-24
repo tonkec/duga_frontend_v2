@@ -1,24 +1,30 @@
 # Next to do
 
-- maknut na all users samog sebe
-- loaderi
+### Enhancements
+
+- stavit na all profiles da li je user trenutno aktivan ili ne
+- verification email? => treba postavit mailove => 27.12
+- forgot password => treba postavit mailove => 27.12
+- reset password => treba postavit mailove => 27.12
 
 ### Sljedeci veliki feature
 
 - edit profile page
+- poruke
+
+### Easy wins
+
+- loaderi za slike
+- loader za lodanje data
+- umjesto rijeci logout stavit ikonicu
 
 ### Layout
 
 - React helmet
 - footer
 
-### Postavit mailove
-
-- verification email? => treba postavit mailove
-- forgot password => treba postavit mailove
-- reset password => treba postavit mailove
-
 ### Gotovo
 
+- maknut na all users samog sebe
 - filteri na all users
 - dodat logo na svaku stranicu

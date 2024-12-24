@@ -20,10 +20,10 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
   }
 };
 
-const Button = ({ children, onClick, className, type }: IButtonProps) => {
+const Button = ({ children, onClick, className, type, ...props }: IButtonProps) => {
   const bgColor = getBackgroundColor(type);
   return (
-    <button className={`${defaultStyles} ${bgColor} ${className}`} onClick={onClick}>
+    <button {...props} className={`${defaultStyles} ${bgColor} ${className}`} onClick={onClick}>
       {children}
     </button>
   );
