@@ -6,6 +6,12 @@ body {
   background: #f8f8f8;
 }
 
+#root,
+body,
+html {
+  @apply h-full;
+}
+
 @layer base {
   h1 {
     @apply text-2xl;
