@@ -2,14 +2,43 @@ import { Link } from 'react-router';
 import AuthLayout from '../../components/ui/AuthLayout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+type Inputs = {
+  email: string;
+  password: string;
+};
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
 
 const LoginPage = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+
   return (
     <AuthLayout>
-      <form className="w-[400px]">
+      <form className="w-[400px]" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-center">Ulogiraj se!</h1>
-        <Input placeholder="Email" value="" className="mb-2 mt-2" />
-        <Input placeholder="Lozinka" value="" />
+        <Input
+          placeholder="Email"
+          className="mb-2 mt-2"
+          {...register('email', { required: true })}
+        />
+        {errors.email && <span>Ovo polje je obavezno</span>}
+        <Input placeholder="Lozinka" {...register('password', { required: true })} />
+        {errors.password && <span>Ovo polje je obavezno</span>}
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>
