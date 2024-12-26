@@ -5,6 +5,8 @@ import Button from '../Button';
 import FieldError from '../FieldError';
 import { BiX } from 'react-icons/bi';
 import { BiCheck } from 'react-icons/bi';
+import Checkbox from '../Checkbox';
+import Input from '../Input';
 
 const photoLimit = 5;
 
@@ -18,7 +20,6 @@ const PhotoUploader = () => {
 
   return (
     <div>
-      KOMENATRI NA FOTKE, OZNACI PROFILNU
       <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
         {({
           imageList,
@@ -51,10 +52,12 @@ const PhotoUploader = () => {
             )}
 
             <div>
-              <div className="flex gap-4 mt-2">
+              <div className="flex gap-4 mt-4">
                 {imageList.map((image, index) => (
                   <div key={index}>
                     <img src={image.dataURL} alt="tvoja slika" width="300" />
+                    <Input className="mt-4 mb-4" placeholder="Napiši nešto o fotki" />
+                    <Checkbox /> Nova profilna
                     <div className="flex gap-1 justify-between mt-4">
                       <Button className="flex-1" type="black" onClick={() => onImageRemove(index)}>
                         Obriši
