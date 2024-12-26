@@ -20,6 +20,7 @@ const PhotoUploader = () => {
 
   return (
     <div>
+      UCITAT POSTOJECE SLIKE
       <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
         {({
           imageList,

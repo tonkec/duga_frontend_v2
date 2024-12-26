@@ -1,4 +1,5 @@
 import AppContainer from '../AppContainer';
+import Footer from '../Footer';
 import Navigation from '../Navigation';
 
 interface IAppLayoutProps {
@@ -10,7 +11,8 @@ const AppLayout = ({ children }: IAppLayoutProps) => {
     <>
       <Navigation />
       <AppContainer>
-        <main className="p-4 mt-10">{children}</main>
+        <main className="mt-10">{children}</main>
+        <Footer />
       </AppContainer>
     </>
   );
