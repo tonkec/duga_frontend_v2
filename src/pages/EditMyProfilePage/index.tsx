@@ -5,12 +5,14 @@ import PhotoUploader from '../../components/PhotoUploader';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Input from '../../components/Input';
 import Select from 'react-select';
+import Checkbox from '../../components/Checkbox';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
   { value: 'date', label: 'Dejt' },
   { value: 'relationship', label: 'Vezu' },
   { value: 'marriage', label: 'Brak' },
+  { value: 'partnership', label: 'Partnerstvo' },
   { value: 'nothing', label: 'Samo zujim' },
   { value: 'idk', label: 'Ne znam' },
 ];
@@ -22,6 +24,7 @@ const relationshipStatusOptions = [
   },
   { value: 'relationship', label: 'U vezi' },
   { value: 'marriage', label: 'U braku' },
+  { value: 'partnership', label: 'U partnerstvu' },
   { value: 'idk', label: 'Ne znam' },
   { value: 'inbetween', label: 'Nešto izmedju' },
 ];
@@ -66,6 +69,15 @@ const EditMyProfilePage = () => {
                     console.log(e);
                   }}
                   className="mb-2"
+                  theme={(theme) => ({
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      text: 'orangered',
+                      primary25: '#F037A5',
+                      primary: 'black',
+                    },
+                  })}
                 />
                 <Select
                   isClearable
@@ -74,14 +86,30 @@ const EditMyProfilePage = () => {
                   onChange={(e) => {
                     console.log(e);
                   }}
+                  theme={(theme) => ({
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      text: 'orangered',
+                      primary25: '#F037A5',
+                      primary: 'black',
+                    },
+                  })}
                   className="mb-2"
                 />
               </div>
             </div>
             <h2 className="mb-2">Stil života</h2>
-            Checkbox
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-              <div className="col-span-2">X Cigarete X Alkohol X Sport</div>
+            <div className="flex grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">
+                <Checkbox /> Cigarete{' '}
+              </div>
+              <div className="col-span-2">
+                <Checkbox /> Alkohol
+              </div>
+              <div className="col-span-2">
+                <Checkbox /> Sport
+              </div>
             </div>
             <h2 className="mb-2">Vrijednosti</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
