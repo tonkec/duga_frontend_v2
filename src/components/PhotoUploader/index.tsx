@@ -13,16 +13,12 @@ const PhotoUploader = () => {
   const maxNumber = photoLimit;
 
   const onChange = (imageList: ImageListType) => {
-    if (imageList.length > maxNumber) {
-      console.log('b');
-    }
-    console.log(imageList);
     setImages(imageList as never[]);
   };
 
   return (
     <div>
-      KOMENATRI NA FOTKE
+      KOMENATRI NA FOTKE, OZNACI PROFILNU
       <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
         {({
           imageList,

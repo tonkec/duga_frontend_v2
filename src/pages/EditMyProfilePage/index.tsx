@@ -6,6 +6,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Input from '../../components/Input';
 import Select from 'react-select';
 import Checkbox from '../../components/Checkbox';
+import TextArea from '../../components/Textarea';
+import Button from '../../components/Button';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -129,14 +131,20 @@ const EditMyProfilePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
               <div className="col-span-2">
                 TEXTAREAS
-                <Input className="mb-2" placeholder="Najsramotnija stvar koja mi se dogodila" />
-                <Input className="mb-2" placeholder="Imam previše godina za..." />
-                <Input className="mb-2" placeholder="Dan mi je ljepši ako..." />
-                <Input className="mb-2" placeholder="Najdraža youtube pjesma" />
-                <Input className="mb-2" placeholder="Trailer za najdraži film." />
-                <Input className="mb-2" placeholder="Za kraj nešto o meni" />
+                <TextArea
+                  className="mb-4"
+                  placeholder="Najsramotnija stvar koja mi se dogodila..."
+                />
+                <TextArea className="mb-4" placeholder="Imam previše godina za...." />
+                <TextArea className="mb-4" placeholder="Dan mi je ljepši ako..." />
+                <Input className="mb-2" placeholder="Najdraža youtube pjesma (youtube link)" />
+                <Input className="mb-2" placeholder="Trailer za najdraži film (youtube link)" />
+                <TextArea placeholder="Za kraj nešto o meni" />
               </div>
             </div>
+            <Button onClick={() => {}} type="primary">
+              Spremi
+            </Button>
           </Card>
         </TabPanel>
 
