@@ -3,7 +3,9 @@ import { Carousel } from 'react-responsive-carousel';
 import Modal from 'react-modal';
 import Button from '../../components/Button';
 import { BiArrowBack } from 'react-icons/bi';
+import notFound from '../../assets/not_found.svg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+export const REACT_APP_S3_BUCKET_URL = 'https://duga-user-photo.s3.eu-north-1.amazonaws.com';
 
 export interface IImage {
   createdAt: string;
@@ -21,7 +23,6 @@ interface IPhotosProps {
   images: IImage[];
 }
 
-export const REACT_APP_S3_BUCKET_URL = 'https://duga-user-photo.s3.eu-north-1.amazonaws.com';
 Modal.setAppElement('#root');
 const customStyles = {
   content: {
@@ -42,9 +43,15 @@ const Photos = ({ images }: IPhotosProps) => {
     setIsModalOpen(false);
   };
 
-  if (!images) {
-    return 'Ovaj korisnik nema nijednu fotku';
+  if (!images.length) {
+    return (
+      <div className="">
+        <h2 className="font-bold mt-5 mb-2">Fotografije ne postoje</h2>
+        <img src={notFound} className="mx-auto block max-w-[300px]" />
+      </div>
+    );
   }
+
   return (
     <>
       <Modal
@@ -75,7 +82,7 @@ const Photos = ({ images }: IPhotosProps) => {
           </Carousel>
         </div>
       </Modal>
-      <h2 className="font-bold mt-5 mb-2">Fotografije</h2>
+      <h2 className="font-bold mt-5 mb-2">Fotografije ({images.length})</h2>
       <div className="flex gap-5">
         {images.map((image: IImage, index: number) => {
           return (

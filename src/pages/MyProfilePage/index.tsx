@@ -10,12 +10,18 @@ import Cta from '../../components/Cta';
 import Iframe from 'react-iframe';
 import Photos, { IImage, REACT_APP_S3_BUCKET_URL } from '../../components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { BiSolidCamera } from 'react-icons/bi';
+import { BiSolidFile } from 'react-icons/bi';
+
+import avatar from '../../assets/avatar.svg';
 import 'react-tabs/style/react-tabs.css';
 
 const getProfilePhotoUrl = (profilePhoto: IImage) => {
   if (profilePhoto) {
     return `${REACT_APP_S3_BUCKET_URL}/${profilePhoto.url}`;
   }
+
+  return avatar;
 };
 
 const MyProfilePage = () => {
@@ -37,8 +43,16 @@ const MyProfilePage = () => {
     <AppLayout>
       <Tabs selectedTabClassName="bg-black text-white rounded-t-md">
         <TabList style={{ borderBottom: 'none', marginBottom: 0 }}>
-          <Tab style={{ border: 'none' }}>Općenito</Tab>
-          <Tab>Fotke</Tab>
+          <Tab style={{ border: 'none' }}>
+            <div className="flex items-center gap-1">
+              Općenito <BiSolidFile fontSize={25} />
+            </div>
+          </Tab>
+          <Tab>
+            <div className="flex items-center gap-1">
+              Fotografije <BiSolidCamera fontSize={25} />
+            </div>
+          </Tab>
         </TabList>
 
         <TabPanel>
@@ -62,16 +76,16 @@ const MyProfilePage = () => {
                         {currentUser?.data.firstName} {currentUser?.data.lastName}
                       </h1>
                       <p className="flex items-center text-lg gap-2">
-                        <BiSolidMap /> <b>Lokacija: </b> {currentUser?.data.location}
+                        <BiSolidMap /> <b>Lokacija: </b> {currentUser?.data.location || 'N/A'}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <BiBody /> <b>Rod: </b> {currentUser?.data.gender}
+                        <BiBody /> <b>Rod: </b> {currentUser?.data.gender || 'N/A'}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <BiBoltCircle /> <b>Seksualnost: </b> {currentUser?.data.sexuality}
+                        <BiBoltCircle /> <b>Seksualnost: </b> {currentUser?.data.sexuality || 'N/A'}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <BiStopwatch /> <b>Godine: </b> {currentUser?.data.age}
+                        <BiStopwatch /> <b>Godine: </b> {currentUser?.data.age || 'N/A'}
                       </p>
                     </div>
 
@@ -137,7 +151,7 @@ const MyProfilePage = () => {
                 </div>
 
                 <div className="mb-10">
-                  <h2 className="font-bold mb-5">Trailer na najdraži film</h2>
+                  <h2 className="font-bold mb-5">Trailer za najdraži film</h2>
                   <Iframe
                     url="https://www.youtube.com/embed/KnrRy6kSFF0?si=5q6UKW91IH7IG7Vh"
                     width="600"

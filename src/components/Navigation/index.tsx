@@ -1,7 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link, useNavigate } from 'react-router';
 
-const navigationStyles = 'flex justify-end space-x-4 bg-white p-4 shadow-sm';
+const navigationStyles = 'flex justify-end space-x-4 bg-black p-4 shadow-sm text-white';
 
 const Navigation = () => {
   const navigate = useNavigate();
