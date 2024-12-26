@@ -25,13 +25,15 @@ const SignupPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    createUser(data);
+    if (isValid) {
+      createUser(data);
+    }
   };
   return (
     <AuthLayout>

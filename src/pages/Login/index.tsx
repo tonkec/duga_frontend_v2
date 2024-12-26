@@ -22,13 +22,15 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    loginUser(data);
+    if (isValid) {
+      loginUser(data);
+    }
   };
 
   return (
