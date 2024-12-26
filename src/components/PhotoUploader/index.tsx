@@ -22,6 +22,7 @@ const PhotoUploader = () => {
 
   return (
     <div>
+      KOMENATRI NA FOTKE
       <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
         {({
           imageList,
@@ -39,10 +40,10 @@ const PhotoUploader = () => {
                 style={isDragging ? { color: 'red' } : undefined}
                 onClick={onImageUpload}
                 {...dragProps}
-                className="flex w-full flex-col inline-block border-2 mb-6 border-black px-4 justfiy-center items-center rounded py-12"
+                className="flex w-full flex-col inline-block border-2 mb-6 border-pink px-4 justfiy-center items-center rounded py-12"
               >
-                <BiCloudUpload fontSize={80} />
-                <h2>Dovuci ili klikni</h2>
+                <BiCloudUpload fontSize={80} color="#F037A5" />
+                <h2 className="text-pink">Dovuci ili klikni</h2>
               </button>
             </div>
             {errors?.maxNumber && (
@@ -57,7 +58,7 @@ const PhotoUploader = () => {
               <div className="flex gap-4 mt-2">
                 {imageList.map((image, index) => (
                   <div key={index}>
-                    <img src={image.dataURL} alt="tvoja slika" width="200" />
+                    <img src={image.dataURL} alt="tvoja slika" width="300" />
                     <div className="flex gap-1 justify-between mt-4">
                       <Button className="flex-1" type="black" onClick={() => onImageRemove(index)}>
                         Obriši

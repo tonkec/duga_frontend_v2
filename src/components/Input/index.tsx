@@ -8,7 +8,7 @@ interface InputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 pr-8 block w-full appearance-none leading-normal focus:border-pink`;
+const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-2 px-4 pr-8 block w-full appearance-none leading-normal focus:border-pink`;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ placeholder, className, onChange, icon, value, ...props }, ref) => {

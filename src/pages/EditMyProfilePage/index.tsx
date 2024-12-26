@@ -3,6 +3,28 @@ import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import PhotoUploader from '../../components/PhotoUploader';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Input from '../../components/Input';
+import Select from 'react-select';
+
+const lookingForOptions = [
+  { value: 'friendship', label: 'Prijateljstvo' },
+  { value: 'date', label: 'Dejt' },
+  { value: 'relationship', label: 'Vezu' },
+  { value: 'marriage', label: 'Brak' },
+  { value: 'nothing', label: 'Samo zujim' },
+  { value: 'idk', label: 'Ne znam' },
+];
+
+const relationshipStatusOptions = [
+  {
+    value: 'single',
+    label: 'Single',
+  },
+  { value: 'relationship', label: 'U vezi' },
+  { value: 'marriage', label: 'U braku' },
+  { value: 'idk', label: 'Ne znam' },
+  { value: 'inbetween', label: 'Nešto izmedju' },
+];
 
 const EditMyProfilePage = () => {
   return (
@@ -23,7 +45,71 @@ const EditMyProfilePage = () => {
         </TabList>
 
         <TabPanel>
-          <Card>Biografija</Card>
+          <Card>
+            <h2 className="mb-2">Općenito</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">
+                <Input className="mb-2" placeholder="Lokacija" />
+                <Input className="mb-2" placeholder="Rod" />
+                <Input className="mb-2" placeholder="Seksualnost" />
+                <Input className="mb-2" placeholder="Godine" />
+              </div>
+            </div>
+            <h2 className="mb-2">Tražim...</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">
+                <Select
+                  isClearable
+                  options={lookingForOptions}
+                  placeholder="Trenutno tražim..."
+                  onChange={(e) => {
+                    console.log(e);
+                  }}
+                  className="mb-2"
+                />
+                <Select
+                  isClearable
+                  options={relationshipStatusOptions}
+                  placeholder="Trenutno sam..."
+                  onChange={(e) => {
+                    console.log(e);
+                  }}
+                  className="mb-2"
+                />
+              </div>
+            </div>
+            <h2 className="mb-2">Stil života</h2>
+            Checkbox
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">X Cigarete X Alkohol X Sport</div>
+            </div>
+            <h2 className="mb-2">Vrijednosti</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">
+                <Input className="mb-2" placeholder="Religioznost" />
+                <Input className="mb-2" placeholder="Političnost" />
+              </div>
+            </div>
+            <h2 className="mb-2">Ostalo</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">
+                <Input className="mb-2" placeholder="Interesi" />
+                <Input className="mb-2" placeholder="Jezici koje govorim" />
+              </div>
+            </div>
+            <h2 className="mb-2">Fun facts</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="col-span-2">
+                TEXTAREAS
+                <Input className="mb-2" placeholder="Najsramotnija stvar koja mi se dogodila" />
+                <Input className="mb-2" placeholder="Imam previše godina za..." />
+                <Input className="mb-2" placeholder="Dan mi je ljepši ako..." />
+                <Input className="mb-2" placeholder="Najdraža youtube pjesma" />
+                <Input className="mb-2" placeholder="Trailer za najdraži film." />
+                <Input className="mb-2" placeholder="Za kraj nešto o meni" />
+              </div>
+            </div>
+          </Card>
         </TabPanel>
 
         <TabPanel>

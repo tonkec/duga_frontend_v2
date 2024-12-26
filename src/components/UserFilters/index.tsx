@@ -1,10 +1,10 @@
 import Input from '../Input';
 import { BiSearch } from 'react-icons/bi';
 import Select from 'react-select';
-import { User } from '../UserCard';
+import { IUser } from '../UserCard';
 import { SyntheticEvent } from 'react';
 
-const selectOptions: { value: keyof User; label: string }[] = [
+const selectOptions: { value: keyof IUser; label: string }[] = [
   { value: 'gender', label: 'rod' },
   { value: 'sexuality', label: 'seksualnost' },
   { value: 'location', label: 'lokacija' },
