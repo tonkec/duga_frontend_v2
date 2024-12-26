@@ -58,10 +58,10 @@ const MyProfilePage = () => {
         </TabList>
 
         <TabPanel>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
+            <div className="lg:col-span-2">
               <Card>
-                <div className="flex gap-6">
+                <div className="xl:flex gap-6">
                   <div>
                     <Avatar
                       name={`${currentUser?.data.firstName} ${currentUser?.data.lastName}`}
@@ -162,13 +162,13 @@ const MyProfilePage = () => {
                 </div>
 
                 <div className="mb-10">
-                  <h2 className="font-bold mt-5">Za kraj nešto o meni</h2>
+                  <h2 className="font-bold mt-5">Za kraj ću reći još</h2>
                   <p>Ja sam najbolji na svijetu.</p>
                 </div>
               </Card>
             </div>
 
-            <div className="col-span-1 max-w-[300px]">
+            <div className="lg:col-span-1 max-w-[300px]">
               <Cta
                 buttonText="Uredi profil"
                 className="mb-4"
