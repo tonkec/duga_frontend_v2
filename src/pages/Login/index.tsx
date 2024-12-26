@@ -2,10 +2,11 @@ import { Link } from 'react-router';
 import AuthLayout from '../../components/AuthLayout';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useLoginUser } from './hooks';
+import FieldError from '../../components/FieldError';
 
 type Inputs = {
   email: string;
@@ -16,6 +17,19 @@ const schema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
+
+const getErrorMessage = (errors: FieldErrors<Inputs>) => {
+  let errorMessage = '';
+  if (errors.password) {
+    errorMessage += 'Lozinka je neispravna.';
+  }
+
+  if (errors.email) {
+    errorMessage += ' Email je neispravan.';
+  }
+
+  return errorMessage;
+};
 
 const LoginPage = () => {
   const { loginUser } = useLoginUser();
@@ -33,18 +47,20 @@ const LoginPage = () => {
     }
   };
 
+  const hasFormError = errors.password || errors.email;
+
   return (
     <AuthLayout>
       <form className="w-[400px]" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-center text-white">Ulogiraj se!</h1>
+        {hasFormError && <FieldError message={getErrorMessage(errors)} />}
+
         <Input
           placeholder="Email"
           className="mb-2 mt-2"
           {...register('email', { required: true })}
         />
-        {errors.email && <span>Upiši ispravan email</span>}
         <Input placeholder="Lozinka" {...register('password', { required: true })} />
-        {errors.password && <span>Upiši ispravnu lozinku</span>}
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>
