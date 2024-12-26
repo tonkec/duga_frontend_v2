@@ -3,6 +3,7 @@ import App from '../App';
 import LoginPage from '../pages/Login';
 import SignupPage from '../pages/Signup';
 import MyProfilePage from '../pages/MyProfilePage';
+import EditMyProfilePage from '../pages/EditMyProfilePage';
 import { AuthGuard } from './guards/AuthGuard';
 
 const DugaRoutes = () => {
@@ -23,6 +24,15 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <MyProfilePage />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/edit"
+        element={
+          <AuthGuard>
+            <EditMyProfilePage />
           </AuthGuard>
         }
       />

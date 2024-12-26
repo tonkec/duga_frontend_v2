@@ -15,6 +15,7 @@ import { BiSolidFile } from 'react-icons/bi';
 
 import avatar from '../../assets/avatar.svg';
 import 'react-tabs/style/react-tabs.css';
+import { useNavigate } from 'react-router';
 
 const getProfilePhotoUrl = (profilePhoto: IImage) => {
   if (profilePhoto) {
@@ -25,6 +26,7 @@ const getProfilePhotoUrl = (profilePhoto: IImage) => {
 };
 
 const MyProfilePage = () => {
+  const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
   const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
@@ -172,7 +174,9 @@ const MyProfilePage = () => {
                 className="mb-4"
                 subtitle="Impresioniraj ekipu svojim profilom."
                 title="Uredi svoj profil!"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate('/edit');
+                }}
               />
               <Cta
                 buttonText="Pošalji poruku"
