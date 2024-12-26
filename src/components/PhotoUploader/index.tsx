@@ -57,7 +57,7 @@ const PhotoUploader = () => {
               <div className="flex gap-4 mt-2">
                 {imageList.map((image, index) => (
                   <div key={index}>
-                    <img src={image.dataURL} alt="" width="200" />
+                    <img src={image.dataURL} alt="tvoja slika" width="200" />
                     <div className="flex gap-1 justify-between mt-4">
                       <Button className="flex-1" type="black" onClick={() => onImageRemove(index)}>
                         Obriši
@@ -74,8 +74,8 @@ const PhotoUploader = () => {
                 ))}
               </div>
 
-              <div className="flex gap-2 w-full mt-24">
-                {imageList.length > 0 && (
+              {imageList.length > 0 && (
+                <div className="flex gap-2 w-full mt-24">
                   <Button
                     type="black"
                     className="flex-1 flex items-center justify-center"
@@ -83,8 +83,7 @@ const PhotoUploader = () => {
                   >
                     Makni sve slike <BiX fontSize={30} />
                   </Button>
-                )}
-                {imageList.length > 0 && (
+
                   <Button
                     type="primary"
                     className="flex-1 flex items-center justify-center"
@@ -92,8 +91,8 @@ const PhotoUploader = () => {
                   >
                     Spremi sve <BiCheck fontSize={30} />
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </>
         )}
