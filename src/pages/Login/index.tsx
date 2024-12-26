@@ -34,7 +34,7 @@ const LoginPage = () => {
   return (
     <AuthLayout>
       <form className="w-[400px]" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-center">Ulogiraj se!</h1>
+        <h1 className="text-center text-white">Ulogiraj se!</h1>
         <Input
           placeholder="Email"
           className="mb-2 mt-2"
@@ -46,7 +46,7 @@ const LoginPage = () => {
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>
-        <Link to="/signup" className="text-center block mt-2 underline">
+        <Link to="/signup" className="text-center text-white block mt-2 underline">
           Registriraj se!
         </Link>
       </form>

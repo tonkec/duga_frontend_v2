@@ -1,4 +1,4 @@
-import Logo from '../Logo';
+import AuthLogo from '../AuthLogo';
 
 interface IAuthLayoutProps {
   children: React.ReactNode;
@@ -6,12 +6,18 @@ interface IAuthLayoutProps {
 
 const AuthLayout = ({ children }: IAuthLayoutProps) => {
   return (
-    <>
-      <Logo />
-      <div className="flex items-center justify-center" style={{ height: 'calc(100% - 102px)' }}>
-        {children}
+    <div className="lg:flex h-screen">
+      <div className="flex flex-col items-center justify-between w-full flex-1 bg-blue pt-5 px-5 xl:max-w-[700px]">
+        <div className="mr-auto">
+          <h1 className="text-white text-4xl">Duga</h1>
+          <h3 className="text-white">Upoznaj zanimljive queer osobe s Balkana.</h3>
+        </div>
+        <div className="mb-10 mt-10">{children}</div>
       </div>
-    </>
+      <div className="self-end p-4">
+        <AuthLogo />
+      </div>
+    </div>
   );
 };
 

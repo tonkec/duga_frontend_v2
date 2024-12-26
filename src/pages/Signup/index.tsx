@@ -36,7 +36,7 @@ const SignupPage = () => {
   return (
     <AuthLayout>
       <form className="w-[400px]" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-center">Prijavi se!</h1>
+        <h1 className="text-center text-white">Registriraj se!</h1>
         <Input
           placeholder="Ime"
           className="mb-2 mt-2"
@@ -58,9 +58,9 @@ const SignupPage = () => {
         <Input placeholder="Lozinka" {...register('password', { required: true })} />
         {errors.password && <span>Upiši ispravnu lozinku</span>}
         <Button onClick={() => {}} className="w-full mt-2" type="primary">
-          Prijavi se
+          Registriraj se!
         </Button>
-        <Link to="/login" className="text-center block mt-2 underline">
+        <Link to="/login" className="text-center text-white block mt-2 underline">
           Ulogiraj se!
         </Link>
       </form>
