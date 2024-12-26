@@ -46,7 +46,7 @@ const Photos = ({ images }: IPhotosProps) => {
   if (!images.length) {
     return (
       <div className="">
-        <h2 className="font-bold mt-5 mb-2">Fotografije ne postoje</h2>
+        <h2 className="font-bold mt-5 mb-2">Nema fotografija</h2>
         <img src={notFound} className="mx-auto block max-w-[300px]" />
       </div>
     );
