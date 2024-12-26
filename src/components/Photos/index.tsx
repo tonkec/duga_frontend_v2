@@ -5,7 +5,7 @@ import Button from '../../components/Button';
 import { BiArrowBack } from 'react-icons/bi';
 import notFound from '../../assets/not_found.svg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-export const REACT_APP_S3_BUCKET_URL = 'https://duga-user-photo.s3.eu-north-1.amazonaws.com';
+import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
 
 export interface IImage {
   createdAt: string;

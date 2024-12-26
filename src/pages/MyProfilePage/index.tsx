@@ -8,22 +8,14 @@ import { BiBody, BiSolidMap, BiStopwatch, BiBoltCircle } from 'react-icons/bi';
 import { getUserBio } from '../../components/UserCard';
 import Cta from '../../components/Cta';
 import Iframe from 'react-iframe';
-import Photos, { IImage, REACT_APP_S3_BUCKET_URL } from '../../components/Photos';
+import Photos, { IImage } from '../../components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { BiSolidCamera } from 'react-icons/bi';
 import { BiSolidFile } from 'react-icons/bi';
 
-import avatar from '../../assets/avatar.svg';
 import 'react-tabs/style/react-tabs.css';
 import { useNavigate } from 'react-router';
-
-const getProfilePhotoUrl = (profilePhoto: IImage) => {
-  if (profilePhoto) {
-    return `${REACT_APP_S3_BUCKET_URL}/${profilePhoto.url}`;
-  }
-
-  return avatar;
-};
+import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
@@ -34,8 +26,6 @@ const MyProfilePage = () => {
   if (allImagesLoading || isUserLoading) {
     return <AppLayout>Loading...</AppLayout>;
   }
-
-  const getProfilePhoto = allImages?.data.images.find((image: IImage) => image.isProfilePhoto);
 
   const allImagesWithoutProfilePhoto = allImages?.data.images.filter(
     (image: IImage) => !image.isProfilePhoto
@@ -65,7 +55,7 @@ const MyProfilePage = () => {
                   <div>
                     <Avatar
                       name={`${currentUser?.data.firstName} ${currentUser?.data.lastName}`}
-                      src={getProfilePhotoUrl(getProfilePhoto)}
+                      src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
                       size="300"
                       color="#2D46B9"
                       className="rounded"

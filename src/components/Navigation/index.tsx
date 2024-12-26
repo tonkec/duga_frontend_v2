@@ -1,15 +1,18 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link, useNavigate } from 'react-router';
-import { BiGroup } from 'react-icons/bi';
-import { BiUser } from 'react-icons/bi';
-import { BiExit } from 'react-icons/bi';
+import { BiGroup, BiExit, BiEnvelope } from 'react-icons/bi';
+import ProfilePhoto from '../ProfilePhoto';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
+import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 
-const navigationStyles = 'flex justify-end space-x-4 bg-black p-4 shadow-sm text-white';
+const navigationStyles = 'flex space-x-4 bg-black p-4 shadow-sm text-white';
 
 const Navigation = () => {
   const navigate = useNavigate();
   const [, saveAuthToken] = useLocalStorage('token', null);
-  const [, saveUserId] = useLocalStorage('userId', null);
+  const [userId, saveUserId] = useLocalStorage('userId', null);
+  const { allImages } = useGetAllImages(String(userId) || '');
+
   const onLogout = () => {
     saveAuthToken(null);
     saveUserId(null);
@@ -18,21 +21,26 @@ const Navigation = () => {
 
   return (
     <nav className={navigationStyles}>
-      <ul className="flex gap-2 space-x-4">
+      <ul className="flex gap-2 space-x-4 items-center">
+        <li>
+          <ProfilePhoto url={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))} />
+        </li>
+
         <li>
           <Link to="/" className="flex items-center gap-1">
-            <BiGroup fontSize={25} />
-            Profili
+            Poruke
+            <BiEnvelope fontSize={25} />
           </Link>
         </li>
         <li>
-          <Link to="/profile" className="flex items-center gap-1">
-            <BiUser fontSize={22} /> Moj Profil
+          <Link to="/" className="flex items-center gap-1">
+            Korisnici
+            <BiGroup fontSize={25} />
           </Link>
         </li>
         <li>
           <span className="cursor-pointer flex items-center gap-1" onClick={onLogout}>
-            <BiExit fontSize={25} /> Logout
+            Odjava <BiExit fontSize={25} />
           </span>
         </li>
       </ul>
