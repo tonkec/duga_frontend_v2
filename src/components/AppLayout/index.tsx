@@ -8,12 +8,9 @@ interface IAppLayoutProps {
 const AppLayout = ({ children }: IAppLayoutProps) => {
   return (
     <>
-      {' '}
       <Navigation />
       <AppContainer>
-        <div className="h-screen">
-          <main className="p-4">{children}</main>
-        </div>
+        <main className="p-4 mt-10">{children}</main>
       </AppContainer>
     </>
   );
