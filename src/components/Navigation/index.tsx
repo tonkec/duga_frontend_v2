@@ -21,11 +21,7 @@ const Navigation = () => {
 
   return (
     <nav className={navigationStyles}>
-      <ul className="flex gap-2 space-x-4 items-center">
-        <li>
-          <ProfilePhoto url={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))} />
-        </li>
-
+      <ul className="flex w-full gap-2 space-x-4 items-center">
         <li>
           <Link to="/" className="flex items-center gap-1">
             Poruke
@@ -44,6 +40,9 @@ const Navigation = () => {
           </span>
         </li>
       </ul>
+      <div className="float-right">
+        <ProfilePhoto url={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))} />
+      </div>
     </nav>
   );
 };
