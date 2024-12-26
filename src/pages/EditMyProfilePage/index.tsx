@@ -27,8 +27,8 @@ const relationshipStatusOptions = [
   { value: 'relationship', label: 'U vezi' },
   { value: 'marriage', label: 'U braku' },
   { value: 'partnership', label: 'U partnerstvu' },
-  { value: 'idk', label: 'Ne znam' },
   { value: 'inbetween', label: 'Nešto izmedju' },
+  { value: 'idk', label: 'Ne znam' },
 ];
 
 const EditMyProfilePage = () => {
@@ -130,7 +130,6 @@ const EditMyProfilePage = () => {
             <h2 className="mb-2">Fun facts</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
               <div className="col-span-2">
-                TEXTAREAS
                 <TextArea
                   className="mb-4"
                   placeholder="Najsramotnija stvar koja mi se dogodila..."
@@ -139,7 +138,7 @@ const EditMyProfilePage = () => {
                 <TextArea className="mb-4" placeholder="Dan mi je ljepši ako..." />
                 <Input className="mb-2" placeholder="Najdraža youtube pjesma (youtube link)" />
                 <Input className="mb-2" placeholder="Trailer za najdraži film (youtube link)" />
-                <TextArea placeholder="Za kraj nešto o meni" />
+                <TextArea placeholder="Za kraj još nešto o meni" />
               </div>
             </div>
             <Button onClick={() => {}} type="primary">
