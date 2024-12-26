@@ -16,6 +16,8 @@ export default {
         "pink": "#F037A5",
         "pink-dark": "#ce0087",
         "blue": "#2D46B9",
+        "red": "#FF748B",
+        "rose": "#ffe4f9"
       }
     },
    
