@@ -66,6 +66,7 @@ type Inputs = {
   sport: boolean;
   favoriteDay: string;
   spirituality: string;
+  embarasement: string;
 };
 
 const schema = z.object({
@@ -82,6 +83,7 @@ const schema = z.object({
   sport: z.boolean(),
   favoriteDay: z.string().min(1),
   spirituality: z.string().min(2),
+  embarasement: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -116,6 +118,7 @@ const EditMyProfilePage = () => {
         sport: currentUser.data.sports || false,
         favoriteDay: currentUser.data.favoriteDay || '',
         spirituality: currentUser.data.spirituality || '',
+        embarasement: currentUser.data.embarasement || '',
       });
     }
   }, [currentUser, reset]);
@@ -308,6 +311,7 @@ const EditMyProfilePage = () => {
                   <TextArea
                     className="mb-4"
                     placeholder="Najsramotnija stvar koja mi se dogodila..."
+                    {...register('embarasement')}
                   />
                   <TextArea className="mb-4" placeholder="Imam previše godina za...." />
                   <TextArea className="mb-4" placeholder="Dan mi je ljepši ako..." />
