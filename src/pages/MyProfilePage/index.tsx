@@ -232,11 +232,7 @@ const MyProfilePage = () => {
 
                 <div className="mb-10">
                   <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
-                  <Iframe
-                    url="https://www.youtube.com/embed/iuz4Hp4-1uU?si=tDWcD5HsprpGMvY-"
-                    width="600"
-                    height="400"
-                  />
+                  <Iframe url={currentUser?.data.favoriteSong} width="600" height="400" />
                 </div>
 
                 <div className="mb-10">
