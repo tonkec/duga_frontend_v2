@@ -357,12 +357,12 @@ const EditMyProfilePage = () => {
                   />
                   <Input
                     className="mb-2"
-                    placeholder="Najdraža youtube pjesma (youtube link)"
+                    placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
                     {...register('favoriteSong')}
                   />
                   <Input
                     className="mb-2"
-                    placeholder="Trailer za najdraži film (youtube link)"
+                    placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
                     {...register('favoriteMovie')}
                   />
                 </div>

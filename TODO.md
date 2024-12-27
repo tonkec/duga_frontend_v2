@@ -5,6 +5,7 @@
 
 ### Enhancements
 
+- error kad je kriva sifra na loginu
 - stavit na all profiles da li je user trenutno aktivan ili ne
 - verification email? => treba postavit mailove => 27.12
 - forgot password => treba postavit mailove => 27.12
