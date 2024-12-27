@@ -35,7 +35,6 @@ export interface IUserUpdateProps {
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {
-  console.log(data);
   const client = apiClient({ isAuth: false });
   return client.post(`/users/update-user`, { data: data });
 };

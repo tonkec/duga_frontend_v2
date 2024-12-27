@@ -1,6 +1,7 @@
 # Next to do
 
 - edit profile page
+  - zasto su svi fields required
 
 ### Enhancements
 
@@ -18,15 +19,15 @@
 
 - loaderi za slike => poslije editing profile
 - loader za lodanje data
-- umjesto rijeci logout stavit ikonicu
 
 ### Layout
 
 - React helmet
-- footer
 
 ### Gotovo
 
+- footer
+- umjesto rijeci logout stavit ikonicu
 - maknut na all users samog sebe
 - filteri na all users
 - dodat logo na svaku stranicu

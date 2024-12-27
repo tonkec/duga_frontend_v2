@@ -77,27 +77,27 @@ type Inputs = {
 };
 
 const schema = z.object({
-  bio: z.string().min(2),
-  age: z.number().int(),
-  location: z.string().min(2),
-  sexuality: z.string().min(2),
-  gender: z.string().min(2),
-  username: z.string().min(2),
-  lookingFor: z.string().min(2),
-  relationshipStatus: z.string().min(2),
-  cigarettes: z.boolean(),
-  alcohol: z.boolean(),
-  sport: z.boolean(),
-  favoriteDay: z.string().min(1),
-  spirituality: z.string().min(2),
-  embarasement: z.string().min(2),
-  tooOldFor: z.string().min(2),
-  makesMyDay: z.string().min(2),
-  favoriteSong: z.string().min(2),
-  favoriteMovie: z.string().min(2),
-  interests: z.string().min(2),
-  languages: z.string().min(2),
-  ending: z.string().min(2),
+  bio: z.string().min(2).optional(),
+  age: z.number().int().positive().optional(),
+  location: z.string().min(2).optional(),
+  sexuality: z.string().min(2).optional(),
+  gender: z.string().min(2).optional(),
+  username: z.string().min(2).optional(),
+  lookingFor: z.string().min(2).optional(),
+  relationshipStatus: z.string().min(2).optional(),
+  cigarettes: z.boolean().optional(),
+  alcohol: z.boolean().optional(),
+  sport: z.boolean().optional(),
+  favoriteDay: z.string().min(1).optional(),
+  spirituality: z.string().min(2).optional(),
+  embarasement: z.string().min(2).optional(),
+  tooOldFor: z.string().min(2).optional(),
+  makesMyDay: z.string().min(2).optional(),
+  favoriteSong: z.string().min(2).optional(),
+  favoriteMovie: z.string().min(2).optional(),
+  interests: z.string().min(2).optional(),
+  languages: z.string().min(2).optional(),
+  ending: z.string().min(2).optional(),
 });
 
 const EditMyProfilePage = () => {
@@ -107,11 +107,14 @@ const EditMyProfilePage = () => {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, errors },
     reset,
     control,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      relationshipStatus: '',
+    },
   });
 
   useEffect(() => {
@@ -147,6 +150,7 @@ const EditMyProfilePage = () => {
   }, [currentUser, reset]);
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
+    console.log(errors);
     if (isValid) {
       updateUserMutation(data);
     }
@@ -190,9 +194,9 @@ const EditMyProfilePage = () => {
                   <Controller
                     name="lookingFor"
                     control={control}
-                    defaultValue={currentUser?.data.lookingFor}
                     render={({ field }) => (
                       <Select
+                        isClearable
                         {...field}
                         options={lookingForOptions}
                         placeholder="Trenutno tražim..."
@@ -217,9 +221,13 @@ const EditMyProfilePage = () => {
                   <Controller
                     name="relationshipStatus"
                     control={control}
-                    defaultValue={currentUser?.data.relationshipStatus}
+                    rules={{
+                      validate: (value) =>
+                        value === undefined || value === null || value.length > 1 || true,
+                    }}
                     render={({ field }) => (
                       <Select
+                        isClearable
                         {...field}
                         options={relationshipStatusOptions}
                         placeholder="Trenutno sam..."
@@ -306,9 +314,9 @@ const EditMyProfilePage = () => {
                   <Controller
                     name="favoriteDay"
                     control={control}
-                    defaultValue={currentUser?.data.favoriteDayOfWeek}
                     render={({ field }) => (
                       <Select
+                        isClearable
                         {...field}
                         options={daysOfWeek}
                         placeholder="Najdraži dan u tjednu"
