@@ -42,6 +42,16 @@ const relationshipStatusOptions = [
   { value: 'idk', label: 'Ne znam' },
 ];
 
+const daysOfWeek = [
+  { value: 'monday', label: 'Ponedjeljak' },
+  { value: 'tuesday', label: 'Utorak' },
+  { value: 'wednesday', label: 'Srijeda' },
+  { value: 'thursday', label: 'Četvrtak' },
+  { value: 'friday', label: 'Petak' },
+  { value: 'saturday', label: 'Subota' },
+  { value: 'sunday', label: 'Nedjelja' },
+];
+
 type Inputs = {
   bio: string;
   age: number;
@@ -54,6 +64,7 @@ type Inputs = {
   cigarettes: boolean;
   alcohol: boolean;
   sport: boolean;
+  favoriteDay: string;
 };
 
 const schema = z.object({
@@ -68,6 +79,7 @@ const schema = z.object({
   cigarettes: z.boolean(),
   alcohol: z.boolean(),
   sport: z.boolean(),
+  favoriteDay: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -100,6 +112,7 @@ const EditMyProfilePage = () => {
         cigarettes: currentUser.data.cigarettes || false,
         alcohol: currentUser.data.alcohol || false,
         sport: currentUser.data.sports || false,
+        favoriteDay: currentUser.data.favoriteDay || '',
       });
     }
   }, [currentUser, reset]);
@@ -260,8 +273,10 @@ const EditMyProfilePage = () => {
               <h2 className="mb-2">Vrijednosti</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <Input className="mb-2" placeholder="Religioznost" />
-                  <Input className="mb-2" placeholder="Političnost" />
+                  <TextArea
+                    className="mb-2"
+                    placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
+                  />
                 </div>
               </div>
               <h2 className="mb-2">Ostalo</h2>
@@ -272,6 +287,34 @@ const EditMyProfilePage = () => {
                 </div>
               </div>
               <h2 className="mb-2">Fun facts</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+                <div className="col-span-2">
+                  <Controller
+                    name="favoriteDay"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={daysOfWeek}
+                        placeholder="Najdraži dan u tjednu"
+                        className="mb-2"
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: '#F037A5',
+                            primary: 'black',
+                          },
+                        })}
+                        value={daysOfWeek.find((option) => option.value === field.value) || null}
+                        onChange={(selectedOption) =>
+                          field.onChange(selectedOption ? selectedOption.value : null)
+                        }
+                      />
+                    )}
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
                   <TextArea

@@ -12,10 +12,11 @@ const TextArea = forwardRef<HTMLTextAreaElement, ITextAreaProps>(
     return (
       <textarea
         {...props}
-        rows={10}
+        rows={6}
         className={`${defaultStyles} ${className}`}
         placeholder={placeholder}
         ref={ref}
+        style={{ resize: 'none' }}
       ></textarea>
     );
   }

@@ -69,6 +69,27 @@ const getRelationshipStatusTranslation = (relationshipStatus: string) => {
   }
 };
 
+const getFavoriteDayOfWeekTranslation = (favoriteDayOfWeek: string) => {
+  switch (favoriteDayOfWeek) {
+    case 'monday':
+      return 'Ponedjeljak';
+    case 'tuesday':
+      return 'Utorak';
+    case 'wednesday':
+      return 'Srijeda';
+    case 'thursday':
+      return 'Četvrtak';
+    case 'friday':
+      return 'Petak';
+    case 'saturday':
+      return 'Subota';
+    case 'sunday':
+      return 'Nedjelja';
+    default:
+      return 'N/A';
+  }
+};
+
 const MyProfilePage = () => {
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
@@ -141,46 +162,37 @@ const MyProfilePage = () => {
                         <b>Trenutno sam: </b>{' '}
                         {getRelationshipStatusTranslation(currentUser?.data.relationshipStatus)}
                       </p>
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Cigarete:</b>{' '}
-                        {currentUser?.data.cigarettes ? (
-                          <BiCheckCircle fontSize={30} color="#34D399" />
-                        ) : (
-                          <BiX fontSize={30} color="#FF748B" />
-                        )}
-                      </p>
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Alkohol:</b>{' '}
-                        {currentUser?.data.alcohol ? (
-                          <BiCheckCircle fontSize={30} color="#34D399" />
-                        ) : (
-                          <BiX fontSize={30} color="#FF748B" />
-                        )}
-                      </p>
+                      <div className="flex gap-1">
+                        <p className="flex items-center text-lg gap-1">
+                          <b>Cigarete</b>{' '}
+                          {currentUser?.data.cigarettes ? (
+                            <BiCheckCircle fontSize={30} color="#34D399" />
+                          ) : (
+                            <BiX fontSize={30} color="#FF748B" />
+                          )}
+                        </p>
+                        <p className="flex items-center text-lg gap-1">
+                          <b>Alkohol</b>{' '}
+                          {currentUser?.data.alcohol ? (
+                            <BiCheckCircle fontSize={30} color="#34D399" />
+                          ) : (
+                            <BiX fontSize={30} color="#FF748B" />
+                          )}
+                        </p>
+
+                        <p className="flex items-center text-lg gap-1">
+                          <b>Sport</b>{' '}
+                          {currentUser?.data.sport ? (
+                            <BiCheckCircle fontSize={30} color="#34D399" />
+                          ) : (
+                            <BiX fontSize={30} color="#FF748B" />
+                          )}
+                        </p>
+                      </div>
 
                       <p className="flex items-center text-lg gap-2">
-                        <b>Sport:</b>{' '}
-                        {currentUser?.data.sport ? (
-                          <BiCheckCircle fontSize={30} color="#34D399" />
-                        ) : (
-                          <BiX fontSize={30} color="#FF748B" />
-                        )}
-                      </p>
-
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Interesi: </b> Kuglanje, bitcoin
-                      </p>
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Jezici koje govorim: </b> Hrvatski, Bosanski
-                      </p>
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Religija:</b> Ne!
-                      </p>
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Politika:</b> Apolitičnost
-                      </p>
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Najdraži dan u tjednu:</b> Petak
+                        <b>Najdraži dan u tjednu:</b>{' '}
+                        {getFavoriteDayOfWeekTranslation(currentUser?.data.favoriteDayOfWeek)}
                       </p>
                     </div>
                   </div>
@@ -205,6 +217,18 @@ const MyProfilePage = () => {
                   <h2 className="font-bold mt-5">Dan mi je ljepši ako...</h2>
                   <p>vidim svog psa</p>
                 </div>
+
+                <div className="mb-10">
+                  <h2 className="font-bold mt-5">Duhovnost/religioznost</h2>
+                  <p>vidim svog psa</p>
+                </div>
+
+                <p className="flex items-center text-lg gap-2">
+                  <h2 className="font-bold mt-5">Interesi:</h2>
+                </p>
+                <p className="flex items-center text-lg gap-2">
+                  <h2 className="font-bold mt-5">Jezici koje govorim: </h2>
+                </p>
 
                 <div className="mb-10">
                   <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
