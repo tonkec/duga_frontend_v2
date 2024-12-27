@@ -68,6 +68,7 @@ type Inputs = {
   spirituality: string;
   embarasement: string;
   tooOldFor: string;
+  makesMyDay: string;
 };
 
 const schema = z.object({
@@ -86,6 +87,7 @@ const schema = z.object({
   spirituality: z.string().min(2),
   embarasement: z.string().min(2),
   tooOldFor: z.string().min(2),
+  makesMyDay: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -118,7 +120,9 @@ const EditMyProfilePage = () => {
         cigarettes: currentUser.data.cigarettes || false,
         alcohol: currentUser.data.alcohol || false,
         sport: currentUser.data.sports || false,
-        favoriteDay: currentUser.data.favoriteDay || '',
+        favoriteDay: daysOfWeek.find(
+          (option) => option.value === currentUser.data.favoriteDayOfWeek
+        )?.value,
         spirituality: currentUser.data.spirituality || '',
         embarasement: currentUser.data.embarasement || '',
         tooOldFor: currentUser.data.tooOldFor || '',
@@ -286,6 +290,7 @@ const EditMyProfilePage = () => {
                   <Controller
                     name="favoriteDay"
                     control={control}
+                    defaultValue={currentUser?.data.favoriteDayOfWeek}
                     render={({ field }) => (
                       <Select
                         {...field}
@@ -321,7 +326,11 @@ const EditMyProfilePage = () => {
                     placeholder="Imam previše godina za...."
                     {...register('tooOldFor')}
                   />
-                  <TextArea className="mb-4" placeholder="Dan mi je ljepši ako..." />
+                  <TextArea
+                    className="mb-4"
+                    placeholder="Dan mi je ljepši ako..."
+                    {...register('makesMyDay')}
+                  />
                   <Input className="mb-2" placeholder="Najdraža youtube pjesma (youtube link)" />
                   <Input className="mb-2" placeholder="Trailer za najdraži film (youtube link)" />
                 </div>

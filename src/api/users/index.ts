@@ -26,6 +26,7 @@ export interface IUserUpdateProps {
   spirituality: string;
   embarasement: string;
   tooOldFor: string;
+  makesMyDay: string;
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {

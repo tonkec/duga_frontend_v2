@@ -215,7 +215,7 @@ const MyProfilePage = () => {
 
                 <div className="mb-10">
                   <h2 className="font-bold mt-5">Dan mi je ljepši ako...</h2>
-                  <p>vidim svog psa</p>
+                  <p>{currentUser?.data.makesMyDay}</p>
                 </div>
 
                 <div className="mb-10">
