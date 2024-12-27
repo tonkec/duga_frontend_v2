@@ -31,6 +31,7 @@ export interface IUserUpdateProps {
   favoriteMovie: string;
   interests: string;
   languages: string;
+  ending: string;
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {

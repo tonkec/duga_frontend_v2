@@ -245,7 +245,7 @@ const MyProfilePage = () => {
 
                 <div className="mb-10">
                   <h2 className="font-bold mt-5">Za kraj ću reći još</h2>
-                  <p>Ja sam najbolji na svijetu.</p>
+                  <p>{currentUser?.data.ending}</p>
                 </div>
               </Card>
             </div>
