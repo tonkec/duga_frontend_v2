@@ -30,6 +30,7 @@ export interface IUserUpdateProps {
   favoriteSong: string;
   favoriteMovie: string;
   interests: string;
+  languages: string;
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {

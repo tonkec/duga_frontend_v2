@@ -228,9 +228,10 @@ const MyProfilePage = () => {
                   <p>{currentUser?.data.interests}</p>
                 </div>
 
-                <p className="flex items-center text-lg gap-2">
+                <div className="mb-10">
                   <h2 className="font-bold mt-5">Jezici koje govorim: </h2>
-                </p>
+                  <p>{currentUser?.data.languages}</p>
+                </div>
 
                 <div className="mb-10">
                   <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>

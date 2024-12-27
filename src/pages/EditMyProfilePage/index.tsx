@@ -72,6 +72,7 @@ type Inputs = {
   favoriteSong: string;
   favoriteMovie: string;
   interests: string;
+  languages: string;
 };
 
 const schema = z.object({
@@ -94,6 +95,7 @@ const schema = z.object({
   favoriteSong: z.string().min(2),
   favoriteMovie: z.string().min(2),
   interests: z.string().min(2),
+  languages: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -136,6 +138,7 @@ const EditMyProfilePage = () => {
         favoriteSong: currentUser.data.favoriteSong || '',
         favoriteMovie: currentUser.data.favoriteMovie || '',
         interests: currentUser.data.interests || '',
+        languages: currentUser.data.languages || '',
       });
     }
   }, [currentUser, reset]);
@@ -370,7 +373,11 @@ const EditMyProfilePage = () => {
                     placeholder="Interesi (odvojeni zarezom)"
                     {...register('interests')}
                   />
-                  <Input className="mb-2" placeholder="Jezici koje govorim" />
+                  <Input
+                    className="mb-2"
+                    placeholder="Jezici koje govorim (odvojeni zarezom)"
+                    {...register('languages')}
+                  />
                   <TextArea placeholder="Za kraj još nešto o meni" />
                 </div>
               </div>
