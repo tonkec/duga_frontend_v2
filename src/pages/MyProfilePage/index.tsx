@@ -210,7 +210,7 @@ const MyProfilePage = () => {
 
                 <div className="mb-10">
                   <h2 className="font-bold mt-5">Imam previše godina za...</h2>
-                  <p>izlaske petkom</p>
+                  <p>{currentUser?.data.tooOldFor}</p>
                 </div>
 
                 <div className="mb-10">

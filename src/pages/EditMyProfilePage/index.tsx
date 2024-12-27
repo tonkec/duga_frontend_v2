@@ -67,6 +67,7 @@ type Inputs = {
   favoriteDay: string;
   spirituality: string;
   embarasement: string;
+  tooOldFor: string;
 };
 
 const schema = z.object({
@@ -84,6 +85,7 @@ const schema = z.object({
   favoriteDay: z.string().min(1),
   spirituality: z.string().min(2),
   embarasement: z.string().min(2),
+  tooOldFor: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -119,6 +121,7 @@ const EditMyProfilePage = () => {
         favoriteDay: currentUser.data.favoriteDay || '',
         spirituality: currentUser.data.spirituality || '',
         embarasement: currentUser.data.embarasement || '',
+        tooOldFor: currentUser.data.tooOldFor || '',
       });
     }
   }, [currentUser, reset]);
@@ -313,7 +316,11 @@ const EditMyProfilePage = () => {
                     placeholder="Najsramotnija stvar koja mi se dogodila..."
                     {...register('embarasement')}
                   />
-                  <TextArea className="mb-4" placeholder="Imam previše godina za...." />
+                  <TextArea
+                    className="mb-4"
+                    placeholder="Imam previše godina za...."
+                    {...register('tooOldFor')}
+                  />
                   <TextArea className="mb-4" placeholder="Dan mi je ljepši ako..." />
                   <Input className="mb-2" placeholder="Najdraža youtube pjesma (youtube link)" />
                   <Input className="mb-2" placeholder="Trailer za najdraži film (youtube link)" />
