@@ -97,6 +97,9 @@ const EditMyProfilePage = () => {
           lookingForOptions.find((option) => option.value === currentUser.data.lookingFor)?.value ||
           '',
         relationshipStatus: currentUser.data.relationshipStatus || '',
+        cigarettes: currentUser.data.cigarettes || false,
+        alcohol: currentUser.data.alcohol || false,
+        sport: currentUser.data.sports || false,
       });
     }
   }, [currentUser, reset]);
@@ -212,6 +215,7 @@ const EditMyProfilePage = () => {
                           type="checkbox"
                           {...field}
                           value={currentUser?.data.cigarettes || false}
+                          checked={currentUser?.data.cigarettes || false}
                         />{' '}
                         Cigarete
                       </>
@@ -228,6 +232,7 @@ const EditMyProfilePage = () => {
                           type="checkbox"
                           {...field}
                           value={currentUser?.data.alcohol || false}
+                          checked={currentUser?.data.alcohol || false}
                         />{' '}
                         Alkohol
                       </>
@@ -243,7 +248,8 @@ const EditMyProfilePage = () => {
                         <input
                           type="checkbox"
                           {...field}
-                          value={currentUser?.data.sports || false}
+                          value={currentUser?.data.sport || false}
+                          checked={currentUser?.data.sport || false}
                         />{' '}
                         Sport
                       </>

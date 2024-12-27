@@ -12,6 +12,8 @@ import Photos, { IImage } from '../../components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { BiSolidCamera } from 'react-icons/bi';
 import { BiSolidFile } from 'react-icons/bi';
+import { BiCheckCircle } from 'react-icons/bi';
+import { BiX } from 'react-icons/bi';
 
 import 'react-tabs/style/react-tabs.css';
 import { useNavigate } from 'react-router';
@@ -140,14 +142,29 @@ const MyProfilePage = () => {
                         {getRelationshipStatusTranslation(currentUser?.data.relationshipStatus)}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <b>Cigarete:</b> {currentUser?.data.cigarettes ? 'Da' : 'Ne'}
+                        <b>Cigarete:</b>{' '}
+                        {currentUser?.data.cigarettes ? (
+                          <BiCheckCircle fontSize={30} color="#34D399" />
+                        ) : (
+                          <BiX fontSize={30} color="#FF748B" />
+                        )}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <b>Alkohol:</b> {currentUser?.data.alcohol ? 'Da' : 'Ne'}
+                        <b>Alkohol:</b>{' '}
+                        {currentUser?.data.alcohol ? (
+                          <BiCheckCircle fontSize={30} color="#34D399" />
+                        ) : (
+                          <BiX fontSize={30} color="#FF748B" />
+                        )}
                       </p>
 
                       <p className="flex items-center text-lg gap-2">
-                        <b>Sport:</b> {currentUser?.data.sport ? 'Da' : 'Ne'}
+                        <b>Sport:</b>{' '}
+                        {currentUser?.data.sport ? (
+                          <BiCheckCircle fontSize={30} color="#34D399" />
+                        ) : (
+                          <BiX fontSize={30} color="#FF748B" />
+                        )}
                       </p>
 
                       <p className="flex items-center text-lg gap-2">
