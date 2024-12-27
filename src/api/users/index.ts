@@ -17,6 +17,7 @@ export interface IUserUpdateProps {
   location: string;
   age: number;
   username: string;
+  lookingFor: string;
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {

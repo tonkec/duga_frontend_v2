@@ -17,6 +17,27 @@ import 'react-tabs/style/react-tabs.css';
 import { useNavigate } from 'react-router';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 
+const getLookingForTranslation = (lookingFor: string) => {
+  switch (lookingFor) {
+    case 'friendship':
+      return 'Prijateljstvo';
+    case 'date':
+      return 'Dejt';
+    case 'relationship':
+      return 'Vezu';
+    case 'marriage':
+      return 'Brak';
+    case 'partnership':
+      return 'Partnerstvo';
+    case 'nothing':
+      return 'Samo zujim';
+    case 'idk':
+      return 'Ne znam';
+    default:
+      return 'N/A';
+  }
+};
+
 const MyProfilePage = () => {
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
@@ -83,7 +104,7 @@ const MyProfilePage = () => {
 
                     <div className="flex flex-col gap-2 mt-20">
                       <p className="flex items-center text-lg gap-2 mt-[-8px]">
-                        <b>Tražim:</b> ozbiljnu vezu
+                        <b>Tražim:</b> {getLookingForTranslation(currentUser?.data.lookingFor)}
                       </p>
                       <p className="flex items-center text-lg gap-2">
                         <b>Trenutno sam: </b> Single

@@ -12,8 +12,16 @@ export const useUpdateUser = () => {
     isError: isUserUpdatingError,
     isSuccess: isUserUpdatingSuccess,
   } = useMutation({
-    mutationFn: ({ sexuality, age, location, gender, bio, username }: IUserUpdateProps) =>
-      updateUser({ sexuality, age, location, gender, bio, username }),
+    mutationFn: ({
+      sexuality,
+      age,
+      location,
+      gender,
+      bio,
+      username,
+      lookingFor,
+    }: IUserUpdateProps) =>
+      updateUser({ sexuality, age, location, gender, bio, username, lookingFor }),
     onSuccess: () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');

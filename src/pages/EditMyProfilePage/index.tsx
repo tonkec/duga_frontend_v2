@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect } from 'react';
 import Button from '../../components/Button';
+import AppSelect from '../../components/Select';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -45,6 +46,7 @@ type Inputs = {
   sexuality: string;
   gender: string;
   username: string;
+  lookingFor: string;
 };
 const schema = z.object({
   bio: z.string().min(2),
@@ -53,6 +55,7 @@ const schema = z.object({
   sexuality: z.string().min(2),
   gender: z.string().min(2),
   username: z.string().min(2),
+  lookingFor: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -64,6 +67,7 @@ const EditMyProfilePage = () => {
     handleSubmit,
     formState: { isValid },
     reset,
+    control,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
@@ -77,11 +81,13 @@ const EditMyProfilePage = () => {
         location: currentUser.data.location || '',
         sexuality: currentUser.data.sexuality || '',
         gender: currentUser.data.gender || '',
+        lookingFor: currentUser.data.lookingFor || '',
       });
     }
   }, [currentUser, reset]);
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
+    console.log(data);
     if (isValid) {
       updateUserMutation(data);
     }
@@ -122,23 +128,12 @@ const EditMyProfilePage = () => {
               <h2 className="mb-2">Tražim...</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <Select
-                    isClearable
+                  <AppSelect
+                    name="lookingFor"
+                    control={control}
                     options={lookingForOptions}
-                    placeholder="Trenutno tražim..."
-                    onChange={(e) => {
-                      console.log(e);
-                    }}
+                    placeholder="Tražim..."
                     className="mb-2"
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        text: 'orangered',
-                        primary25: '#F037A5',
-                        primary: 'black',
-                      },
-                    })}
                   />
                   <Select
                     isClearable
