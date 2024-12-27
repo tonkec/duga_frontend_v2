@@ -70,6 +70,7 @@ type Inputs = {
   tooOldFor: string;
   makesMyDay: string;
   favoriteSong: string;
+  favoriteMovie: string;
 };
 
 const schema = z.object({
@@ -90,6 +91,7 @@ const schema = z.object({
   tooOldFor: z.string().min(2),
   makesMyDay: z.string().min(2),
   favoriteSong: z.string().min(2),
+  favoriteMovie: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -130,6 +132,7 @@ const EditMyProfilePage = () => {
         tooOldFor: currentUser.data.tooOldFor || '',
         makesMyDay: currentUser.data.makesMyDay || '',
         favoriteSong: currentUser.data.favoriteSong || '',
+        favoriteMovie: currentUser.data.favoriteMovie || '',
       });
     }
   }, [currentUser, reset]);
@@ -340,7 +343,11 @@ const EditMyProfilePage = () => {
                     placeholder="Najdraža youtube pjesma (youtube link)"
                     {...register('favoriteSong')}
                   />
-                  <Input className="mb-2" placeholder="Trailer za najdraži film (youtube link)" />
+                  <Input
+                    className="mb-2"
+                    placeholder="Trailer za najdraži film (youtube link)"
+                    {...register('favoriteMovie')}
+                  />
                 </div>
               </div>
               <h2 className="mb-2">Ostalo</h2>

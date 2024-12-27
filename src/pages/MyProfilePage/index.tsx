@@ -237,11 +237,7 @@ const MyProfilePage = () => {
 
                 <div className="mb-10">
                   <h2 className="font-bold mb-5">Trailer za najdraži film</h2>
-                  <Iframe
-                    url="https://www.youtube.com/embed/KnrRy6kSFF0?si=5q6UKW91IH7IG7Vh"
-                    width="600"
-                    height="400"
-                  />
+                  <Iframe url={currentUser?.data.favoriteMovie} width="600" height="400" />
                 </div>
 
                 <div className="mb-10">
