@@ -31,6 +31,7 @@ export const useUpdateUser = () => {
       makesMyDay,
       favoriteSong,
       favoriteMovie,
+      interests,
     }: IUserUpdateProps) =>
       updateUser({
         sexuality,
@@ -51,6 +52,7 @@ export const useUpdateUser = () => {
         makesMyDay,
         favoriteSong,
         favoriteMovie,
+        interests,
       }),
     onSuccess: () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
