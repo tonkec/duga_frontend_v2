@@ -82,7 +82,7 @@ const SignupPage = () => {
           {...register('email', { required: true })}
         />
         <Input placeholder="Lozinka" {...register('password', { required: true })} />
-        <Button onClick={() => {}} className="w-full mt-2" type="primary">
+        <Button className="w-full mt-2" type="primary">
           Registriraj se!
         </Button>
         <Link to="/login" className="text-center text-white block mt-2 underline">

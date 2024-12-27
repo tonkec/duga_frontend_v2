@@ -7,7 +7,7 @@ interface IProfilePhotoProps {
 const ProfilePhoto = ({ url }: IProfilePhotoProps) => {
   return (
     <Link to={'/profile'}>
-      <img src={url} className="rounded-full" height={60} width={60} />
+      <img src={url} className="rounded-full" height={40} width={40} />
     </Link>
   );
 };
