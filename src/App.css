@@ -26,15 +26,8 @@ html {
 
 /* carousel */
 .carousel.carousel-slider .control-arrow {
-  @apply bg-pink;
   opacity: 1 !important;
   top: 50% !important;
   bottom: auto !important;
   background-color: black !important;
-}
-
-/* tabs */
-
-.react-tabs__tab--selected {
-  @apply bg-pink;
 }
