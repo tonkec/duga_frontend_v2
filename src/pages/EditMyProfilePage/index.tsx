@@ -126,6 +126,7 @@ const EditMyProfilePage = () => {
         spirituality: currentUser.data.spirituality || '',
         embarasement: currentUser.data.embarasement || '',
         tooOldFor: currentUser.data.tooOldFor || '',
+        makesMyDay: currentUser.data.makesMyDay || '',
       });
     }
   }, [currentUser, reset]);
