@@ -5,7 +5,6 @@ import PhotoUploader from '../../components/PhotoUploader';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Input from '../../components/Input';
 import Select from 'react-select';
-import Checkbox from '../../components/Checkbox';
 import TextArea from '../../components/Textarea';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useLocalStorage } from '@uidotdev/usehooks';
@@ -52,7 +51,11 @@ type Inputs = {
   username: string;
   lookingFor: string;
   relationshipStatus: string;
+  cigarettes: boolean;
+  alcohol: boolean;
+  sport: boolean;
 };
+
 const schema = z.object({
   bio: z.string().min(2),
   age: z.number().int(),
@@ -62,6 +65,9 @@ const schema = z.object({
   username: z.string().min(2),
   lookingFor: z.string().min(2),
   relationshipStatus: z.string().min(2),
+  cigarettes: z.boolean(),
+  alcohol: z.boolean(),
+  sport: z.boolean(),
 });
 
 const EditMyProfilePage = () => {
@@ -197,13 +203,52 @@ const EditMyProfilePage = () => {
               <h2 className="mb-2">Stil života</h2>
               <div className="flex grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <Checkbox /> Cigarete
+                  <Controller
+                    name="cigarettes"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          type="checkbox"
+                          {...field}
+                          value={currentUser?.data.cigarettes || false}
+                        />{' '}
+                        Cigarete
+                      </>
+                    )}
+                  />
                 </div>
                 <div className="col-span-2">
-                  <Checkbox /> Alkohol
+                  <Controller
+                    name="alcohol"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          type="checkbox"
+                          {...field}
+                          value={currentUser?.data.alcohol || false}
+                        />{' '}
+                        Alkohol
+                      </>
+                    )}
+                  />
                 </div>
                 <div className="col-span-2">
-                  <Checkbox /> Sport
+                  <Controller
+                    name="sport"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          type="checkbox"
+                          {...field}
+                          value={currentUser?.data.sports || false}
+                        />{' '}
+                        Sport
+                      </>
+                    )}
+                  />
                 </div>
               </div>
               <h2 className="mb-2">Vrijednosti</h2>

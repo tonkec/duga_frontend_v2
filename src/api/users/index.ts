@@ -19,6 +19,9 @@ export interface IUserUpdateProps {
   username: string;
   lookingFor: string;
   relationshipStatus: string;
+  cigarettes: boolean;
+  alcohol: boolean;
+  sport: boolean;
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {

@@ -140,11 +140,16 @@ const MyProfilePage = () => {
                         {getRelationshipStatusTranslation(currentUser?.data.relationshipStatus)}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <b>Cigarete:</b> Ne!
+                        <b>Cigarete:</b> {currentUser?.data.cigarettes ? 'Da' : 'Ne'}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <b>Alkohol:</b> Ne!
+                        <b>Alkohol:</b> {currentUser?.data.alcohol ? 'Da' : 'Ne'}
                       </p>
+
+                      <p className="flex items-center text-lg gap-2">
+                        <b>Sport:</b> {currentUser?.data.sport ? 'Da' : 'Ne'}
+                      </p>
+
                       <p className="flex items-center text-lg gap-2">
                         <b>Interesi: </b> Kuglanje, bitcoin
                       </p>
