@@ -23,6 +23,7 @@ export interface IUserUpdateProps {
   alcohol: boolean;
   sport: boolean;
   favoriteDay: string;
+  spirituality: string;
 }
 
 export const updateUser = async (data: IUserUpdateProps) => {

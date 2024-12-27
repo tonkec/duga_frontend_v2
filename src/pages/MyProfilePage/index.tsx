@@ -220,7 +220,7 @@ const MyProfilePage = () => {
 
                 <div className="mb-10">
                   <h2 className="font-bold mt-5">Duhovnost/religioznost</h2>
-                  <p>vidim svog psa</p>
+                  <p>{currentUser?.data.spirituality}</p>
                 </div>
 
                 <p className="flex items-center text-lg gap-2">

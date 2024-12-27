@@ -65,6 +65,7 @@ type Inputs = {
   alcohol: boolean;
   sport: boolean;
   favoriteDay: string;
+  spirituality: string;
 };
 
 const schema = z.object({
@@ -79,7 +80,8 @@ const schema = z.object({
   cigarettes: z.boolean(),
   alcohol: z.boolean(),
   sport: z.boolean(),
-  favoriteDay: z.string().min(2),
+  favoriteDay: z.string().min(1),
+  spirituality: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -113,6 +115,7 @@ const EditMyProfilePage = () => {
         alcohol: currentUser.data.alcohol || false,
         sport: currentUser.data.sports || false,
         favoriteDay: currentUser.data.favoriteDay || '',
+        spirituality: currentUser.data.spirituality || '',
       });
     }
   }, [currentUser, reset]);
@@ -270,22 +273,7 @@ const EditMyProfilePage = () => {
                   />
                 </div>
               </div>
-              <h2 className="mb-2">Vrijednosti</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
-                  <TextArea
-                    className="mb-2"
-                    placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
-                  />
-                </div>
-              </div>
-              <h2 className="mb-2">Ostalo</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
-                  <Input className="mb-2" placeholder="Interesi" />
-                  <Input className="mb-2" placeholder="Jezici koje govorim" />
-                </div>
-              </div>
+
               <h2 className="mb-2">Fun facts</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
@@ -325,12 +313,28 @@ const EditMyProfilePage = () => {
                   <TextArea className="mb-4" placeholder="Dan mi je ljepši ako..." />
                   <Input className="mb-2" placeholder="Najdraža youtube pjesma (youtube link)" />
                   <Input className="mb-2" placeholder="Trailer za najdraži film (youtube link)" />
-                  <TextArea placeholder="Za kraj još nešto o meni" />
-                  <Button type="primary" className="mt-4">
-                    Spremi
-                  </Button>
                 </div>
               </div>
+              <h2 className="mb-2">Ostalo</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+                <div className="col-span-2">
+                  <TextArea
+                    className="mb-2"
+                    placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
+                    {...register('spirituality')}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+                <div className="col-span-2">
+                  <Input className="mb-2" placeholder="Interesi" />
+                  <Input className="mb-2" placeholder="Jezici koje govorim" />
+                  <TextArea placeholder="Za kraj još nešto o meni" />
+                </div>
+              </div>
+              <Button type="primary" className="mt-4">
+                Spremi
+              </Button>
             </form>
           </Card>
         </TabPanel>
