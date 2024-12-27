@@ -35,6 +35,11 @@ const relationshipStatusOptions = [
   { value: 'marriage', label: 'U braku' },
   { value: 'partnership', label: 'U partnerstvu' },
   { value: 'inbetween', label: 'Nešto izmedju' },
+  { value: 'divorced', label: 'Razveden/a' },
+  { value: 'widowed', label: 'Udovac/udovica' },
+  { value: 'separated', label: 'Razdvojen/a' },
+  { value: 'open', label: 'U otvorenoj vezi' },
+  { value: 'engaged', label: 'Zaručen/a' },
   { value: 'idk', label: 'Ne znam' },
 ];
 
@@ -46,6 +51,7 @@ type Inputs = {
   gender: string;
   username: string;
   lookingFor: string;
+  relationshipStatus: string;
 };
 const schema = z.object({
   bio: z.string().min(2),
@@ -55,6 +61,7 @@ const schema = z.object({
   gender: z.string().min(2),
   username: z.string().min(2),
   lookingFor: z.string().min(2),
+  relationshipStatus: z.string().min(2),
 });
 
 const EditMyProfilePage = () => {
@@ -83,6 +90,7 @@ const EditMyProfilePage = () => {
         lookingFor:
           lookingForOptions.find((option) => option.value === currentUser.data.lookingFor)?.value ||
           '',
+        relationshipStatus: currentUser.data.relationshipStatus || '',
       });
     }
   }, [currentUser, reset]);
@@ -155,30 +163,41 @@ const EditMyProfilePage = () => {
                       />
                     )}
                   />
-                  <Select
-                    isClearable
-                    options={relationshipStatusOptions}
-                    placeholder="Trenutno sam..."
-                    onChange={(e) => {
-                      console.log(e);
-                    }}
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        text: 'orangered',
-                        primary25: '#F037A5',
-                        primary: 'black',
-                      },
-                    })}
-                    className="mb-2"
+                  <Controller
+                    name="relationshipStatus"
+                    control={control}
+                    defaultValue={currentUser?.data.relationshipStatus}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={relationshipStatusOptions}
+                        placeholder="Trenutno sam..."
+                        className="mb-2"
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: '#F037A5',
+                            primary: 'black',
+                          },
+                        })}
+                        value={
+                          relationshipStatusOptions.find(
+                            (option) => option.value === field.value
+                          ) || null
+                        }
+                        onChange={(selectedOption) =>
+                          field.onChange(selectedOption ? selectedOption.value : null)
+                        }
+                      />
+                    )}
                   />
                 </div>
               </div>
               <h2 className="mb-2">Stil života</h2>
               <div className="flex grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <Checkbox /> Cigarete{' '}
+                  <Checkbox /> Cigarete
                 </div>
                 <div className="col-span-2">
                   <Checkbox /> Alkohol

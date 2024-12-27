@@ -38,6 +38,35 @@ const getLookingForTranslation = (lookingFor: string) => {
   }
 };
 
+const getRelationshipStatusTranslation = (relationshipStatus: string) => {
+  switch (relationshipStatus) {
+    case 'single':
+      return 'Single';
+    case 'relationship':
+      return 'U vezi';
+    case 'marriage':
+      return 'U braku';
+    case 'partnership':
+      return 'U partnerstvu';
+    case 'inbetween':
+      return 'Nešto izmedju';
+    case 'divorced':
+      return 'Razveden/a';
+    case 'widowed':
+      return 'Udovac/udovica';
+    case 'separated':
+      return 'Razdvojen/a';
+    case 'open':
+      return 'U otvorenoj vezi';
+    case 'engaged':
+      return 'Zaručen/a';
+    case 'idk':
+      return 'Ne znam';
+    default:
+      return 'N/A';
+  }
+};
+
 const MyProfilePage = () => {
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
@@ -107,7 +136,8 @@ const MyProfilePage = () => {
                         <b>Tražim:</b> {getLookingForTranslation(currentUser?.data.lookingFor)}
                       </p>
                       <p className="flex items-center text-lg gap-2">
-                        <b>Trenutno sam: </b> Single
+                        <b>Trenutno sam: </b>{' '}
+                        {getRelationshipStatusTranslation(currentUser?.data.relationshipStatus)}
                       </p>
                       <p className="flex items-center text-lg gap-2">
                         <b>Cigarete:</b> Ne!

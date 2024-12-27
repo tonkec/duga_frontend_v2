@@ -20,8 +20,18 @@ export const useUpdateUser = () => {
       bio,
       username,
       lookingFor,
+      relationshipStatus,
     }: IUserUpdateProps) =>
-      updateUser({ sexuality, age, location, gender, bio, username, lookingFor }),
+      updateUser({
+        sexuality,
+        age,
+        location,
+        gender,
+        bio,
+        username,
+        lookingFor,
+        relationshipStatus,
+      }),
     onSuccess: () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');
