@@ -10,12 +10,11 @@ import TextArea from '../../components/Textarea';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useUpdateUser } from './hooks';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect } from 'react';
 import Button from '../../components/Button';
-import AppSelect from '../../components/Select';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -81,13 +80,14 @@ const EditMyProfilePage = () => {
         location: currentUser.data.location || '',
         sexuality: currentUser.data.sexuality || '',
         gender: currentUser.data.gender || '',
-        lookingFor: currentUser.data.lookingFor || '',
+        lookingFor:
+          lookingForOptions.find((option) => option.value === currentUser.data.lookingFor)?.value ||
+          '',
       });
     }
   }, [currentUser, reset]);
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
     if (isValid) {
       updateUserMutation(data);
     }
@@ -128,12 +128,32 @@ const EditMyProfilePage = () => {
               <h2 className="mb-2">Tražim...</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <AppSelect
+                  <Controller
                     name="lookingFor"
                     control={control}
-                    options={lookingForOptions}
-                    placeholder="Tražim..."
-                    className="mb-2"
+                    defaultValue={currentUser?.data.lookingFor}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={lookingForOptions}
+                        placeholder="Trenutno tražim..."
+                        className="mb-2"
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: '#F037A5',
+                            primary: 'black',
+                          },
+                        })}
+                        value={
+                          lookingForOptions.find((option) => option.value === field.value) || null
+                        }
+                        onChange={(selectedOption) =>
+                          field.onChange(selectedOption ? selectedOption.value : null)
+                        }
+                      />
+                    )}
                   />
                   <Select
                     isClearable
