@@ -278,7 +278,7 @@ const MyProfilePage = () => {
         </TabPanel>
         <TabPanel>
           <Card>
-            <Photos images={allImagesWithoutProfilePhoto} />
+            <Photos notFoundText="Nema fotografija" images={allImagesWithoutProfilePhoto} />
           </Card>
         </TabPanel>
       </Tabs>

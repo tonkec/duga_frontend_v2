@@ -6,10 +6,16 @@ import FieldError from '../FieldError';
 import { BiX } from 'react-icons/bi';
 import { BiCheck } from 'react-icons/bi';
 import Input from '../Input';
+import { useLocalStorage } from '@uidotdev/usehooks';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
+import Photos from '../Photos';
 
 const photoLimit = 5;
 
 const PhotoUploader = () => {
+  const [userId] = useLocalStorage('userId');
+  const { allImages: allUserImages } = useGetAllImages(userId as string);
+
   const [images, setImages] = useState([]);
   const maxNumber = photoLimit;
 
@@ -19,7 +25,13 @@ const PhotoUploader = () => {
 
   return (
     <div>
-      UCITAT POSTOJECE SLIKE
+      <div className="mb-12">
+        <Photos
+          isEditable={true}
+          notFoundText="Nema postojećih fotografija."
+          images={allUserImages?.data.images}
+        />
+      </div>
       <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
         {({
           imageList,
@@ -37,10 +49,10 @@ const PhotoUploader = () => {
                 style={isDragging ? { color: 'red' } : undefined}
                 onClick={onImageUpload}
                 {...dragProps}
-                className="flex w-full flex-col inline-block border-2 mb-6 border-pink px-4 justfiy-center items-center rounded py-12"
+                className="flex w-full flex-col inline-block border-2 mb-6 border-black px-4 justfiy-center items-center rounded py-12"
               >
-                <BiCloudUpload fontSize={80} color="#F037A5" />
-                <h2 className="text-pink">Dovuci ili klikni</h2>
+                <BiCloudUpload fontSize={80} />
+                <h2>Dodaj nove fotografije</h2>
               </button>
             </div>
             {errors?.maxNumber && (

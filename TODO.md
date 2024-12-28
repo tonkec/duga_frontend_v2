@@ -2,6 +2,8 @@
 
 - edit profile page
   - zasto su svi fields required
+  - fotke
+- other user profile page
 
 ### Enhancements
 
