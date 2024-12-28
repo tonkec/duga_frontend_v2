@@ -4,8 +4,12 @@ import Photos, { IImage } from '../Photos';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '../Button';
-
+export interface ImageDescription {
+  description: string;
+  imageId: string;
+}
 const PhotoUploader = () => {
+  const [imageDescriptions, setImageDescriptions] = useState<ImageDescription[]>([]);
   const [userId] = useLocalStorage('userId');
   const { onUploadPhotos } = useUploadPhotos(userId as string);
 
@@ -20,29 +24,32 @@ const PhotoUploader = () => {
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
-    const files = (e.target as HTMLFormElement).avatars.files; // Use `avatars` as the name
+    const files = (e.target as HTMLFormElement).avatars.files;
     const formData = new FormData();
-
     if (files) {
       for (let i = 0; i < files.length; i++) {
-        formData.append('avatars', files[i]);
+        const file = files[i];
+        formData.append('avatars', file);
       }
     }
-
+    formData.append('text', JSON.stringify(imageDescriptions));
     formData.append('userId', userId as string);
-    formData.append('text', 'some text');
 
     onUploadPhotos(formData);
   };
 
   return (
     <div>
-      <div className="mb-12">
-        {allUserImages && (
-          <Photos images={allUserImages} notFoundText="Nema fotografija" isEditable />
-        )}
-      </div>
       <form onSubmit={onSubmitHandler}>
+        <div className="mb-12">
+          <Photos
+            setImageDescriptions={setImageDescriptions}
+            images={allUserImages}
+            notFoundText="Još nemaš nijednu fotografiju"
+            isEditable
+          />
+        </div>
+
         <div className="mb-4">
           <input
             type="file"

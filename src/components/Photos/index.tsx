@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { SetStateAction, SyntheticEvent, useState } from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import Modal from 'react-modal';
 import Button from '../../components/Button';
@@ -9,7 +9,8 @@ import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
 import Input from '../Input';
 import { useDeletePhoto } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
-
+import { ImageDescription } from '../PhotoUploader';
+import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
 export interface IImage {
   createdAt: string;
   description: string;
@@ -24,9 +25,10 @@ export interface IImage {
 }
 
 interface IPhotosProps {
-  images: IImage[];
+  images: IImage[] | undefined;
   notFoundText: string;
   isEditable?: boolean;
+  setImageDescriptions?: (e: SetStateAction<ImageDescription[]>) => void;
 }
 
 Modal.setAppElement('#root');
@@ -41,10 +43,37 @@ const customStyles = {
   },
 };
 
-const PhotoActionButtons = ({ onRemove }: { onRemove: () => void }) => {
+const PhotoActionButtons = ({
+  onRemove,
+  setImageDescriptions,
+  file,
+}: {
+  file: File;
+  onRemove: () => void;
+  setImageDescriptions: (e: SetStateAction<ImageDescription[]>) => void;
+}) => {
+  const onDescriptionChange = (e: SyntheticEvent) => {
+    setImageDescriptions((prevState) => {
+      const target = e.target as HTMLInputElement;
+      const description = target.value;
+      const imageId = removeSpacesAndDashes(file.name);
+      const image = { description, imageId };
+      const newState = prevState.filter((item) => item.imageId !== imageId);
+      newState.push(image);
+      return newState;
+    });
+  };
+
   return (
     <>
-      <Input className="mt-4 mb-4" placeholder="Napiši nešto o fotografiji" />
+      <Input
+        className="mt-4"
+        placeholder="Napiši nešto o fotografiji"
+        onChange={(e) => {
+          onDescriptionChange(e);
+        }}
+      />
+
       <div className="mt-4 flex gap-2">
         <Button type="black" className="flex gap-1 items-center" onClick={onRemove}>
           <span>Obriši</span>
@@ -65,7 +94,7 @@ const getImageUrl = (image: IImage) => {
   return `${REACT_APP_S3_BUCKET_URL}/${image.url}`;
 };
 
-const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
+const Photos = ({ images, notFoundText, isEditable, setImageDescriptions }: IPhotosProps) => {
   const [userId] = useLocalStorage('userId');
   const { deletePhoto } = useDeletePhoto(userId as string);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,11 +129,7 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
             {images.map((image: IImage, index: number) => {
               return (
                 <div className="relative" key={index}>
-                  <img
-                    className="cursor-pointer"
-                    src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`}
-                    alt="user image"
-                  />
+                  <img src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`} alt="user image" />
                   <p className="absolute top-0 px-4 py-2 w-full bg-black text-white">
                     {image.description}
                   </p>
@@ -115,7 +140,7 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
         </div>
       </Modal>
       <h2 className="font-bold mt-5 mb-2">Fotografije ({images.length})</h2>
-      <div className="flex gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {images.map((image: IImage, index: number) => {
           return (
             <div className="max-w-[400px]" key={index}>
@@ -129,11 +154,13 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
                 }}
               />
 
-              {isEditable && (
+              {isEditable && setImageDescriptions && (
                 <PhotoActionButtons
                   onRemove={() => {
                     deletePhoto({ url: image.url });
                   }}
+                  setImageDescriptions={setImageDescriptions}
+                  file={{ name: image.name } as File}
                 />
               )}
             </div>
