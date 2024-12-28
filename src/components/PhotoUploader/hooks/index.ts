@@ -1,9 +1,10 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { uploadPhotos } from '../../../api/uploads';
 
-export const useUploadPhotos = () => {
+export const useUploadPhotos = (id: string) => {
+  const queryClient = useQueryClient();
   const {
     mutate: onUploadPhotos,
     isPending: isUploadingPhotos,
@@ -13,6 +14,9 @@ export const useUploadPhotos = () => {
     mutationFn: (data: FormData) => uploadPhotos(data),
     onSuccess: () => {
       toast.success('Fotografije uspješno spremljene', toastConfig);
+      queryClient.invalidateQueries({
+        queryKey: ['uploads', 'avatar', id],
+      });
     },
     onError: (error) => {
       console.error(error);

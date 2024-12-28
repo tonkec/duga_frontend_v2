@@ -11,9 +11,10 @@ export const deleteImage = async (url: string) => {
 };
 
 export const uploadPhotos = async (data: FormData) => {
-  // for (const [key, value] of data.entries()) {
-  //   console.log(`${key}:`, value);
-  // }
   const client = apiClient({ isAuth: false });
-  return client.post(`/uploads/photos`, data);
+  return client.post(`/uploads/photos`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };

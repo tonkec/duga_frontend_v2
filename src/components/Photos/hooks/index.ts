@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteImage } from '../../../api/uploads';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
@@ -7,7 +7,8 @@ interface DeletePhotoParams {
   url: string;
 }
 
-export const useDeletePhoto = () => {
+export const useDeletePhoto = (id: string) => {
+  const queryClient = useQueryClient();
   const {
     mutate: deletePhoto,
     isPending: isDeleting,
@@ -17,6 +18,9 @@ export const useDeletePhoto = () => {
     mutationFn: (params: DeletePhotoParams) => deleteImage(params.url),
     onSuccess: () => {
       toast.success('Fotografija uspješno obrisana.', toastConfig);
+      queryClient.invalidateQueries({
+        queryKey: ['uploads', 'avatar', id],
+      });
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);

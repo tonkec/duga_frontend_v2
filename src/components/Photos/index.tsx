@@ -8,6 +8,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
 import Input from '../Input';
 import { useDeletePhoto } from './hooks';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 export interface IImage {
   createdAt: string;
@@ -57,7 +58,8 @@ const PhotoActionButtons = ({ onRemove }: { onRemove: () => void }) => {
 };
 
 const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
-  const { deletePhoto } = useDeletePhoto();
+  const [userId] = useLocalStorage('userId');
+  const { deletePhoto } = useDeletePhoto(userId as string);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
 

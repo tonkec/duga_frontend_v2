@@ -1,32 +1,30 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import Photos from '../Photos';
-import { apiClient } from '../../api';
 import { SyntheticEvent } from 'react';
+import { useUploadPhotos } from './hooks';
 
 const PhotoUploader = () => {
   const [userId] = useLocalStorage('userId');
+  const { onUploadPhotos } = useUploadPhotos(userId as string);
+
   const { allImages: allUserImages } = useGetAllImages(userId as string);
-  const client = apiClient({ isAuth: false });
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
+    const files = (e.target as HTMLFormElement).avatars.files; // Use `avatars` as the name
     const formData = new FormData();
-    const fileInput = (e.target as HTMLFormElement).avatar;
-    const file = fileInput.files[0];
 
-    if (file) {
-      formData.append('avatar', file);
-    } else {
-      console.error('No file selected.');
-      return;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append('avatars', files[i]);
+      }
     }
 
-    client.post(`/uploads/photos`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    formData.append('userId', userId as string);
+    formData.append('text', 'some text');
+
+    onUploadPhotos(formData);
   };
 
   return (
@@ -39,8 +37,7 @@ const PhotoUploader = () => {
         />
       </div>
       <form onSubmit={onSubmitHandler}>
-        <input type="file" name="avatar" multiple />
-
+        <input type="file" name="avatars" multiple />
         <button type="submit">Upload</button>
       </form>
     </div>
