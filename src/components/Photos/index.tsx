@@ -20,6 +20,7 @@ export interface IImage {
   updatedAt: string;
   url: string;
   userId: string;
+  isLocal?: boolean;
 }
 
 interface IPhotosProps {
@@ -55,6 +56,13 @@ const PhotoActionButtons = ({ onRemove }: { onRemove: () => void }) => {
       </div>
     </>
   );
+};
+
+const getImageUrl = (image: IImage) => {
+  if (image.isLocal) {
+    return image.url;
+  }
+  return `${REACT_APP_S3_BUCKET_URL}/${image.url}`;
 };
 
 const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
@@ -113,7 +121,7 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
             <div className="max-w-[400px]" key={index}>
               <img
                 className="cursor-pointer"
-                src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`}
+                src={getImageUrl(image)}
                 alt="user image"
                 onClick={() => {
                   setIsModalOpen(!isModalOpen);
