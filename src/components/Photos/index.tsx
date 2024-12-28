@@ -7,6 +7,7 @@ import notFound from '../../assets/not_found.svg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
 import Input from '../Input';
+import { useDeletePhoto } from './hooks';
 
 export interface IImage {
   createdAt: string;
@@ -41,7 +42,6 @@ const customStyles = {
 const PhotoActionButtons = ({ onRemove }: { onRemove: () => void }) => {
   return (
     <>
-      {' '}
       <Input className="mt-4 mb-4" placeholder="Napiši nešto o fotografiji" />
       <div className="mt-4 flex gap-2">
         <Button type="black" className="flex gap-1 items-center" onClick={onRemove}>
@@ -57,6 +57,7 @@ const PhotoActionButtons = ({ onRemove }: { onRemove: () => void }) => {
 };
 
 const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
+  const { deletePhoto } = useDeletePhoto();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
 
@@ -64,7 +65,7 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
     setIsModalOpen(false);
   };
 
-  if (!images.length) {
+  if (!images || !images.length) {
     return (
       <>
         <img src={notFound} className="mx-auto block max-w-[300px]" />
@@ -86,9 +87,9 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
             <BiArrowBack fontSize={20} />
           </Button>
           <Carousel selectedItem={imageIndex}>
-            {images.map((image: IImage) => {
+            {images.map((image: IImage, index: number) => {
               return (
-                <div className="relative">
+                <div className="relative" key={index}>
                   <img
                     className="cursor-pointer"
                     src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`}
@@ -107,7 +108,7 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
       <div className="flex gap-5">
         {images.map((image: IImage, index: number) => {
           return (
-            <div className="max-w-[400px]">
+            <div className="max-w-[400px]" key={index}>
               <img
                 className="cursor-pointer"
                 src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`}
@@ -118,7 +119,13 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
                 }}
               />
 
-              {isEditable && <PhotoActionButtons onRemove={() => {}} />}
+              {isEditable && (
+                <PhotoActionButtons
+                  onRemove={() => {
+                    deletePhoto({ url: image.url });
+                  }}
+                />
+              )}
             </div>
           );
         })}
