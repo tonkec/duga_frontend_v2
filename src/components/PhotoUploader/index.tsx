@@ -1,26 +1,32 @@
-import { useState } from 'react';
-import ImageUploading, { ImageListType } from 'react-images-uploading';
-import { BiCloudUpload } from 'react-icons/bi';
-import Button from '../Button';
-import FieldError from '../FieldError';
-import { BiX } from 'react-icons/bi';
-import { BiCheck } from 'react-icons/bi';
-import Input from '../Input';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import Photos from '../Photos';
-
-const photoLimit = 5;
+import { apiClient } from '../../api';
+import { SyntheticEvent } from 'react';
 
 const PhotoUploader = () => {
   const [userId] = useLocalStorage('userId');
   const { allImages: allUserImages } = useGetAllImages(userId as string);
+  const client = apiClient({ isAuth: false });
 
-  const [images, setImages] = useState([]);
-  const maxNumber = photoLimit;
+  const onSubmitHandler = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+    const fileInput = (e.target as HTMLFormElement).avatar;
+    const file = fileInput.files[0];
 
-  const onChange = (imageList: ImageListType) => {
-    setImages(imageList as never[]);
+    if (file) {
+      formData.append('avatar', file);
+    } else {
+      console.error('No file selected.');
+      return;
+    }
+
+    client.post(`/uploads/photos`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   };
 
   return (
@@ -32,83 +38,11 @@ const PhotoUploader = () => {
           images={allUserImages?.data.images}
         />
       </div>
-      <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
-        {({
-          imageList,
-          onImageUpload,
-          onImageRemoveAll,
-          onImageUpdate,
-          onImageRemove,
-          isDragging,
-          dragProps,
-          errors,
-        }) => (
-          <>
-            <div className="w-full text-left">
-              <button
-                style={isDragging ? { color: 'red' } : undefined}
-                onClick={onImageUpload}
-                {...dragProps}
-                className="flex w-full flex-col inline-block border-2 mb-6 border-black px-4 justfiy-center items-center rounded py-12"
-              >
-                <BiCloudUpload fontSize={80} />
-                <h2>Dodaj nove fotografije</h2>
-              </button>
-            </div>
-            {errors?.maxNumber && (
-              <FieldError
-                isSelfRemoving
-                className="text-center max-w-[160px]"
-                message="Previše slika!"
-              />
-            )}
+      <form onSubmit={onSubmitHandler}>
+        <input type="file" name="avatar" multiple />
 
-            <div>
-              <div className="flex gap-4 mt-4">
-                {imageList.map((image, index) => (
-                  <div key={index}>
-                    <img src={image.dataURL} alt="tvoja slika" width="300" />
-                    <Input className="mt-4 mb-4" placeholder="Napiši nešto o fotki" />
-                    Nova profilna
-                    <div className="flex gap-1 justify-between mt-4">
-                      <Button className="flex-1" type="black" onClick={() => onImageRemove(index)}>
-                        Obriši
-                      </Button>
-                      <Button
-                        className="flex-1"
-                        type="tertiary"
-                        onClick={() => onImageUpdate(index)}
-                      >
-                        Izmijeni
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {imageList.length > 0 && (
-                <div className="flex gap-2 w-full mt-24">
-                  <Button
-                    type="black"
-                    className="flex-1 flex items-center justify-center"
-                    onClick={onImageRemoveAll}
-                  >
-                    Makni sve slike <BiX fontSize={30} />
-                  </Button>
-
-                  <Button
-                    type="primary"
-                    className="flex-1 flex items-center justify-center"
-                    onClick={() => {}}
-                  >
-                    Spremi sve <BiCheck fontSize={30} />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </ImageUploading>
+        <button type="submit">Upload</button>
+      </form>
     </div>
   );
 };
