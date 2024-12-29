@@ -1,9 +1,11 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
-import Photos, { IImage } from '../Photos';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { IImage } from '../Photos';
+import { SyntheticEvent, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '../Button';
+import Input from '../Input';
+import { BiTrash } from 'react-icons/bi';
+import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -13,14 +15,7 @@ const PhotoUploader = () => {
   const [userId] = useLocalStorage('userId');
   const { onUploadPhotos } = useUploadPhotos(userId as string);
 
-  const { allImages: existingImages } = useGetAllImages(userId as string);
   const [allUserImages, setAllUserImages] = useState<IImage[]>();
-
-  useEffect(() => {
-    if (existingImages) {
-      setAllUserImages(existingImages.data.images);
-    }
-  }, [existingImages]);
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -38,16 +33,58 @@ const PhotoUploader = () => {
     onUploadPhotos(formData);
   };
 
+  const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
+    setImageDescriptions((prevState) => {
+      const target = e.target as HTMLInputElement;
+      const description = target.value;
+      const imageId = removeSpacesAndDashes(file.name);
+      const image = { description, imageId };
+      const newState = prevState.filter((item) => item.imageId !== imageId);
+      newState.push(image);
+      return newState;
+    });
+  };
+
   return (
     <div>
       <form onSubmit={onSubmitHandler}>
-        <div className="mb-12">
-          <Photos
-            setImageDescriptions={setImageDescriptions}
-            images={allUserImages}
-            notFoundText="Još nemaš nijednu fotografiju"
-            isEditable
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+          {allUserImages &&
+            allUserImages.map((image) => {
+              return (
+                <div key={image.name} className="mb-4 max-w-[400px]">
+                  <img src={image.url} alt={image.name} />
+
+                  <>
+                    <Input
+                      className="mt-4"
+                      placeholder="Napiši nešto o fotografiji"
+                      onChange={(e) => {
+                        onDescriptionChange(e, image);
+                      }}
+                    />
+
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        type="black"
+                        className="flex gap-1 items-center"
+                        onClick={() => {
+                          setAllUserImages((prev) =>
+                            prev?.filter((img) => img.name !== image.name)
+                          );
+                        }}
+                      >
+                        <span>Obriši</span>
+                        <BiTrash fontSize={20} />
+                      </Button>
+                    </div>
+                    <div className="flex gap-1 items-center mt-4">
+                      <input type="checkbox" /> <span>Postavi kao profilnu</span>
+                    </div>
+                  </>
+                </div>
+              );
+            })}
         </div>
 
         <div className="mb-4">

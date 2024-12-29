@@ -1,16 +1,12 @@
-import { SetStateAction, SyntheticEvent, useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import Modal from 'react-modal';
 import Button from '../../components/Button';
-import { BiArrowBack, BiTrash } from 'react-icons/bi';
+import { BiArrowBack } from 'react-icons/bi';
 import notFound from '../../assets/not_found.svg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
-import Input from '../Input';
-import { useDeletePhoto } from './hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { ImageDescription } from '../PhotoUploader';
-import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
 export interface IImage {
   createdAt: string;
   description: string;
@@ -43,50 +39,6 @@ const customStyles = {
   },
 };
 
-const PhotoActionButtons = ({
-  onRemove,
-  setImageDescriptions,
-  file,
-}: {
-  file: File;
-  onRemove: () => void;
-  setImageDescriptions: (e: SetStateAction<ImageDescription[]>) => void;
-}) => {
-  const onDescriptionChange = (e: SyntheticEvent) => {
-    setImageDescriptions((prevState) => {
-      const target = e.target as HTMLInputElement;
-      const description = target.value;
-      const imageId = removeSpacesAndDashes(file.name);
-      const image = { description, imageId };
-      const newState = prevState.filter((item) => item.imageId !== imageId);
-      newState.push(image);
-      return newState;
-    });
-  };
-
-  return (
-    <>
-      <Input
-        className="mt-4"
-        placeholder="Napiši nešto o fotografiji"
-        onChange={(e) => {
-          onDescriptionChange(e);
-        }}
-      />
-
-      <div className="mt-4 flex gap-2">
-        <Button type="black" className="flex gap-1 items-center" onClick={onRemove}>
-          <span>Obriši</span>
-          <BiTrash fontSize={20} />
-        </Button>
-      </div>
-      <div className="flex gap-1 items-center mt-4">
-        <input type="checkbox" /> <span>Postavi kao profilnu</span>
-      </div>
-    </>
-  );
-};
-
 const getImageUrl = (image: IImage) => {
   if (image.isLocal) {
     return image.url;
@@ -94,9 +46,7 @@ const getImageUrl = (image: IImage) => {
   return `${REACT_APP_S3_BUCKET_URL}/${image.url}`;
 };
 
-const Photos = ({ images, notFoundText, isEditable, setImageDescriptions }: IPhotosProps) => {
-  const [userId] = useLocalStorage('userId');
-  const { deletePhoto } = useDeletePhoto(userId as string);
+const Photos = ({ images, notFoundText }: IPhotosProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
 
@@ -153,16 +103,6 @@ const Photos = ({ images, notFoundText, isEditable, setImageDescriptions }: IPho
                   setImageIndex(index);
                 }}
               />
-
-              {isEditable && setImageDescriptions && (
-                <PhotoActionButtons
-                  onRemove={() => {
-                    deletePhoto({ url: image.url });
-                  }}
-                  setImageDescriptions={setImageDescriptions}
-                  file={{ name: image.name } as File}
-                />
-              )}
             </div>
           );
         })}
