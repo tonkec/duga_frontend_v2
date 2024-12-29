@@ -9,6 +9,8 @@ import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
 import Card from '../Card';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { useDeletePhoto } from '../Photos/hooks';
+import { toast } from 'react-toastify';
+import { toastConfig } from '../../configs/toast.config';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -22,6 +24,11 @@ interface IPhotoActionButtonsProps {
   defaultCheckboxValue?: boolean;
   onCheckboxChange: (e: SyntheticEvent) => void;
 }
+
+const validateFileType = (file: File) => {
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+  return allowedTypes.includes(file.type);
+};
 
 const PhotoActionButtons = ({
   onInputChange,
@@ -58,7 +65,6 @@ const PhotoActionButtons = ({
 
 const PhotoUploader = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const [userId] = useLocalStorage('userId');
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
@@ -74,6 +80,7 @@ const PhotoUploader = () => {
     if (files) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+
         formData.append('avatars', file);
       }
     }
@@ -238,6 +245,11 @@ const PhotoUploader = () => {
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
+                  const invalidFiles = Array.from(files).filter((file) => !validateFileType(file));
+                  if (invalidFiles.length) {
+                    toast.error('Dozvoljeni formati su jpeg, jpg i png', toastConfig);
+                    return;
+                  }
                   const images = Array.from(files).map((file) => {
                     return {
                       url: URL.createObjectURL(file),
