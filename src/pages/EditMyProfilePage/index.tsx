@@ -77,27 +77,27 @@ type Inputs = {
 };
 
 const schema = z.object({
-  bio: z.string().min(2).optional(),
-  age: z.number().int().positive().optional(),
-  location: z.string().min(2).optional(),
-  sexuality: z.string().min(2).optional(),
-  gender: z.string().min(2).optional(),
-  username: z.string().min(2).optional(),
-  lookingFor: z.string().min(2).optional(),
-  relationshipStatus: z.string().min(2).optional(),
+  bio: z.string().optional(),
+  age: z.number().int().optional(),
+  location: z.string().optional(),
+  sexuality: z.string().optional(),
+  gender: z.string().optional(),
+  username: z.string().optional(),
+  lookingFor: z.string().optional(),
+  relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
   alcohol: z.boolean().optional(),
   sport: z.boolean().optional(),
   favoriteDay: z.string().min(1).optional(),
-  spirituality: z.string().min(2).optional(),
-  embarasement: z.string().min(2).optional(),
-  tooOldFor: z.string().min(2).optional(),
-  makesMyDay: z.string().min(2).optional(),
-  favoriteSong: z.string().min(2).optional(),
-  favoriteMovie: z.string().min(2).optional(),
-  interests: z.string().min(2).optional(),
-  languages: z.string().min(2).optional(),
-  ending: z.string().min(2).optional(),
+  spirituality: z.string().optional(),
+  embarasement: z.string().optional(),
+  tooOldFor: z.string().optional(),
+  makesMyDay: z.string().optional(),
+  favoriteSong: z.string().optional(),
+  favoriteMovie: z.string().optional(),
+  interests: z.string().optional(),
+  languages: z.string().optional(),
+  ending: z.string().optional(),
 });
 
 const EditMyProfilePage = () => {
@@ -107,14 +107,11 @@ const EditMyProfilePage = () => {
   const {
     register,
     handleSubmit,
-    formState: { isValid, errors },
+    formState: { isValid },
     reset,
     control,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      relationshipStatus: '',
-    },
   });
 
   useEffect(() => {
@@ -150,7 +147,6 @@ const EditMyProfilePage = () => {
   }, [currentUser, reset]);
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
-    console.log(errors);
     if (isValid) {
       updateUserMutation(data);
     }

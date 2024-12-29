@@ -90,6 +90,10 @@ const getFavoriteDayOfWeekTranslation = (favoriteDayOfWeek: string) => {
   }
 };
 
+const shouldRenderField = (field: string) => {
+  return field && field !== 'N/A';
+};
+
 const MyProfilePage = () => {
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
@@ -190,63 +194,85 @@ const MyProfilePage = () => {
                         </p>
                       </div>
 
-                      <p className="flex items-center text-lg gap-2">
-                        <b>Najdraži dan u tjednu:</b>{' '}
-                        {getFavoriteDayOfWeekTranslation(currentUser?.data.favoriteDayOfWeek)}
-                      </p>
+                      {shouldRenderField(currentUser?.data.favoriteDayOfWeek) && (
+                        <p className="flex items-center text-lg gap-2">
+                          <b>Najdraži dan u tjednu:</b>
+                          {getFavoriteDayOfWeekTranslation(currentUser?.data.favoriteDayOfWeek)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">O meni</h2>
-                  <p>{getUserBio(currentUser?.data.bio)}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.bio) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">O meni</h2>
+                    <p>{getUserBio(currentUser?.data.bio)}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Najsramotnija stvar koja mi se dogodila</h2>
-                  <p>{currentUser?.data.embarasement}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.embarasement) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Najsramotnija stvar koja mi se dogodila</h2>
+                    <p>{currentUser?.data.embarasement}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Imam previše godina za...</h2>
-                  <p>{currentUser?.data.tooOldFor}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.tooOldFor) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Imam previše godina za...</h2>
+                    <p>{currentUser?.data.tooOldFor}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Dan mi je ljepši ako...</h2>
-                  <p>{currentUser?.data.makesMyDay}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.makesMyDay) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Dan mi je ljepši ako...</h2>
+                    <p>{currentUser?.data.makesMyDay}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Duhovnost/religioznost</h2>
-                  <p>{currentUser?.data.spirituality}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.spirituality) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Duhovnost/religioznost</h2>
+                    <p>{currentUser?.data.spirituality}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Interesi:</h2>
-                  <p>{currentUser?.data.interests}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.interests) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Interesi:</h2>
+                    <p>{currentUser?.data.interests}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Jezici koje govorim: </h2>
-                  <p>{currentUser?.data.languages}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.languages) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Jezici koje govorim: </h2>
+                    <p>{currentUser?.data.languages}</p>
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
-                  <Iframe url={currentUser?.data.favoriteSong} width="600" height="400" />
-                </div>
+                {shouldRenderField(currentUser?.data.favoriteSong) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
+                    <Iframe url={currentUser?.data.favoriteSong} width="600" height="400" />
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mb-5">Trailer za najdraži film</h2>
-                  <Iframe url={currentUser?.data.favoriteMovie} width="600" height="400" />
-                </div>
+                {shouldRenderField(currentUser?.data.favoriteMovie) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
+                    <Iframe url={currentUser?.data.favoriteMovie} width="600" height="400" />
+                  </div>
+                )}
 
-                <div className="mb-10">
-                  <h2 className="font-bold mt-5">Za kraj ću reći još</h2>
-                  <p>{currentUser?.data.ending}</p>
-                </div>
+                {shouldRenderField(currentUser?.data.ending) && (
+                  <div className="mb-10">
+                    <h2 className="font-bold mt-5">Za kraj ću reći još</h2>
+                    <p>{currentUser?.data.ending}</p>
+                  </div>
+                )}
               </Card>
             </div>
 
