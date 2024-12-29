@@ -6,7 +6,7 @@ import { BiArrowBack } from 'react-icons/bi';
 import notFound from '../../assets/not_found.svg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
-import { ImageDescription, PhotoActionButtons } from '../PhotoUploader';
+import { ImageDescription } from '../PhotoUploader';
 export interface IImage {
   createdAt: string;
   description: string;
@@ -107,16 +107,6 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
                   }
                 }}
               />
-
-              {isEditable && (
-                <PhotoActionButtons
-                  defaultInputValue={image.description}
-                  onInputChange={() => {}}
-                  onDelete={() => {
-                    console.log('delete');
-                  }}
-                />
-              )}
             </div>
           );
         })}

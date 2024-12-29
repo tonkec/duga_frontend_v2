@@ -8,6 +8,7 @@ import { BiTrash } from 'react-icons/bi';
 import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
 import Card from '../Card';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
+import { useDeletePhoto } from '../Photos/hooks';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -19,7 +20,7 @@ interface IPhotoActionButtonsProps {
   defaultInputValue: string;
 }
 
-export const PhotoActionButtons = ({
+const PhotoActionButtons = ({
   onInputChange,
   onDelete,
   defaultInputValue,
@@ -50,6 +51,7 @@ const PhotoUploader = () => {
   const [imageDescriptions, setImageDescriptions] = useState<ImageDescription[]>([]);
   const [userId] = useLocalStorage('userId');
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
+  const { deletePhoto } = useDeletePhoto(userId as string);
 
   const { onUploadPhotos } = useUploadPhotos(userId as string);
 
@@ -85,10 +87,14 @@ const PhotoUploader = () => {
     });
   };
 
-  const onDelete = (image: IImage) => {
+  const onDeleteFromState = (image: IImage) => {
     setAllUserImages((prev) =>
       prev?.filter((img) => removeSpacesAndDashes(img.name) !== removeSpacesAndDashes(image.name))
     );
+  };
+
+  const onDeleteFromS3 = (image: IImage) => {
+    deletePhoto({ url: image.url });
   };
 
   const onSubmitUpdatePhotos = (e: SyntheticEvent) => {
@@ -127,7 +133,7 @@ const PhotoUploader = () => {
                         return newState;
                       });
                     }}
-                    onDelete={() => onDelete(image)}
+                    onDelete={() => onDeleteFromS3(image)}
                     defaultInputValue={image.description}
                   />
                 </div>
@@ -149,7 +155,7 @@ const PhotoUploader = () => {
                     <img src={image.url} alt={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
-                      onDelete={() => onDelete(image)}
+                      onDelete={() => onDeleteFromState(image)}
                       defaultInputValue={image.description}
                     />
                   </div>
