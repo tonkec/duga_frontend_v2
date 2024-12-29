@@ -400,9 +400,7 @@ const EditMyProfilePage = () => {
         </TabPanel>
 
         <TabPanel>
-          <Card>
-            <PhotoUploader />
-          </Card>
+          <PhotoUploader />
         </TabPanel>
       </Tabs>
     </AppLayout>

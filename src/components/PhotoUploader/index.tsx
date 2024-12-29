@@ -6,10 +6,35 @@ import Button from '../Button';
 import Input from '../Input';
 import { BiTrash } from 'react-icons/bi';
 import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
+import EditablePhotos from '../EditablePhotos';
+import Card from '../Card';
 export interface ImageDescription {
   description: string;
   imageId: string;
 }
+
+interface IPhotoActionButtonsProps {
+  onInputChange: (e: SyntheticEvent) => void;
+  onDelete: () => void;
+}
+
+const PhotoActionButtons = ({ onInputChange, onDelete }: IPhotoActionButtonsProps) => {
+  return (
+    <>
+      <Input className="mt-4" placeholder="Napiši nešto o fotografiji" onChange={onInputChange} />
+      <div className="mt-4 flex gap-2">
+        <Button type="black" className="flex gap-1 items-center" onClick={onDelete}>
+          <span>Obriši</span>
+          <BiTrash fontSize={20} />
+        </Button>
+      </div>
+      <div className="flex gap-1 items-center mt-4">
+        <input type="checkbox" /> <span>Postavi kao profilnu</span>
+      </div>
+    </>
+  );
+};
+
 const PhotoUploader = () => {
   const [imageDescriptions, setImageDescriptions] = useState<ImageDescription[]>([]);
   const [userId] = useLocalStorage('userId');
@@ -45,77 +70,65 @@ const PhotoUploader = () => {
     });
   };
 
+  const onDelete = (image: IImage) => {
+    setAllUserImages((prev) =>
+      prev?.filter((img) => removeSpacesAndDashes(img.name) !== removeSpacesAndDashes(image.name))
+    );
+  };
+
   return (
     <div>
-      <form onSubmit={onSubmitHandler}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-          {allUserImages &&
-            allUserImages.map((image) => {
-              return (
-                <div key={image.name} className="mb-4 max-w-[400px]">
-                  <img src={image.url} alt={image.name} />
-
-                  <>
-                    <Input
-                      className="mt-4"
-                      placeholder="Napiši nešto o fotografiji"
-                      onChange={(e) => {
-                        onDescriptionChange(e, image);
-                      }}
+      <Card className="mb-6">
+        <EditablePhotos />
+      </Card>
+      <Card>
+        <form onSubmit={onSubmitHandler}>
+          <h2 className="font-bold mt-5 mb-2"> Dodaj nove fotografije </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+            {allUserImages &&
+              allUserImages.map((image) => {
+                return (
+                  <div key={image.name} className="mb-4 max-w-[400px]">
+                    <img src={image.url} alt={image.name} />
+                    <PhotoActionButtons
+                      onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
+                      onDelete={() => onDelete(image)}
                     />
+                  </div>
+                );
+              })}
+          </div>
 
-                    <div className="mt-4 flex gap-2">
-                      <Button
-                        type="black"
-                        className="flex gap-1 items-center"
-                        onClick={() => {
-                          setAllUserImages((prev) =>
-                            prev?.filter((img) => img.name !== image.name)
-                          );
-                        }}
-                      >
-                        <span>Obriši</span>
-                        <BiTrash fontSize={20} />
-                      </Button>
-                    </div>
-                    <div className="flex gap-1 items-center mt-4">
-                      <input type="checkbox" /> <span>Postavi kao profilnu</span>
-                    </div>
-                  </>
-                </div>
-              );
-            })}
-        </div>
+          <div className="mb-4">
+            <input
+              type="file"
+              name="avatars"
+              multiple
+              onChange={(e) => {
+                if (e.target.files) {
+                  const files = e.target.files;
+                  const images = Array.from(files).map((file) => {
+                    return {
+                      url: URL.createObjectURL(file),
+                      name: file.name,
+                      fileType: file.type,
+                      description: '',
+                      userId: userId as string,
+                      isProfilePhoto: false,
+                      isLocal: true,
+                    };
+                  });
 
-        <div className="mb-4">
-          <input
-            type="file"
-            name="avatars"
-            multiple
-            onChange={(e) => {
-              if (e.target.files) {
-                const files = e.target.files;
-                const images = Array.from(files).map((file) => {
-                  return {
-                    url: URL.createObjectURL(file),
-                    name: file.name,
-                    fileType: file.type,
-                    description: '',
-                    userId: userId as string,
-                    isProfilePhoto: false,
-                    isLocal: true,
-                  };
-                });
-
-                setAllUserImages((prev) => [...(prev || []), ...(images as IImage[])]);
-              }
-            }}
-          />
-        </div>
-        <Button type="primary">
-          <span>Spremi</span>
-        </Button>
-      </form>
+                  setAllUserImages((prev) => [...(prev || []), ...(images as IImage[])]);
+                }
+              }}
+            />
+          </div>
+          <Button type="primary">
+            <span>Spremi</span>
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 };

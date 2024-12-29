@@ -46,7 +46,7 @@ const getImageUrl = (image: IImage) => {
   return `${REACT_APP_S3_BUCKET_URL}/${image.url}`;
 };
 
-const Photos = ({ images, notFoundText }: IPhotosProps) => {
+const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
 
@@ -65,42 +65,46 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
 
   return (
     <>
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Example Modal"
-        style={customStyles}
-      >
-        <div>
-          <Button type="icon" onClick={closeModal}>
-            <BiArrowBack fontSize={20} />
-          </Button>
-          <Carousel selectedItem={imageIndex}>
-            {images.map((image: IImage, index: number) => {
-              return (
-                <div className="relative" key={index}>
-                  <img src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`} alt="user image" />
-                  <p className="absolute top-0 px-4 py-2 w-full bg-black text-white">
-                    {image.description}
-                  </p>
-                </div>
-              );
-            })}
-          </Carousel>
-        </div>
-      </Modal>
+      {!isEditable && (
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          contentLabel="Example Modal"
+          style={customStyles}
+        >
+          <div>
+            <Button type="icon" onClick={closeModal}>
+              <BiArrowBack fontSize={20} />
+            </Button>
+            <Carousel selectedItem={imageIndex}>
+              {images.map((image: IImage, index: number) => {
+                return (
+                  <div className="relative" key={index}>
+                    <img src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`} alt="user image" />
+                    <p className="absolute top-0 px-4 py-2 w-full bg-black text-white">
+                      {image.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </Carousel>
+          </div>
+        </Modal>
+      )}
       <h2 className="font-bold mt-5 mb-2">Fotografije ({images.length})</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {images.map((image: IImage, index: number) => {
           return (
             <div className="max-w-[400px]" key={index}>
               <img
-                className="cursor-pointer"
+                className={!isEditable ? 'cursor-pointer' : ''}
                 src={getImageUrl(image)}
                 alt="user image"
                 onClick={() => {
-                  setIsModalOpen(!isModalOpen);
-                  setImageIndex(index);
+                  if (!isEditable) {
+                    setImageIndex(index);
+                    setIsModalOpen(true);
+                  }
                 }}
               />
             </div>
