@@ -6,12 +6,13 @@ interface InputProps {
   icon?: React.ReactNode;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  defaultValue?: string;
 }
 
 const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-2 px-4 pr-8 block w-full appearance-none leading-normal focus:border-pink`;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ placeholder, className, onChange, icon, value, ...props }, ref) => {
+  ({ placeholder, className, onChange, icon, value, defaultValue, ...props }, ref) => {
     return (
       <div className="relative">
         <input
@@ -21,6 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          defaultValue={defaultValue}
         />
         {icon && <span className="absolute right-3 top-3">{icon}</span>}
       </div>

@@ -1,13 +1,13 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { IImage } from '../Photos';
+import { getImageUrl, IImage } from '../Photos';
 import { SyntheticEvent, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '../Button';
 import Input from '../Input';
 import { BiTrash } from 'react-icons/bi';
 import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
-import EditablePhotos from '../EditablePhotos';
 import Card from '../Card';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -16,12 +16,22 @@ export interface ImageDescription {
 interface IPhotoActionButtonsProps {
   onInputChange: (e: SyntheticEvent) => void;
   onDelete: () => void;
+  defaultInputValue: string;
 }
 
-const PhotoActionButtons = ({ onInputChange, onDelete }: IPhotoActionButtonsProps) => {
+export const PhotoActionButtons = ({
+  onInputChange,
+  onDelete,
+  defaultInputValue,
+}: IPhotoActionButtonsProps) => {
   return (
     <>
-      <Input className="mt-4" placeholder="Napiši nešto o fotografiji" onChange={onInputChange} />
+      <Input
+        defaultValue={defaultInputValue}
+        className="mt-4"
+        placeholder="Napiši nešto o fotografiji"
+        onChange={onInputChange}
+      />
       <div className="mt-4 flex gap-2">
         <Button type="black" className="flex gap-1 items-center" onClick={onDelete}>
           <span>Obriši</span>
@@ -36,15 +46,18 @@ const PhotoActionButtons = ({ onInputChange, onDelete }: IPhotoActionButtonsProp
 };
 
 const PhotoUploader = () => {
+  const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [imageDescriptions, setImageDescriptions] = useState<ImageDescription[]>([]);
   const [userId] = useLocalStorage('userId');
+  const { allImages: allExistingImages } = useGetAllImages(userId as string);
+
   const { onUploadPhotos } = useUploadPhotos(userId as string);
 
   const [allUserImages, setAllUserImages] = useState<IImage[]>();
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
-    const files = (e.target as HTMLFormElement).avatars.files;
+    const files = (e.target as HTMLFormElement)?.avatars?.files;
     const formData = new FormData();
     if (files) {
       for (let i = 0; i < files.length; i++) {
@@ -64,7 +77,9 @@ const PhotoUploader = () => {
       const description = target.value;
       const imageId = removeSpacesAndDashes(file.name);
       const image = { description, imageId };
-      const newState = prevState.filter((item) => item.imageId !== imageId);
+      const newState = prevState.filter(
+        (item) => removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
+      );
       newState.push(image);
       return newState;
     });
@@ -76,10 +91,52 @@ const PhotoUploader = () => {
     );
   };
 
+  const onSubmitUpdatePhotos = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('text', JSON.stringify(updatedImageDescriptions));
+    formData.append('userId', userId as string);
+
+    onUploadPhotos(formData);
+  };
+
   return (
     <div>
       <Card className="mb-6">
-        <EditablePhotos />
+        <form
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4"
+          onSubmit={onSubmitUpdatePhotos}
+        >
+          {allExistingImages &&
+            allExistingImages.data.images.map((image: IImage) => {
+              return (
+                <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
+                  <img src={getImageUrl(image)} alt={image.name} />
+                  <PhotoActionButtons
+                    onInputChange={(e: SyntheticEvent) => {
+                      setUpdatedImageDescriptions((prev) => {
+                        const target = e.target as HTMLInputElement;
+                        const description = target.value;
+                        const imageId = removeSpacesAndDashes(image.name);
+                        const newImage = { description, imageId };
+                        const newState = prev.filter(
+                          (item) =>
+                            removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
+                        );
+                        newState.push(newImage);
+                        return newState;
+                      });
+                    }}
+                    onDelete={() => onDelete(image)}
+                    defaultInputValue={image.description}
+                  />
+                </div>
+              );
+            })}
+          <Button type="primary">
+            <span>Spremi</span>
+          </Button>
+        </form>
       </Card>
       <Card>
         <form onSubmit={onSubmitHandler}>
@@ -93,6 +150,7 @@ const PhotoUploader = () => {
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDelete(image)}
+                      defaultInputValue={image.description}
                     />
                   </div>
                 );
