@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { getImageUrl, IImage } from '../Photos';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '../Button';
 import Input from '../Input';
@@ -47,15 +47,15 @@ const PhotoActionButtons = ({
 };
 
 const PhotoUploader = () => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [userId] = useLocalStorage('userId');
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [imageDescriptions, setImageDescriptions] = useState<ImageDescription[]>([]);
-  const [userId] = useLocalStorage('userId');
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto(userId as string);
-
   const { onUploadPhotos } = useUploadPhotos(userId as string);
-
-  const [allUserImages, setAllUserImages] = useState<IImage[]>();
+  const [newImages, setNewImages] = useState<IImage[]>();
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -88,7 +88,10 @@ const PhotoUploader = () => {
   };
 
   const onDeleteFromState = (image: IImage) => {
-    setAllUserImages((prev) =>
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    setNewImages((prev) =>
       prev?.filter((img) => removeSpacesAndDashes(img.name) !== removeSpacesAndDashes(image.name))
     );
   };
@@ -102,19 +105,20 @@ const PhotoUploader = () => {
     const formData = new FormData();
     formData.append('text', JSON.stringify(updatedImageDescriptions));
     formData.append('userId', userId as string);
-
     onUploadPhotos(formData);
   };
 
+  const shouldShowEditable = allExistingImages && allExistingImages.data.images.length > 0;
+
   return (
     <div>
-      <Card className="mb-6">
-        <form
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4"
-          onSubmit={onSubmitUpdatePhotos}
-        >
-          {allExistingImages &&
-            allExistingImages.data.images.map((image: IImage) => {
+      {shouldShowEditable && (
+        <Card className="mb-6">
+          <form
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4"
+            onSubmit={onSubmitUpdatePhotos}
+          >
+            {allExistingImages.data.images.map((image: IImage) => {
               return (
                 <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
                   <img src={getImageUrl(image)} alt={image.name} />
@@ -139,17 +143,20 @@ const PhotoUploader = () => {
                 </div>
               );
             })}
-          <Button type="primary">
-            <span>Spremi</span>
-          </Button>
-        </form>
-      </Card>
+            <div className="mb-4">
+              <Button type="primary">
+                <span>Spremi sve</span>
+              </Button>
+            </div>
+          </form>
+        </Card>
+      )}
       <Card>
         <form onSubmit={onSubmitHandler}>
           <h2 className="font-bold mt-5 mb-2"> Dodaj nove fotografije </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-            {allUserImages &&
-              allUserImages.map((image) => {
+            {newImages &&
+              newImages.map((image) => {
                 return (
                   <div key={image.name} className="mb-4 max-w-[400px]">
                     <img src={image.url} alt={image.name} />
@@ -165,6 +172,7 @@ const PhotoUploader = () => {
 
           <div className="mb-4">
             <input
+              ref={fileInputRef}
               type="file"
               name="avatars"
               multiple
@@ -183,14 +191,16 @@ const PhotoUploader = () => {
                     };
                   });
 
-                  setAllUserImages((prev) => [...(prev || []), ...(images as IImage[])]);
+                  setNewImages((prev) => [...(prev || []), ...(images as IImage[])]);
                 }
               }}
             />
           </div>
-          <Button type="primary">
-            <span>Spremi</span>
-          </Button>
+          {newImages && newImages.length > 0 && (
+            <Button type="primary">
+              <span>Spremi</span>
+            </Button>
+          )}
         </form>
       </Card>
     </div>
