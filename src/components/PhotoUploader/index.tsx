@@ -12,18 +12,23 @@ import { useDeletePhoto } from '../Photos/hooks';
 export interface ImageDescription {
   description: string;
   imageId: string;
+  isProfilePhoto?: boolean;
 }
 
 interface IPhotoActionButtonsProps {
   onInputChange: (e: SyntheticEvent) => void;
   onDelete: () => void;
   defaultInputValue: string;
+  defaultCheckboxValue?: boolean;
+  onCheckboxChange: (e: SyntheticEvent) => void;
 }
 
 const PhotoActionButtons = ({
   onInputChange,
   onDelete,
   defaultInputValue,
+  defaultCheckboxValue,
+  onCheckboxChange,
 }: IPhotoActionButtonsProps) => {
   return (
     <>
@@ -33,14 +38,19 @@ const PhotoActionButtons = ({
         placeholder="Napiši nešto o fotografiji"
         onChange={onInputChange}
       />
+      <div className="flex gap-1 items-center mt-4">
+        <input
+          type="checkbox"
+          onChange={(e) => onCheckboxChange(e)}
+          checked={defaultCheckboxValue}
+        />{' '}
+        <span>Postavi kao profilnu</span>
+      </div>
       <div className="mt-4 flex gap-2">
         <Button type="black" className="flex gap-1 items-center" onClick={onDelete}>
           <span>Obriši</span>
           <BiTrash fontSize={20} />
         </Button>
-      </div>
-      <div className="flex gap-1 items-center mt-4">
-        <input type="checkbox" /> <span>Postavi kao profilnu</span>
       </div>
     </>
   );
@@ -51,7 +61,7 @@ const PhotoUploader = () => {
 
   const [userId] = useLocalStorage('userId');
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
-  const [imageDescriptions, setImageDescriptions] = useState<ImageDescription[]>([]);
+  const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto(userId as string);
   const { onUploadPhotos } = useUploadPhotos(userId as string);
@@ -67,14 +77,14 @@ const PhotoUploader = () => {
         formData.append('avatars', file);
       }
     }
-    formData.append('text', JSON.stringify(imageDescriptions));
+    formData.append('text', JSON.stringify(newImageDescriptions));
     formData.append('userId', userId as string);
 
     onUploadPhotos(formData);
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
-    setImageDescriptions((prevState) => {
+    setNewImageDescriptions((prevState) => {
       const target = e.target as HTMLInputElement;
       const description = target.value;
       const imageId = removeSpacesAndDashes(file.name);
@@ -139,13 +149,37 @@ const PhotoUploader = () => {
                     }}
                     onDelete={() => onDeleteFromS3(image)}
                     defaultInputValue={image.description}
+                    defaultCheckboxValue={image.isProfilePhoto}
+                    onCheckboxChange={(e: SyntheticEvent) => {
+                      setUpdatedImageDescriptions((prev) => {
+                        const imageId = removeSpacesAndDashes(image.name);
+                        if (prev.length === 0) {
+                          return [
+                            {
+                              description: image.description,
+                              imageId,
+                              isProfilePhoto: (e.target as HTMLInputElement).checked,
+                            },
+                          ];
+                        }
+
+                        const newState = prev.map((item) => {
+                          if (removeSpacesAndDashes(item.imageId) === imageId) {
+                            return { ...item, isProfilePhoto: !item.isProfilePhoto };
+                          }
+                          return item;
+                        });
+
+                        return newState;
+                      });
+                    }}
                   />
                 </div>
               );
             })}
-            <div className="mb-4">
+            <div className="col-span-3">
               <Button type="primary">
-                <span>Spremi sve</span>
+                <span>Spremi</span>
               </Button>
             </div>
           </form>
@@ -164,6 +198,31 @@ const PhotoUploader = () => {
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDeleteFromState(image)}
                       defaultInputValue={image.description}
+                      onCheckboxChange={(e: SyntheticEvent) => {
+                        setNewImageDescriptions((prev) => {
+                          const imageId = removeSpacesAndDashes(image.name);
+
+                          if (prev.length === 0) {
+                            return [
+                              {
+                                description: image.description,
+                                imageId,
+                                isProfilePhoto: (e.target as HTMLInputElement).checked,
+                              },
+                            ];
+                          }
+
+                          const newState = prev.map((item) => {
+                            if (
+                              removeSpacesAndDashes(item.imageId) === removeSpacesAndDashes(imageId)
+                            ) {
+                              return { ...item, isProfilePhoto: !item.isProfilePhoto };
+                            }
+                            return item;
+                          });
+                          return newState;
+                        });
+                      }}
                     />
                   </div>
                 );
