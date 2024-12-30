@@ -255,7 +255,7 @@ const PhotoUploader = () => {
                   const files = e.target.files;
                   const invalidFiles = Array.from(files).filter((file) => !validateFileType(file));
                   if (invalidFiles.length) {
-                    toast.error('Dozvoljeni formati su jpeg, jpg i png', toastConfig);
+                    toast.error('Dozvoljeni formati su jpeg, jpg i png!', toastConfig);
                     return;
                   }
                   const images = Array.from(files).map((file) => {
