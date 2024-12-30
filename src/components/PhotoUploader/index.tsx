@@ -49,8 +49,8 @@ const PhotoActionButtons = ({
         <input
           type="checkbox"
           onChange={(e) => onCheckboxChange(e)}
-          checked={defaultCheckboxValue}
-        />{' '}
+          defaultChecked={defaultCheckboxValue}
+        />
         <span>Postavi kao profilnu</span>
       </div>
       <div className="mt-4 flex gap-2">

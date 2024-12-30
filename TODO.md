@@ -2,14 +2,10 @@
 
 - edit profile page
 
-  - zasto su svi fields required
   - fotke
+    - ako je jedna profilna, onda druga se mora unchecked => 30.12
 
-    - POSTAVI KAO PROFILNU 5
-    - validacija fajlova 4
-    - editirat postojeci desc 2
-
-- other user profile page
+- fallback za avatar svg ili slova?
 
 ### Enhancements
 
@@ -23,6 +19,8 @@
 ### Sljedeci veliki feature
 
 - poruke
+- notifikacije
+- other user profile page => uzet myprofile page kao template
 
 ### Easy wins
 
@@ -35,8 +33,12 @@
 
 ### Gotovo
 
-- prikazat postojeci desc 1
-- ne moze se izbrisat ako nije vec spremljena 3
+- zasto su svi fields required
+- validacija fajlova
+- editirat postojeci desc
+- POSTAVI KAO PROFILNU
+- prikazat postojeci desc
+- ne moze se izbrisat ako nije vec spremljena
 - footer
 - umjesto rijeci logout stavit ikonicu
 - maknut na all users samog sebe
