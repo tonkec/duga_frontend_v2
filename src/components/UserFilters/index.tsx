@@ -36,6 +36,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
         }}
       />
       <Input
+        type="text"
         placeholder={`Pretraži ${selectValue.label}`}
         icon={<BiSearch color="grey" fontSize="20px" />}
         value={search}

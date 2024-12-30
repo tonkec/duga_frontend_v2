@@ -56,11 +56,16 @@ const LoginPage = () => {
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
 
         <Input
+          type="email"
           placeholder="Email"
           className="mb-2 mt-2"
           {...register('email', { required: true })}
         />
-        <Input placeholder="Lozinka" {...register('password', { required: true })} />
+        <Input
+          type="password"
+          placeholder="Lozinka"
+          {...register('password', { required: true })}
+        />
         <Button className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>

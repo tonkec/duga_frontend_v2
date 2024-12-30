@@ -44,6 +44,7 @@ const PhotoActionButtons = ({
         className="mt-4"
         placeholder="Napiši nešto o fotografiji"
         onChange={onInputChange}
+        type="text"
       />
       <div className="flex gap-1 items-center mt-4">
         <input

@@ -3,7 +3,6 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
-import { Error, getErrorMessage } from '../../../utils/getErrorMessage';
 import { login } from '../../../api/auth/login';
 
 interface IUserProps {
@@ -18,8 +17,8 @@ function useLoginUser() {
 
   const {
     mutate: loginUser,
-    isPending: isCreating,
-    isError: isSignupError,
+    isPending: isLoggingIn,
+    isError: isLoginError,
     isSuccess,
   } = useMutation({
     mutationFn: ({ email, password }: IUserProps) => login(email, password),
@@ -29,12 +28,12 @@ function useLoginUser() {
       toast.success('Uspješno si se ulogirao_la!', toastConfig);
       navigate('/');
     },
-    onError: (err: Error) => {
-      toast.error(getErrorMessage(err), toastConfig);
+    onError: () => {
+      toast.error('Greška! Probaj opet.', toastConfig);
     },
   });
 
-  return { isCreating, loginUser, isSignupError, isSuccess };
+  return { isLoggingIn, loginUser, isLoginError, isSuccess };
 }
 
 export { useLoginUser };

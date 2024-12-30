@@ -175,11 +175,26 @@ const EditMyProfilePage = () => {
               <h2 className="mb-2">Općenito</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <Input className="mb-2" placeholder="Korisničko ime" {...register('username')} />
-                  <Input className="mb-2" placeholder="Lokacija" {...register('location')} />
-                  <Input className="mb-2" placeholder="Rod" {...register('gender')} />
-                  <Input className="mb-2" placeholder="Seksualnost" {...register('sexuality')} />
-                  <Input className="mb-2" placeholder="Godine" {...register('age')} />
+                  <Input
+                    type="text"
+                    className="mb-2"
+                    placeholder="Korisničko ime"
+                    {...register('username')}
+                  />
+                  <Input
+                    type="text"
+                    className="mb-2"
+                    placeholder="Lokacija"
+                    {...register('location')}
+                  />
+                  <Input type="text" className="mb-2" placeholder="Rod" {...register('gender')} />
+                  <Input
+                    type="text"
+                    className="mb-2"
+                    placeholder="Seksualnost"
+                    {...register('sexuality')}
+                  />
+                  <Input type="text" className="mb-2" placeholder="Godine" {...register('age')} />
                   <TextArea placeholder="Nešto ukratko o tebi" {...register('bio')} />
                 </div>
               </div>
@@ -352,11 +367,13 @@ const EditMyProfilePage = () => {
                     {...register('makesMyDay')}
                   />
                   <Input
+                    type="text"
                     className="mb-2"
                     placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
                     {...register('favoriteSong')}
                   />
                   <Input
+                    type="text"
                     className="mb-2"
                     placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
                     {...register('favoriteMovie')}
@@ -376,11 +393,13 @@ const EditMyProfilePage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
                   <Input
+                    type="text"
                     className="mb-2"
                     placeholder="Interesi (odvojeni zarezom)"
                     {...register('interests')}
                   />
                   <Input
+                    type="text"
                     className="mb-2"
                     placeholder="Jezici koje govorim (odvojeni zarezom)"
                     {...register('languages')}

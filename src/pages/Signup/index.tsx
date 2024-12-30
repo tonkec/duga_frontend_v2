@@ -66,22 +66,29 @@ const SignupPage = () => {
         <h1 className="text-center text-white">Registriraj se!</h1>
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
         <Input
+          type="text"
           placeholder="Ime"
           className="mb-2 mt-2"
           {...register('firstName', { required: true })}
         />
 
         <Input
+          type="text"
           placeholder="Prezime"
           className="mb-2 mt-2"
           {...register('lastName', { required: true })}
         />
         <Input
+          type="email"
           placeholder="Email"
           className="mb-2 mt-2"
           {...register('email', { required: true })}
         />
-        <Input placeholder="Lozinka" {...register('password', { required: true })} />
+        <Input
+          type="password"
+          placeholder="Lozinka"
+          {...register('password', { required: true })}
+        />
         <Button className="w-full mt-2" type="primary">
           Registriraj se!
         </Button>
