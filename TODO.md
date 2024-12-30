@@ -9,18 +9,18 @@
 
 ### Enhancements
 
-- error kad je kriva sifra na loginu
-- stavit na all profiles da li je user trenutno aktivan ili ne
 - verification email? => treba postavit mailove
 - forgot password => treba postavit mailove
 - reset password => treba postavit mailove
 - paginacija svih profila
+- objasnjenje za iframove
 
 ### Sljedeci veliki feature
 
 - poruke
 - notifikacije
 - other user profile page => uzet myprofile page kao template
+- stavit na all profiles da li je user trenutno aktivan ili ne
 
 ### Easy wins
 
@@ -33,6 +33,7 @@
 
 ### Gotovo
 
+- error kad je kriva sifra na loginu
 - zasto su svi fields required
 - validacija fajlova
 - editirat postojeci desc

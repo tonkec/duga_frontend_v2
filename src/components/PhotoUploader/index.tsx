@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { getImageUrl, IImage } from '../Photos';
-import { SyntheticEvent, useRef, useState } from 'react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '../Button';
 import Input from '../Input';
@@ -21,8 +21,9 @@ interface IPhotoActionButtonsProps {
   onInputChange: (e: SyntheticEvent) => void;
   onDelete: () => void;
   defaultInputValue: string;
-  defaultCheckboxValue?: boolean;
-  onCheckboxChange: (e: SyntheticEvent) => void;
+  isChecked?: boolean;
+  onCheckboxChange?: (e: SyntheticEvent) => void;
+  hasCheckbox?: boolean;
 }
 
 const validateFileType = (file: File) => {
@@ -34,8 +35,9 @@ const PhotoActionButtons = ({
   onInputChange,
   onDelete,
   defaultInputValue,
-  defaultCheckboxValue,
+  isChecked,
   onCheckboxChange,
+  hasCheckbox,
 }: IPhotoActionButtonsProps) => {
   return (
     <>
@@ -46,14 +48,22 @@ const PhotoActionButtons = ({
         onChange={onInputChange}
         type="text"
       />
-      <div className="flex gap-1 items-center mt-4">
-        <input
-          type="checkbox"
-          onChange={(e) => onCheckboxChange(e)}
-          defaultChecked={defaultCheckboxValue}
-        />
-        <span>Postavi kao profilnu</span>
-      </div>
+      {hasCheckbox && (
+        <div className="flex gap-1 items-center mt-4">
+          <input
+            type="checkbox"
+            onChange={
+              onCheckboxChange
+                ? onCheckboxChange
+                : (e: SyntheticEvent) => {
+                    e.preventDefault();
+                  }
+            }
+            checked={isChecked}
+          />
+          <span>Postavi kao profilnu</span>
+        </div>
+      )}
       <div className="mt-4 flex gap-2">
         <Button type="black" className="flex gap-1 items-center" onClick={onDelete}>
           <span>Obriši</span>
@@ -73,6 +83,18 @@ const PhotoUploader = () => {
   const { deletePhoto } = useDeletePhoto(userId as string);
   const { onUploadPhotos } = useUploadPhotos(userId as string);
   const [newImages, setNewImages] = useState<IImage[]>();
+  const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
+    []
+  );
+
+  useEffect(() => {
+    if (allExistingImages && allExistingImages.data.images.length > 0) {
+      const checkboxes = allExistingImages.data.images.map((image: IImage, index: number) => {
+        return { index, isProfilePhoto: image.isProfilePhoto || false };
+      });
+      setAllCheckboxes(checkboxes);
+    }
+  }, [allExistingImages]);
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -87,7 +109,6 @@ const PhotoUploader = () => {
     }
     formData.append('text', JSON.stringify(newImageDescriptions));
     formData.append('userId', userId as string);
-
     onUploadPhotos(formData);
   };
 
@@ -136,7 +157,7 @@ const PhotoUploader = () => {
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4"
             onSubmit={onSubmitUpdatePhotos}
           >
-            {allExistingImages.data.images.map((image: IImage) => {
+            {allExistingImages.data.images.map((image: IImage, index: number) => {
               return (
                 <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
                   <img src={getImageUrl(image)} alt={image.name} />
@@ -157,8 +178,19 @@ const PhotoUploader = () => {
                     }}
                     onDelete={() => onDeleteFromS3(image)}
                     defaultInputValue={image.description}
-                    defaultCheckboxValue={image.isProfilePhoto}
+                    isChecked={
+                      allCheckboxes.find((checkbox) => checkbox.index === index)?.isProfilePhoto ||
+                      false
+                    }
+                    hasCheckbox
                     onCheckboxChange={(e: SyntheticEvent) => {
+                      const isChecked = (e.target as HTMLInputElement).checked;
+                      setAllCheckboxes((prev) =>
+                        prev.map((checkbox) => ({
+                          ...checkbox,
+                          isProfilePhoto: checkbox.index === index ? isChecked : false,
+                        }))
+                      );
                       setUpdatedImageDescriptions((prev) => {
                         const imageId = removeSpacesAndDashes(image.name);
                         if (prev.length === 0) {
@@ -206,31 +238,6 @@ const PhotoUploader = () => {
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDeleteFromState(image)}
                       defaultInputValue={image.description}
-                      onCheckboxChange={(e: SyntheticEvent) => {
-                        setNewImageDescriptions((prev) => {
-                          const imageId = removeSpacesAndDashes(image.name);
-
-                          if (prev.length === 0) {
-                            return [
-                              {
-                                description: image.description,
-                                imageId,
-                                isProfilePhoto: (e.target as HTMLInputElement).checked,
-                              },
-                            ];
-                          }
-
-                          const newState = prev.map((item) => {
-                            if (
-                              removeSpacesAndDashes(item.imageId) === removeSpacesAndDashes(imageId)
-                            ) {
-                              return { ...item, isProfilePhoto: !item.isProfilePhoto };
-                            }
-                            return item;
-                          });
-                          return newState;
-                        });
-                      }}
                     />
                   </div>
                 );
