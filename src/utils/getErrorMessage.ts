@@ -14,7 +14,6 @@ export interface Error {
 }
 
 const getErrorMessage = (error: Error) => {
-  console.log(error);
   if (error.response) {
     return error.response.data.errors
       .map((error: IErrorProps) => error.message)

@@ -69,9 +69,15 @@ const LoginPage = () => {
         <Button className="w-full mt-2" type="primary">
           Ulogiraj se
         </Button>
-        <Link to="/signup" className="text-center text-white block mt-2 underline">
-          Registriraj se!
-        </Link>
+        <div className="flex flex-col mt-2 justify-center gap-1">
+          <Link to="/signup" className="text-center text-white block mt-2 underline">
+            Registriraj se!
+          </Link>
+
+          <Link to="/forgot-password" className="text-center text-white block mt-2 underline">
+            Zaboravljena lozinka?
+          </Link>
+        </div>
       </form>
     </AuthLayout>
   );

@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router';
 import App from '../App';
 import LoginPage from '../pages/Login';
 import SignupPage from '../pages/Signup';
+import ForgotPassword from '../pages/ForgotPassword';
 import MyProfilePage from '../pages/MyProfilePage';
 import EditMyProfilePage from '../pages/EditMyProfilePage';
 import { AuthGuard } from './guards/AuthGuard';
@@ -17,8 +18,9 @@ const DugaRoutes = () => {
           </AuthGuard>
         }
       />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignupPage />} />
+      <Route path="forgot-password" element={<ForgotPassword />} />
       <Route
         path="/profile"
         element={

@@ -1,10 +1,5 @@
 # Next to do
 
-- edit profile page
-
-  - fotke
-    - ako je jedna profilna, onda druga se mora unchecked => 30.12
-
 - fallback za avatar svg ili slova?
 
 ### Enhancements
@@ -33,6 +28,7 @@
 
 ### Gotovo
 
+- edit profile page
 - error kad je kriva sifra na loginu
 - zasto su svi fields required
 - validacija fajlova
@@ -45,3 +41,5 @@
 - maknut na all users samog sebe
 - filteri na all users
 - dodat logo na svaku stranicu
+- fotke
+  - ako je jedna profilna, onda druga se mora unchecked => 30.12
