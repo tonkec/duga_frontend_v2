@@ -5,7 +5,7 @@ import { toastConfig } from '../../../configs/toast.config';
 import { useNavigate } from 'react-router-dom';
 import { Error, getErrorMessage } from '../../../utils/getErrorMessage';
 
-interface IUserProps {
+interface ISignupProps {
   email: string;
   password: string;
   firstName: string;
@@ -20,7 +20,7 @@ export const useCreateUser = () => {
     isError: isSignupError,
     isSuccess,
   } = useMutation({
-    mutationFn: ({ email, password, firstName, lastName }: IUserProps) =>
+    mutationFn: ({ email, password, firstName, lastName }: ISignupProps) =>
       register(email, password, firstName, lastName),
     onSuccess: () => {
       toast.success('Bravo! Sada se možeš ulogirati', toastConfig);

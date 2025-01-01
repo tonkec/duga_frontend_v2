@@ -6,7 +6,7 @@ import { toastConfig } from '../../../configs/toast.config';
 import { login } from '../../../api/auth/login';
 import { useCookies } from 'react-cookie';
 
-interface IUserProps {
+interface ILoginProps {
   email: string;
   password: string;
 }
@@ -23,7 +23,7 @@ function useLoginUser() {
     isError: isLoginError,
     isSuccess,
   } = useMutation({
-    mutationFn: ({ email, password }: IUserProps) => login(email, password),
+    mutationFn: ({ email, password }: ILoginProps) => login(email, password),
     onSuccess: (data) => {
       if (data.data.isVerified) {
         setCookie('token', data.data.token);
