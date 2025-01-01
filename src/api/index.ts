@@ -14,7 +14,7 @@ const getCookie = (name: string) => {
 
 const apiClient = ({ isAuth }: { isAuth: boolean }) => {
   const defaultOptions = {
-    baseURL: 'http://localhost:8080',
+    baseURL: import.meta.env.VITE_BASE_URL,
     headers: {
       'Content-Type': 'application/json',
     },
