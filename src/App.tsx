@@ -76,7 +76,6 @@ function App() {
 
   return (
     <AppLayout>
-      <h1>Hello</h1>
       <UserFilters
         selectValue={selectValue}
         setSelectValue={setSelectValue}
