@@ -1,21 +1,28 @@
 # Next to do
 
-- fallback za avatar svg ili slova?
+- verification email
+
+  - kad se signupa, dobije email s tokenom za potvrdu
+  - ne moze se ulogirat ako nije email potvrden
+
+- spremit auth token u cookie => https://www.npmjs.com/package/react-cookie
 
 ### Enhancements
-
-- verification email? => treba postavit mailove
-- forgot password => treba postavit mailove
-- reset password => treba postavit mailove
+  
+- fallback za avatar svg ili slova?
 - paginacija svih profila
 - objasnjenje za iframove
+- stavit na all profiles da li je user trenutno aktivan ili ne
 
 ### Sljedeci veliki feature
 
+- prikazat lajkove na fotke
+- dodat komentare na fotke
 - poruke
 - notifikacije
+  - follow
+  - new message
 - other user profile page => uzet myprofile page kao template
-- stavit na all profiles da li je user trenutno aktivan ili ne
 
 ### Easy wins
 
@@ -28,6 +35,8 @@
 
 ### Gotovo
 
+- forgot password
+- reset password
 - edit profile page
 - error kad je kriva sifra na loginu
 - zasto su svi fields required

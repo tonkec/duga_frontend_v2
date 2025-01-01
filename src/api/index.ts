@@ -1,6 +1,17 @@
 import axios from 'axios';
 import { getErrorMessage } from '../utils/getErrorMessage';
 
+const getCookie = (name: string) => {
+  const cookies = document.cookie.split('; ');
+  for (let i = 0; i < cookies.length; i++) {
+    const [key, value] = cookies[i].split('=');
+    if (key === name) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+};
+
 const apiClient = ({ isAuth }: { isAuth: boolean }) => {
   const defaultOptions = {
     baseURL: 'http://localhost:8080',
@@ -12,8 +23,9 @@ const apiClient = ({ isAuth }: { isAuth: boolean }) => {
   const instance = axios.create(defaultOptions);
   instance.interceptors.request.use(function (config) {
     if (isAuth) return config;
-    const isLoggedIn = JSON.parse(localStorage.getItem('token') || '');
-    config.headers.Authorization = isLoggedIn ? `Bearer ${isLoggedIn}` : '';
+    const token = getCookie('token');
+    const isLoggedIn = !!token;
+    config.headers.Authorization = isLoggedIn ? `Bearer ${token}` : '';
     return config;
   });
 

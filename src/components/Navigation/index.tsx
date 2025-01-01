@@ -4,17 +4,19 @@ import { BiGroup, BiExit, BiEnvelope } from 'react-icons/bi';
 import ProfilePhoto from '../ProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import { useCookies } from 'react-cookie';
 
 const navigationStyles = 'flex space-x-4 bg-black p-4 shadow-sm text-white';
 
 const Navigation = () => {
   const navigate = useNavigate();
-  const [, saveAuthToken] = useLocalStorage('token', null);
+  const [, setCookie] = useCookies(['token']);
+
   const [userId, saveUserId] = useLocalStorage('userId', null);
   const { allImages } = useGetAllImages(String(userId) || '');
 
   const onLogout = () => {
-    saveAuthToken(null);
+    setCookie('token', '');
     saveUserId(null);
     navigate('/login');
   };

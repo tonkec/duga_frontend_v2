@@ -66,8 +66,17 @@ function App() {
 
   const renderedUsers = search ? filteredUsers : allUsersWithCurrentUser;
 
+  if (!renderedUsers) {
+    return (
+      <AppLayout>
+        <h1>No users found</h1>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
+      <h1>Hello</h1>
       <UserFilters
         selectValue={selectValue}
         setSelectValue={setSelectValue}

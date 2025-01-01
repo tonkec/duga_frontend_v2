@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { login } from '../../../api/auth/login';
+import { useCookies } from 'react-cookie';
 
 interface IUserProps {
   email: string;
@@ -11,8 +12,9 @@ interface IUserProps {
 }
 
 function useLoginUser() {
+  const [, setCookie] = useCookies(['token']);
+
   const navigate = useNavigate();
-  const [, saveAuthToken] = useLocalStorage('token', null);
   const [, saveUserId] = useLocalStorage('userId', null);
 
   const {
@@ -23,7 +25,7 @@ function useLoginUser() {
   } = useMutation({
     mutationFn: ({ email, password }: IUserProps) => login(email, password),
     onSuccess: (data) => {
-      saveAuthToken(data.data.token);
+      setCookie('token', data.data.token);
       saveUserId(data.data.id);
       toast.success('Uspješno si se ulogirao_la!', toastConfig);
       navigate('/');

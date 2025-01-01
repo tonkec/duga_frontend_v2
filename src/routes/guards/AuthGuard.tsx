@@ -1,14 +1,14 @@
 import { Navigate } from 'react-router-dom';
-import { useLocalStorage } from '@uidotdev/usehooks';
+import { useCookies } from 'react-cookie';
 
 interface IAuthGuardProps {
   children: React.ReactNode;
 }
 
 export const AuthGuard = ({ children }: IAuthGuardProps) => {
-  const [isLoggedIn] = useLocalStorage('token');
+  const [cookies] = useCookies(['token']);
 
-  if (!isLoggedIn) {
+  if (!cookies.token) {
     return <Navigate to="/login" />;
   }
 
