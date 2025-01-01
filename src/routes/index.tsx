@@ -6,6 +6,7 @@ import ForgotPassword from '../pages/ForgotPassword';
 import MyProfilePage from '../pages/MyProfilePage';
 import EditMyProfilePage from '../pages/EditMyProfilePage';
 import ResetPassword from '../pages/ResetPassword';
+import VerificationPage from '../pages/VerificationPage';
 import { AuthGuard } from './guards/AuthGuard';
 
 const DugaRoutes = () => {
@@ -23,6 +24,7 @@ const DugaRoutes = () => {
       <Route path="signup" element={<SignupPage />} />
       <Route path="forgot-password" element={<ForgotPassword />} />
       <Route path="reset-password" element={<ResetPassword />} />
+      <Route path="verification" element={<VerificationPage />} />
       <Route
         path="/profile"
         element={

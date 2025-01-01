@@ -25,10 +25,17 @@ function useLoginUser() {
   } = useMutation({
     mutationFn: ({ email, password }: IUserProps) => login(email, password),
     onSuccess: (data) => {
-      setCookie('token', data.data.token);
-      saveUserId(data.data.id);
-      toast.success('Uspješno si se ulogirao_la!', toastConfig);
-      navigate('/');
+      if (data.data.isVerified) {
+        setCookie('token', data.data.token);
+        saveUserId(data.data.id);
+        toast.success('Uspješno si se ulogirao_la!', toastConfig);
+        navigate('/');
+      }
+
+      if (!data.data.isVerified) {
+        toast.error('Email nije verificiran!', toastConfig);
+        navigate('/login');
+      }
     },
     onError: () => {
       toast.error('Greška! Probaj opet.', toastConfig);

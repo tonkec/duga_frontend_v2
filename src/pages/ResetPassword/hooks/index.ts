@@ -5,7 +5,7 @@ import { toastConfig } from '../../../configs/toast.config';
 import { resetPassword } from '../../../api/auth/resetPassword';
 import { verifyToken } from '../../../api/auth/verifyToken';
 
-interface IForgotPasswordProps {
+interface IResetPasswordProps {
   password: string;
   email: string;
 }
@@ -45,7 +45,7 @@ function useResetPassword() {
     isError: isResetPasswordError,
     isSuccess,
   } = useMutation({
-    mutationFn: ({ password, email }: IForgotPasswordProps) => resetPassword(password, email),
+    mutationFn: ({ password, email }: IResetPasswordProps) => resetPassword(password, email),
     onSuccess: (data) => {
       console.log(data);
       toast.success('Lozinka je promijenjena', toastConfig);
