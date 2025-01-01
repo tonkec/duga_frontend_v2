@@ -1,15 +1,5 @@
 import { apiClient } from '..';
 
-export const getAllUsers = async () => {
-  const client = apiClient({ isAuth: false });
-  return client.get(`/users/get-users/`);
-};
-
-export const getUserById = async (id: string) => {
-  const client = apiClient({ isAuth: false });
-  return client.get(`/users/${id}`);
-};
-
 export interface IUserUpdateProps {
   bio: string;
   sexuality: string;
@@ -33,6 +23,15 @@ export interface IUserUpdateProps {
   languages: string;
   ending: string;
 }
+export const getAllUsers = async () => {
+  const client = apiClient({ isAuth: false });
+  return client.get(`/users/get-users/`);
+};
+
+export const getUserById = async (id: string) => {
+  const client = apiClient({ isAuth: false });
+  return client.get(`/users/${id}`);
+};
 
 export const updateUser = async (data: IUserUpdateProps) => {
   const client = apiClient({ isAuth: false });
