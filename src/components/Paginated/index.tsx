@@ -28,7 +28,7 @@ const Paginated = ({ data }: IPaginatedProps) => {
 
   return (
     <div className="h-full">
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {currentPageData.map((item: IUser, index: number) => (
           <li className="h-full" key={index}>
             <UserCard user={item} />

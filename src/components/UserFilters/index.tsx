@@ -23,8 +23,8 @@ interface IUserFiltersProps {
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="flex gap-2 justify-end mb-4">
-      <div>
+    <div className="md:flex gap-2 justify-end mb-4">
+      <div className="mb-2 md:mb-0">
         <Input
           type="text"
           placeholder={`Pretraži ${selectValue.label}`}
