@@ -34,7 +34,7 @@ const getUserLocation = ({ location }: { location: string }) => {
 const UserCard = ({ user }: IUserCardProps) => {
   const navigate = useNavigate();
   return (
-    <Card className="space-x-4">
+    <Card className="flex gap-3 h-full items-start">
       <Avatar
         name={`${user.firstName} ${user.lastName}`}
         src={user.avatar}
@@ -53,7 +53,7 @@ const UserCard = ({ user }: IUserCardProps) => {
         <Button
           onClick={() => navigate(`/user/${user.id}`)}
           type="primary"
-          className="mt-4 max-w-[150px]"
+          className="mt-8 max-w-[150px]"
         >
           Pogledaj profil
         </Button>

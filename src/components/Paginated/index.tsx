@@ -2,7 +2,7 @@ import { useState } from 'react';
 import UserCard, { IUser } from '../UserCard';
 import Button from '../Button';
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 6;
 
 interface IPaginatedProps {
   data: IUser[];
@@ -11,10 +11,8 @@ interface IPaginatedProps {
 const Paginated = ({ data }: IPaginatedProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Calculate total pages
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
 
-  // Get the current page's data
   const currentPageData = data.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -29,12 +27,11 @@ const Paginated = ({ data }: IPaginatedProps) => {
   };
 
   return (
-    <>
-      {' '}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+    <div className="h-full">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         {currentPageData.map((item: IUser, index: number) => (
-          <li>
-            <UserCard key={index} user={item} />
+          <li className="h-full" key={index}>
+            <UserCard user={item} />
           </li>
         ))}
       </ul>
@@ -49,7 +46,7 @@ const Paginated = ({ data }: IPaginatedProps) => {
           Next
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 
