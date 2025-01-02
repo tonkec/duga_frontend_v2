@@ -2,11 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import './App.css';
 import AppLayout from './components/AppLayout';
 import { getAllUsers } from './api/users';
-import UserCard, { IUser } from './components/UserCard';
+import { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetUserById } from './hooks/useGetUserById';
+import Paginated from './components/Paginated';
 
 const useGetAllUsers = () => {
   const {
@@ -24,7 +25,6 @@ const useGetAllUsers = () => {
 function App() {
   const [userId] = useLocalStorage('userId');
   const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
-
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [selectValue, setSelectValue] = useState({
     value: '',
@@ -82,11 +82,7 @@ function App() {
         search={search}
         setSearch={setSearch}
       />
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
-        {renderedUsers.map((user: IUser) => (
-          <UserCard key={user.id} user={user} />
-        ))}
-      </ul>
+      <Paginated data={renderedUsers} />
     </AppLayout>
   );
 }

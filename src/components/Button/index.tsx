@@ -3,6 +3,7 @@ interface IButtonProps {
   onClick?: () => void;
   className?: string;
   type: 'primary' | 'secondary' | 'tertiary' | 'icon' | 'black';
+  disabled?: boolean;
 }
 
 const defaultStyles = `rounded text-sm`;
@@ -24,10 +25,15 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
   }
 };
 
-const Button = ({ children, onClick, className, type, ...props }: IButtonProps) => {
+const Button = ({ children, onClick, className, type, disabled, ...props }: IButtonProps) => {
   const bgColor = getBackgroundColor(type);
   return (
-    <button {...props} className={`${defaultStyles} ${bgColor} ${className}`} onClick={onClick}>
+    <button
+      {...props}
+      disabled={disabled}
+      className={`${defaultStyles} ${bgColor} ${className}`}
+      onClick={onClick}
+    >
       {children}
     </button>
   );

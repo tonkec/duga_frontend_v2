@@ -12,7 +12,7 @@ import {
 import Iframe from 'react-iframe';
 import { IImage } from '../Photos';
 
-interface IUserProfileCardProps {
+export interface IUserProfileCardProps {
   bio: string;
   sexuality: string;
   gender: string;
