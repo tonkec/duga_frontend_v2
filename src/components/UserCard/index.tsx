@@ -1,7 +1,8 @@
-import { truncateString } from '../../utils/truncateString';
 import Button from '../Button';
 import Avatar from 'react-avatar';
 import Card from '../Card';
+import { getUserBio } from '../UserProfileCard/utils';
+import { useNavigate } from 'react-router';
 export interface IUser {
   avatar: string;
   email: string;
@@ -22,14 +23,6 @@ interface IUserCardProps {
   user: IUser;
 }
 
-export const getUserBio = (bio: string) => {
-  if (!bio) {
-    return 'Biografija još nije postavljena.';
-  }
-
-  return truncateString(bio, 100);
-};
-
 const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return <p className="text-gray-600">Lokacija: Nepoznato</p>;
@@ -39,6 +32,7 @@ const getUserLocation = ({ location }: { location: string }) => {
 };
 
 const UserCard = ({ user }: IUserCardProps) => {
+  const navigate = useNavigate();
   return (
     <Card className="space-x-4">
       <Avatar
@@ -56,7 +50,11 @@ const UserCard = ({ user }: IUserCardProps) => {
           {getUserLocation(user)}
           <p className="text-gray-600 mt-2">{getUserBio(user.bio)}</p>
         </div>
-        <Button onClick={() => {}} type="primary" className="mt-4 max-w-[150px]">
+        <Button
+          onClick={() => navigate(`/user/${user.id}`)}
+          type="primary"
+          className="mt-4 max-w-[150px]"
+        >
           Pogledaj profil
         </Button>
       </div>

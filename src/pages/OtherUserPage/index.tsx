@@ -1,29 +1,42 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
+import { useParams } from 'react-router';
 import AppLayout from '../../components/AppLayout';
-import Card from '../../components/Card';
-import Cta from '../../components/Cta';
-import Photos, { IImage } from '../../components/Photos';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
-import { useNavigate } from 'react-router';
 import UserProfileCard from '../../components/UserProfileCard';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
-import 'react-tabs/style/react-tabs.css';
+import Cta from '../../components/Cta';
+import Card from '../../components/Card';
+import Photos from '../../components/Photos';
 import { useGetUserById } from '../../hooks/useGetUserById';
 
-const MyProfilePage = () => {
-  const navigate = useNavigate();
-  const [userId] = useLocalStorage('userId');
+const OtherUserPage = () => {
+  const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
-  const { user: currentUser } = useGetUserById(userId as string);
+  const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
 
-  if (allImagesLoading) {
-    return <AppLayout>Loading...</AppLayout>;
+  if (!userId || isNaN(Number(userId))) {
+    return (
+      <AppLayout>
+        <p>Korisnik_ca nije pronađen_a!</p>
+      </AppLayout>
+    );
   }
 
-  const allImagesWithoutProfilePhoto = allImages?.data.images.filter(
-    (image: IImage) => !image.isProfilePhoto
-  );
+  if (isUserLoading) {
+    return (
+      <AppLayout>
+        <p>Učitavanje...</p>
+      </AppLayout>
+    );
+  }
+
+  if (!otherUser) {
+    return (
+      <AppLayout>
+        <p>Korisnik_ca nije pronađen_a!</p>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -45,7 +58,7 @@ const MyProfilePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
             <div className="lg:col-span-2">
               <UserProfileCard
-                user={currentUser?.data}
+                user={otherUser?.data}
                 allImages={allImages?.data.images}
                 allImagesLoading={allImagesLoading}
               />
@@ -53,25 +66,16 @@ const MyProfilePage = () => {
 
             <div className="lg:col-span-1 max-w-[300px]">
               <Cta
-                buttonText="Uredi profil"
-                className="mb-4"
-                subtitle="Impresioniraj ekipu svojim profilom."
-                title="Uredi svoj profil!"
-                onClick={() => {
-                  navigate('/edit');
-                }}
-              />
-              <Cta
-                buttonText="Pošalji poruku"
-                subtitle="Možda te baš čeka zanimljiva osoba."
-                title="Pošalji nekome poruku!"
+                buttonText="Zaprati"
+                subtitle="Zaprati ovu zanimljivu osobicu."
+                title="Zaprati me!"
                 onClick={() => {}}
               />
               <Cta
-                buttonText="Pretraži ekipu"
                 className="mt-4"
-                subtitle="Istraži koga ima okolo."
-                title="Istraži!"
+                buttonText="Pošalji poruku"
+                subtitle="Pošalji poruku ovoj osobici."
+                title="Pošalji poruku!"
                 onClick={() => {}}
               />
             </div>
@@ -79,7 +83,7 @@ const MyProfilePage = () => {
         </TabPanel>
         <TabPanel>
           <Card>
-            <Photos notFoundText="Nema fotografija" images={allImagesWithoutProfilePhoto} />
+            <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
           </Card>
         </TabPanel>
       </Tabs>
@@ -87,4 +91,4 @@ const MyProfilePage = () => {
   );
 };
 
-export default MyProfilePage;
+export default OtherUserPage;

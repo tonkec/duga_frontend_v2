@@ -7,6 +7,7 @@ import MyProfilePage from '../pages/MyProfilePage';
 import EditMyProfilePage from '../pages/EditMyProfilePage';
 import ResetPassword from '../pages/ResetPassword';
 import VerificationPage from '../pages/VerificationPage';
+import OtherUserPage from '../pages/OtherUserPage';
 import { AuthGuard } from './guards/AuthGuard';
 
 const DugaRoutes = () => {
@@ -42,6 +43,8 @@ const DugaRoutes = () => {
           </AuthGuard>
         }
       />
+
+      <Route path="/user/:userId" element={<OtherUserPage />} />
     </Routes>
   );
 };
