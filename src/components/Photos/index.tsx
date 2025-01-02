@@ -1,12 +1,9 @@
 import { SetStateAction, useState } from 'react';
-import { Carousel } from 'react-responsive-carousel';
-import Modal from 'react-modal';
-import Button from '../../components/Button';
-import { BiArrowBack } from 'react-icons/bi';
 import notFound from '../../assets/not_found.svg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { REACT_APP_S3_BUCKET_URL } from '../../utils/getProfilePhoto';
 import { ImageDescription } from '../PhotoUploader';
+import TextArea from '../Textarea';
 export interface IImage {
   createdAt: string;
   description: string;
@@ -27,18 +24,6 @@ interface IPhotosProps {
   setImageDescriptions?: (e: SetStateAction<ImageDescription[]>) => void;
 }
 
-Modal.setAppElement('#root');
-const customStyles = {
-  content: {
-    width: '600px',
-    margin: 'auto',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '750px',
-  },
-};
-
 export const getImageUrl = (image: IImage) => {
   if (image.isLocal) {
     return image.url;
@@ -46,13 +31,57 @@ export const getImageUrl = (image: IImage) => {
   return `${REACT_APP_S3_BUCKET_URL}/${image.url}`;
 };
 
-const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
+const PhotoPreviewer = ({
+  currentImageURL,
+  setCurrentImageURL,
+  currentImageDescription,
+}: {
+  currentImageDescription: string | null;
+  currentImageURL: string | null;
+  setCurrentImageURL: (e: string | null) => void;
+}) => {
+  return (
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 z-50 flex p-4">
+      <button
+        className="absolute top-0 right-0 p-2 bg-white rounded-full"
+        onClick={() => setCurrentImageURL(null)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+      <div className="relative">
+        <img src={currentImageURL ? currentImageURL : ''} alt="current image" />
+      </div>
+      <div className="flex-1">
+        {currentImageDescription && (
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold">Opis</h2>
+            <p>{currentImageDescription}</p>
+          </div>
+        )}
+        <form className="">
+          <TextArea placeholder="Napiši komentar" />
+        </form>
+      </div>
+    </div>
+  );
+};
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
+  const [currentImageURL, setCurrentImageURL] = useState<string | null>(null);
+  const [currentImageDescription, setCurrentImageDescription] = useState<string | null>(null);
 
   if (!images || !images.length) {
     return (
@@ -65,32 +94,6 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
 
   return (
     <>
-      {!isEditable && (
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={closeModal}
-          contentLabel="Example Modal"
-          style={customStyles}
-        >
-          <div>
-            <Button type="icon" onClick={closeModal}>
-              <BiArrowBack fontSize={20} />
-            </Button>
-            <Carousel selectedItem={imageIndex}>
-              {images.map((image: IImage, index: number) => {
-                return (
-                  <div className="relative" key={index}>
-                    <img src={`${REACT_APP_S3_BUCKET_URL}/${image.url}`} alt="user image" />
-                    <p className="absolute top-0 px-4 py-2 w-full bg-black text-white">
-                      {image.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </Carousel>
-          </div>
-        </Modal>
-      )}
       <h2 className="font-bold mt-5 mb-2">Fotografije ({images.length})</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {images.map((image: IImage, index: number) => {
@@ -101,16 +104,22 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
                 src={getImageUrl(image)}
                 alt="user image"
                 onClick={() => {
-                  if (!isEditable) {
-                    setImageIndex(index);
-                    setIsModalOpen(true);
-                  }
+                  setCurrentImageURL(getImageUrl(image));
+                  setCurrentImageDescription(image.description);
                 }}
               />
             </div>
           );
         })}
       </div>
+
+      {currentImageURL && (
+        <PhotoPreviewer
+          currentImageURL={currentImageURL}
+          setCurrentImageURL={setCurrentImageURL}
+          currentImageDescription={currentImageDescription}
+        />
+      )}
     </>
   );
 };

@@ -1,16 +1,13 @@
 # Next to do
 
-- verification email
-
-  - kad se signupa, dobije email s tokenom za potvrdu
-  - ne moze se ulogirat ako nije email potvrden
-
-- spremit auth token u cookie => https://www.npmjs.com/package/react-cookie
+- photo comments
+  - dodat formu na sliku od tudeg profila
+  - crud komentara
+  - makmut opis s fotke ako nema opisa
 
 ### Enhancements
-  
+
 - fallback za avatar svg ili slova?
-- paginacija svih profila
 - objasnjenje za iframove
 - stavit na all profiles da li je user trenutno aktivan ili ne
 
@@ -35,6 +32,13 @@
 
 ### Gotovo
 
+- paginacija svih profila
+- verification email
+
+  - kad se signupa, dobije email s tokenom za potvrdu
+  - ne moze se ulogirat ako nije email potvrden
+
+- spremit auth token u cookie => https://www.npmjs.com/package/react-cookie
 - forgot password
 - reset password
 - edit profile page
