@@ -24,16 +24,16 @@ export interface IUserUpdateProps {
   ending: string;
 }
 export const getAllUsers = async () => {
-  const client = apiClient({ isAuth: false });
+  const client = apiClient();
   return client.get(`/users/get-users/`);
 };
 
 export const getUserById = async (id: string) => {
-  const client = apiClient({ isAuth: false });
+  const client = apiClient();
   return client.get(`/users/${id}`);
 };
 
 export const updateUser = async (data: IUserUpdateProps) => {
-  const client = apiClient({ isAuth: false });
+  const client = apiClient();
   return client.post(`/users/update-user`, { data: data });
 };

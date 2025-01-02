@@ -6,6 +6,6 @@ export const register = async (
   firstName: string,
   lastName: string
 ) => {
-  const client = apiClient({ isAuth: true });
+  const client = apiClient(true);
   return client.post(`/register`, { email, password, firstName, lastName });
 };

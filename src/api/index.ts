@@ -12,7 +12,7 @@ const getCookie = (name: string) => {
   return null;
 };
 
-const apiClient = ({ isAuth }: { isAuth: boolean }) => {
+const apiClient = (isAuth?: boolean) => {
   const defaultOptions = {
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: {
