@@ -2,7 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import Cta from '../../components/Cta';
-import Photos, { IImage } from '../../components/Photos';
+import Photos from '../../components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
@@ -20,10 +20,6 @@ const MyProfilePage = () => {
   if (allImagesLoading) {
     return <AppLayout>Loading...</AppLayout>;
   }
-
-  const allImagesWithoutProfilePhoto = allImages?.data.images.filter(
-    (image: IImage) => !image.isProfilePhoto
-  );
 
   return (
     <AppLayout>
@@ -79,7 +75,7 @@ const MyProfilePage = () => {
         </TabPanel>
         <TabPanel>
           <Card>
-            <Photos notFoundText="Nema fotografija" images={allImagesWithoutProfilePhoto} />
+            <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
           </Card>
         </TabPanel>
       </Tabs>
