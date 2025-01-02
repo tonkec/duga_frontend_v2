@@ -1,5 +1,5 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { getImageUrl, IImage } from '../Photos';
+import { IImage } from '../Photos';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '../Button';
@@ -11,6 +11,7 @@ import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { useDeletePhoto } from '../Photos/hooks';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../configs/toast.config';
+import { getImageUrl } from '../../utils/getImageUrl';
 export interface ImageDescription {
   description: string;
   imageId: string;

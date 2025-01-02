@@ -1,6 +1,7 @@
 # Next to do
 
 - photo comments
+  - dodat rutu za fotku
   - dodat formu na sliku od tudeg profila
   - crud komentara
   - makmut opis s fotke ako nema opisa

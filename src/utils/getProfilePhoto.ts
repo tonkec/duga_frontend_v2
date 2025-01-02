@@ -1,7 +1,6 @@
 import avatar from '../assets/avatar.svg';
 import { IImage } from '../components/Photos';
-export const REACT_APP_S3_BUCKET_URL = 'https://duga-user-photo.s3.eu-north-1.amazonaws.com';
-
+import { REACT_APP_S3_BUCKET_URL } from './consts';
 export const getProfilePhotoUrl = (profilePhoto: IImage | undefined) => {
   if (profilePhoto) {
     return `${REACT_APP_S3_BUCKET_URL}/${profilePhoto.url}`;

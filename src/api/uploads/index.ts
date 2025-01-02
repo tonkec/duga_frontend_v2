@@ -10,6 +10,11 @@ export const deleteImage = async (url: string) => {
   return client.delete(`/uploads/delete-photo`, { data: { url } });
 };
 
+export const getSingleImage = async (id: string) => {
+  const client = apiClient();
+  return client.get(`/uploads/photo/${id}`);
+};
+
 export const uploadPhotos = async (data: FormData) => {
   const client = apiClient();
   return client.post(`/uploads/photos`, data, {
