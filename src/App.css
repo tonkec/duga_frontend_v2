@@ -23,11 +23,3 @@ html {
     @apply text-lg;
   }
 }
-
-/* carousel */
-.carousel.carousel-slider .control-arrow {
-  opacity: 1 !important;
-  top: 50% !important;
-  bottom: auto !important;
-  background-color: black !important;
-}

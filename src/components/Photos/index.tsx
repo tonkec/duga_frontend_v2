@@ -1,6 +1,5 @@
 import { SetStateAction } from 'react';
 import notFound from '../../assets/not_found.svg';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { ImageDescription } from '../PhotoUploader';
 import { useNavigate } from 'react-router';
 import { getImageUrl } from '../../utils/getImageUrl';
