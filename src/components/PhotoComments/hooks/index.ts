@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import { addUploadComment } from '../../../api/uploadComments';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { addUploadComment, getUploadComments } from '../../../api/uploadComments';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 
@@ -19,7 +19,7 @@ export const useAddUploadComment = () => {
     mutationFn: ({ userId, uploadId, comment }: IAddUploadCommentProps) =>
       addUploadComment({ userId, uploadId, comment }),
     onSuccess: (data) => {
-      console.log('Komentar uspješno dodan.', data);
+      console.log(data);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
@@ -32,4 +32,17 @@ export const useAddUploadComment = () => {
     isAddUploadCommentError,
     isAddUploadCommentSuccess,
   };
+};
+
+export const useGetUploadComments = (uploadId: string) => {
+  const {
+    data: allComments,
+    error: allCommentsError,
+    isPending: allCommentsLoading,
+  } = useQuery({
+    queryKey: ['comments'],
+    queryFn: () => getUploadComments(uploadId),
+  });
+
+  return { allComments, allCommentsError, allCommentsLoading };
 };

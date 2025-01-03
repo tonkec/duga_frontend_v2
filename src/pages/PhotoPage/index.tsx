@@ -16,7 +16,7 @@ const PhotoPage = () => {
   return (
     <AppLayout>
       <Card>
-        <div className="lg:flex gap-5 items-end">
+        <div className="lg:flex gap-5 items-start">
           <div>
             <img src={getPhotoUrl(singleImage?.data)} alt="Slika" />
             <p>PHoto likes</p>

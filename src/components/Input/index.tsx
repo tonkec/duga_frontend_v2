@@ -14,7 +14,7 @@ const inputStyles = `bg-white focus:outline-none focus:shadow-outline border bor
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ placeholder, type, className, onChange, icon, value, defaultValue, ...props }, ref) => {
-    return (
+    return icon ? (
       <div className="relative">
         <input
           {...props}
@@ -28,6 +28,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         />
         {icon && <span className="absolute right-3 top-3">{icon}</span>}
       </div>
+    ) : (
+      <input
+        {...props}
+        ref={ref}
+        className={`${inputStyles} ${className}`}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        defaultValue={defaultValue}
+        type={type}
+      />
     );
   }
 );
