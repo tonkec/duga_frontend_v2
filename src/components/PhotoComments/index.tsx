@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
+import FieldError from '../FieldError';
 
 const schema = z.object({
   comment: z.string().nonempty('Komentar je obavezan.'),
@@ -31,7 +32,7 @@ const PhotoComments = () => {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
@@ -51,7 +52,6 @@ const PhotoComments = () => {
 
   return (
     <>
-      {' '}
       <div className="flex flex-col gap-2 ">
         <div>
           {allComments?.data.map((comment: IComment) => (
@@ -61,6 +61,7 @@ const PhotoComments = () => {
           ))}
         </div>
       </div>
+
       <form
         className="flex w-full justify-between gap-2 items-center"
         onSubmit={handleSubmit(onSubmit)}
@@ -68,6 +69,7 @@ const PhotoComments = () => {
         <Input type="text" placeholder="Dodaj komentar" {...register('comment')} />
         <Button type="primary">Komentiraj</Button>
       </form>
+      {errors.comment && <FieldError message={errors.comment.message || ''} />}
     </>
   );
 };
