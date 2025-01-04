@@ -10,7 +10,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
       ) : (
-        <p>komentirao_la: {user?.data.firstName || `User ${comment.userId}`}</p>
+        <p>od: {user?.data.firstName || `User ${comment.userId}`}</p>
       )}
     </div>
   );

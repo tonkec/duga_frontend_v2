@@ -8,6 +8,8 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '../FieldError';
+import { socket } from '../../socket';
+import { useEffect, useState } from 'react';
 
 const schema = z.object({
   comment: z.string().nonempty('Komentar je obavezan.'),
@@ -21,18 +23,24 @@ export interface IComment {
   id: string;
   comment: string;
   userId: string;
+  uploadId: string;
+  createdAt: string;
 }
 
 const PhotoComments = () => {
   const { mutateAddUploadComment } = useAddUploadComment();
   const [userId] = useLocalStorage('userId');
   const { photoId } = useParams();
-  const { allComments } = useGetUploadComments(photoId as string);
+  const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
+    photoId as string
+  );
+  const [allComments, setAllComments] = useState<IComment[]>([]);
 
   const {
     register,
     handleSubmit,
     formState: { isValid, errors },
+    reset,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
@@ -48,13 +56,31 @@ const PhotoComments = () => {
       comment: data.comment,
     };
     mutateAddUploadComment(dataToSubmit);
+    reset();
   };
+
+  useEffect(() => {
+    if (!areCommentsLoading) {
+      setAllComments(allCommentsData?.data as IComment[]);
+    }
+    socket.on('receive-comment', (data) => {
+      setAllComments((prev) => [...prev, data.data]);
+    });
+
+    return () => {
+      socket.off('receive-comment');
+    };
+  }, [areCommentsLoading, allCommentsData]);
+
+  const sortedComments = allComments?.sort((a, b) => {
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
 
   return (
     <>
       <div className="flex flex-col gap-2 ">
         <div>
-          {allComments?.data.map((comment: IComment) => (
+          {sortedComments?.map((comment: IComment) => (
             <div key={comment.id} className="bg-gray-100 p-2 rounded mb-2">
               <CommentWithUser comment={comment} />
             </div>
