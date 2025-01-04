@@ -64,6 +64,7 @@ const PhotoComments = () => {
     if (!areCommentsLoading) {
       setAllComments(allCommentsData?.data as IComment[]);
     }
+
     socket.on('receive-comment', (data) => {
       setAllComments((prev) => [...prev, data.data]);
     });
@@ -74,7 +75,7 @@ const PhotoComments = () => {
   }, [areCommentsLoading, allCommentsData]);
 
   const sortedComments = allComments?.sort((a, b) => {
-    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (
