@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import './App.css';
 import AppLayout from './components/AppLayout';
 import { getAllUsers } from './api/users';
-import { IUser } from './components/UserCard';
+import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
@@ -84,7 +84,13 @@ function App() {
         search={search}
         setSearch={setSearch}
       />
-      <Paginated data={renderedUsers} />
+      <Paginated<IUser>
+        gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        data={renderedUsers}
+        paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
+          <UserCard user={singleEntry} />
+        )}
+      />
     </AppLayout>
   );
 }

@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import UserCard, { IUser } from '../UserCard';
 import Button from '../Button';
 
 const ITEMS_PER_PAGE = 6;
 
-interface IPaginatedProps {
-  data: IUser[];
+interface IPaginatedProps<T> {
+  data: T[];
+  paginatedSingle: React.FC<{ singleEntry: T }>;
+  gridClassName?: string;
 }
 
-const Paginated = ({ data }: IPaginatedProps) => {
+const Paginated = <T,>({
+  data,
+  paginatedSingle: PaginatedSingle,
+  gridClassName,
+}: IPaginatedProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
@@ -25,13 +30,12 @@ const Paginated = ({ data }: IPaginatedProps) => {
   const goToPreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
-
   return (
     <div className="h-full">
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentPageData.map((item: IUser, index: number) => (
+      <ul className={gridClassName}>
+        {currentPageData.map((item, index) => (
           <li className="h-full" key={index}>
-            <UserCard user={item} />
+            <PaginatedSingle singleEntry={item} />
           </li>
         ))}
       </ul>

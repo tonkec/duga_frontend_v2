@@ -10,6 +10,7 @@ import CommentWithUser from './components/CommentWithUser';
 import FieldError from '../FieldError';
 import { socket } from '../../socket';
 import { useEffect, useState } from 'react';
+import Paginated from '../Paginated';
 
 const schema = z.object({
   comment: z.string().nonempty('Komentar je obavezan.'),
@@ -80,11 +81,13 @@ const PhotoComments = () => {
     <>
       <div className="flex flex-col gap-2 ">
         <div>
-          {sortedComments?.map((comment: IComment) => (
-            <div key={comment.id} className="bg-gray-100 p-2 rounded mb-2">
-              <CommentWithUser comment={comment} />
-            </div>
-          ))}
+          <Paginated<IComment>
+            gridClassName="grid grid-cols-1 gap-2"
+            data={sortedComments}
+            paginatedSingle={({ singleEntry }: { singleEntry: IComment }) => (
+              <CommentWithUser comment={singleEntry} />
+            )}
+          />
         </div>
       </div>
 
