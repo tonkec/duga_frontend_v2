@@ -20,7 +20,7 @@ export const getUploadComments = async (uploadId: string) => {
   return client.get(`/comments/get-comments/${uploadId}`);
 };
 
-export const deleteUploadComment = async (commentId: string) => {
+export const deleteUploadComment = async (commentId: number) => {
   const client = apiClient();
   return client.delete(`/comments/delete-comment/${commentId}`);
 };

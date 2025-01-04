@@ -1,10 +1,9 @@
 # Next to do
 
 - photo comments
-  - dodat rutu za fotku
-  - dodat formu na sliku od tudeg profila
   - crud komentara
-  - makmut opis s fotke ako nema opisa
+  - maknut opis s fotke ako nema opisa
+  - istestirat s dva usera da li rade socketi
 
 ### Enhancements
 
@@ -33,6 +32,8 @@
 
 ### Gotovo
 
+- dodat formu na sliku od tudeg profila
+- dodat rutu za fotku
 - paginacija svih profila
 - verification email
 

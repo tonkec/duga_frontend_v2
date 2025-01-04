@@ -21,7 +21,7 @@ interface Inputs {
 }
 
 export interface IComment {
-  id: string;
+  id: number;
   comment: string;
   userId: string;
   uploadId: string;
@@ -69,8 +69,18 @@ const PhotoComments = () => {
       setAllComments((prev) => [...prev, data.data]);
     });
 
+    socket.on('remove-comment', (data) => {
+      setAllComments((prev) => {
+        const updatedComments = prev.filter(
+          (comment) => comment.id !== Number(data.data.commentId)
+        );
+        return updatedComments;
+      });
+    });
+
     return () => {
       socket.off('receive-comment');
+      socket.off('delete-comment');
     };
   }, [areCommentsLoading, allCommentsData]);
 

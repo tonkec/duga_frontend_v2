@@ -30,26 +30,33 @@ const Paginated = <T,>({
   const goToPreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
+
+  if (totalPages === 0) {
+    return null;
+  }
+
   return (
     <div className="h-full">
       <ul className={gridClassName}>
         {currentPageData.map((item, index) => (
-          <li className="h-full" key={index}>
+          <li className="h-full mb-2" key={index}>
             <PaginatedSingle singleEntry={item} />
           </li>
         ))}
       </ul>
-      <div className="flex justify-center items-center w-full p-4 gap-4">
-        <Button type="tertiary" onClick={goToPreviousPage} disabled={currentPage === 1}>
-          Previous
-        </Button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <Button type="tertiary" onClick={goToNextPage} disabled={currentPage === totalPages}>
-          Next
-        </Button>
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center w-full p-4 gap-4">
+          <Button type="tertiary" onClick={goToPreviousPage} disabled={currentPage === 1}>
+            Previous
+          </Button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button type="tertiary" onClick={goToNextPage} disabled={currentPage === totalPages}>
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
