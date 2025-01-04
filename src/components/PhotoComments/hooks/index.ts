@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   addUploadComment,
   deleteUploadComment,
+  editUploadComment,
   getUploadComments,
 } from '../../../api/uploadComments';
 import { toast } from 'react-toastify';
@@ -12,6 +13,32 @@ interface IAddUploadCommentProps {
   uploadId: string;
   comment: string;
 }
+
+export const useEditUploadComment = () => {
+  const {
+    mutate: mutateEditUploadComment,
+    isPending: isEditingUploadComment,
+    isError: isEditUploadCommentError,
+    isSuccess: isEditUploadCommentSuccess,
+  } = useMutation({
+    mutationFn: (comment: { id: number; comment: string }) =>
+      editUploadComment(comment.id, comment.comment),
+    onSuccess: (data) => {
+      toast.success('Komentar uspješno izmijenjen.', toastConfig);
+      socket.emit('edit-comment', data);
+    },
+    onError: () => {
+      toast.error('Došlo je do greške.', toastConfig);
+    },
+  });
+
+  return {
+    mutateEditUploadComment,
+    isEditingUploadComment,
+    isEditUploadCommentError,
+    isEditUploadCommentSuccess,
+  };
+};
 
 export const useAddUploadComment = () => {
   const {
