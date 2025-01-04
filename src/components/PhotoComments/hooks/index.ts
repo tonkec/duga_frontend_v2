@@ -4,7 +4,7 @@ import {
   deleteUploadComment,
   editUploadComment,
   getUploadComments,
-} from '../../../api/uploadComments';
+} from '../../../api/uploadsComments';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { socket } from '../../../socket';

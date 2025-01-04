@@ -1,12 +1,12 @@
 # Next to do
 
-- photo comments
-  - crud komentara
-  - maknut opis s fotke ako nema opisa
-  - istestirat s dva usera da li rade socketi
+- photo likes
+- testirat apsolutno sve
+- enhancements
 
 ### Enhancements
 
+- maknut opis s fotke ako nema opisa
 - fallback za avatar svg ili slova?
 - objasnjenje za iframove
 - stavit na all profiles da li je user trenutno aktivan ili ne
@@ -32,6 +32,9 @@
 
 ### Gotovo
 
+- photo comments
+- crud komentara
+- istestirat s dva usera da li rade socketi
 - dodat formu na sliku od tudeg profila
 - dodat rutu za fotku
 - paginacija svih profila

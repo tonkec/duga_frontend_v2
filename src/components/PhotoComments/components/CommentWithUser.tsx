@@ -79,7 +79,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2 bg-gray-100 p-2 rounded">
+    <div className="flex flex-col gap-1 bg-gray-100 p-2 rounded">
       {renderContent()}
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
