@@ -4,6 +4,7 @@ import { useGetSingleImage } from './hooks';
 import { getPhotoUrl } from '../../utils/getPhotoUrl';
 import Card from '../../components/Card';
 import PhotoComments from '../../components/PhotoComments';
+import PhotoLikes from '../../components/PhotoLikes';
 
 const PhotoPage = () => {
   const { photoId } = useParams();
@@ -19,7 +20,7 @@ const PhotoPage = () => {
         <div className="lg:flex gap-5 items-start">
           <div>
             <img src={getPhotoUrl(singleImage?.data)} alt="Slika" />
-            <p>PHoto likes</p>
+            <PhotoLikes photoId={photoId} />
           </div>
           <div className="flex-1">
             <PhotoComments />

@@ -1,37 +1,35 @@
 # Next to do
 
-- photo likes
+- photo likes, ne moze sam sebi lajkat
 - testirat apsolutno sve
-- enhancements
 
 ### Enhancements
 
+- all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
 - fallback za avatar svg ili slova?
 - objasnjenje za iframove
-- stavit na all profiles da li je user trenutno aktivan ili ne
 
 ### Sljedeci veliki feature
 
-- prikazat lajkove na fotke
-- dodat komentare na fotke
+- stavit na all profiles da li je user trenutno aktivan ili ne
 - poruke
 - notifikacije
   - follow
   - new message
-- other user profile page => uzet myprofile page kao template
+  - komnetar
+  - lajk
 
 ### Easy wins
 
 - loaderi za slike => poslije editing profile
 - loader za lodanje data
-
-### Layout
-
 - React helmet
 
 ### Gotovo
 
+- other user profile page => uzet myprofile page kao template
+- dodat komentare na fotke
 - photo comments
 - crud komentara
 - istestirat s dva usera da li rade socketi
