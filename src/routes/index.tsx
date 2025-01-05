@@ -9,6 +9,7 @@ import ResetPassword from '../pages/ResetPassword';
 import VerificationPage from '../pages/VerificationPage';
 import OtherUserPage from '../pages/OtherUserPage';
 import PhotoPage from '../pages/PhotoPage';
+import ChatPage from '../pages/ChatPage';
 import { AuthGuard } from './guards/AuthGuard';
 
 const DugaRoutes = () => {
@@ -59,6 +60,15 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PhotoPage />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/chat"
+        element={
+          <AuthGuard>
+            <ChatPage />
           </AuthGuard>
         }
       />

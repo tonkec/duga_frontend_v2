@@ -11,7 +11,6 @@ const navigationStyles = 'flex space-x-4 bg-black p-4 shadow-sm text-white';
 const Navigation = () => {
   const navigate = useNavigate();
   const [, setCookie] = useCookies(['token']);
-
   const [userId, saveUserId] = useLocalStorage('userId', null);
   const { allImages } = useGetAllImages(String(userId) || '');
 
@@ -25,7 +24,7 @@ const Navigation = () => {
     <nav className={navigationStyles}>
       <ul className="flex w-full gap-2 space-x-4 items-center">
         <li>
-          <Link to="/" className="flex items-center gap-1">
+          <Link to="/chat" className="flex items-center gap-1">
             Poruke
             <BiEnvelope fontSize={25} />
           </Link>
