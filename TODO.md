@@ -1,7 +1,7 @@
 # Next to do
 
 - poruke
-  - find user to chat with
+  - find user to chat with => vec ima chat?
   - create chat
   - send message
   - receive message
