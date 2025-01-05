@@ -3,10 +3,13 @@ import AppLayout from '../../components/AppLayout';
 import Input from '../../components/Input';
 import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 import UserCard, { IUser } from '../../components/UserCard';
+import { useCreateNewChat } from './hooks';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 const NewChatPage = () => {
+  const [currentUserId] = useLocalStorage('userId');
   const [search, setSearch] = useState('');
-
+  const { onCreateChat } = useCreateNewChat();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
 
   if (isAllUsersLoading) {
@@ -20,6 +23,10 @@ const NewChatPage = () => {
           user.lastName.toLowerCase().includes(search.toLowerCase())
       )
     : [];
+
+  const onButtonClick = (partnerId: string) => {
+    onCreateChat({ userId: currentUserId as string, partnerId });
+  };
 
   return (
     <AppLayout>
@@ -37,9 +44,7 @@ const NewChatPage = () => {
             <UserCard
               key={user.id}
               user={user}
-              onButtonClick={() => {
-                console.log('clicked');
-              }}
+              onButtonClick={() => onButtonClick(user.id)}
               buttonText="Pošalji poruku"
             />
           );
