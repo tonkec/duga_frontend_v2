@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { addUploadLike, getUploadLikes, removeUploadLike } from '../../../api/uploadsLikes';
+import { socket } from '../../../socket';
 
 export const useUpvoteUpload = () => {
   const {
@@ -12,7 +13,7 @@ export const useUpvoteUpload = () => {
   } = useMutation({
     mutationFn: (photoLike: { userId: string; uploadId: string }) => addUploadLike(photoLike),
     onSuccess: (data) => {
-      console.log(data);
+      socket.emit('upvote-upload', data.data);
       toast.success('Fotografija je lajkana', toastConfig);
     },
     onError: (e) => {
@@ -37,7 +38,8 @@ export const useDownvoteUpload = () => {
     isSuccess: isDownvoteUploadSuccess,
   } = useMutation({
     mutationFn: (photoLike: { userId: string; uploadId: string }) => removeUploadLike(photoLike),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      socket.emit('downvote-upload', data.data);
       toast.success('Fotografija je dislajkana', toastConfig);
     },
     onError: (e) => {

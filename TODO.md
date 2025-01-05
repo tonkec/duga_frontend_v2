@@ -1,6 +1,7 @@
 # Next to do
 
-- photo likes, ne moze sam sebi lajkat
+- photo likes
+- edit comment socket emit
 - testirat apsolutno sve
 
 ### Enhancements

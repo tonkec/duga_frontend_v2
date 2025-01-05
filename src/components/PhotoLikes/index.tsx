@@ -1,6 +1,8 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
+import { useEffect, useState } from 'react';
+import { socket } from '../../socket';
 
 interface IPhotoLikesProps {
   photoId: string | undefined;
@@ -14,9 +16,10 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const [currentUser] = useLocalStorage('userId');
   const { mutateUpvoteUpload } = useUpvoteUpload();
   const { mutateDownvoteUpload } = useDownvoteUpload();
-  const { allUploadUpvotes } = useGetUploadUpvotes(photoId as string);
+  const { allUploadUpvotes, areUploadUpvotesLoading } = useGetUploadUpvotes(photoId as string);
+  const [allLikes, setAllLikes] = useState<ILike[]>([]);
 
-  const hasUserLiked = allUploadUpvotes?.data.some((like: ILike) => like.userId === currentUser);
+  const hasUserLiked = allLikes.some((like) => like.userId === currentUser);
 
   const onUpvote = () => {
     if (!currentUser || !photoId) {
@@ -40,6 +43,21 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
     });
   };
 
+  useEffect(() => {
+    socket.on('upvote-upload', (data: ILike[]) => {
+      setAllLikes(data);
+    });
+
+    socket.on('downvote-upload', (data: ILike[]) => {
+      setAllLikes(data);
+    });
+  }, [allLikes, currentUser]);
+
+  useEffect(() => {
+    if (!areUploadUpvotesLoading) {
+      setAllLikes(allUploadUpvotes?.data);
+    }
+  }, [allUploadUpvotes, areUploadUpvotesLoading]);
   return (
     <div className="flex items-center gap-2 mt-2">
       {hasUserLiked ? (
@@ -47,7 +65,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
       ) : (
         <BiHeart color="red" className="cursor-pointer" fontSize={30} onClick={onUpvote} />
       )}
-      <span>{allUploadUpvotes?.data.length}</span>
+      <span>{allLikes.length}</span>
     </div>
   );
 };
