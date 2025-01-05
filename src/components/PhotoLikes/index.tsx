@@ -51,6 +51,11 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
     socket.on('downvote-upload', (data: ILike[]) => {
       setAllLikes(data);
     });
+
+    return () => {
+      socket.off('upvote-upload');
+      socket.off('downvote-upload');
+    };
   }, [allLikes, currentUser]);
 
   useEffect(() => {
@@ -58,6 +63,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
       setAllLikes(allUploadUpvotes?.data);
     }
   }, [allUploadUpvotes, areUploadUpvotesLoading]);
+
   return (
     <div className="flex items-center gap-2 mt-2">
       {hasUserLiked ? (

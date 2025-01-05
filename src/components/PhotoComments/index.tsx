@@ -78,9 +78,25 @@ const PhotoComments = () => {
       });
     });
 
+    socket.on('update-comment', (data) => {
+      setAllComments((prev) => {
+        const updatedComments = prev.map((comment) => {
+          if (Number(comment.id) === Number(data.data.id)) {
+            return {
+              ...comment,
+              comment: data.data.comment,
+            };
+          }
+          return comment;
+        });
+        return updatedComments;
+      });
+    });
+
     return () => {
       socket.off('receive-comment');
       socket.off('delete-comment');
+      socket.off('update-comment');
     };
   }, [areCommentsLoading, allCommentsData]);
 

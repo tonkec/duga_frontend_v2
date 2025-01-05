@@ -1,6 +1,5 @@
 # Next to do
 
-- photo likes
 - edit comment socket emit
 - testirat apsolutno sve
 
@@ -29,6 +28,7 @@
 
 ### Gotovo
 
+- photo likes
 - other user profile page => uzet myprofile page kao template
 - dodat komentare na fotke
 - photo comments
