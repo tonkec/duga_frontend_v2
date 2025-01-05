@@ -9,7 +9,7 @@ import ResetPassword from '../pages/ResetPassword';
 import VerificationPage from '../pages/VerificationPage';
 import OtherUserPage from '../pages/OtherUserPage';
 import PhotoPage from '../pages/PhotoPage';
-import ChatPage from '../pages/ChatPage';
+import NewChatPage from '../pages/NewChatPage';
 import { AuthGuard } from './guards/AuthGuard';
 
 const DugaRoutes = () => {
@@ -65,10 +65,10 @@ const DugaRoutes = () => {
       />
 
       <Route
-        path="/chat"
+        path="/new-chat"
         element={
           <AuthGuard>
-            <ChatPage />
+            <NewChatPage />
           </AuthGuard>
         }
       />

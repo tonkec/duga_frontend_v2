@@ -1,7 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import './App.css';
 import AppLayout from './components/AppLayout';
-import { getAllUsers } from './api/users';
 import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useState } from 'react';
@@ -9,21 +7,11 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetUserById } from './hooks/useGetUserById';
 import Paginated from './components/Paginated';
 import TestSocketConnection from './TestSocketConnection';
-
-const useGetAllUsers = () => {
-  const {
-    data: allUsers,
-    error: allUsersError,
-    isPending: isAllUsersLoading,
-  } = useQuery({
-    queryKey: ['users'],
-    queryFn: getAllUsers,
-  });
-
-  return { allUsers, allUsersError, isAllUsersLoading };
-};
+import { useGetAllUsers } from './hooks/useGetAllUsers';
+import { useNavigate } from 'react-router';
 
 function App() {
+  const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
   const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
@@ -37,11 +25,11 @@ function App() {
     return <AppLayout>Loading...</AppLayout>;
   }
 
-  const allUsersWithCurrentUser = allUsers?.data.filter(
+  const allUsersWithoutCurrentUser = allUsers?.data.filter(
     (user: IUser) => user.id !== currentUser?.data.id
   );
 
-  const filteredUsers = allUsersWithCurrentUser?.filter((user: IUser) => {
+  const filteredUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => {
     if (selectValue.value === 'firstName') {
       return user.firstName.toLowerCase().includes(search.toLowerCase());
     }
@@ -65,7 +53,7 @@ function App() {
     }
   });
 
-  const renderedUsers = search ? filteredUsers : allUsersWithCurrentUser;
+  const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
 
   if (!renderedUsers) {
     return (
@@ -88,7 +76,13 @@ function App() {
         gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         data={renderedUsers}
         paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
-          <UserCard user={singleEntry} />
+          <UserCard
+            user={singleEntry}
+            onButtonClick={() => {
+              navigate(`/user/${singleEntry.id}`);
+            }}
+            buttonText="Pogledaj profil"
+          />
         )}
       />
     </AppLayout>

@@ -1,6 +1,11 @@
 # Next to do
 
-- edit comment socket emit
+- poruke
+  - find user to chat with
+  - create chat
+  - send message
+  - receive message
+  - typing
 - testirat apsolutno sve
 
 ### Enhancements
@@ -12,8 +17,9 @@
 
 ### Sljedeci veliki feature
 
+- following
 - stavit na all profiles da li je user trenutno aktivan ili ne
-- poruke
+
 - notifikacije
   - follow
   - new message
@@ -28,6 +34,7 @@
 
 ### Gotovo
 
+- edit comment socket emit
 - photo likes
 - other user profile page => uzet myprofile page kao template
 - dodat komentare na fotke

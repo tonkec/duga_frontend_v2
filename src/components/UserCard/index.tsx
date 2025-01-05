@@ -2,7 +2,6 @@ import Button from '../Button';
 import Avatar from 'react-avatar';
 import Card from '../Card';
 import { getUserBio } from '../UserProfileCard/utils';
-import { useNavigate } from 'react-router';
 export interface IUser {
   avatar: string;
   email: string;
@@ -21,6 +20,8 @@ export interface IUser {
 
 interface IUserCardProps {
   user: IUser;
+  onButtonClick: () => void;
+  buttonText: string;
 }
 
 const getUserLocation = ({ location }: { location: string }) => {
@@ -31,8 +32,7 @@ const getUserLocation = ({ location }: { location: string }) => {
   return <p className="text-gray-600">Lokacija: {location}</p>;
 };
 
-const UserCard = ({ user }: IUserCardProps) => {
-  const navigate = useNavigate();
+const UserCard = ({ user, onButtonClick, buttonText }: IUserCardProps) => {
   return (
     <Card className="flex gap-3 h-full items-start">
       <Avatar
@@ -50,12 +50,8 @@ const UserCard = ({ user }: IUserCardProps) => {
           {getUserLocation(user)}
           <p className="text-gray-600 mt-2">{getUserBio(user.bio)}</p>
         </div>
-        <Button
-          onClick={() => navigate(`/user/${user.id}`)}
-          type="primary"
-          className="mt-8 max-w-[150px]"
-        >
-          Pogledaj profil
+        <Button onClick={onButtonClick} type="primary" className="mt-8 max-w-[150px]">
+          {buttonText}
         </Button>
       </div>
     </Card>
