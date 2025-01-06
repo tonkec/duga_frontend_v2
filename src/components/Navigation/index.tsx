@@ -24,15 +24,15 @@ const Navigation = () => {
     <nav className={navigationStyles}>
       <ul className="flex w-full gap-2 space-x-4 items-center">
         <li>
-          <Link to="/new-chat" className="flex items-center gap-1">
-            Poruke
-            <BiEnvelope fontSize={25} />
-          </Link>
-        </li>
-        <li>
           <Link to="/" className="flex items-center gap-1">
             Korisnici
             <BiGroup fontSize={25} />
+          </Link>
+        </li>
+        <li>
+          <Link to="/new-chat" className="flex items-center gap-1">
+            Poruke
+            <BiEnvelope fontSize={25} />
           </Link>
         </li>
         <li>
