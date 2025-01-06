@@ -3,11 +3,13 @@ import AppLayout from '../../components/AppLayout';
 import Input from '../../components/Input';
 import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 import UserCard, { IUser } from '../../components/UserCard';
-import { useCreateNewChat } from './hooks';
+import { useCreateNewChat, useGetAllUserChats } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
+  const { userChats } = useGetAllUserChats(currentUserId as string);
+  console.log(userChats);
   const [search, setSearch] = useState('');
   const { onCreateChat } = useCreateNewChat();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
