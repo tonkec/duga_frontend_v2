@@ -16,7 +16,7 @@ const ChatPage = () => {
     return <AppLayout>Loading...</AppLayout>;
   }
 
-  if (!allMessages?.data.data.messages.length) {
+  if (!allMessages?.data?.data?.messages?.length) {
     return (
       <AppLayout>
         <Card>
