@@ -9,6 +9,7 @@ import Paginated from './components/Paginated';
 import TestSocketConnection from './TestSocketConnection';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
+import Loader from './components/Loader';
 
 function App() {
   const navigate = useNavigate();
@@ -22,7 +23,11 @@ function App() {
   const [search, setSearch] = useState('');
 
   if (isAllUsersLoading || isUserLoading) {
-    return <AppLayout>Loading...</AppLayout>;
+    return (
+      <AppLayout>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   const allUsersWithoutCurrentUser = allUsers?.data.filter(

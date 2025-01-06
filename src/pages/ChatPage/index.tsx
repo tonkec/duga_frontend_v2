@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import { useGetAllMessages } from './hooks';
+import Loader from '../../components/Loader';
 
 interface IMessage {
   id: string;
@@ -13,7 +14,11 @@ const ChatPage = () => {
 
   const { allMessages, isAllMessagesLoading } = useGetAllMessages(chatId as string);
   if (isAllMessagesLoading) {
-    return <AppLayout>Loading...</AppLayout>;
+    return (
+      <AppLayout>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   if (!allMessages?.data?.data?.messages?.length) {

@@ -10,6 +10,7 @@ import UserProfileCard from '../../components/UserProfileCard';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import 'react-tabs/style/react-tabs.css';
 import { useGetUserById } from '../../hooks/useGetUserById';
+import Loader from '../../components/Loader';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
@@ -18,7 +19,11 @@ const MyProfilePage = () => {
   const { user: currentUser } = useGetUserById(userId as string);
 
   if (allImagesLoading) {
-    return <AppLayout>Loading...</AppLayout>;
+    return (
+      <AppLayout>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   return (

@@ -5,6 +5,7 @@ import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 import UserCard, { IUser } from '../../components/UserCard';
 import { useCreateNewChat, useGetAllUserChats } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
+import Loader from '../../components/Loader';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
@@ -15,7 +16,11 @@ const NewChatPage = () => {
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
 
   if (isAllUsersLoading) {
-    return <AppLayout>Loading...</AppLayout>;
+    return (
+      <AppLayout>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   const filteredUsers = search

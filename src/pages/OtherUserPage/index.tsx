@@ -8,6 +8,7 @@ import Cta from '../../components/Cta';
 import Card from '../../components/Card';
 import Photos from '../../components/Photos';
 import { useGetUserById } from '../../hooks/useGetUserById';
+import Loader from '../../components/Loader';
 
 const OtherUserPage = () => {
   const { userId } = useParams();
@@ -25,7 +26,7 @@ const OtherUserPage = () => {
   if (isUserLoading) {
     return (
       <AppLayout>
-        <p>Učitavanje...</p>
+        <Loader />
       </AppLayout>
     );
   }

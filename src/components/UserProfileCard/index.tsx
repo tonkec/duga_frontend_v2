@@ -11,6 +11,7 @@ import {
 } from './utils';
 import Iframe from 'react-iframe';
 import { IImage } from '../Photos';
+import Loader from '../Loader';
 
 export interface IUserProfileCardProps {
   bio: string;
@@ -49,7 +50,7 @@ const UserProfileCard = ({
   allImagesLoading: boolean;
 }) => {
   if (allImagesLoading) {
-    return <p>Učitavanje...</p>;
+    return <Loader />;
   }
 
   return (

@@ -5,6 +5,7 @@
   - send message
   - receive message
   - typing
+  - posalji poruku button na other profile page
 - testirat apsolutno sve
 
 ### Enhancements

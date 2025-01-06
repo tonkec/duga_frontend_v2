@@ -5,13 +5,18 @@ import { getPhotoUrl } from '../../utils/getPhotoUrl';
 import Card from '../../components/Card';
 import PhotoComments from '../../components/PhotoComments';
 import PhotoLikes from '../../components/PhotoLikes';
+import Loader from '../../components/Loader';
 
 const PhotoPage = () => {
   const { photoId } = useParams();
   const { singleImage, singleImageLoading } = useGetSingleImage(photoId as string);
 
   if (singleImageLoading) {
-    return <AppLayout>Učitavam sliku...</AppLayout>;
+    return (
+      <AppLayout>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   return (
