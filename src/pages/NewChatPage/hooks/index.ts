@@ -9,7 +9,7 @@ interface CreateChatInput {
   partnerId: string;
 }
 
-interface Chat {
+export interface IChat {
   id: number;
   type: string;
   Users: User[];
@@ -38,7 +38,7 @@ export const useCreateNewChat = () => {
     isPending: isCreatingChat,
     isError: isCreateChatError,
     isSuccess: isCreateChatSuccess,
-  } = useMutation<Chat[], unknown, CreateChatInput>({
+  } = useMutation<IChat[], unknown, CreateChatInput>({
     mutationFn: async (input: CreateChatInput) => {
       const response = await createChat(input);
       return response.data;

@@ -1,8 +1,7 @@
 # Next to do
 
 - poruke
-  - find user to chat with => vec ima chat?
-  - create chat
+  - find user to chat with => prikazat postojece chatove
   - send message
   - receive message
   - typing
@@ -14,6 +13,7 @@
 - maknut opis s fotke ako nema opisa
 - fallback za avatar svg ili slova?
 - objasnjenje za iframove
+- sound za notifikaciju?
 
 ### Sljedeci veliki feature
 
@@ -34,6 +34,7 @@
 
 ### Gotovo
 
+- create chat
 - edit comment socket emit
 - photo likes
 - other user profile page => uzet myprofile page kao template
