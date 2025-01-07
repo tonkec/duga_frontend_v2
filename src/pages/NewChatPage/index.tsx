@@ -3,9 +3,10 @@ import AppLayout from '../../components/AppLayout';
 import Input from '../../components/Input';
 import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 import UserCard, { IUser } from '../../components/UserCard';
-import { useCreateNewChat, useGetAllUserChats } from './hooks';
+import { useCreateNewChat } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '../../components/Loader';
+import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');

@@ -14,7 +14,7 @@
 - maknut opis s fotke ako nema opisa
 - fallback za avatar svg ili slova?
 - objasnjenje za iframove
-- sound za notifikaciju?
+- dal se moze vidjet ko je lajkao fotku
 
 ### Sljedeci veliki feature
 
@@ -26,15 +26,16 @@
   - new message
   - komnetar
   - lajk
+  - sound za notifikaciju?
 
 ### Easy wins
 
-- loaderi za slike => poslije editing profile
-- loader za lodanje data
+- loaderi za slike
 - React helmet
 
 ### Gotovo
 
+- loader za lodanje data
 - create chat
 - edit comment socket emit
 - photo likes
