@@ -7,11 +7,11 @@ import { useCreateNewChat } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '../../components/Loader';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
+import AllUserChats from './components/AllUserChats';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(currentUserId as string);
-  console.log(userChats);
   const [search, setSearch] = useState('');
   const { onCreateChat } = useCreateNewChat();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
@@ -58,6 +58,9 @@ const NewChatPage = () => {
           );
         })}
       </div>
+
+      <h2>Nastavi razgovarati</h2>
+      <AllUserChats userChats={userChats?.data} />
     </AppLayout>
   );
 };
