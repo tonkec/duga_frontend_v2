@@ -11,7 +11,7 @@ interface IMessage {
   createdAt: string;
 }
 
-const currentUserMessageStyles = 'bg-blue text-white p-2 rounded-lg mb-2 max-w-xs';
+const currentUserMessageStyles = 'bg-blue text-white py-2 px-4 rounded-full mb-2 max-w-[200px]';
 
 const ChatPage = () => {
   const { chatId } = useParams();

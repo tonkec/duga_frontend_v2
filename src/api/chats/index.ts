@@ -7,7 +7,6 @@ export const createChat = async (data: { userId: string; partnerId: string }) =>
 
 export const getAllUserChats = async (userId: string) => {
   const client = apiClient();
-  console.log(userId);
   return client.get(`/chats`, {
     params: {
       user: {

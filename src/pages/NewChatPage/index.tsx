@@ -65,8 +65,6 @@ const NewChatPage = () => {
           );
         })}
       </div>
-
-      {console.log(userChats)}
       {userChats?.data.length && <AllUserChats userChats={userChats?.data} />}
     </AppLayout>
   );
