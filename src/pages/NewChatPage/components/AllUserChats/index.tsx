@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import { IUser } from '../../../../components/UserCard';
 import UserChat from '../UserChat';
 
@@ -20,6 +21,7 @@ interface IAllUserChats {
 }
 
 const AllUserChats = ({ userChats }: IAllUserChats) => {
+  const navigate = useNavigate();
   return (
     <div>
       {userChats?.map((chat) => {
@@ -28,7 +30,7 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
             <UserChat
               user={chat.Users[0]}
               onClick={() => {
-                console.log('clicked');
+                navigate(`/chat/${chat.id}`);
               }}
             />
           </div>
