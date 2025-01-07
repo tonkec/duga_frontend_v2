@@ -5,6 +5,8 @@ import ProfilePhoto from '../ProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useCookies } from 'react-cookie';
+import { useGetUserById } from '../../hooks/useGetUserById';
+import Loader from '../Loader';
 
 const navigationStyles = 'flex space-x-4 gradient p-4 shadow-sm text-white';
 
@@ -13,12 +15,17 @@ const Navigation = () => {
   const [, setCookie] = useCookies(['token']);
   const [userId, saveUserId] = useLocalStorage('userId', null);
   const { allImages } = useGetAllImages(String(userId) || '');
+  const { user: currentUser, isUserLoading } = useGetUserById(userId || '');
 
   const onLogout = () => {
     setCookie('token', '');
     saveUserId(null);
     navigate('/login');
   };
+
+  const currentUserProfilePhoto = getProfilePhoto(allImages?.data.images);
+
+  if (isUserLoading) return <Loader />;
 
   return (
     <nav className={navigationStyles}>
@@ -47,9 +54,14 @@ const Navigation = () => {
           </span>
         </li>
       </ul>
-      <div className="float-right">
-        <ProfilePhoto url={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))} />
-      </div>
+      {currentUser && (
+        <div className="float-right">
+          <ProfilePhoto
+            currentUser={currentUser?.data}
+            url={getProfilePhotoUrl(currentUserProfilePhoto)}
+          />
+        </div>
+      )}
     </nav>
   );
 };

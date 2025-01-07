@@ -7,7 +7,7 @@ export const useGetAllUserChats = (userId: string) => {
     error: userChatsError,
     isPending: isUserChatsLoading,
   } = useQuery({
-    queryKey: ['user', userId],
+    queryKey: ['userChats', userId],
     queryFn: () => getAllUserChats(userId),
   });
 
