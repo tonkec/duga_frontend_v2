@@ -17,6 +17,7 @@ export default function TestSocketConnection() {
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+    console.log('socket', socket);
 
     return () => {
       socket.off('connect', onConnect);

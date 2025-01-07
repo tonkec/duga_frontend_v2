@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetUserById } from './hooks/useGetUserById';
 import Paginated from './components/Paginated';
-import TestSocketConnection from './TestSocketConnection';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
@@ -70,7 +69,6 @@ function App() {
 
   return (
     <AppLayout>
-      <TestSocketConnection />
       <UserFilters
         selectValue={selectValue}
         setSelectValue={setSelectValue}

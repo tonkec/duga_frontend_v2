@@ -15,3 +15,12 @@ export const getAllUserChats = async (userId: string) => {
     },
   });
 };
+
+export const getCurrentChat = async (chatId: string) => {
+  const client = apiClient();
+  return client.get(`/chats/current-chat/${chatId}`, {
+    params: {
+      id: chatId,
+    },
+  });
+};
