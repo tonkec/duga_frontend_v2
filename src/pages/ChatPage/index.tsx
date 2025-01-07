@@ -11,6 +11,8 @@ interface IMessage {
   createdAt: string;
 }
 
+const currentUserMessageStyles = 'bg-blue text-white p-2 rounded-lg mb-2 max-w-xs';
+
 const ChatPage = () => {
   const { chatId } = useParams();
   const { allMessages, isAllMessagesLoading } = useGetAllMessages(chatId as string);
@@ -42,9 +44,9 @@ const ChatPage = () => {
     <AppLayout>
       <Card>
         <h1>Chat Page</h1>
-        <div>
+        <div className="mt-4">
           {descendingMessages.map((message: IMessage) => (
-            <div key={message.id}>
+            <div className={currentUserMessageStyles} key={message.id}>
               <p>{message.message}</p>
             </div>
           ))}

@@ -48,7 +48,6 @@ const SendMessage = ({ chatId }: ISendMessageProps) => {
       message: data.content,
     };
     if (isValid) {
-      console.log(msg);
       socket.emit('message', msg);
     }
   };
