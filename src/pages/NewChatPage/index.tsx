@@ -59,8 +59,7 @@ const NewChatPage = () => {
         })}
       </div>
 
-      <h2>Nastavi razgovarati</h2>
-      <AllUserChats userChats={userChats?.data} />
+      {userChats?.data.length && <AllUserChats userChats={userChats?.data} />}
     </AppLayout>
   );
 };

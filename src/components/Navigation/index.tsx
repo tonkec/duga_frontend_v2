@@ -6,7 +6,7 @@ import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useCookies } from 'react-cookie';
 
-const navigationStyles = 'flex space-x-4 bg-black p-4 shadow-sm text-white';
+const navigationStyles = 'flex space-x-4 gradient p-4 shadow-sm text-white';
 
 const Navigation = () => {
   const navigate = useNavigate();

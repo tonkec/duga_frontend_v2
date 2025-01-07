@@ -7,7 +7,7 @@ interface IAuthLayoutProps {
 const AuthLayout = ({ children }: IAuthLayoutProps) => {
   return (
     <div className="lg:flex h-screen">
-      <div className="flex flex-col items-center justify-end w-full h-full flex-1 bg-blue pt-5 px-5 xl:max-w-[700px]">
+      <div className="flex flex-col items-center justify-end w-full h-full flex-1 gradient pt-5 px-5 xl:max-w-[700px]">
         <div>
           <div className="mx-auto w-[400px] mb-64">
             <h1 className="text-white text-6xl text-center mb-6">Duga</h1>
