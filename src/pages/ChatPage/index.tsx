@@ -9,6 +9,8 @@ import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
 import { useGetCurrentChat } from './hooks';
 import { useGetUserById } from '../../hooks/useGetUserById';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
+import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 
 interface IMessage {
   id: string;
@@ -37,12 +39,27 @@ const ChatPage = () => {
     if (!currentChat || isCurrentChatLoading) return null;
     return getOtherUser(currentChat.data, currentUserId as string)?.userId;
   }, [currentChat, currentUserId, isCurrentChatLoading]);
-  const { user: otherUser } = useGetUserById(String(otherUserId || ''));
 
-  const chatTitle = useMemo(() => {
+  const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
+  const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
+  const otherUserProfilePhoto = getProfilePhotoUrl(
+    getProfilePhoto(allOtherUserImages?.data.images)
+  );
+  const currentUserProfilePhoto = getProfilePhotoUrl(
+    getProfilePhoto(allCurrentUserImages?.data.images)
+  );
+  const { user: otherUser } = useGetUserById(String(otherUserId || ''));
+  const { user: currentUser } = useGetUserById(currentUserId as string);
+
+  const otherUserName = useMemo(() => {
     if (!otherUser) return '';
     return `${otherUser.data.firstName} ${otherUser.data.lastName}`;
   }, [otherUser]);
+
+  const currentUserName = useMemo(() => {
+    if (!currentUser) return '';
+    return `${currentUser.data.firstName} ${currentUser.data.lastName}`;
+  }, [currentUser]);
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
@@ -58,9 +75,14 @@ const ChatPage = () => {
     <ChatGuard>
       <AppLayout>
         <Card>
-          <h1>{chatTitle}</h1>
+          <h1>{otherUserName}</h1>
           <div className="mt-4">
-            <PaginatedMessages />
+            <PaginatedMessages
+              currentUserName={currentUserName}
+              otherUserName={otherUserName}
+              currentUserProfilePhoto={currentUserProfilePhoto}
+              otherUserProfilePhoto={otherUserProfilePhoto}
+            />
             {receivedMessages.map((message: IMessage) => (
               <div
                 className="bg-gray-200 py-2 px-4 rounded-full mb-2 max-w-[200px] text-white"

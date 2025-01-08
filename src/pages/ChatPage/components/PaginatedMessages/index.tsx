@@ -11,7 +11,17 @@ interface Message {
   };
 }
 
-const PaginatedMessages = () => {
+const PaginatedMessages = ({
+  otherUserProfilePhoto,
+  currentUserProfilePhoto,
+  otherUserName,
+  currentUserName,
+}: {
+  otherUserProfilePhoto: string;
+  currentUserProfilePhoto: string;
+  otherUserName: string;
+  currentUserName: string;
+}) => {
   const { messages, loadMore } = usePaginatedMessages();
 
   return (
@@ -22,7 +32,14 @@ const PaginatedMessages = () => {
       style={{ height: '300px', overflow: 'auto' }}
     >
       {messages.map((message) => (
-        <Message key={message.id} message={message} />
+        <Message
+          otherUserName={otherUserName}
+          currentUserName={currentUserName}
+          currentUserProfilePhoto={currentUserProfilePhoto}
+          otherUserProfilePhoto={otherUserProfilePhoto}
+          key={message.id}
+          message={message}
+        />
       ))}
     </div>
   );
