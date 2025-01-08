@@ -15,7 +15,6 @@ export const addUploadLike = async ({ userId, uploadId }: IAddLikeProps) => {
 
 export const removeUploadLike = async ({ userId, uploadId }: IAddLikeProps) => {
   const client = apiClient();
-  console.log(userId, uploadId);
   return client.post(`/likes/downvote`, {
     userId,
     uploadId,

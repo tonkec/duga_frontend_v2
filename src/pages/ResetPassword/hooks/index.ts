@@ -46,8 +46,7 @@ function useResetPassword() {
     isSuccess,
   } = useMutation({
     mutationFn: ({ password, email }: IResetPasswordProps) => resetPassword(password, email),
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       toast.success('Lozinka je promijenjena', toastConfig);
       navigate('/login');
     },

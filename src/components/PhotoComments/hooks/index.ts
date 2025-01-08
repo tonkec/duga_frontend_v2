@@ -75,7 +75,6 @@ export const useDeleteUploadComment = () => {
   } = useMutation({
     mutationFn: (commentId: number) => deleteUploadComment(commentId),
     onSuccess: (data) => {
-      console.log(data);
       socket.emit('delete-comment', data);
       toast.success('Komentar uspešno obrisan.', toastConfig);
     },

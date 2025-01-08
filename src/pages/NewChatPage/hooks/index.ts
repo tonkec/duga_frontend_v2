@@ -44,7 +44,6 @@ export const useCreateNewChat = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log(data);
       toast.success('Razgovor uspješno kreiran', toastConfig);
       navigate(`/chat/${data[0].id}`);
     },
