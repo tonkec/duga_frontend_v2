@@ -11,11 +11,13 @@ import OtherUserPage from '../pages/OtherUserPage';
 import PhotoPage from '../pages/PhotoPage';
 import NewChatPage from '../pages/NewChatPage';
 import ChatPage from '../pages/ChatPage';
+import NotFoundPage from '../pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 
 const DugaRoutes = () => {
   return (
     <Routes>
+      <Route path="*" element={<NotFoundPage />} />
       <Route
         path="/"
         element={
