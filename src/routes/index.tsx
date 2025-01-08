@@ -17,7 +17,14 @@ import { AuthGuard } from './guards/AuthGuard';
 const DugaRoutes = () => {
   return (
     <Routes>
-      <Route path="*" element={<NotFoundPage />} />
+      <Route
+        path="*"
+        element={
+          <AuthGuard>
+            <NotFoundPage />
+          </AuthGuard>
+        }
+      />
       <Route
         path="/"
         element={
