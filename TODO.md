@@ -1,9 +1,11 @@
 # Next to do
 
 - poruke
-  - samo user tog chata moze vidjet taj chat
+  - paginacija poruka
+  - brisanje chata
   - typing
   - posalji poruku button na other profile page
+  - napisat s kim je trenutno chat
 - testirat apsolutno sve
 
 ### Enhancements
@@ -33,6 +35,8 @@
 
 ### Gotovo
 
+- kad se refresha chat, nestane
+- samo user tog chata moze vidjet taj chat
 - find user to chat with => prikazat postojece chatove
 - send message
 - receive message
