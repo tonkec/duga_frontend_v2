@@ -13,7 +13,7 @@ const queryClient = new QueryClient({
       retry: 1,
       staleTime: 0,
       refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
     },
   },
 });
