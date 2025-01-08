@@ -18,6 +18,7 @@ const ChatGuard = ({ children }: IChatGuardProps) => {
   const { currentChat, isCurrentChatLoading } = useGetCurrentChat(chatId as string);
   const currentChatUsersId = currentChat?.data.map((user: IChatUser) => user.userId);
   const shouldRender = currentChatUsersId?.includes(Number(currentUserId));
+  console.log('shouldRender', shouldRender);
   useEffect(() => {
     if (isCurrentChatLoading) {
       return;

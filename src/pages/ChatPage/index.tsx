@@ -40,21 +40,25 @@ const ChatPage = () => {
 
   if (isAllMessagesLoading) {
     return (
-      <AppLayout>
-        <Loader />
-      </AppLayout>
+      <ChatGuard>
+        <AppLayout>
+          <Loader />
+        </AppLayout>
+      </ChatGuard>
     );
   }
 
   if (!allMessages?.data?.messages?.length) {
     return (
-      <AppLayout>
-        <Card>
-          <h1>Chat Page</h1>
-          <p>Nema poruka</p>
-          <SendMessage chatId={chatId} />
-        </Card>
-      </AppLayout>
+      <ChatGuard>
+        <AppLayout>
+          <Card>
+            <h1>Chat Page</h1>
+            <p>Nema poruka</p>
+            <SendMessage chatId={chatId} />
+          </Card>
+        </AppLayout>
+      </ChatGuard>
     );
   }
 
