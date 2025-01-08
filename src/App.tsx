@@ -29,7 +29,7 @@ function App() {
     );
   }
 
-  const allUsersWithoutCurrentUser = allUsers?.data.filter(
+  const allUsersWithoutCurrentUser = allUsers?.data?.filter(
     (user: IUser) => user.id !== currentUser?.data.id
   );
 

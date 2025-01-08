@@ -1,9 +1,7 @@
 # Next to do
 
 - poruke
-  - find user to chat with => prikazat postojece chatove
-  - send message
-  - receive message
+  - samo user tog chata moze vidjet taj chat
   - typing
   - posalji poruku button na other profile page
 - testirat apsolutno sve
@@ -35,6 +33,9 @@
 
 ### Gotovo
 
+- find user to chat with => prikazat postojece chatove
+- send message
+- receive message
 - loader za lodanje data
 - create chat
 - edit comment socket emit

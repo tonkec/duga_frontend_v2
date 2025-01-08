@@ -39,6 +39,7 @@ const SendMessage = ({ chatId }: ISendMessageProps) => {
     register,
     handleSubmit,
     formState: { errors, isValid },
+    reset,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
@@ -55,6 +56,7 @@ const SendMessage = ({ chatId }: ISendMessageProps) => {
     if (isValid) {
       socket.emit('message', msg);
     }
+    reset();
   };
 
   return (
