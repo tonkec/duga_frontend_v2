@@ -2,11 +2,13 @@ import { useParams } from 'react-router';
 import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import SendMessage from './components/SendMessage';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { socket } from '../../socket';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
+import { useGetCurrentChat } from './hooks';
+import { useGetUserById } from '../../hooks/useGetUserById';
 
 interface IMessage {
   id: string;
@@ -17,10 +19,30 @@ interface IMessage {
   };
 }
 
+interface IChatUser {
+  userId: number;
+}
+
+const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
+  return chatUsers.find((user) => user.userId !== Number(currentUserId));
+};
+
 const ChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
+  const { currentChat, isCurrentChatLoading } = useGetCurrentChat(chatId as string);
+
+  const otherUserId = useMemo(() => {
+    if (!currentChat || isCurrentChatLoading) return null;
+    return getOtherUser(currentChat.data, currentUserId as string)?.userId;
+  }, [currentChat, currentUserId, isCurrentChatLoading]);
+  const { user: otherUser } = useGetUserById(String(otherUserId || ''));
+
+  const chatTitle = useMemo(() => {
+    if (!otherUser) return '';
+    return `${otherUser.data.firstName} ${otherUser.data.lastName}`;
+  }, [otherUser]);
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
@@ -36,7 +58,7 @@ const ChatPage = () => {
     <ChatGuard>
       <AppLayout>
         <Card>
-          <h1>Chat Page</h1>
+          <h1>{chatTitle}</h1>
           <div className="mt-4">
             <PaginatedMessages />
             {receivedMessages.map((message: IMessage) => (

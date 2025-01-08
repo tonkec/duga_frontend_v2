@@ -14,11 +14,7 @@ const Message = ({ message }: IMessageProps) => {
   const isFromCurrentUser = message.User.id === Number(currentUserId);
   return (
     <div
-      className={
-        isFromCurrentUser
-          ? 'bg-gray-200 py-2 px-4 rounded-full mb-2 max-w-[200px] text-white'
-          : 'bg-gray-200 py-2 px-4 rounded-full mb-2 max-w-[200px] text-white'
-      }
+      className={'py-2 px-4 rounded-full mb-2 max-w-[200px] text-white'}
       style={{
         marginLeft: isFromCurrentUser ? 'auto' : '0',
         backgroundColor: isFromCurrentUser ? '#2D46B9' : '#F037A5',
