@@ -7,6 +7,7 @@ import SendMessage from './components/SendMessage';
 import { useEffect, useState } from 'react';
 import { socket } from '../../socket';
 import { useLocalStorage } from '@uidotdev/usehooks';
+import ChatGuard from './components/ChatGuard';
 
 interface IMessage {
   id: string;
@@ -21,7 +22,6 @@ const ChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
   const { allMessages, isAllMessagesLoading } = useGetAllMessages(chatId as string);
-
   const descendingMessages = allMessages?.data?.messages?.sort((a: IMessage, b: IMessage) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
@@ -30,7 +30,6 @@ const ChatPage = () => {
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
-      console.log(data);
       setReceivedMessages((prev) => [...prev, data]);
     });
 
@@ -58,39 +57,43 @@ const ChatPage = () => {
       </AppLayout>
     );
   }
+
   return (
-    <AppLayout>
-      <Card>
-        <h1>Chat Page</h1>
-        <div className="mt-4">
-          {descendingMessages?.map((message: IMessage) => (
-            <div
-              className="bg-pink text-white py-2 px-4 rounded-full mb-2 max-w-[200px]"
-              style={{
-                marginLeft: message.User.id === Number(currentUserId) ? 'auto' : '0',
-                backgroundColor: message.User.id === 4 ? '#2D46B9' : '#F037A5',
-              }}
-              key={message.id}
-            >
-              <p>{message.message}</p>
-            </div>
-          ))}
-          {receivedMessages.map((message: IMessage) => (
-            <div
-              className="bg-gray-200 py-2 px-4 rounded-full mb-2 max-w-[200px] text-white"
-              key={message.id}
-              style={{
-                marginLeft: message.User.id === Number(currentUserId) ? 'auto' : '0',
-                backgroundColor: message.User.id === Number(currentUserId) ? '#2D46B9' : '#F037A5',
-              }}
-            >
-              <p>{message.message}</p>
-            </div>
-          ))}
-        </div>
-        <SendMessage chatId={chatId} />
-      </Card>
-    </AppLayout>
+    <ChatGuard>
+      <AppLayout>
+        <Card>
+          <h1>Chat Page</h1>
+          <div className="mt-4">
+            {descendingMessages?.map((message: IMessage) => (
+              <div
+                className="bg-pink text-white py-2 px-4 rounded-full mb-2 max-w-[200px]"
+                style={{
+                  marginLeft: message.User.id === Number(currentUserId) ? 'auto' : '0',
+                  backgroundColor: message.User.id === 4 ? '#2D46B9' : '#F037A5',
+                }}
+                key={message.id}
+              >
+                <p>{message.message}</p>
+              </div>
+            ))}
+            {receivedMessages.map((message: IMessage) => (
+              <div
+                className="bg-gray-200 py-2 px-4 rounded-full mb-2 max-w-[200px] text-white"
+                key={message.id}
+                style={{
+                  marginLeft: message.User.id === Number(currentUserId) ? 'auto' : '0',
+                  backgroundColor:
+                    message.User.id === Number(currentUserId) ? '#2D46B9' : '#F037A5',
+                }}
+              >
+                <p>{message.message}</p>
+              </div>
+            ))}
+          </div>
+          <SendMessage chatId={chatId} />
+        </Card>
+      </AppLayout>
+    </ChatGuard>
   );
 };
 

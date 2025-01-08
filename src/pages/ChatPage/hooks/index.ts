@@ -9,7 +9,7 @@ export const useGetAllMessages = (chatId: string) => {
     isPending: isAllMessagesLoading,
     isSuccess: isAllMessagesSuccess,
   } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['messages', chatId],
     queryFn: () => getChatMessages(chatId),
   });
 
