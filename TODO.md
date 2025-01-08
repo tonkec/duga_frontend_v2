@@ -1,11 +1,14 @@
 # Next to do
 
 - poruke
+
+  - kad se napise nova poruka i onda scrolla
+  - received messages refreshaj => styling se promijeni
   - brisanje chata
   - typing
   - posalji poruku button na other profile page
-  - napisat s kim je trenutno chat
-  - kad se napise nova poruka i onda scrolla
+  - link na other user profile page
+
 - testirat apsolutno sve
 
 ### Enhancements
@@ -35,6 +38,7 @@
 
 ### Gotovo
 
+- napisat s kim je trenutno chat
 - paginacija poruka
 - kad se refresha chat, nestane
 - samo user tog chata moze vidjet taj chat

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import SendMessage from './components/SendMessage';
@@ -30,6 +30,7 @@ const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
 };
 
 const ChatPage = () => {
+  const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
@@ -75,13 +76,16 @@ const ChatPage = () => {
     <ChatGuard>
       <AppLayout>
         <Card>
-          <h1>{otherUserName}</h1>
+          <h1 className="underline cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
+            {otherUserName}
+          </h1>
           <div className="mt-4">
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}
               currentUserProfilePhoto={currentUserProfilePhoto}
               otherUserProfilePhoto={otherUserProfilePhoto}
+              otherUserId={otherUserId as number}
             />
             {receivedMessages.map((message: IMessage) => (
               <div

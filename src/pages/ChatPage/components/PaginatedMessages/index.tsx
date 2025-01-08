@@ -16,11 +16,13 @@ const PaginatedMessages = ({
   currentUserProfilePhoto,
   otherUserName,
   currentUserName,
+  otherUserId,
 }: {
   otherUserProfilePhoto: string;
   currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
+  otherUserId: number | undefined;
 }) => {
   const { messages, loadMore } = usePaginatedMessages();
 
@@ -39,6 +41,7 @@ const PaginatedMessages = ({
           otherUserProfilePhoto={otherUserProfilePhoto}
           key={message.id}
           message={message}
+          otherUserId={otherUserId}
         />
       ))}
     </div>

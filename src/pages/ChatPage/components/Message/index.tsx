@@ -1,5 +1,6 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
+import { useNavigate } from 'react-router';
 
 interface IMessageProps {
   message: {
@@ -12,19 +13,17 @@ interface IMessageProps {
   currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
+  otherUserId: number | undefined;
 }
 
-interface ICurrentUserMessageTemplateProps {
+interface IMessageTemplateProps {
   userName: string;
   profilePhoto: string;
   message: string;
+  otherUserId?: number;
 }
 
-const CurrentUserMessageTemplate = ({
-  userName,
-  profilePhoto,
-  message,
-}: ICurrentUserMessageTemplateProps) => {
+const CurrentUserMessageTemplate = ({ userName, profilePhoto, message }: IMessageTemplateProps) => {
   return (
     <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
       <div
@@ -44,10 +43,16 @@ const OtherUserMessageTemplate = ({
   userName,
   profilePhoto,
   message,
-}: ICurrentUserMessageTemplateProps) => {
+  otherUserId,
+}: IMessageTemplateProps) => {
+  const navigate = useNavigate();
   return (
     <div className="flex">
-      <div style={{ marginRight: '2px' }}>
+      <div
+        style={{ marginRight: '2px' }}
+        onClick={() => navigate(`/user/${otherUserId}`)}
+        className="cursor-pointer"
+      >
         <Avatar name={userName} src={profilePhoto} size="22" round />
       </div>
       <div
@@ -66,6 +71,7 @@ const Message = ({
   currentUserProfilePhoto,
   otherUserName,
   currentUserName,
+  otherUserId,
 }: IMessageProps) => {
   const [currentUserId] = useLocalStorage('userId');
   const isFromCurrentUser = message.User.id === Number(currentUserId);
@@ -80,6 +86,7 @@ const Message = ({
       userName={otherUserName}
       profilePhoto={otherUserProfilePhoto}
       message={message.message}
+      otherUserId={otherUserId}
     />
   );
 };
