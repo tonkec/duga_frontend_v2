@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useGetCurrentChat } from '../../hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 
@@ -11,6 +11,7 @@ interface IChatGuardProps {
 }
 
 const ChatGuard = ({ children }: IChatGuardProps) => {
+  const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
   const { currentChat } = useGetCurrentChat(chatId as string);
@@ -18,7 +19,7 @@ const ChatGuard = ({ children }: IChatGuardProps) => {
   const shouldRender = currentChatUsersId?.includes(Number(currentUserId));
 
   if (!shouldRender) {
-    return null;
+    return navigate('/404');
   }
 
   return <>{children}</>;
