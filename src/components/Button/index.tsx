@@ -2,11 +2,11 @@ interface IButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
-  type: 'primary' | 'secondary' | 'tertiary' | 'icon' | 'black';
+  type: 'primary' | 'secondary' | 'tertiary' | 'icon' | 'black' | 'blue';
   disabled?: boolean;
 }
 
-const defaultStyles = `rounded text-sm`;
+const defaultStyles = `rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200`;
 
 const getBackgroundColor = (type: IButtonProps['type']) => {
   switch (type) {
@@ -20,6 +20,8 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
       return 'px-0';
     case 'black':
       return 'py-2 px-4 bg-black text-white hover:bg-gray-800';
+    case 'blue':
+      return 'py-2 px-4 bg-blue text-white hover:bg-blue-dark';
     default:
       return 'bg-blue';
   }

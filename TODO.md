@@ -3,19 +3,19 @@
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom
-  - refreshanje mijenja layout
+  - refreshanje mijenja layout?
   - click na chat pokazuje duple poruke, refreshaj?
-  - ako je chat prazan, onda se ne bi trebao pokazat na new-chat
+  - ako je chat prazan, onda se ne bi trebao pokazat na new-chat?
 
 - novi featuri za poruke
 
-  - brisanje chata
   - typing
   - posalji poruku button na other profile page
-  - seen
+  - seen?
 
 ### Enhancements
 
+- svi profili unaprijedit
 - all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
 - objasnjenje za iframove
@@ -41,6 +41,7 @@
 
 ### Gotovo
 
+- brisanje chata
 - timestamp
 - 404 na postojeci chat
 - received messages refreshaj => styling se promijeni

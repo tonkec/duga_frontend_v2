@@ -1,27 +1,25 @@
 import { useState } from 'react';
 import Button from '../Button';
-
-const ITEMS_PER_PAGE = 6;
+import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 
 interface IPaginatedProps<T> {
   data: T[];
   paginatedSingle: React.FC<{ singleEntry: T }>;
   gridClassName?: string;
+  itemsPerPage?: number;
 }
 
 const Paginated = <T,>({
   data,
   paginatedSingle: PaginatedSingle,
   gridClassName,
+  itemsPerPage = 8,
 }: IPaginatedProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  const currentPageData = data.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const currentPageData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const goToNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -36,24 +34,32 @@ const Paginated = <T,>({
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full mt-4">
       <ul className={gridClassName}>
         {currentPageData.map((item, index) => (
-          <li className="h-full mb-2" key={index}>
+          <li className="h-full xl:mb-4" key={index}>
             <PaginatedSingle singleEntry={item} />
           </li>
         ))}
       </ul>
       {totalPages > 1 && (
         <div className="flex justify-center items-center w-full p-4 gap-4">
-          <Button type="tertiary" onClick={goToPreviousPage} disabled={currentPage === 1}>
-            Previous
+          <Button
+            className="flex items-center"
+            type="tertiary"
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+          >
+            <BiChevronLeft fontSize={20} />
           </Button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button type="tertiary" onClick={goToNextPage} disabled={currentPage === totalPages}>
-            Next
+
+          <Button
+            className="flex items-center"
+            type="tertiary"
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+          >
+            <BiChevronRight fontSize={20} />
           </Button>
         </div>
       )}

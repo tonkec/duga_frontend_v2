@@ -9,8 +9,10 @@ import Paginated from './components/Paginated';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
+import { useGetWindowSize } from './hooks/useGetWindowSize';
 
 function App() {
+  const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
   const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
@@ -67,6 +69,8 @@ function App() {
     );
   }
 
+  const itemsPerPage = windowSize.width < 768 ? 2 : 4;
+
   return (
     <AppLayout>
       <UserFilters
@@ -76,15 +80,21 @@ function App() {
         setSearch={setSearch}
       />
       <Paginated<IUser>
-        gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         data={renderedUsers}
+        itemsPerPage={itemsPerPage}
         paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
           <UserCard
             user={singleEntry}
             onButtonClick={() => {
               navigate(`/user/${singleEntry.id}`);
             }}
+            onSecondButtonClick={() => {
+              console.log('Send message');
+            }}
             buttonText="Pogledaj profil"
+            secondButton
+            secondButtonText="Pošalji poruku"
           />
         )}
       />
