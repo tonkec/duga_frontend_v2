@@ -11,6 +11,7 @@ import { useGetCurrentChat } from './hooks';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import Message from './components/Message';
 
 interface IMessage {
   id: string;
@@ -80,6 +81,17 @@ const ChatPage = () => {
             {otherUserName}
           </h1>
           <div className="mt-4">
+            {receivedMessages.map((message: IMessage) => (
+              <Message
+                otherUserName={otherUserName}
+                currentUserName={currentUserName}
+                currentUserProfilePhoto={currentUserProfilePhoto}
+                otherUserProfilePhoto={otherUserProfilePhoto}
+                otherUserId={otherUserId as number}
+                key={message.id}
+                message={message}
+              />
+            ))}
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}
@@ -87,19 +99,6 @@ const ChatPage = () => {
               otherUserProfilePhoto={otherUserProfilePhoto}
               otherUserId={otherUserId as number}
             />
-            {receivedMessages.map((message: IMessage) => (
-              <div
-                className="bg-gray-200 py-2 px-4 rounded-full mb-2 max-w-[200px] text-white"
-                key={message.id}
-                style={{
-                  marginLeft: message.User.id === Number(currentUserId) ? 'auto' : '0',
-                  backgroundColor:
-                    message.User.id === Number(currentUserId) ? '#2D46B9' : '#F037A5',
-                }}
-              >
-                <p>{message.message}</p>
-              </div>
-            ))}
           </div>
           <SendMessage chatId={chatId} />
         </Card>

@@ -23,13 +23,12 @@ interface IMessageTemplateProps {
   otherUserId?: number;
 }
 
+const messageStyles = 'py-2 px-4 rounded-full mb-2 max-w-fit text-white';
+
 const CurrentUserMessageTemplate = ({ userName, profilePhoto, message }: IMessageTemplateProps) => {
   return (
     <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
-      <div
-        className="py-2 px-4 rounded-full mb-2 max-w-[200px] text-white"
-        style={{ backgroundColor: '#2D46B9' }}
-      >
+      <div className={messageStyles} style={{ backgroundColor: '#2D46B9' }}>
         <p>{message}</p>
       </div>
       <div style={{ marginLeft: '2px' }}>
@@ -55,10 +54,7 @@ const OtherUserMessageTemplate = ({
       >
         <Avatar name={userName} src={profilePhoto} size="22" round />
       </div>
-      <div
-        className="py-2 px-4 rounded-full mb-2 max-w-[200px] text-white"
-        style={{ backgroundColor: '#F037A5' }}
-      >
+      <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
         <p>{message}</p>
       </div>
     </div>

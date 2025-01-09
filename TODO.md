@@ -1,21 +1,22 @@
 # Next to do
 
-- poruke
+- poruke fixanje/improvements
 
   - kad se napise nova poruka i onda scrolla
   - received messages refreshaj => styling se promijeni
+  - ikonica za profile photo bi se trebala pokazat samo jednom
+  - 404 na postojeci chat
+
+- novi featuri za poruke
+
   - brisanje chata
   - typing
   - posalji poruku button na other profile page
-  - link na other user profile page
-
-- testirat apsolutno sve
 
 ### Enhancements
 
 - all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
-- fallback za avatar svg ili slova?
 - objasnjenje za iframove
 - dal se moze vidjet ko je lajkao fotku
 
@@ -38,6 +39,8 @@
 
 ### Gotovo
 
+- fallback za avatar svg ili slova?
+- link na other user profile page
 - napisat s kim je trenutno chat
 - paginacija poruka
 - kad se refresha chat, nestane
