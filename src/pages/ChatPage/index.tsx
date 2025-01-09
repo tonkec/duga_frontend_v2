@@ -11,7 +11,6 @@ import { useGetCurrentChat } from './hooks';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
-import Message from './components/Message';
 
 interface IMessage {
   id: string;
@@ -81,23 +80,13 @@ const ChatPage = () => {
             {otherUserName}
           </h1>
           <div className="mt-4">
-            {receivedMessages.map((message: IMessage) => (
-              <Message
-                otherUserName={otherUserName}
-                currentUserName={currentUserName}
-                currentUserProfilePhoto={currentUserProfilePhoto}
-                otherUserProfilePhoto={otherUserProfilePhoto}
-                otherUserId={otherUserId as number}
-                key={message.id}
-                message={message}
-              />
-            ))}
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}
               currentUserProfilePhoto={currentUserProfilePhoto}
               otherUserProfilePhoto={otherUserProfilePhoto}
               otherUserId={otherUserId as number}
+              receivedMessages={receivedMessages}
             />
           </div>
           <SendMessage chatId={chatId} />

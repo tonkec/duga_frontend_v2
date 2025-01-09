@@ -17,14 +17,18 @@ const PaginatedMessages = ({
   otherUserName,
   currentUserName,
   otherUserId,
+  receivedMessages,
 }: {
   otherUserProfilePhoto: string;
   currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
   otherUserId: number | undefined;
+  receivedMessages: Message[];
 }) => {
   const { messages, loadMore } = usePaginatedMessages();
+
+  const allMessages = [...receivedMessages, ...messages];
 
   return (
     <div
@@ -33,7 +37,7 @@ const PaginatedMessages = ({
       }, 500)}
       style={{ height: '300px', overflow: 'auto' }}
     >
-      {messages.map((message) => (
+      {allMessages.map((message) => (
         <Message
           otherUserName={otherUserName}
           currentUserName={currentUserName}

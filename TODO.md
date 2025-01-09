@@ -2,8 +2,6 @@
 
 - poruke fixanje/improvements
 
-  - kad se napise nova poruka i onda scrolla
-  - received messages refreshaj => styling se promijeni
   - ikonica za profile photo bi se trebala pokazat samo jednom
   - 404 na postojeci chat
 
@@ -39,6 +37,8 @@
 
 ### Gotovo
 
+- received messages refreshaj => styling se promijeni
+- kad se napise nova poruka i onda scrolla
 - fallback za avatar svg ili slova?
 - link na other user profile page
 - napisat s kim je trenutno chat
