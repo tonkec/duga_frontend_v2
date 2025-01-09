@@ -13,9 +13,10 @@ interface IUserChatProps {
     id: string;
   };
   onClick: () => void;
+  lastMessage: string;
 }
 
-const UserChat = ({ user, onClick }: IUserChatProps) => {
+const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
   const { allImages, allImagesLoading } = useGetAllImages(user.id);
 
   if (allImagesLoading) return <Loader />;
@@ -37,6 +38,10 @@ const UserChat = ({ user, onClick }: IUserChatProps) => {
           <h1 className="text-lg font-semibold">
             {user.firstName} {user.lastName}
           </h1>
+        </div>
+
+        <div className="ml-4">
+          <p className="text-gray-500">{lastMessage}</p>
         </div>
       </div>
       <BiChevronRight className="w-6 h-6 text-gray-500" />

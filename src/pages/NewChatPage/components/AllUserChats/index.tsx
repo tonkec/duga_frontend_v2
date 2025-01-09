@@ -4,7 +4,13 @@ import UserChat from '../UserChat';
 
 interface IChat {
   id: number;
-  Messages: string[];
+  Messages: {
+    message: string;
+    userId: string;
+    chatId: number;
+    createdAt: string;
+    updatedAt: string;
+  }[];
   Users: IUser[];
   createdAt: string;
   type: string;
@@ -20,6 +26,10 @@ interface IAllUserChats {
   userChats: IChat[];
 }
 
+const getLastMessage = (userChat: IChat) => {
+  return userChat.Messages[userChat.Messages.length - 1].message;
+};
+
 const AllUserChats = ({ userChats }: IAllUserChats) => {
   const navigate = useNavigate();
   return (
@@ -32,6 +42,7 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
               onClick={() => {
                 navigate(`/chat/${chat.id}`);
               }}
+              lastMessage={getLastMessage(chat)}
             />
           </div>
         );

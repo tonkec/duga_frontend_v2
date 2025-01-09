@@ -79,12 +79,12 @@ const ChatPage = () => {
       <AppLayout>
         <Button
           className="mb-2"
-          type="black"
+          type="danger"
           onClick={() => {
             deleteChat({ chatId: chatId as string });
           }}
         >
-          Izbriši chat
+          Izbriši razgovor
         </Button>
         <Card>
           <h1 className="underline cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>

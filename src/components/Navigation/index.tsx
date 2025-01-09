@@ -31,6 +31,12 @@ const Navigation = () => {
     <nav className={navigationStyles}>
       <ul className="flex w-full gap-2 space-x-4 items-center">
         <li>
+          <ProfilePhoto
+            currentUser={currentUser?.data}
+            url={getProfilePhotoUrl(currentUserProfilePhoto)}
+          />
+        </li>
+        <li>
           <Link to="/" className="flex items-center gap-1">
             Korisnici
             <BiGroup fontSize={25} />
@@ -48,20 +54,12 @@ const Navigation = () => {
             <BiUser fontSize={25} />
           </Link>
         </li>
-        <li>
-          <span className="cursor-pointer flex items-center gap-1" onClick={onLogout}>
-            Odjava <BiExit fontSize={25} />
-          </span>
-        </li>
       </ul>
-      {currentUser && (
-        <div className="float-right">
-          <ProfilePhoto
-            currentUser={currentUser?.data}
-            url={getProfilePhotoUrl(currentUserProfilePhoto)}
-          />
-        </div>
-      )}
+      <div className="float-right mt-2">
+        <span className="cursor-pointer flex items-center gap-1" onClick={onLogout}>
+          <BiExit fontSize={25} />
+        </span>
+      </div>
     </nav>
   );
 };

@@ -2,19 +2,25 @@
 
 - poruke fixanje/improvements
 
-  - ikonica za profile photo bi se trebala pokazat samo jednom
-  - refreshanje mijenja layout?
-  - click na chat pokazuje duple poruke, refreshaj?
-  - ako je chat prazan, onda se ne bi trebao pokazat na new-chat?
+  - ikonica za profile photo bi se trebala pokazat samo jednom 13.01
+  - ako je chat prazan, onda se ne bi trebao pokazat na new-chat? 10.01
+  - refreshanje mijenja layout? 10.01
+  - click na chat pokazuje duple poruke, refreshaj? 10.01
+  - posalji poruku button na other profile page => samo ako vec nije napravljen chat 10.01
+  - posalji poruku button na all profiles page => samo ako vec nije napravljen chat 10.01
+  - sto se dogodi kad se izbrise chat?
+  - napravit bubble u chatu
 
 - novi featuri za poruke
   - typing
-  - posalji poruku button na other profile page => samo ako vec nije napravljen chat
-  - posalji poruku button na all profiles page => samo ako vec nije napravljen chat
   - seen?
+  - read/undread
+  - slanje slika?
+  - emojies
 
 ### Enhancements
 
+- all chats dodat jos contenta, redizajnirat
 - dodat content na all profiles page
   - currently online users
   - finish your profile
@@ -23,13 +29,16 @@
 - all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
 - objasnjenje za iframove
-- dal se moze vidjet ko je lajkao fotku
+- dal se moze vidjet ko je lajkao fotku?
 
 ### Sljedeci veliki feature
 
 - following
 - stavit na all profiles da li je user trenutno aktivan ili ne
 - breadcrumbs
+- tagganje usera u komentarima
+- going online/offline
+- error boundaries
 
 - notifikacije
   - follow
@@ -45,6 +54,7 @@
 
 ### Gotovo
 
+- na poruci u new-chat treba pisat zadnja poruka
 - svi profili unaprijedit
 - brisanje chata
 - timestamp
