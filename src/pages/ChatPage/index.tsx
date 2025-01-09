@@ -7,10 +7,11 @@ import { socket } from '../../socket';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
-import { useGetCurrentChat } from './hooks';
+import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import Button from '../../components/Button';
 
 interface IMessage {
   id: string;
@@ -33,6 +34,7 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
+  const { deleteChat } = useDeleteCurrentChat();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat, isCurrentChatLoading } = useGetCurrentChat(chatId as string);
 
@@ -75,6 +77,15 @@ const ChatPage = () => {
   return (
     <ChatGuard>
       <AppLayout>
+        <Button
+          className="mb-2"
+          type="black"
+          onClick={() => {
+            deleteChat({ chatId: chatId as string });
+          }}
+        >
+          Izbriši chat
+        </Button>
         <Card>
           <h1 className="underline cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
             {otherUserName}

@@ -3,6 +3,9 @@
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom
+  - refreshanje mijenja layout
+  - click na chat pokazuje duple poruke, refreshaj?
+  - ako je chat prazan, onda se ne bi trebao pokazat na new-chat
 
 - novi featuri za poruke
 
@@ -22,6 +25,7 @@
 
 - following
 - stavit na all profiles da li je user trenutno aktivan ili ne
+- breadcrumbs
 
 - notifikacije
   - follow

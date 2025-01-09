@@ -29,3 +29,8 @@ export const getCurrentChat = async (chatId: string) => {
     },
   });
 };
+
+export const deleteCurrentChat = async (chatId: string) => {
+  const client = apiClient();
+  return client.delete(`/chats/${chatId}`);
+};

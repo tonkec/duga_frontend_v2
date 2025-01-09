@@ -1,6 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getChatMessages } from '../../../api/chatMessages';
-import { getCurrentChat } from '../../../api/chats';
+import { deleteCurrentChat, getCurrentChat } from '../../../api/chats';
+import { toastConfig } from '../../../configs/toast.config';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
 
 export const useGetAllMessages = (chatId: string, page: number) => {
   const {
@@ -35,4 +38,25 @@ export const useGetCurrentChat = (chatId: string) => {
   });
 
   return { currentChat, currentChatError, isCurrentChatLoading, isCurrentChatSuccess };
+};
+
+export const useDeleteCurrentChat = () => {
+  const navigate = useNavigate();
+  const {
+    mutate: deleteChat,
+    isPending: isDeletingChat,
+    isError: isDeleteChatError,
+    isSuccess: isDeleteChatSuccess,
+  } = useMutation({
+    mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
+    onSuccess: () => {
+      toast.success('Chat izbrisan!', toastConfig);
+      navigate('/new-chat');
+    },
+    onError: () => {
+      toast.error('Greška! Probaj opet.', toastConfig);
+    },
+  });
+
+  return { deleteChat, isDeletingChat, isDeleteChatError, isDeleteChatSuccess };
 };
