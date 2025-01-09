@@ -3,13 +3,13 @@
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom
-  - 404 na postojeci chat
 
 - novi featuri za poruke
 
   - brisanje chata
   - typing
   - posalji poruku button na other profile page
+  - seen
 
 ### Enhancements
 
@@ -37,6 +37,8 @@
 
 ### Gotovo
 
+- timestamp
+- 404 na postojeci chat
 - received messages refreshaj => styling se promijeni
 - kad se napise nova poruka i onda scrolla
 - fallback za avatar svg ili slova?

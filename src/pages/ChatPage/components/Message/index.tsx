@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 interface IMessageProps {
   message: {
     message: string;
+    createdAt: string;
     User: {
       id: number;
     };
@@ -21,15 +22,40 @@ interface IMessageTemplateProps {
   profilePhoto: string;
   message: string;
   otherUserId?: number;
+  createdAt: string;
 }
 
 const messageStyles = 'py-2 px-4 rounded-full mb-2 max-w-fit text-white';
 
-const CurrentUserMessageTemplate = ({ userName, profilePhoto, message }: IMessageTemplateProps) => {
+const getMessageCreatedAt = (createdAt: string) => {
+  const date = new Date(createdAt);
+  const today = new Date();
+  if (date.getDate() === today.getDate()) {
+    return (
+      <p className="text-xs text-gray-400">
+        {date.getHours()}:{date.getMinutes()}
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-xs text-gray-400">
+      {date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}
+    </p>
+  );
+};
+
+const CurrentUserMessageTemplate = ({
+  userName,
+  profilePhoto,
+  message,
+  createdAt,
+}: IMessageTemplateProps) => {
   return (
     <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
       <div className={messageStyles} style={{ backgroundColor: '#2D46B9' }}>
         <p>{message}</p>
+        {getMessageCreatedAt(createdAt)}
       </div>
       <div style={{ marginLeft: '2px' }}>
         <Avatar name={userName} src={profilePhoto} size="24" round />
@@ -43,6 +69,7 @@ const OtherUserMessageTemplate = ({
   profilePhoto,
   message,
   otherUserId,
+  createdAt,
 }: IMessageTemplateProps) => {
   const navigate = useNavigate();
   return (
@@ -56,6 +83,7 @@ const OtherUserMessageTemplate = ({
       </div>
       <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
         <p>{message}</p>
+        {getMessageCreatedAt(createdAt)}
       </div>
     </div>
   );
@@ -76,6 +104,7 @@ const Message = ({
       userName={currentUserName}
       profilePhoto={currentUserProfilePhoto}
       message={message.message}
+      createdAt={message.createdAt}
     />
   ) : (
     <OtherUserMessageTemplate
@@ -83,6 +112,7 @@ const Message = ({
       profilePhoto={otherUserProfilePhoto}
       message={message.message}
       otherUserId={otherUserId}
+      createdAt={message.createdAt}
     />
   );
 };
