@@ -5,8 +5,8 @@ import { toastConfig } from '../../../configs/toast.config';
 import { useNavigate } from 'react-router';
 
 interface CreateChatInput {
-  userId: string;
-  partnerId: string;
+  userId: number;
+  partnerId: number;
 }
 
 export interface IChat {

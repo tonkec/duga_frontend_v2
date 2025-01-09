@@ -39,8 +39,8 @@ const NewChatPage = () => {
         .filter((user: IUser) => user.id !== currentUserId && !hasAlreadyChatted(user.id))
     : [];
 
-  const onButtonClick = (partnerId: string) => {
-    onCreateChat({ userId: currentUserId as string, partnerId });
+  const onButtonClick = (partnerId: number) => {
+    onCreateChat({ userId: Number(currentUserId), partnerId });
   };
 
   return (
@@ -59,13 +59,13 @@ const NewChatPage = () => {
             <UserCard
               key={user.id}
               user={user}
-              onButtonClick={() => onButtonClick(user.id)}
+              onButtonClick={() => onButtonClick(Number(user.id))}
               buttonText="Pošalji poruku"
             />
           );
         })}
       </div>
-      {userChats?.data.length && <AllUserChats userChats={userChats?.data} />}
+      {userChats?.data.length > 0 && <AllUserChats userChats={userChats?.data} />}
     </AppLayout>
   );
 };
