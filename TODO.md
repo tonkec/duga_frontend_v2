@@ -8,14 +8,18 @@
   - ako je chat prazan, onda se ne bi trebao pokazat na new-chat?
 
 - novi featuri za poruke
-
   - typing
-  - posalji poruku button na other profile page
+  - posalji poruku button na other profile page => samo ako vec nije napravljen chat
+  - posalji poruku button na all profiles page => samo ako vec nije napravljen chat
   - seen?
 
 ### Enhancements
 
-- svi profili unaprijedit
+- dodat content na all profiles page
+  - currently online users
+  - finish your profile
+  - want to improve duga?
+  - latest chats
 - all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
 - objasnjenje za iframove
@@ -41,6 +45,7 @@
 
 ### Gotovo
 
+- svi profili unaprijedit
 - brisanje chata
 - timestamp
 - 404 na postojeci chat

@@ -9,10 +9,12 @@ export default function TestSocketConnection() {
   useEffect(() => {
     function onConnect() {
       setIsConnected(true);
+      console.log('Connected to server', isConnected);
     }
 
     function onDisconnect() {
       setIsConnected(false);
+      console.log('Disconnected from server', isConnected);
     }
 
     socket.on('connect', onConnect);
@@ -22,12 +24,7 @@ export default function TestSocketConnection() {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
     };
-  }, []);
+  }, [isConnected]);
 
-  return (
-    <div className="App">
-      <h1>Socket Connection</h1>
-      <p>Socket is {isConnected ? 'connected' : 'disconnected'}</p>
-    </div>
-  );
+  return null;
 }
