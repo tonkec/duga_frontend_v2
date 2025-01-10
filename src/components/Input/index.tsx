@@ -26,7 +26,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           defaultValue={defaultValue}
           type={type}
         />
-        {icon && <span className="absolute right-3 top-3">{icon}</span>}
+        {icon && <span className="absolute right-3 top-[10px]">{icon}</span>}
       </div>
     ) : (
       <input

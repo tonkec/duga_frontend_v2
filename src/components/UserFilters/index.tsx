@@ -21,13 +21,28 @@ interface IUserFiltersProps {
   setSearch: (value: string) => void;
 }
 
+const getPlaceholder = (selectValue: { value: string; label: string }) => {
+  switch (selectValue.value) {
+    case 'firstName':
+      return 'Pretraži prema imenu...';
+    case 'gender':
+      return 'Pretraži prema rodu...';
+    case 'sexuality':
+      return 'Pretraži prema seksualnosti...';
+    case 'location':
+      return 'Pretraži prema lokaciji...';
+    default:
+      return 'Pretraži prema...';
+  }
+};
+
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
     <div className="md:flex gap-2 justify-end mb-4">
       <div className="mb-2 md:mb-0">
         <Input
           type="text"
-          placeholder={`Pretraži ${selectValue.label}`}
+          placeholder={getPlaceholder(selectValue)}
           icon={<BiSearch color="grey" fontSize="20px" />}
           value={search}
           onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}

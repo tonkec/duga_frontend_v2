@@ -12,6 +12,7 @@ import Loader from './components/Loader';
 import { useGetWindowSize } from './hooks/useGetWindowSize';
 import SendMessageButton from './components/SendMessageButton';
 import notFound from './assets/not_found.svg';
+import Cta from './components/Cta';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -63,7 +64,7 @@ function App() {
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
 
-  const itemsPerPage = windowSize.width < 768 ? 2 : 4;
+  const itemsPerPage = windowSize.width < 768 ? 2 : 3;
 
   return (
     <AppLayout>
@@ -78,21 +79,45 @@ function App() {
           <img src={notFound} alt="No users found" className="mx-auto" />
         </div>
       )}
-      <Paginated<IUser>
-        gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-        data={renderedUsers}
-        itemsPerPage={itemsPerPage}
-        paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
-          <UserCard
-            user={singleEntry}
-            onButtonClick={() => {
-              navigate(`/user/${singleEntry.id}`);
-            }}
-            buttonText="Pogledaj profil"
-            secondButton={<SendMessageButton sendMessageToId={singleEntry.id} buttonType="blue" />}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-2">
+          <h2>
+            <span>👇 Neke zanimljive osobice </span>
+          </h2>
+          <Paginated<IUser>
+            gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            data={renderedUsers}
+            itemsPerPage={itemsPerPage}
+            paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
+              <UserCard
+                user={singleEntry}
+                onButtonClick={() => {
+                  navigate(`/user/${singleEntry.id}`);
+                }}
+                buttonText="Pogledaj profil 👀"
+                secondButton={
+                  <SendMessageButton sendMessageToId={singleEntry.id} buttonType="blue" />
+                }
+              />
+            )}
           />
-        )}
-      />
+        </div>
+
+        <div className="col-span-1">
+          <Cta
+            title="Dovrši svoj profil"
+            buttonText="Izmijeni profil"
+            subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života ✍️"
+            className="mb-4 mt-12"
+          />
+
+          <Cta
+            title="Želiš li nam pomoći?"
+            buttonText="Javi nam se"
+            subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike 🙏"
+          />
+        </div>
+      </div>
     </AppLayout>
   );
 }

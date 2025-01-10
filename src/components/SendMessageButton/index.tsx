@@ -40,7 +40,7 @@ const SendMessageButton = ({
       }}
       type={buttonType}
     >
-      Pošalji poruku
+      Pošalji poruku ✉️
     </Button>
   );
 };
