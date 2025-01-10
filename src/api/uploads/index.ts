@@ -23,3 +23,8 @@ export const uploadPhotos = async (data: FormData) => {
     },
   });
 };
+
+export const getLatestUploads = async () => {
+  const client = apiClient();
+  return client.get(`/uploads/latest`);
+};

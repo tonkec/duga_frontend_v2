@@ -14,6 +14,7 @@ import SendMessageButton from './components/SendMessageButton';
 import notFound from './assets/not_found.svg';
 import Cta from './components/Cta';
 import Card from './components/Card';
+import LatestUploads from './components/LatestUploads';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -201,28 +202,7 @@ function App() {
         </div>
       </div>
 
-      <Card className="mt-8 max-w-xxl">
-        <div className="grid grid-cols-3 gap-6">
-          <div>
-            <img src={notFound} alt="No users found" className="mx-auto" />
-            <div className="flex gap-1 items-center mt-2">
-              <p className="underline">Antonija Simic</p> <span>12:22</span>
-            </div>
-          </div>
-          <div>
-            <img src={notFound} alt="No users found" className="mx-auto" />
-            <div className="flex gap-1 items-center mt-2">
-              <p className="underline">Antonija Simic</p> <span>12:22</span>
-            </div>
-          </div>
-          <div>
-            <img src={notFound} alt="No users found" className="mx-auto" />
-            <div className="flex gap-1 items-center mt-2">
-              <p className="underline">Antonija Simic</p> <span>12:22</span>
-            </div>
-          </div>
-        </div>
-      </Card>
+      <LatestUploads />
     </AppLayout>
   );
 }
