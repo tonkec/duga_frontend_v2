@@ -44,6 +44,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
               label: e?.label || '',
             });
           }}
+          defaultValue={selectOptions.find((option) => option.value === selectValue.value)}
         />
       </div>
     </div>

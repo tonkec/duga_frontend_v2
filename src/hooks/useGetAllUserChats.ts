@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAllUserChats } from '../api/chats';
 
-export const useGetAllUserChats = (userId: string) => {
+export const useGetAllUserChats = (userId: string, isQueryEnabled?: boolean) => {
   const {
     data: userChats,
     error: userChatsError,
@@ -9,6 +9,7 @@ export const useGetAllUserChats = (userId: string) => {
   } = useQuery({
     queryKey: ['userChats', userId],
     queryFn: () => getAllUserChats(userId),
+    enabled: isQueryEnabled,
   });
 
   return { userChats, userChatsError, isUserChatsLoading };

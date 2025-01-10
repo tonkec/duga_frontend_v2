@@ -19,8 +19,8 @@ function App() {
   const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [selectValue, setSelectValue] = useState({
-    value: '',
-    label: '',
+    value: 'firstName',
+    label: 'ime',
   });
   const [search, setSearch] = useState('');
 
