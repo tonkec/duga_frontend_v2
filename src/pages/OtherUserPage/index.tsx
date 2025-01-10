@@ -67,16 +67,16 @@ const OtherUserPage = () => {
 
             <div className="lg:col-span-1 max-w-[300px]">
               <Cta
-                buttonText="Zaprati"
-                subtitle="Zaprati ovu zanimljivu osobicu."
-                title="Zaprati me!"
-                onClick={() => {}}
-              />
-              <Cta
-                className="mt-4"
                 buttonText="Pošalji poruku"
                 subtitle="Pošalji poruku ovoj osobici."
                 title="Pošalji poruku!"
+                onClick={() => {}}
+              />{' '}
+              <Cta
+                className="mt-4"
+                buttonText="Zaprati"
+                subtitle="Zaprati ovu zanimljivu osobicu."
+                title="Zaprati me!"
                 onClick={() => {}}
               />
             </div>

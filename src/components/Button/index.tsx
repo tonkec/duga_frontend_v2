@@ -2,7 +2,7 @@ interface IButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
-  type: 'primary' | 'secondary' | 'tertiary' | 'icon' | 'black' | 'blue' | 'danger';
+  type: 'primary' | 'secondary' | 'tertiary' | 'icon' | 'black' | 'blue' | 'danger' | 'blue-dark';
   disabled?: boolean;
 }
 
@@ -13,7 +13,7 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
     case 'primary':
       return 'py-2 px-4 bg-pink hover:bg-pink-dark text-white';
     case 'secondary':
-      return 'py-2 px-4 bg-white hover:bg-blue text-black hover:text-white';
+      return 'py-2 px-4 bg-white hover:bg-blue-dark text-black hover:text-white';
     case 'tertiary':
       return 'py-2 px-4 bg-rose hover:bg-[rgb(245,200,230)] text-black hover:text-black';
     case 'icon':
@@ -24,6 +24,8 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
       return 'py-2 px-4 bg-blue text-white hover:bg-blue-dark';
     case 'danger':
       return 'py-2 px-4 bg-red text-white';
+    case 'blue-dark':
+      return 'py-2 px-4 bg-blue-dark text-white';
     default:
       return 'bg-blue';
   }
