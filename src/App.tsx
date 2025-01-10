@@ -64,7 +64,7 @@ function App() {
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
 
-  const itemsPerPage = windowSize.width < 768 ? 2 : 3;
+  const itemsPerPage = windowSize.width < 1024 ? 2 : 3;
 
   return (
     <AppLayout>
@@ -74,16 +74,14 @@ function App() {
         search={search}
         setSearch={setSearch}
       />
-      {!renderedUsers?.length && (
-        <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
-          <img src={notFound} alt="No users found" className="mx-auto" />
-        </div>
-      )}
-      <div className="grid grid-cols-3 gap-4">
+
+      <div className="grid lg:grid-cols-3 gap-4 content-center">
         <div className="col-span-2">
-          <h2>
-            <span>👇 Neke zanimljive osobice </span>
-          </h2>
+          {!renderedUsers?.length && (
+            <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
+              <img src={notFound} alt="No users found" className="mx-auto" />
+            </div>
+          )}
           <Paginated<IUser>
             gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             data={renderedUsers}
@@ -108,7 +106,7 @@ function App() {
             title="Dovrši svoj profil"
             buttonText="Izmijeni profil"
             subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života ✍️"
-            className="mb-4 mt-12"
+            className="mb-4 mt-4"
           />
 
           <Cta

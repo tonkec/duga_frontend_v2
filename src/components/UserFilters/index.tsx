@@ -38,29 +38,35 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="md:flex gap-2 justify-end mb-4">
-      <div className="mb-2 md:mb-0">
-        <Input
-          type="text"
-          placeholder={getPlaceholder(selectValue)}
-          icon={<BiSearch color="grey" fontSize="20px" />}
-          value={search}
-          onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-        />
-      </div>
-      <div>
-        <Select
-          isClearable
-          options={selectOptions}
-          placeholder="Pretraži prema..."
-          onChange={(e) => {
-            setSelectValue({
-              value: e?.value || '',
-              label: e?.label || '',
-            });
-          }}
-          defaultValue={selectOptions.find((option) => option.value === selectValue.value)}
-        />
+    <div className="lg:flex gap-2 justify-between mb-4">
+      <h2 className="justify-start mb-2 lg:mb-0">
+        <span>👇 Neke zanimljive osobice </span>
+      </h2>
+      <div className="lg:flex gap-2">
+        <div className="mb-2 lg:mb-0">
+          <Input
+            type="text"
+            placeholder={getPlaceholder(selectValue)}
+            icon={<BiSearch color="grey" fontSize="20px" />}
+            value={search}
+            onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
+            className="min-w-[600px]"
+          />
+        </div>
+        <div>
+          <Select
+            isClearable
+            options={selectOptions}
+            placeholder="Pretraži prema..."
+            onChange={(e) => {
+              setSelectValue({
+                value: e?.value || '',
+                label: e?.label || '',
+              });
+            }}
+            defaultValue={selectOptions.find((option) => option.value === selectValue.value)}
+          />
+        </div>
       </div>
     </div>
   );

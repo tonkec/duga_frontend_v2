@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link, useNavigate } from 'react-router';
-import { BiGroup, BiExit, BiEnvelope, BiUser } from 'react-icons/bi';
+import { BiExit } from 'react-icons/bi';
 import ProfilePhoto from '../ProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
@@ -38,20 +38,20 @@ const Navigation = () => {
         </li>
         <li>
           <Link to="/" className="flex items-center gap-1">
-            Korisnici
-            <BiGroup fontSize={25} />
+            <span>Korisnici</span>
+            {String.fromCodePoint(parseInt('1F46F', 16))}
           </Link>
         </li>
         <li>
-          <Link to="/new-chat" className="flex items-center gap-1">
-            Poruke
-            <BiEnvelope fontSize={25} />
+          <Link to="/new-chat" className="flex items-center gap-2">
+            <span>Poruke</span>
+            {String.fromCodePoint(parseInt('1F4EB', 16))}
           </Link>
         </li>
         <li>
           <Link to="/profile" className="flex items-center gap-1">
-            Profil
-            <BiUser fontSize={25} />
+            <span>Profil</span>
+            {String.fromCodePoint(parseInt('1F9D1', 16))}
           </Link>
         </li>
       </ul>
