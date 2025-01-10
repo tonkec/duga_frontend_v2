@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
 import { useGetWindowSize } from './hooks/useGetWindowSize';
 import SendMessageButton from './components/SendMessageButton';
+import notFound from './assets/not_found.svg';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -62,14 +63,6 @@ function App() {
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
 
-  if (!renderedUsers) {
-    return (
-      <AppLayout>
-        <h1>No users found</h1>
-      </AppLayout>
-    );
-  }
-
   const itemsPerPage = windowSize.width < 768 ? 2 : 4;
 
   return (
@@ -80,6 +73,11 @@ function App() {
         search={search}
         setSearch={setSearch}
       />
+      {!renderedUsers?.length && (
+        <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
+          <img src={notFound} alt="No users found" className="mx-auto" />
+        </div>
+      )}
       <Paginated<IUser>
         gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         data={renderedUsers}

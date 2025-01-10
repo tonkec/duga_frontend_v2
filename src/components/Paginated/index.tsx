@@ -46,7 +46,7 @@ const Paginated = <T,>({
         <div className="flex justify-center items-center w-full p-4 gap-4">
           <Button
             className="flex items-center"
-            type="tertiary"
+            type="blue"
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
           >
@@ -55,7 +55,7 @@ const Paginated = <T,>({
 
           <Button
             className="flex items-center"
-            type="tertiary"
+            type="blue"
             onClick={goToNextPage}
             disabled={currentPage === totalPages}
           >

@@ -10,7 +10,7 @@ interface InputProps {
   type: string;
 }
 
-const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-[6px] px-4 pr-8 block w-full appearance-none leading-normal focus:border-pink`;
+const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-[6px] px-4 pr-8 block w-full appearance-none leading-normal focus:border-blue`;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ placeholder, type, className, onChange, icon, value, defaultValue, ...props }, ref) => {
