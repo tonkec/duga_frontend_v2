@@ -13,6 +13,7 @@ import { useGetWindowSize } from './hooks/useGetWindowSize';
 import SendMessageButton from './components/SendMessageButton';
 import notFound from './assets/not_found.svg';
 import Cta from './components/Cta';
+import Card from './components/Card';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -64,7 +65,7 @@ function App() {
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
 
-  const itemsPerPage = windowSize.width < 1024 ? 2 : 3;
+  const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
 
   return (
     <AppLayout>
@@ -75,30 +76,106 @@ function App() {
         setSearch={setSearch}
       />
 
-      <div className="grid lg:grid-cols-3 gap-4 content-center">
-        <div className="col-span-2">
-          {!renderedUsers?.length && (
-            <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
-              <img src={notFound} alt="No users found" className="mx-auto" />
-            </div>
+      <div className="mt-12">
+        {!renderedUsers?.length && (
+          <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
+            <img src={notFound} alt="No users found" className="mx-auto" />
+          </div>
+        )}
+        <Paginated<IUser>
+          gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          data={renderedUsers}
+          itemsPerPage={itemsPerPage}
+          paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
+            <UserCard
+              user={singleEntry}
+              onButtonClick={() => {
+                navigate(`/user/${singleEntry.id}`);
+              }}
+              buttonText="Pogledaj profil 👀"
+              secondButton={
+                <SendMessageButton sendMessageToId={singleEntry.id} buttonType="blue" />
+              }
+            />
           )}
-          <Paginated<IUser>
-            gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-            data={renderedUsers}
-            itemsPerPage={itemsPerPage}
-            paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
-              <UserCard
-                user={singleEntry}
-                onButtonClick={() => {
-                  navigate(`/user/${singleEntry.id}`);
-                }}
-                buttonText="Pogledaj profil 👀"
-                secondButton={
-                  <SendMessageButton sendMessageToId={singleEntry.id} buttonType="blue" />
-                }
-              />
-            )}
-          />
+        />
+      </div>
+
+      <div className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
+        <Card className="p-0 overflow-hidden col-span-1">
+          <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+            <p className="mt-2 mb-3">Antonija Simic</p>
+            <p>
+              Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
+              dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
+            </p>
+            <p
+              className="
+            text-sm text-gray-500"
+            >
+              12:31pm
+            </p>
+          </div>
+        </Card>
+
+        <div className="col-span-2">
+          <Card className="p-0 overflow-hidden">
+            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+              <p className="mt-2 mb-3">Antonija Simic</p>
+              <p>
+                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
+                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
+              </p>
+              <p
+                className="
+            text-sm text-gray-500"
+              >
+                12:31pm
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+              <p className="mt-2 mb-3">Antonija Simic</p>
+              <p>
+                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
+                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
+              </p>
+              <p
+                className="
+            text-sm text-gray-500"
+              >
+                12:31pm
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+              <p className="mt-2 mb-3">Antonija Simic</p>
+              <p>
+                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
+                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
+              </p>
+              <p
+                className="
+            text-sm text-gray-500"
+              >
+                12:31pm
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+              <p className="mt-2 mb-3">Antonija Simic</p>
+              <p>
+                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
+                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
+              </p>
+              <p
+                className="
+            text-sm text-gray-500"
+              >
+                12:31pm
+              </p>
+            </div>
+          </Card>
         </div>
 
         <div className="col-span-1">
@@ -106,7 +183,14 @@ function App() {
             title="Dovrši svoj profil"
             buttonText="Izmijeni profil"
             subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života ✍️"
-            className="mb-4 mt-4"
+            className="mb-4"
+          />
+
+          <Cta
+            title="Nemaš poruka?"
+            subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu 💬"
+            buttonText="Nova poruka"
+            className="mb-4"
           />
 
           <Cta
@@ -116,6 +200,29 @@ function App() {
           />
         </div>
       </div>
+
+      <Card className="mt-8 max-w-xxl">
+        <div className="grid grid-cols-3 gap-6">
+          <div>
+            <img src={notFound} alt="No users found" className="mx-auto" />
+            <div className="flex gap-1 items-center mt-2">
+              <p className="underline">Antonija Simic</p> <span>12:22</span>
+            </div>
+          </div>
+          <div>
+            <img src={notFound} alt="No users found" className="mx-auto" />
+            <div className="flex gap-1 items-center mt-2">
+              <p className="underline">Antonija Simic</p> <span>12:22</span>
+            </div>
+          </div>
+          <div>
+            <img src={notFound} alt="No users found" className="mx-auto" />
+            <div className="flex gap-1 items-center mt-2">
+              <p className="underline">Antonija Simic</p> <span>12:22</span>
+            </div>
+          </div>
+        </div>
+      </Card>
     </AppLayout>
   );
 }

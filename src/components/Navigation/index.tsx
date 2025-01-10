@@ -38,8 +38,8 @@ const Navigation = () => {
         </li>
         <li>
           <Link to="/" className="flex items-center gap-1">
-            <span>Korisnici</span>
-            {String.fromCodePoint(parseInt('1F46F', 16))}
+            <span>Početna</span>
+            {String.fromCodePoint(parseInt('1F3D8', 16))}
           </Link>
         </li>
         <li>
