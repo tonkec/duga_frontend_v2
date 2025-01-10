@@ -8,7 +8,6 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '../../components/Loader';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
-import { hasAlreadyChatted } from './utils/hasAlreadyChatted';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
@@ -33,9 +32,7 @@ const NewChatPage = () => {
             user.lastName.toLowerCase().includes(search.toLowerCase())
           );
         })
-        .filter(
-          (user: IUser) => user.id !== currentUserId && !hasAlreadyChatted(userChats?.data, user.id)
-        )
+        .filter((user: IUser) => user.id !== currentUserId)
     : [];
 
   const onButtonClick = (partnerId: number) => {
