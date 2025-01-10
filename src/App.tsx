@@ -10,6 +10,9 @@ import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
 import { useGetWindowSize } from './hooks/useGetWindowSize';
+import { useGetAllUserChats } from './hooks/useGetAllUserChats';
+import { hasAlreadyChatted } from './pages/NewChatPage/utils/hasAlreadyChatted';
+import { useCreateNewChat } from './pages/NewChatPage/hooks';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -22,6 +25,8 @@ function App() {
     label: '',
   });
   const [search, setSearch] = useState('');
+  const { onCreateChat } = useCreateNewChat();
+  const { userChats } = useGetAllUserChats(userId as string);
 
   if (isAllUsersLoading || isUserLoading) {
     return (
@@ -90,10 +95,12 @@ function App() {
               navigate(`/user/${singleEntry.id}`);
             }}
             onSecondButtonClick={() => {
-              console.log('Send message');
+              if (!hasAlreadyChatted(userChats?.data, singleEntry.id)) {
+                onCreateChat({ userId: Number(userId), partnerId: Number(singleEntry.id) });
+              }
             }}
             buttonText="Pogledaj profil"
-            secondButton
+            secondButton={!hasAlreadyChatted(userChats?.data, singleEntry.id)}
             secondButtonText="Pošalji poruku"
           />
         )}

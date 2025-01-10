@@ -3,11 +3,12 @@ import AppLayout from '../../components/AppLayout';
 import Input from '../../components/Input';
 import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 import UserCard, { IUser } from '../../components/UserCard';
-import { IChat, useCreateNewChat } from './hooks';
+import { useCreateNewChat } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '../../components/Loader';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
+import { hasAlreadyChatted } from './utils/hasAlreadyChatted';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
@@ -24,10 +25,6 @@ const NewChatPage = () => {
     );
   }
 
-  const hasAlreadyChatted = (userId: string) => {
-    return userChats?.data.some((chat: IChat) => Number(chat.Users[0].id) === Number(userId));
-  };
-
   const filteredUsers = search
     ? allUsers?.data
         .filter((user: IUser) => {
@@ -36,7 +33,9 @@ const NewChatPage = () => {
             user.lastName.toLowerCase().includes(search.toLowerCase())
           );
         })
-        .filter((user: IUser) => user.id !== currentUserId && !hasAlreadyChatted(user.id))
+        .filter(
+          (user: IUser) => user.id !== currentUserId && !hasAlreadyChatted(userChats?.data, user.id)
+        )
     : [];
 
   const onButtonClick = (partnerId: number) => {

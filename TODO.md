@@ -15,13 +15,12 @@
   - typing
   - seen?
   - read/undread
-  - slanje slika?
-  - emojies
+  - emojis
 
 ### Enhancements
 
 - all chats dodat jos contenta, redizajnirat
-- dodat content na all profiles page
+- dodat content na all profiles page 16.01
   - currently online users
   - finish your profile
   - want to improve duga?
@@ -30,15 +29,17 @@
 - maknut opis s fotke ako nema opisa
 - objasnjenje za iframove
 - dal se moze vidjet ko je lajkao fotku?
+- stavit na profilu na fotografijama broj lajkova
 
 ### Sljedeci veliki feature
 
 - following
-- stavit na all profiles da li je user trenutno aktivan ili ne
 - breadcrumbs
 - tagganje usera u komentarima
 - going online/offline
+- stavit na all profiles da li je user trenutno aktivan ili ne
 - error boundaries
+- slanje slike u porukama => s3
 
 - notifikacije
   - follow

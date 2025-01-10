@@ -27,6 +27,10 @@ interface IAllUserChats {
 }
 
 const getLastMessage = (userChat: IChat) => {
+  if (userChat.Messages.length === 0) {
+    return '';
+  }
+
   return userChat.Messages[userChat.Messages.length - 1].message;
 };
 

@@ -74,7 +74,7 @@ const UserCard = ({
   onSecondButtonClick,
 }: IUserCardProps) => {
   return (
-    <Card>
+    <Card className="h-full">
       <div className="w-full text-center">
         <Avatar
           name={`${user.firstName} ${user.lastName}`}
@@ -95,7 +95,7 @@ const UserCard = ({
           {getUserAge(user)}
           <p className="text-gray-600 mt-2 flex items-center justify-center gap-1">
             {' '}
-            <span>{getUserBio(user.bio)}</span>
+            <span> {getUserBio(user.bio)}</span>
           </p>
         </div>
         <div className="flex gap-2 justify-center items-center mt-4 flex-col">
