@@ -1,8 +1,18 @@
+export type ButtonType =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'icon'
+  | 'black'
+  | 'blue'
+  | 'danger'
+  | 'blue-dark';
+
 interface IButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
-  type: 'primary' | 'secondary' | 'tertiary' | 'icon' | 'black' | 'blue' | 'danger' | 'blue-dark';
+  type: ButtonType;
   disabled?: boolean;
 }
 

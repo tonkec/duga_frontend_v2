@@ -3,6 +3,7 @@ import Avatar from 'react-avatar';
 import Card from '../Card';
 import { getUserBio } from '../UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
+import React from 'react';
 export interface IUser {
   avatar: string;
   email: string;
@@ -24,9 +25,7 @@ interface IUserCardProps {
   user: IUser;
   onButtonClick: () => void;
   buttonText: string;
-  secondButton?: boolean;
-  secondButtonText?: string;
-  onSecondButtonClick?: () => void;
+  secondButton?: React.ReactNode;
 }
 
 const getUserLocation = ({ location }: { location: string }) => {
@@ -65,14 +64,7 @@ const getUserAge = ({ age }: { age: number }) => {
   );
 };
 
-const UserCard = ({
-  user,
-  onButtonClick,
-  buttonText,
-  secondButton,
-  secondButtonText,
-  onSecondButtonClick,
-}: IUserCardProps) => {
+const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardProps) => {
   return (
     <Card className="h-full">
       <div className="w-full text-center">
@@ -102,11 +94,7 @@ const UserCard = ({
           <Button onClick={onButtonClick} type="primary">
             {buttonText}
           </Button>
-          {secondButton && (
-            <Button onClick={onSecondButtonClick} type="blue">
-              {secondButtonText}
-            </Button>
-          )}
+          {secondButton}
         </div>
       </div>
     </Card>

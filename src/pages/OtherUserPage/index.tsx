@@ -9,16 +9,12 @@ import Card from '../../components/Card';
 import Photos from '../../components/Photos';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import Loader from '../../components/Loader';
-import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
-import { hasAlreadyChatted } from '../NewChatPage/utils/hasAlreadyChatted';
-import { useCreateNewChat } from '../NewChatPage/hooks';
+import SendMessageButton from '../../components/SendMessageButton';
 
 const OtherUserPage = () => {
   const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
-  const { userChats } = useGetAllUserChats(userId as string);
-  const { onCreateChat } = useCreateNewChat();
 
   if (!userId || isNaN(Number(userId))) {
     return (
@@ -70,16 +66,13 @@ const OtherUserPage = () => {
               />
             </div>
             <div className="lg:col-span-1 max-w-[300px]">
-              {!hasAlreadyChatted(userChats?.data, userId as string) && (
-                <Cta
-                  buttonText="Pošalji poruku"
-                  subtitle="Pošalji poruku ovoj osobici."
-                  title="Pošalji poruku!"
-                  onClick={() => {
-                    onCreateChat({ userId: Number(userId), partnerId: Number(userId) });
-                  }}
+              <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
+                <SendMessageButton
+                  sendMessageToId={userId as string}
+                  buttonType="blue-dark"
+                  buttonClasses="w-full"
                 />
-              )}
+              </Cta>
               <Cta
                 className="mt-4"
                 buttonText="Zaprati"
