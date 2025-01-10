@@ -103,23 +103,28 @@ function App() {
       </div>
 
       <div className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-        <Card className="p-0 overflow-hidden col-span-1">
-          <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-            <p className="mt-2 mb-3">Antonija Simic</p>
-            <p>
-              Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
-              dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
-            </p>
-            <p
-              className="
+        <div className="col-span-2">
+          <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
+          <Card className="p-0 overflow-hidden">
+            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+              <p className="mt-2 mb-3">Antonija Simic</p>
+              <p>
+                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
+                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
+              </p>
+              <p
+                className="
             text-sm text-gray-500"
-            >
-              12:31pm
-            </p>
-          </div>
-        </Card>
+              >
+                12:31pm
+              </p>
+            </div>
+          </Card>
+        </div>
 
         <div className="col-span-2">
+          <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
+
           <Card className="p-0 overflow-hidden">
             <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
               <p className="mt-2 mb-3">Antonija Simic</p>
@@ -178,31 +183,32 @@ function App() {
             </div>
           </Card>
         </div>
-
-        <div className="col-span-1">
-          <Cta
-            title="Dovrši svoj profil"
-            buttonText="Izmijeni profil"
-            subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života ✍️"
-            className="mb-4"
-          />
-
-          <Cta
-            title="Nemaš poruka?"
-            subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu 💬"
-            buttonText="Nova poruka"
-            className="mb-4"
-          />
-
-          <Cta
-            title="Želiš li nam pomoći?"
-            buttonText="Javi nam se"
-            subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike 🙏"
-          />
-        </div>
       </div>
 
       <LatestUploads />
+
+      <div className="flex justify-center gap-4 mt-12">
+        <Cta
+          className="flex-1"
+          title="Dovrši svoj profil"
+          buttonText="Izmijeni profil"
+          subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
+        />
+
+        <Cta
+          className="flex-1"
+          title="Nemaš poruka?"
+          subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu za čavrljanje 💬"
+          buttonText="Nova poruka"
+        />
+
+        <Cta
+          className="flex-1"
+          title="Želiš li nam pomoći?"
+          buttonText="Javi nam se"
+          subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike 🙏"
+        />
+      </div>
     </AppLayout>
   );
 }

@@ -15,14 +15,19 @@ const LatestUploads = () => {
   if (!latestUploads) {
     return <img src={NotFoundSvg} alt="Not found" />;
   }
+
   return (
-    <Card className="mt-8">
-      <div className="grid grid-cols-3 gap-6">
-        {latestUploads?.data.map((upload: IUpload) => (
-          <LatestUpload key={upload.id} upload={upload} />
-        ))}
-      </div>
-    </Card>
+    <div className="mt-8">
+      <h2 className="mb-2">📸 Nedavno dodane fotke</h2>
+
+      <Card>
+        <div className="grid grid-cols-3 gap-6">
+          {latestUploads?.data.map((upload: IUpload) => (
+            <LatestUpload key={upload.id} upload={upload} />
+          ))}
+        </div>
+      </Card>
+    </div>
   );
 };
 
