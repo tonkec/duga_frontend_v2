@@ -1,10 +1,15 @@
 # Next to do
 
+- dovrsit all profiles redizajn
+
+  - responsiveness
+  - linkat cta buttone
+  - nedavne poruke
+  - nedavni komentari
+
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom 13.01
-  - ako je chat prazan, onda se ne bi trebao pokazat na new-chat? 10.01
-  - refreshanje mijenja layout? 10.01
   - click na chat pokazuje duple poruke, refreshaj? 10.01
   - sto se dogodi kad se izbrise chat?
   - napravit bubble u chatu
@@ -38,6 +43,7 @@
 - stavit na all profiles da li je user trenutno aktivan ili ne
 - error boundaries
 - slanje slike u porukama => s3
+- delete account
 
 - notifikacije
   - follow
@@ -53,6 +59,8 @@
 
 ### Gotovo
 
+- refreshanje mijenja layout? 10.01
+- ako je chat prazan, onda se ne bi trebao pokazat na new-chat? 10.01
 - posalji poruku button na other profile page => samo ako vec nije napravljen chat 10.01
 - posalji poruku button na all profiles page => samo ako vec nije napravljen chat 10.01
 - na poruci u new-chat treba pisat zadnja poruka

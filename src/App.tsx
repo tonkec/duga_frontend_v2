@@ -153,34 +153,6 @@ function App() {
                 12:31pm
               </p>
             </div>
-
-            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-              <p className="mt-2 mb-3">Antonija Simic</p>
-              <p>
-                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
-                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
-              </p>
-              <p
-                className="
-            text-sm text-gray-500"
-              >
-                12:31pm
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-              <p className="mt-2 mb-3">Antonija Simic</p>
-              <p>
-                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
-                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
-              </p>
-              <p
-                className="
-            text-sm text-gray-500"
-              >
-                12:31pm
-              </p>
-            </div>
           </Card>
         </div>
       </div>

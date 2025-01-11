@@ -19,11 +19,10 @@ export interface IImage {
 interface IPhotosProps {
   images: IImage[] | undefined;
   notFoundText: string;
-  isEditable?: boolean;
   setImageDescriptions?: (e: SetStateAction<ImageDescription[]>) => void;
 }
 
-const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
+const Photos = ({ images, notFoundText }: IPhotosProps) => {
   const navigate = useNavigate();
 
   if (!images || !images.length) {
@@ -43,7 +42,6 @@ const Photos = ({ images, notFoundText, isEditable }: IPhotosProps) => {
           return (
             <div className="max-w-[400px]" key={index}>
               <img
-                className={!isEditable ? 'cursor-pointer' : ''}
                 src={getImageUrl(image)}
                 alt="user image"
                 onClick={() => {
