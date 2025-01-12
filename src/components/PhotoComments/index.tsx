@@ -8,9 +8,9 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '../FieldError';
-import { socket } from '../../socket';
 import { useEffect, useState } from 'react';
 import Paginated from '../Paginated';
+import { useSocket } from '../../context/socket';
 
 const schema = z.object({
   comment: z.string().nonempty('Komentar je obavezan.'),
@@ -29,6 +29,7 @@ export interface IComment {
 }
 
 const PhotoComments = () => {
+  const socket = useSocket();
   const { mutateAddUploadComment } = useAddUploadComment();
   const [userId] = useLocalStorage('userId');
   const { photoId } = useParams();

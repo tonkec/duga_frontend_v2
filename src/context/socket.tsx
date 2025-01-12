@@ -5,9 +5,14 @@ import { io, Socket } from 'socket.io-client';
 // Type the socket context
 type SocketType = Socket | null;
 
+const URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://duga-backend.herokuapp.com'
+    : 'http://localhost:8080';
+
 // Create Socket Context
 const SocketContext = createContext<SocketType>(null);
-const socket: Socket = io('http://localhost:8080');
+const socket: Socket = io(URL);
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [currentUserId] = useLocalStorage('userId');

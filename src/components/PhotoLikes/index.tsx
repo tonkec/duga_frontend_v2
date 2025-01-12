@@ -2,7 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
 import { useEffect, useState } from 'react';
-import { socket } from '../../socket';
+import { useSocket } from '../../context/socket';
 
 interface IPhotoLikesProps {
   photoId: string | undefined;
@@ -13,6 +13,7 @@ interface ILike {
 }
 
 const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
+  const socket = useSocket();
   const [currentUser] = useLocalStorage('userId');
   const { mutateUpvoteUpload } = useUpvoteUpload();
   const { mutateDownvoteUpload } = useDownvoteUpload();
