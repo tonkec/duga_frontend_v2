@@ -24,9 +24,10 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
         onClick={() => {
           navigate(`/photo/${upload.id}`);
         }}
+        style={{ maxWidth: '100%' }}
       />
 
-      <div className="flex items-center gap-2 mt-4">
+      <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
         <Avatar
           color="#2D46B9"
           name={`${user?.data.firstName} ${user?.data.lastName}`}

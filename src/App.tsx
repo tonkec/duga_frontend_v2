@@ -103,7 +103,7 @@ function App() {
         />
       </div>
 
-      <div className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
+      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
         <div className="col-span-2">
           <LatestComments />
         </div>
@@ -115,7 +115,7 @@ function App() {
 
       <LatestUploads />
 
-      <div className="flex justify-center gap-4 mt-12">
+      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-12">
         <Cta
           className="flex-1"
           title="Dovrši svoj profil"
