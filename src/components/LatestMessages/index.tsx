@@ -48,7 +48,9 @@ const LatestMessages = () => {
         {latestChats?.map((chat: IChat) =>
           chat.Messages.map((message: IMessage) => (
             <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-              <p>Razgovor sa {chat.Users[0].firstName} </p>
+              <p className="text-gray-500 text-sm">
+                Razgovor sa korisnikom_com {chat.Users[0].firstName}{' '}
+              </p>
               <LatestMessage
                 message={message}
                 onClick={() => {
