@@ -10,7 +10,7 @@ import CommentWithUser from './components/CommentWithUser';
 import FieldError from '../FieldError';
 import { useEffect, useState } from 'react';
 import Paginated from '../Paginated';
-import { useSocket } from '../../context/socket';
+import { useSocket } from '../../context/useSocket';
 
 const schema = z.object({
   comment: z.string().nonempty('Komentar je obavezan.'),

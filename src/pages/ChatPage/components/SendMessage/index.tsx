@@ -9,7 +9,7 @@ import { useGetAllUserChats } from '../../../../hooks/useGetAllUserChats';
 import { IChat } from '../../../NewChatPage/hooks';
 import { IUser } from '../../../../components/UserCard';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
-import { useSocket } from '../../../../context/socket';
+import { useSocket } from '../../../../context/useSocket';
 
 type Inputs = {
   content: string;

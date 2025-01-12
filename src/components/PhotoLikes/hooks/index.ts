@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { addUploadLike, getUploadLikes, removeUploadLike } from '../../../api/uploadsLikes';
-import { useSocket } from '../../../context/socket';
+import { useSocket } from '../../../context/useSocket';
 
 export const useUpvoteUpload = () => {
   const socket = useSocket();

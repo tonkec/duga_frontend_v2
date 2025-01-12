@@ -1,5 +1,5 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 // Type the socket context
@@ -11,7 +11,7 @@ const URL =
     : 'http://localhost:8080';
 
 // Create Socket Context
-const SocketContext = createContext<SocketType>(null);
+export const SocketContext = createContext<SocketType>(null);
 const socket: Socket = io(URL);
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
@@ -49,13 +49,4 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
   // Provide the socket instance via context
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
-};
-
-// Custom hook to consume the Socket Context
-export const useSocket = (): Socket => {
-  const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error('useSocket must be used within a SocketProvider');
-  }
-  return context;
 };

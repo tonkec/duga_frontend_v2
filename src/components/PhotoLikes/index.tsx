@@ -2,7 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
 import { useEffect, useState } from 'react';
-import { useSocket } from '../../context/socket';
+import { useSocket } from '../../context/useSocket';
 
 interface IPhotoLikesProps {
   photoId: string | undefined;

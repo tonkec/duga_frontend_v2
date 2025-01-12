@@ -11,7 +11,7 @@ import { useGetUserById } from '../../hooks/useGetUserById';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import Button from '../../components/Button';
-import { useSocket } from '../../context/socket';
+import { useSocket } from '../../context/useSocket';
 
 interface IMessage {
   id: string;

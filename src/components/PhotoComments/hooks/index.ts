@@ -7,7 +7,7 @@ import {
 } from '../../../api/uploadsComments';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
-import { useSocket } from '../../../context/socket';
+import { useSocket } from '../../../context/useSocket';
 interface IAddUploadCommentProps {
   userId: string;
   uploadId: string;
