@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router';
 import DugaRoutes from './routes/index.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { SocketProvider } from './context/socket.tsx';
+import { SocketProvider } from './context/SocketProvider.tsx';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

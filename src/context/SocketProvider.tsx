@@ -1,9 +1,9 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { createContext, useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { SocketContext } from './SocketContext';
 
 // Type the socket context
-type SocketType = Socket | null;
 
 const URL =
   process.env.NODE_ENV === 'production'
@@ -11,7 +11,6 @@ const URL =
     : 'http://localhost:8080';
 
 // Create Socket Context
-export const SocketContext = createContext<SocketType>(null);
 const socket: Socket = io(URL);
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
@@ -19,7 +18,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
-    // Handle connection and disconnection
     const handleConnect = () => {
       setIsConnected(true);
       console.log('Connected to server with socket ID:', socket.id);
@@ -30,23 +28,18 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       console.log('Disconnected from server');
     };
 
-    // Attach event listeners
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
 
-    // Emit join event when user ID is available
     if (currentUserId) {
       socket.emit('join', { id: currentUserId });
     }
 
-    // Cleanup event listeners on unmount
     return () => {
       socket.off('connect', handleConnect);
       socket.off('disconnect', handleDisconnect);
-      socket.emit('leave', { id: currentUserId }); // Optional: emit a leave event
     };
   }, [currentUserId]);
 
-  // Provide the socket instance via context
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
 };
