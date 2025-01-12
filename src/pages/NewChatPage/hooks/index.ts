@@ -28,6 +28,8 @@ interface Message {
   id: number;
   content: string;
   createdAt: string;
+  message: string;
+  User: User;
 }
 
 export const useCreateNewChat = () => {

@@ -5,7 +5,7 @@
   - responsiveness
   - linkat cta buttone
   - nedavne poruke
-  - nedavni komentari
+  - nedavni komentari§
 
 - poruke fixanje/improvements
 

@@ -15,6 +15,7 @@ import notFound from './assets/not_found.svg';
 import Cta from './components/Cta';
 import Card from './components/Card';
 import LatestUploads from './components/LatestUploads';
+import LatestMessages from './components/LatestMessages';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -123,37 +124,7 @@ function App() {
         </div>
 
         <div className="col-span-2">
-          <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
-
-          <Card className="p-0 overflow-hidden">
-            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-              <p className="mt-2 mb-3">Antonija Simic</p>
-              <p>
-                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
-                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
-              </p>
-              <p
-                className="
-            text-sm text-gray-500"
-              >
-                12:31pm
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-              <p className="mt-2 mb-3">Antonija Simic</p>
-              <p>
-                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
-                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
-              </p>
-              <p
-                className="
-            text-sm text-gray-500"
-              >
-                12:31pm
-              </p>
-            </div>
-          </Card>
+          <LatestMessages />
         </div>
       </div>
 

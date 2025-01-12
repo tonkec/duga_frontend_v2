@@ -27,7 +27,7 @@ interface IMessageTemplateProps {
 
 const messageStyles = 'py-2 px-4 rounded-full mb-2 max-w-fit text-white';
 
-const getMessageCreatedAt = (createdAt: string) => {
+export const getMessageCreatedAt = (createdAt: string) => {
   const date = new Date(createdAt);
   const today = new Date();
   if (date.getDate() === today.getDate()) {
