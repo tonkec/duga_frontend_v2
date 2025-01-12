@@ -32,7 +32,6 @@ const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
 
 const ChatPage = () => {
   const socket = useSocket();
-
   const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();

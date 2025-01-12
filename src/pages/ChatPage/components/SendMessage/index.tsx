@@ -4,12 +4,12 @@ import Input from '../../../../components/Input';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FieldError from '../../../../components/FieldError';
-import { socket } from '../../../../socket';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '../../../../hooks/useGetAllUserChats';
 import { IChat } from '../../../NewChatPage/hooks';
 import { IUser } from '../../../../components/UserCard';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
+import { useSocket } from '../../../../context/socket';
 
 type Inputs = {
   content: string;
@@ -30,6 +30,8 @@ interface ISendMessageProps {
 }
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
+  const socket = useSocket();
+
   const [currentUserId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(currentUserId as string);
   const { user: currentUser } = useGetUserById(String(currentUserId));

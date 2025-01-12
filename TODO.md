@@ -47,6 +47,12 @@
 
 ### Gotovo
 
+- sockets provjera
+
+  - upvote/downvote fotkica
+  - editiranje komentara
+  - slanje poruka
+
 - dodat content na all profiles page 16.01
   - currently online users
   - finish your profile

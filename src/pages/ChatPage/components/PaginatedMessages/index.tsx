@@ -29,6 +29,9 @@ const PaginatedMessages = ({
   const { messages, loadMore } = usePaginatedMessages();
 
   const allMessages = [...receivedMessages, ...messages];
+  const sortedMessages = allMessages.sort((a, b) => {
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
 
   return (
     <div
@@ -37,7 +40,7 @@ const PaginatedMessages = ({
       }, 500)}
       style={{ height: '300px', overflow: 'auto' }}
     >
-      {allMessages.map((message) => (
+      {sortedMessages.map((message) => (
         <Message
           otherUserName={otherUserName}
           currentUserName={currentUserName}

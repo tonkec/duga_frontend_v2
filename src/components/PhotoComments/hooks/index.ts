@@ -7,7 +7,7 @@ import {
 } from '../../../api/uploadsComments';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
-import { socket } from '../../../socket';
+import { useSocket } from '../../../context/socket';
 interface IAddUploadCommentProps {
   userId: string;
   uploadId: string;
@@ -15,6 +15,7 @@ interface IAddUploadCommentProps {
 }
 
 export const useEditUploadComment = () => {
+  const socket = useSocket();
   const {
     mutate: mutateEditUploadComment,
     isPending: isEditingUploadComment,
@@ -41,6 +42,7 @@ export const useEditUploadComment = () => {
 };
 
 export const useAddUploadComment = () => {
+  const socket = useSocket();
   const {
     mutate: mutateAddUploadComment,
     isPending: isAddingUploadComment,
@@ -67,6 +69,8 @@ export const useAddUploadComment = () => {
 };
 
 export const useDeleteUploadComment = () => {
+  const socket = useSocket();
+
   const {
     mutate: mutateDeleteUploadComment,
     isPending: isDeletingUploadComment,

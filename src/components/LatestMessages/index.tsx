@@ -38,18 +38,20 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 const LatestMessages = () => {
   const navigate = useNavigate();
   const numberOfChats = 4;
+  const numberOfMessages = 3;
   const [userId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(userId as string, true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
+
   return (
     <div>
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
       <Card className="p-0 overflow-hidden">
         {latestChats?.map((chat: IChat) =>
-          chat.Messages.map((message: IMessage) => (
+          chat.Messages.slice(0, numberOfMessages).map((message: IMessage, index) => (
             <div
               className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer"
-              key={chat.id}
+              key={`chat-${index}`}
             >
               <p className="text-gray-500 text-sm">
                 Razgovor sa korisnikom_com {chat.Users[0].firstName}{' '}

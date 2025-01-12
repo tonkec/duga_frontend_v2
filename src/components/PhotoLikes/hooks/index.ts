@@ -2,9 +2,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { addUploadLike, getUploadLikes, removeUploadLike } from '../../../api/uploadsLikes';
-import { socket } from '../../../socket';
+import { useSocket } from '../../../context/socket';
 
 export const useUpvoteUpload = () => {
+  const socket = useSocket();
+
   const {
     mutate: mutateUpvoteUpload,
     isPending: isUpvotingUpload,
@@ -31,6 +33,8 @@ export const useUpvoteUpload = () => {
 };
 
 export const useDownvoteUpload = () => {
+  const socket = useSocket();
+
   const {
     mutate: mutateDownvoteUpload,
     isPending: isDownvotingUpload,
