@@ -26,13 +26,13 @@ const schema = z.object({
 
 interface ISendMessageProps {
   chatId: string | undefined;
+  otherUserId: number | undefined | null;
 }
 
-const SendMessage = ({ chatId }: ISendMessageProps) => {
+const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentUserId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(currentUserId as string);
   const { user: currentUser } = useGetUserById(String(currentUserId));
-
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
 
   const {
@@ -60,13 +60,22 @@ const SendMessage = ({ chatId }: ISendMessageProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Input type="text" placeholder="Pošalji poruku" {...register('content')} />
-      {errors.content && <FieldError message="Poruka je obavezna." />}
-      <Button className="mt-2" type="primary">
-        Pošalji
-      </Button>
-    </form>
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Input
+          type="text"
+          placeholder="Pošalji poruku"
+          {...register('content')}
+          onFocus={() => {
+            socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+          }}
+        />
+        {errors.content && <FieldError message="Poruka je obavezna." />}
+        <Button className="mt-2" type="primary">
+          Pošalji
+        </Button>
+      </form>
+    </>
   );
 };
 

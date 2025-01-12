@@ -3,7 +3,6 @@ import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import SendMessage from './components/SendMessage';
 import { useEffect, useMemo, useState } from 'react';
-import { socket } from '../../socket';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
@@ -12,6 +11,7 @@ import { useGetUserById } from '../../hooks/useGetUserById';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import Button from '../../components/Button';
+import { useSocket } from '../../context/socket';
 
 interface IMessage {
   id: string;
@@ -31,6 +31,8 @@ const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
 };
 
 const ChatPage = () => {
+  const socket = useSocket();
+
   const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
@@ -72,7 +74,17 @@ const ChatPage = () => {
     return () => {
       socket.off('received');
     };
-  }, []);
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on('typing', (data: IMessage) => {
+      console.log(data);
+    });
+
+    return () => {
+      socket.off('typing');
+    };
+  }, [socket]);
 
   return (
     <ChatGuard>
@@ -100,7 +112,7 @@ const ChatPage = () => {
               receivedMessages={receivedMessages}
             />
           </div>
-          <SendMessage chatId={chatId} />
+          <SendMessage otherUserId={otherUserId} chatId={chatId} />
         </Card>
       </AppLayout>
     </ChatGuard>

@@ -3,7 +3,7 @@
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom 13.01
-  - click na chat pokazuje duple poruke, refreshaj? 10.01
+  - click na chat pokazuje duple poruke, refreshaj? => nakon deploymenta
   - sto se dogodi kad se izbrise chat?
   - napravit bubble u chatu
 
@@ -16,11 +16,6 @@
 ### Enhancements
 
 - all chats dodat jos contenta, redizajnirat
-- dodat content na all profiles page 16.01
-  - currently online users
-  - finish your profile
-  - want to improve duga?
-  - latest chats
 - all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
 - objasnjenje za iframove
@@ -52,6 +47,11 @@
 
 ### Gotovo
 
+- dodat content na all profiles page 16.01
+  - currently online users
+  - finish your profile
+  - want to improve duga?
+  - latest chats
 - dovrsit all profiles redizajn
 
   - responsiveness
