@@ -3,7 +3,7 @@ import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 import Card from '../Card';
 import { IChat } from '../../pages/NewChatPage/hooks';
 import { useNavigate } from 'react-router';
-import MessageCreatedAt from '../MessageCreatedAt';
+import MessageCreatedAt from '../RecordCreatedAt';
 
 interface IMessage {
   id: number;

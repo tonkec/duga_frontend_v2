@@ -13,9 +13,9 @@ import { useGetWindowSize } from './hooks/useGetWindowSize';
 import SendMessageButton from './components/SendMessageButton';
 import notFound from './assets/not_found.svg';
 import Cta from './components/Cta';
-import Card from './components/Card';
 import LatestUploads from './components/LatestUploads';
 import LatestMessages from './components/LatestMessages';
+import LatestComments from './components/LatestComments';
 
 function App() {
   const windowSize = useGetWindowSize();
@@ -105,22 +105,7 @@ function App() {
 
       <div className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
         <div className="col-span-2">
-          <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
-          <Card className="p-0 overflow-hidden">
-            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
-              <p className="mt-2 mb-3">Antonija Simic</p>
-              <p>
-                Hej Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, Lorem ipsum
-                dolor sit amet consectetur, adipisicing elit. Neque, ipsum.
-              </p>
-              <p
-                className="
-            text-sm text-gray-500"
-              >
-                12:31pm
-              </p>
-            </div>
-          </Card>
+          <LatestComments />
         </div>
 
         <div className="col-span-2">

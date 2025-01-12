@@ -1,7 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
-import MessageCreatedAt from '../../../../components/MessageCreatedAt';
+import MessageCreatedAt from '../../../../components/RecordCreatedAt';
 
 interface IMessageProps {
   message: {

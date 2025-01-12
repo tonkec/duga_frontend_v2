@@ -31,3 +31,8 @@ export const editUploadComment = async (commentId: number, comment: string) => {
     comment,
   });
 };
+
+export const getLatestUploadComments = async () => {
+  const client = apiClient();
+  return client.get(`/comments/latest`);
+};

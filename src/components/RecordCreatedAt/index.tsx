@@ -6,7 +6,7 @@ const formatMinutes = (minutes: number) => {
   return minutes;
 };
 
-const MessageCreatedAt = ({ createdAt }: { createdAt: string }) => {
+const RecordCreatedAt = ({ createdAt }: { createdAt: string }) => {
   const date = new Date(createdAt);
   const today = new Date();
   if (date.getDate() === today.getDate()) {
@@ -25,4 +25,4 @@ const MessageCreatedAt = ({ createdAt }: { createdAt: string }) => {
   );
 };
 
-export default MessageCreatedAt;
+export default RecordCreatedAt;
