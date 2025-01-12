@@ -121,6 +121,7 @@ function App() {
           title="Dovrši svoj profil"
           buttonText="Izmijeni profil"
           subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
+          onClick={() => navigate(`/edit`)}
         />
 
         <Cta
@@ -128,6 +129,7 @@ function App() {
           title="Nemaš poruka?"
           subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu za čavrljanje 💬"
           buttonText="Nova poruka"
+          onClick={() => navigate(`/new-chat`)}
         />
 
         <Cta

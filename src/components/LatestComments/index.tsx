@@ -35,7 +35,6 @@ const LatestComments = () => {
   const navigate = useNavigate();
   const numberOfComments = 3;
   const { allComments, isAllCommentsLoading } = useGetLatestComments();
-  console.log(allComments);
   if (isAllCommentsLoading) {
     return <Loader />;
   }

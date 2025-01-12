@@ -47,7 +47,10 @@ const LatestMessages = () => {
       <Card className="p-0 overflow-hidden">
         {latestChats?.map((chat: IChat) =>
           chat.Messages.map((message: IMessage) => (
-            <div className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer">
+            <div
+              className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer"
+              key={chat.id}
+            >
               <p className="text-gray-500 text-sm">
                 Razgovor sa korisnikom_com {chat.Users[0].firstName}{' '}
               </p>
