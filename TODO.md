@@ -1,12 +1,5 @@
 # Next to do
 
-- dovrsit all profiles redizajn
-
-  - responsiveness
-  - linkat cta buttone
-  - nedavne poruke
-  - nedavni komentari§
-
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom 13.01
@@ -58,6 +51,13 @@
 - React helmet
 
 ### Gotovo
+
+- dovrsit all profiles redizajn
+
+  - responsiveness
+  - linkat cta buttone
+  - nedavne poruke
+  - nedavni komentari
 
 - refreshanje mijenja layout? 10.01
 - ako je chat prazan, onda se ne bi trebao pokazat na new-chat? 10.01
