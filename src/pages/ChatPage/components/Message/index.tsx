@@ -1,6 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
+import MessageCreatedAt from '../../../../components/MessageCreatedAt';
 
 interface IMessageProps {
   message: {
@@ -26,25 +27,6 @@ interface IMessageTemplateProps {
 }
 
 const messageStyles = 'py-2 px-4 rounded-full mb-2 max-w-fit text-white';
-
-export const getMessageCreatedAt = (createdAt: string) => {
-  const date = new Date(createdAt);
-  const today = new Date();
-  if (date.getDate() === today.getDate()) {
-    return (
-      <p className="text-xs text-gray-400">
-        {date.getHours()}:{date.getMinutes()}
-      </p>
-    );
-  }
-
-  return (
-    <p className="text-xs text-gray-400">
-      {date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}
-    </p>
-  );
-};
-
 const CurrentUserMessageTemplate = ({
   userName,
   profilePhoto,
@@ -55,7 +37,7 @@ const CurrentUserMessageTemplate = ({
     <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
       <div className={messageStyles} style={{ backgroundColor: '#2D46B9' }}>
         <p>{message}</p>
-        {getMessageCreatedAt(createdAt)}
+        <MessageCreatedAt createdAt={createdAt} />
       </div>
       <div style={{ marginLeft: '2px' }}>
         <Avatar name={userName} src={profilePhoto} size="24" round />
@@ -83,7 +65,7 @@ const OtherUserMessageTemplate = ({
       </div>
       <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
         <p>{message}</p>
-        {getMessageCreatedAt(createdAt)}
+        <MessageCreatedAt createdAt={createdAt} />
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 import Card from '../Card';
-import { getMessageCreatedAt } from '../../pages/ChatPage/components/Message';
 import { IChat } from '../../pages/NewChatPage/hooks';
 import { useNavigate } from 'react-router';
+import MessageCreatedAt from '../MessageCreatedAt';
 
 interface IMessage {
   id: number;
@@ -30,7 +30,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
         <span> {message.message} </span> <br />
         <span className="text-gray-500 text-sm inline-block mt-2">{getLatestPerson()}</span>
       </p>
-      <p className="text-sm text-gray-500">{getMessageCreatedAt(message.createdAt)}</p>
+      <MessageCreatedAt createdAt={message.createdAt} />
     </div>
   );
 };
