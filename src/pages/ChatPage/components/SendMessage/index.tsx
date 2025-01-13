@@ -71,7 +71,6 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
             socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
           }}
           onBlur={() => {
-            console.log('stop typing');
             socket.emit('stop-typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
           }}
         />
