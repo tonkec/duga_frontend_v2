@@ -120,6 +120,10 @@ const PhotoUploader = () => {
     []
   );
 
+  const isDescriptionValid = (description: string) => {
+    return description.length > 0 && description.length < 100;
+  };
+
   useEffect(() => {
     if (allExistingImages && allExistingImages.data.images.length > 0) {
       const checkboxes = allExistingImages.data.images.map((image: IImage, index: number) => {
@@ -146,6 +150,11 @@ const PhotoUploader = () => {
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
+    if (!isDescriptionValid((e.target as HTMLInputElement).value)) {
+      toast.error('Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!', toastConfig);
+      return;
+    }
+
     setNewImageDescriptions((prevState) => {
       const target = e.target as HTMLInputElement;
       const description = target.value;
@@ -181,9 +190,7 @@ const PhotoUploader = () => {
   };
 
   const shouldShowEditable = allExistingImages && allExistingImages.data.images.length > 0;
-  const isDescriptionValid = (description: string) => {
-    return description.length > 0 && description.length < 100;
-  };
+
   return (
     <div>
       {shouldShowEditable && (
