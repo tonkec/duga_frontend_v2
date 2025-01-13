@@ -27,7 +27,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, children }: IConfirmModalPro
       {children}
       <div className="flex justify-center mt-4 gap-2">
         <Button type="primary" onClick={onConfirm}>
-          Potvrdujem
+          Potvrđujem
         </Button>
         <Button type="black" onClick={onClose}>
           Natrag
