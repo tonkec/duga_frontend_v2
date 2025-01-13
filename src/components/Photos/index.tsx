@@ -48,6 +48,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
                   navigate(`/photo/${image.id}`);
                 }}
               />
+              {image.description && <p className="text-center mt-2">{image.description}</p>}
             </div>
           );
         })}
