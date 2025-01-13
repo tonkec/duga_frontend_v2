@@ -121,3 +121,7 @@
 - dodat logo na svaku stranicu
 - fotke
   - ako je jedna profilna, onda druga se mora unchecked => 30.12
+
+### Otkazano
+
+- stavit paginaciju buttone u zrak

@@ -62,7 +62,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           type="text"
           placeholder="Pošalji poruku"

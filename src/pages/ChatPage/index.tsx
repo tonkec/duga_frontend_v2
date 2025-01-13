@@ -27,6 +27,10 @@ interface IChatUser {
   userId: number;
 }
 
+interface ITypingData {
+  userId: number;
+}
+
 const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
   return chatUsers.find((user) => user.userId !== Number(currentUserId));
 };
@@ -55,6 +59,7 @@ const DeleteChatModal = ({
 };
 
 const ChatPage = () => {
+  const [isTyping, setIsTyping] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const socket = useSocket();
   const navigate = useNavigate();
@@ -101,14 +106,16 @@ const ChatPage = () => {
   }, [socket]);
 
   useEffect(() => {
-    socket.on('typing', (data: IMessage) => {
-      console.log(data);
+    socket.on('typing', (data: ITypingData) => {
+      if (data.userId === Number(otherUserId)) {
+        setIsTyping(true);
+      }
     });
 
     return () => {
       socket.off('typing');
     };
-  }, [socket]);
+  }, [socket, otherUserId]);
 
   return (
     <ChatGuard>
@@ -146,6 +153,7 @@ const ChatPage = () => {
               receivedMessages={receivedMessages}
             />
           </div>
+          {isTyping && <p className="text-sm text-gray-500 mb-0">Tipka...</p>}
           <SendMessage otherUserId={otherUserId} chatId={chatId} />
         </Card>
       </AppLayout>
