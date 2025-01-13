@@ -66,14 +66,18 @@ const MyProfilePage = () => {
                 buttonText="Pošalji poruku"
                 subtitle="Možda te baš čeka zanimljiva osoba."
                 title="Pošalji nekome poruku!"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate('/new-chat');
+                }}
               />
               <Cta
                 buttonText="Pretraži ekipu"
                 className="mt-4"
                 subtitle="Istraži koga ima okolo."
                 title="Istraži!"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate('/');
+                }}
               />
             </div>
           </div>
