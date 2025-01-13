@@ -46,7 +46,7 @@ const LatestMessages = () => {
   return (
     <div>
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
-      <Card className="p-0 overflow-hidden">
+      <Card className="!p-0 overflow-hidden">
         {latestChats?.map((chat: IChat) =>
           chat.Messages.slice(0, numberOfMessages).map((message: IMessage, index) => (
             <div

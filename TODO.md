@@ -1,21 +1,19 @@
 # Next to do
 
-- typing
+- typing testirat
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom 13.01
   - click na chat pokazuje duple poruke, refreshaj? => nakon deploymenta
-  - sto se dogodi kad se izbrise chat?
-    - stavit modal
-  - napravit bubble u chatu
 
 - novi featuri za poruke
   - seen?
   - read/undread
-  - emojis
+  - emojis -> https://github.com/missive/emoji-mart
 
 ### Enhancements
 
+- napravit bubble u chatu?
 - all chats dodat jos contenta, redizajnirat
 - all profiles ne prikazuje profilnu fotku => stavit u field user avatar url od profilne fotke tog usera, napravit to na BE
 - maknut opis s fotke ako nema opisa
@@ -48,6 +46,8 @@
 
 ### Gotovo
 
+- sto se dogodi kad se izbrise chat?
+  - stavit modal
 - sockets provjera
 
   - upvote/downvote fotkica

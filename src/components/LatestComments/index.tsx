@@ -43,7 +43,7 @@ const LatestComments = () => {
   return (
     <div>
       <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
-      <Card className="p-0 overflow-hidden">
+      <Card className="!p-0 overflow-hidden">
         {comments.map((comment: IComment) => (
           <LatestComment
             key={comment.id}
