@@ -1,7 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
-import MessageCreatedAt from '../../../../components/RecordCreatedAt';
+import RecordCreatedAt from '../../../../components/RecordCreatedAt';
 
 interface IMessageProps {
   message: {
@@ -37,7 +37,7 @@ const CurrentUserMessageTemplate = ({
     <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
       <div className={messageStyles} style={{ backgroundColor: '#2D46B9' }}>
         <p>{message}</p>
-        <MessageCreatedAt createdAt={createdAt} />
+        <RecordCreatedAt createdAt={createdAt} />
       </div>
       <div style={{ marginLeft: '2px' }}>
         <Avatar name={userName} src={profilePhoto} size="24" round />
@@ -65,7 +65,7 @@ const OtherUserMessageTemplate = ({
       </div>
       <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
         <p>{message}</p>
-        <MessageCreatedAt createdAt={createdAt} />
+        <RecordCreatedAt createdAt={createdAt} />
       </div>
     </div>
   );

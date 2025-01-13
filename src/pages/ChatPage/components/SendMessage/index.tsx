@@ -31,7 +31,6 @@ interface ISendMessageProps {
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const socket = useSocket();
-
   const [currentUserId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(currentUserId as string);
   const { user: currentUser } = useGetUserById(String(currentUserId));
@@ -63,7 +62,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
         <Input
           type="text"
           placeholder="Pošalji poruku"

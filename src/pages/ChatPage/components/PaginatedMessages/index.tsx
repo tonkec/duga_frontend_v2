@@ -27,7 +27,6 @@ const PaginatedMessages = ({
   receivedMessages: Message[];
 }) => {
   const { messages, loadMore } = usePaginatedMessages();
-
   const allMessages = [...receivedMessages, ...messages];
   const sortedMessages = allMessages.sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
