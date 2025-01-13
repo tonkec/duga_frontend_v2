@@ -5,11 +5,11 @@ interface InputProps {
   className?: string;
   icon?: React.ReactNode;
   value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   defaultValue?: string;
   type: string;
   onFocus?: () => void;
-  onBlur?: () => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-[6px] px-4 pr-8 block w-full appearance-none leading-normal focus:border-blue`;
