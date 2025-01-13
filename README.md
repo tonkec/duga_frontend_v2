@@ -1,6 +1,6 @@
 # Duga App
 
-## A modern dating application designed to connect people through common interests, fun features, and a seamless user experience. This app allows users to create profiles, chat with matches, and explore unique ways to interact, such as sharing photos, favorite songs, and hobbies.
+- A modern dating application designed to connect people through common interests, fun features, and a seamless user experience. This app allows users to create profiles, chat with matches, and explore unique ways to interact, such as sharing photos, favorite songs, and hobbies.
 
 ## Features
 
@@ -136,6 +136,10 @@ We welcome contributions! Follow these steps:
 3. Commit your changes (`git commit -m 'Add your feature'`).
 4. Push to the branch (`git push origin feature/your-feature-name`).
 5. Open a Pull Request.
+
+## Tasks that need to be worked on
+
+- https://trello.com/b/pD7lOUSE/designs
 
 ---
 
