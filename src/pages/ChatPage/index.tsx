@@ -48,7 +48,8 @@ const DeleteChatModal = ({
       onConfirm={onDeleteChat}
       onClose={() => setIsDeleteModalVisible(false)}
     >
-      <p>Da li ste sigurni da želite da obrišete razgovor?</p>
+      <h2 className="text-xl text-center"> Jesi li siguran_na da želiš obrisati razgovor?</h2>
+      <p className="text-center">Brisanje razgovora briše razgovor i za drugu osobu</p>
     </ConfirmModal>
   );
 };
