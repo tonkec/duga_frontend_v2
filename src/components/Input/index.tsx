@@ -9,13 +9,25 @@ interface InputProps {
   defaultValue?: string;
   type: string;
   onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-[6px] px-4 pr-8 block w-full appearance-none leading-normal focus:border-blue`;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { placeholder, type, className, onChange, icon, value, defaultValue, onFocus, ...props },
+    {
+      placeholder,
+      type,
+      className,
+      onChange,
+      icon,
+      value,
+      defaultValue,
+      onFocus,
+      onBlur,
+      ...props
+    },
     ref
   ) => {
     return icon ? (
@@ -30,6 +42,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           defaultValue={defaultValue}
           type={type}
           onFocus={onFocus}
+          onBlur={onBlur}
         />
         {icon && <span className="absolute right-3 top-[10px]">{icon}</span>}
       </div>
@@ -44,6 +57,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         defaultValue={defaultValue}
         type={type}
         onFocus={onFocus}
+        onBlur={onBlur}
       />
     );
   }

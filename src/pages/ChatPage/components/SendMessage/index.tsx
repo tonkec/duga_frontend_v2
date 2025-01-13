@@ -70,6 +70,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           onFocus={() => {
             socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
           }}
+          onBlur={() => {
+            console.log('stop typing');
+            socket.emit('stop-typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+          }}
         />
         {errors.content && <FieldError message="Poruka je obavezna." />}
         <Button className="mt-2" type="primary">

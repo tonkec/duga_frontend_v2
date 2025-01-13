@@ -7,7 +7,6 @@
   - click na chat pokazuje duple poruke, refreshaj? => nakon deploymenta
 
 - novi featuri za poruke
-  - seen?
   - read/undread
   - emojis -> https://github.com/missive/emoji-mart
 

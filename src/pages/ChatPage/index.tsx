@@ -112,8 +112,15 @@ const ChatPage = () => {
       }
     });
 
+    socket.on('stop-typing', (data: ITypingData) => {
+      if (data.userId === Number(otherUserId)) {
+        setIsTyping(false);
+      }
+    });
+
     return () => {
       socket.off('typing');
+      socket.off('stopTyping');
     };
   }, [socket, otherUserId]);
 
