@@ -37,7 +37,7 @@ const PaginatedMessages = ({
       onScroll={debounceScroll(() => {
         loadMore();
       }, 500)}
-      style={{ height: '300px', overflow: 'auto' }}
+      style={{ height: '500px', overflow: 'auto' }}
     >
       {sortedMessages.map((message) => (
         <Message
