@@ -47,7 +47,7 @@ const ForgotPassword = () => {
     <AuthLayout>
       <h1 className="text-center text-white">Zaboravljena lozinka</h1>
       <p className="text-center text-white">
-        Unesite email adresu kako bi ste dobili link za resetiranje lozinke.
+        Unesite email adresu kako biste dobili link za resetiranje lozinke.
       </p>
       {hasFormError && <FieldError message={getErrorMessage(errors)} />}
 
