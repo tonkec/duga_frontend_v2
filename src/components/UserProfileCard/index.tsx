@@ -92,7 +92,7 @@ const UserProfileCard = ({
             <p className="flex items-center text-lg gap-2">
               <b>Trenutno sam: </b> {getRelationshipStatusTranslation(user.relationshipStatus)}
             </p>
-            <div className="flex gap-1">
+            <div className="flex flex-col gap-1">
               <p className="flex items-center text-lg gap-1">
                 <b>Cigarete</b>{' '}
                 {user.cigarettes ? (
