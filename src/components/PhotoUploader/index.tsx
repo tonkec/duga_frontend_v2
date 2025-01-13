@@ -269,11 +269,9 @@ const PhotoUploader = () => {
               })}
             </div>
 
-            <div className="col-span-3">
-              <Button type="primary">
-                <span>Spremi</span>
-              </Button>
-            </div>
+            <Button type="primary">
+              <span>Spremi</span>
+            </Button>
           </form>
         </Card>
       )}
