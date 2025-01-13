@@ -12,6 +12,7 @@ import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import Button from '../../components/Button';
 import { useSocket } from '../../context/useSocket';
+import ConfirmModal from '../../components/ConfirmModal';
 
 interface IMessage {
   id: string;
@@ -30,7 +31,30 @@ const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
   return chatUsers.find((user) => user.userId !== Number(currentUserId));
 };
 
+interface IDeleteChatModalProps {
+  setIsDeleteModalVisible: (value: boolean) => void;
+  onDeleteChat: () => void;
+  isDeleteModalVisible: boolean;
+}
+
+const DeleteChatModal = ({
+  setIsDeleteModalVisible,
+  onDeleteChat,
+  isDeleteModalVisible,
+}: IDeleteChatModalProps) => {
+  return (
+    <ConfirmModal
+      isOpen={isDeleteModalVisible}
+      onConfirm={onDeleteChat}
+      onClose={() => setIsDeleteModalVisible(false)}
+    >
+      <p>Da li ste sigurni da želite da obrišete razgovor?</p>
+    </ConfirmModal>
+  );
+};
+
 const ChatPage = () => {
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const socket = useSocket();
   const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
@@ -88,11 +112,21 @@ const ChatPage = () => {
   return (
     <ChatGuard>
       <AppLayout>
+        <DeleteChatModal
+          isDeleteModalVisible={isDeleteModalVisible}
+          setIsDeleteModalVisible={setIsDeleteModalVisible}
+          onDeleteChat={() => {
+            if (!chatId) return;
+            deleteChat({ chatId });
+            navigate('/chats');
+          }}
+        />
         <Button
           className="mb-2"
           type="danger"
-          onClick={() => {
-            deleteChat({ chatId: chatId as string });
+          onClick={(e) => {
+            e?.preventDefault();
+            setIsDeleteModalVisible(true);
           }}
         >
           Izbriši razgovor
