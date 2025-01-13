@@ -47,6 +47,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
                 onClick={() => {
                   navigate(`/photo/${image.id}`);
                 }}
+                className="cursor-pointer w-full object-cover rounded-md"
               />
               {image.description && <p className="text-center mt-2">{image.description}</p>}
             </div>

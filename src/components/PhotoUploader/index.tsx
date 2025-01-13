@@ -181,7 +181,9 @@ const PhotoUploader = () => {
   };
 
   const shouldShowEditable = allExistingImages && allExistingImages.data.images.length > 0;
-
+  const isDescriptionValid = (description: string) => {
+    return description.length > 0 && description.length < 100;
+  };
   return (
     <div>
       {shouldShowEditable && (
@@ -199,6 +201,15 @@ const PhotoUploader = () => {
                       setUpdatedImageDescriptions((prev) => {
                         const target = e.target as HTMLInputElement;
                         const description = target.value;
+
+                        if (!isDescriptionValid(description)) {
+                          toast.error(
+                            'Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!',
+                            toastConfig
+                          );
+                          return prev;
+                        }
+
                         const imageId = removeSpacesAndDashes(image.name);
                         const newImage = { description, imageId };
                         const newState = prev.filter(
