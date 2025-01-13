@@ -1,50 +1,134 @@
-# React + TypeScript + Vite
+# Duga App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## A modern dating application designed to connect people through common interests, fun features, and a seamless user experience. This app allows users to create profiles, chat with matches, and explore unique ways to interact, such as sharing photos, favorite songs, and hobbies.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **User Profiles**: Create and customize your profile with personal details and photos.
+- **Chat System**: Real-time messaging with support for emojis and media sharing.
+- **Interactive Features**: Share your favorite songs, movies, and personal thoughts to connect deeper.
+- **Responsive Design**: Optimized for both desktop and mobile devices.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Setup
 
-- Configure the top-level `parserOptions` property like this:
+### Prerequisites
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Before you begin, ensure you have the following installed:
+
+- **Node.js** (v16 or later)
+- **npm** or **yarn**
+- **PostgreSQL** (configured for the backend)
+- **Git**
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/tonkec/duga_frontend_v2
+cd duga_frontend_v2
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+git clone https://github.com/tonkec/duga_backend
+cd duga_backend
 ```
+
+### Install Dependencies
+
+#### For the Frontend:
+
+```bash
+cd frontend
+npm install
+```
+
+#### For the Backend:
+
+```bash
+cd backend
+npm install
+```
+
+### Configure Environment Variables
+
+Create `.env` files in both the `frontend` and `backend` directories based on the `.env.example` files provided.
+
+#### Example for Backend `.env`:
+
+```env
+PORT=8080
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_HOST=your_db_host
+DB_DATABASE=your_db_name
+JWT_SECRET=your_secret_key
+```
+
+#### Example for Frontend `.env.development`:
+
+```env
+VITE_BASE_URL=http://localhost:8080
+
+```
+
+---
+
+## How to Run
+
+### Backend
+
+1. **Start the Database**:
+   Ensure your PostgreSQL server is running and properly configured.
+
+2. **Run Migrations**:
+
+   ```bash
+   npx sequelize-cli db:migrate
+   ```
+
+3. **Start the Backend Server**:
+
+   ```bash
+   npm run dev
+   ```
+
+   The backend will be available at `http://localhost:8080`.
+
+---
+
+### Frontend
+
+1. **Start the Frontend**:
+
+   ```bash
+   npm run dev
+   ```
+
+   The frontend will be available at `http://localhost:5173`.
+
+---
+
+## How to Use
+
+1. Open the application in your browser.
+2. Register a new account and set up your profile.
+3. Browse profiles, send messages, and enjoy connecting with new people!
+
+---
+
+## Contribution
+
+We welcome contributions! Follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature-name`).
+3. Commit your changes (`git commit -m 'Add your feature'`).
+4. Push to the branch (`git push origin feature/your-feature-name`).
+5. Open a Pull Request.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
