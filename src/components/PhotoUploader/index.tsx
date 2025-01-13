@@ -196,79 +196,79 @@ const PhotoUploader = () => {
     <div>
       {shouldShowEditable && (
         <Card className="mb-6">
-          <form
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4"
-            onSubmit={onSubmitUpdatePhotos}
-          >
-            {allExistingImages.data.images.map((image: IImage, index: number) => {
-              return (
-                <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
-                  <img src={getImageUrl(image)} alt={image.name} />
-                  <PhotoActionButtons
-                    onInputChange={(e: SyntheticEvent) => {
-                      setUpdatedImageDescriptions((prev) => {
-                        const target = e.target as HTMLInputElement;
-                        const description = target.value;
+          <form onSubmit={onSubmitUpdatePhotos}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+              {allExistingImages.data.images.map((image: IImage, index: number) => {
+                return (
+                  <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
+                    <img src={getImageUrl(image)} alt={image.name} />
+                    <PhotoActionButtons
+                      onInputChange={(e: SyntheticEvent) => {
+                        setUpdatedImageDescriptions((prev) => {
+                          const target = e.target as HTMLInputElement;
+                          const description = target.value;
 
-                        if (!isDescriptionValid(description)) {
-                          toast.error(
-                            'Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!',
-                            toastConfig
-                          );
-                          return prev;
-                        }
-
-                        const imageId = removeSpacesAndDashes(image.name);
-                        const newImage = { description, imageId };
-                        const newState = prev.filter(
-                          (item) =>
-                            removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
-                        );
-                        newState.push(newImage);
-                        return newState;
-                      });
-                    }}
-                    onDelete={() => onDeleteFromS3(image)}
-                    defaultInputValue={image.description}
-                    isChecked={
-                      allCheckboxes.find((checkbox) => checkbox.index === index)?.isProfilePhoto ||
-                      false
-                    }
-                    hasCheckbox
-                    onCheckboxChange={(e: SyntheticEvent) => {
-                      const isChecked = (e.target as HTMLInputElement).checked;
-                      setAllCheckboxes((prev) =>
-                        prev.map((checkbox) => ({
-                          ...checkbox,
-                          isProfilePhoto: checkbox.index === index ? isChecked : false,
-                        }))
-                      );
-                      setUpdatedImageDescriptions((prev) => {
-                        const imageId = removeSpacesAndDashes(image.name);
-                        if (prev.length === 0) {
-                          return [
-                            {
-                              description: image.description,
-                              imageId,
-                              isProfilePhoto: (e.target as HTMLInputElement).checked,
-                            },
-                          ];
-                        }
-
-                        const newState = prev.map((item) => {
-                          if (removeSpacesAndDashes(item.imageId) === imageId) {
-                            return { ...item, isProfilePhoto: !item.isProfilePhoto };
+                          if (!isDescriptionValid(description)) {
+                            toast.error(
+                              'Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!',
+                              toastConfig
+                            );
+                            return prev;
                           }
-                          return item;
-                        });
 
-                        return newState;
-                      });
-                    }}
-                  />
-                </div>
-              );
-            })}
+                          const imageId = removeSpacesAndDashes(image.name);
+                          const newImage = { description, imageId };
+                          const newState = prev.filter(
+                            (item) =>
+                              removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
+                          );
+                          newState.push(newImage);
+                          return newState;
+                        });
+                      }}
+                      onDelete={() => onDeleteFromS3(image)}
+                      defaultInputValue={image.description}
+                      isChecked={
+                        allCheckboxes.find((checkbox) => checkbox.index === index)
+                          ?.isProfilePhoto || false
+                      }
+                      hasCheckbox
+                      onCheckboxChange={(e: SyntheticEvent) => {
+                        const isChecked = (e.target as HTMLInputElement).checked;
+                        setAllCheckboxes((prev) =>
+                          prev.map((checkbox) => ({
+                            ...checkbox,
+                            isProfilePhoto: checkbox.index === index ? isChecked : false,
+                          }))
+                        );
+                        setUpdatedImageDescriptions((prev) => {
+                          const imageId = removeSpacesAndDashes(image.name);
+                          if (prev.length === 0) {
+                            return [
+                              {
+                                description: image.description,
+                                imageId,
+                                isProfilePhoto: (e.target as HTMLInputElement).checked,
+                              },
+                            ];
+                          }
+
+                          const newState = prev.map((item) => {
+                            if (removeSpacesAndDashes(item.imageId) === imageId) {
+                              return { ...item, isProfilePhoto: !item.isProfilePhoto };
+                            }
+                            return item;
+                          });
+
+                          return newState;
+                        });
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
             <div className="col-span-3">
               <Button type="primary">
                 <span>Spremi</span>
