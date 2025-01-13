@@ -57,12 +57,22 @@ Create `.env` files in both the `frontend` and `backend` directories based on th
 #### Example for Backend `.env`:
 
 ```env
-PORT=8080
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
-DB_HOST=your_db_host
-DB_DATABASE=your_db_name
-JWT_SECRET=your_secret_key
+APP_KEY=somekey
+APP_PORT=8080
+APP_URL=http://localhost
+AWS_S3_ACCESS_KEY_ID=somekey
+AWS_S3_BUCKET_NAME=duga
+AWS_S3_SECRET_ACCESS_KEY=somekey
+DB_DATABASE=somekey
+DB_HOST=localhost
+DB_PASSWORD=somekey
+DB_USER=asomekey
+PGSSLMODE=disable
+DATABASE_URL=somekey
+SENDGRID_API_KEY=somekey
+URI=somekey
+APP_FRONTEND_PORT=5173
+NODE_ENV=development
 ```
 
 #### Example for Frontend `.env.development`:
