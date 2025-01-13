@@ -38,7 +38,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 const LatestMessages = () => {
   const navigate = useNavigate();
   const numberOfChats = 4;
-  const numberOfMessages = 3;
+  const numberOfMessages = 2;
   const [userId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(userId as string, true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
