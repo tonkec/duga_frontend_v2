@@ -1,14 +1,15 @@
 # Next to do
 
+- typing
 - poruke fixanje/improvements
 
   - ikonica za profile photo bi se trebala pokazat samo jednom 13.01
   - click na chat pokazuje duple poruke, refreshaj? => nakon deploymenta
   - sto se dogodi kad se izbrise chat?
+    - stavit modal
   - napravit bubble u chatu
 
 - novi featuri za poruke
-  - typing
   - seen?
   - read/undread
   - emojis

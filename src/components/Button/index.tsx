@@ -1,3 +1,5 @@
+import { SyntheticEvent } from 'react';
+
 export type ButtonType =
   | 'primary'
   | 'secondary'
@@ -10,7 +12,7 @@ export type ButtonType =
 
 interface IButtonProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e?: SyntheticEvent) => void;
   className?: string;
   type: ButtonType;
   disabled?: boolean;

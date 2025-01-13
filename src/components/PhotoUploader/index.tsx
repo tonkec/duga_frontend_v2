@@ -12,6 +12,7 @@ import { useDeletePhoto } from '../Photos/hooks';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../configs/toast.config';
 import { getImageUrl } from '../../utils/getImageUrl';
+import ConfirmModal from '../ConfirmModal';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -32,6 +33,24 @@ const validateFileType = (file: File) => {
   return allowedTypes.includes(file.type);
 };
 
+const DeleteButtonModal = ({
+  onDelete,
+  isOpen,
+  onClose,
+}: {
+  onClose: () => void;
+  onDelete: () => void;
+  isOpen: boolean;
+}) => {
+  return (
+    <ConfirmModal isOpen={isOpen} onClose={onClose} onConfirm={onDelete}>
+      <div>
+        <h2 className="text-xl mb-2">Jesi li siguran_na da želiš obrisati fotografiju?</h2>
+      </div>
+    </ConfirmModal>
+  );
+};
+
 const PhotoActionButtons = ({
   onInputChange,
   onDelete,
@@ -40,8 +59,14 @@ const PhotoActionButtons = ({
   onCheckboxChange,
   hasCheckbox,
 }: IPhotoActionButtonsProps) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   return (
     <>
+      <DeleteButtonModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={onDelete}
+      />
       <Input
         defaultValue={defaultInputValue}
         className="mt-4"
@@ -66,7 +91,14 @@ const PhotoActionButtons = ({
         </div>
       )}
       <div className="mt-4 flex gap-2">
-        <Button type="black" className="flex gap-1 items-center" onClick={onDelete}>
+        <Button
+          type="black"
+          className="flex gap-1 items-center"
+          onClick={(e: SyntheticEvent | undefined) => {
+            e?.preventDefault();
+            setIsDeleteModalOpen(true);
+          }}
+        >
           <span>Obriši</span>
           <BiTrash fontSize={20} />
         </Button>
