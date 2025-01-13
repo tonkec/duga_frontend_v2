@@ -9,7 +9,34 @@
 - **Interactive Features**: Share your favorite songs, movies, and personal thoughts to connect deeper.
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 
+## Technologies
+
+### Frontend (FE)
+
+The frontend is built using modern frameworks and tools to ensure a responsive, interactive, and smooth user experience.
+
+- **React**: A JavaScript library for building user interfaces.
+- **React Query (TanStack)**: For efficient data fetching, caching, and synchronization.
+- **React Router / React Router DOM**: For handling routing and navigation in a single-page application.
+- **React Hook Form**: For form management with validation.
+- **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+- **Socket.IO**: For real-time communication between users.
+- **Vite**: A fast build tool for optimized React development.
+
 ---
+
+### Backend (BE)
+
+The backend is designed to handle real-time interactions, file uploads, and relational data storage with a focus on scalability.
+
+- **Node.js**: A JavaScript runtime for building the server-side application.
+- **Express**: A lightweight framework for routing and middleware management.
+- **Socket.IO**: For real-time, bi-directional communication between server and clients.
+- **PostgreSQL**: A relational database for structured data storage.
+- **Sequelize**: An ORM (Object-Relational Mapping) library for database management.
+- **Multer**: For handling file uploads efficiently.
+- **Amazon S3**: For storing and retrieving user-uploaded files and images.
+- **JWT (JSON Web Tokens)**: For secure user authentication and session management.
 
 ## Setup
 
