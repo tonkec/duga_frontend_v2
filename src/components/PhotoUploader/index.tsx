@@ -108,6 +108,7 @@ const PhotoActionButtons = ({
 };
 
 const PhotoUploader = () => {
+  const maxNumberOfImages = 5;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
@@ -304,6 +305,20 @@ const PhotoUploader = () => {
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
+
+                  if (
+                    files.length +
+                      (newImages?.length || 0) +
+                      allExistingImages?.data?.images?.length >
+                    maxNumberOfImages
+                  ) {
+                    toast.error(
+                      `Maksimalan broj fotografija je ${maxNumberOfImages}!`,
+                      toastConfig
+                    );
+                    return;
+                  }
+
                   const invalidFiles = Array.from(files).filter((file) => !validateFileType(file));
                   if (invalidFiles.length) {
                     toast.error('Dozvoljeni formati su jpeg, jpg i png!', toastConfig);
