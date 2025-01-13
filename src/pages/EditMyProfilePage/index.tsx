@@ -54,7 +54,7 @@ const daysOfWeek = [
 
 type Inputs = {
   bio: string;
-  age: number;
+  age: string;
   location: string;
   sexuality: string;
   gender: string;
@@ -78,7 +78,7 @@ type Inputs = {
 
 const schema = z.object({
   bio: z.string().optional(),
-  age: z.number().int().optional(),
+  age: z.string().optional(),
   location: z.string().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
@@ -119,7 +119,7 @@ const EditMyProfilePage = () => {
       reset({
         username: currentUser.data.username || '',
         bio: currentUser.data.bio || '',
-        age: currentUser.data.age || 0,
+        age: String(currentUser.data.age) || '',
         location: currentUser.data.location || '',
         sexuality: currentUser.data.sexuality || '',
         gender: currentUser.data.gender || '',
@@ -276,7 +276,6 @@ const EditMyProfilePage = () => {
                           type="checkbox"
                           {...field}
                           value={currentUser?.data.cigarettes || false}
-                          checked={currentUser?.data.cigarettes || false}
                         />{' '}
                         Cigarete
                       </>
@@ -293,7 +292,6 @@ const EditMyProfilePage = () => {
                           type="checkbox"
                           {...field}
                           value={currentUser?.data.alcohol || false}
-                          checked={currentUser?.data.alcohol || false}
                         />{' '}
                         Alkohol
                       </>
@@ -310,7 +308,6 @@ const EditMyProfilePage = () => {
                           type="checkbox"
                           {...field}
                           value={currentUser?.data.sport || false}
-                          checked={currentUser?.data.sport || false}
                         />{' '}
                         Sport
                       </>

@@ -58,7 +58,8 @@ export const useUpdateUser = () => {
         languages,
         ending,
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data);
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');
     },
