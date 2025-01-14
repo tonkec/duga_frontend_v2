@@ -50,8 +50,8 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
                 }}
                 className="cursor-pointer w-full object-cover rounded-md"
               />
+              {image.description && <p className="mt-2">{image.description}</p>}
               <PhotoLikes photoId={String(image.id)} />
-              {image.description && <p className="text-center mt-2">{image.description}</p>}
             </div>
           );
         })}
