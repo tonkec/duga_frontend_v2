@@ -3,6 +3,7 @@ import notFound from '../../assets/not_found.svg';
 import { ImageDescription } from '../PhotoUploader';
 import { useNavigate } from 'react-router';
 import { getImageUrl } from '../../utils/getImageUrl';
+import PhotoLikes from '../PhotoLikes';
 export interface IImage {
   createdAt: string;
   description: string;
@@ -49,6 +50,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
                 }}
                 className="cursor-pointer w-full object-cover rounded-md"
               />
+              <PhotoLikes photoId={String(image.id)} />
               {image.description && <p className="text-center mt-2">{image.description}</p>}
             </div>
           );
