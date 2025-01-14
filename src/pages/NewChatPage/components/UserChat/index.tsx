@@ -34,9 +34,15 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   if (allImagesLoading) return <Loader />;
 
+  const isMarkedAsRead = () => {
+    if (!lastMessage) return true;
+
+    return is_read;
+  };
+
   return (
     <div
-      className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${is_read ? 'bg-white text-black' : 'bg-blue text-white'}`}
+      className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
       onClick={() => {
         if (lastMessage) {
           onMarkMessagesAsRead(lastMessage.id);
