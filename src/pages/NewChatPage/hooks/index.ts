@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { createChat } from '../../../api/chats';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { useNavigate } from 'react-router';
+import { isMessageRead, markMessagesAsRead } from '../../../api/chatMessages';
 
 interface CreateChatInput {
   userId: number;
@@ -56,4 +57,42 @@ export const useCreateNewChat = () => {
   });
 
   return { onCreateChat, isCreatingChat, isCreateChatError, isCreateChatSuccess };
+};
+
+export const useMarkMessagesAsRead = () => {
+  const {
+    mutate: onMarkMessagesAsRead,
+    isPending: isMarkingMessagesAsRead,
+    isError: isMarkMessagesAsReadError,
+    isSuccess: isMarkMessagesAsReadSuccess,
+  } = useMutation<void, unknown, string>({
+    mutationFn: async (messageId: string) => {
+      if (!messageId) return;
+      await markMessagesAsRead(messageId);
+    },
+    onError: (error: unknown) => {
+      console.error(error);
+    },
+  });
+
+  return {
+    onMarkMessagesAsRead,
+    isMarkingMessagesAsRead,
+    isMarkMessagesAsReadError,
+    isMarkMessagesAsReadSuccess,
+  };
+};
+
+export const useGetIsMessageRead = (id: string) => {
+  const {
+    data: isMessageReadData,
+    error: isMessageReadError,
+    isPending: isMessageReadLoading,
+  } = useQuery({
+    queryKey: ['message', id],
+    queryFn: () => isMessageRead(id),
+    enabled: !!id,
+  });
+
+  return { isMessageReadData, isMessageReadError, isMessageReadLoading };
 };

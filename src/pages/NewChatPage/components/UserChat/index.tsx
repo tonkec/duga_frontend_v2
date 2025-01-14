@@ -3,6 +3,16 @@ import { useGetAllImages } from '../../../../hooks/useGetAllImages';
 import Loader from '../../../../components/Loader';
 import { getProfilePhotoUrl } from '../../../../utils/getProfilePhoto';
 import Avatar from 'react-avatar';
+import { useGetIsMessageRead, useMarkMessagesAsRead } from '../../hooks';
+
+interface IMessage {
+  message: string;
+  userId: string;
+  chatId: number;
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+}
 
 interface IUserChatProps {
   user: {
@@ -13,18 +23,26 @@ interface IUserChatProps {
     id: string;
   };
   onClick: () => void;
-  lastMessage: string;
+  lastMessage: IMessage | null;
 }
 
 const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
   const { allImages, allImagesLoading } = useGetAllImages(user.id);
+  const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
+  const { isMessageReadData } = useGetIsMessageRead(String(lastMessage?.id || ''));
+  const { is_read } = isMessageReadData?.data || {};
 
   if (allImagesLoading) return <Loader />;
 
   return (
     <div
-      className="flex items-center justify-between p-4 border-b border-gray-200 bg-white cursor-pointer mb-4 mt-2"
-      onClick={onClick}
+      className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${is_read ? 'bg-white text-black' : 'bg-blue text-white'}`}
+      onClick={() => {
+        if (lastMessage) {
+          onMarkMessagesAsRead(lastMessage.id);
+        }
+        onClick();
+      }}
     >
       <div className="flex items-center">
         <Avatar
@@ -41,10 +59,10 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
         </div>
 
         <div className="ml-4">
-          <p className="text-gray-500">{lastMessage}</p>
+          <p className="text-gray-500">{lastMessage?.message}</p>
         </div>
       </div>
-      <BiChevronRight className="w-6 h-6 text-gray-500" />
+      <BiChevronRight className="w-6 h-6 text-gray-500" color={is_read ? '#000' : '#fff'} />
     </div>
   );
 };

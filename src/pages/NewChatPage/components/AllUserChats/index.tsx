@@ -10,6 +10,7 @@ interface IChat {
     chatId: number;
     createdAt: string;
     updatedAt: string;
+    id: string;
   }[];
   Users: IUser[];
   createdAt: string;
@@ -28,10 +29,10 @@ interface IAllUserChats {
 
 const getLastMessage = (userChat: IChat) => {
   if (userChat.Messages.length === 0) {
-    return '';
+    return null;
   }
 
-  return userChat.Messages[userChat.Messages.length - 1].message;
+  return userChat.Messages[userChat.Messages.length - 1];
 };
 
 const AllUserChats = ({ userChats }: IAllUserChats) => {
