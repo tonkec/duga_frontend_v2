@@ -62,8 +62,8 @@ const SignupPage = () => {
 
   return (
     <AuthLayout>
-      <form className="w-[400px]" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-center text-white">Registriraj se!</h1>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <h1 className="text-center text-white mb-6">Registriraj se!</h1>
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
         <Input
           type="text"

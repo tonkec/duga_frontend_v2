@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForgotPassword } from './hooks';
 import FieldError from '../../components/FieldError';
+import { Link } from 'react-router';
 
 interface Inputs {
   email: string;
@@ -56,6 +57,10 @@ const ForgotPassword = () => {
         <Button className="w-full mt-2" type="primary">
           Pošalji link za resetiranje lozinke
         </Button>
+
+        <Link to="/login" className="text-center text-white block mt-2 underline">
+          Ulogiraj se!
+        </Link>
       </form>
     </AuthLayout>
   );

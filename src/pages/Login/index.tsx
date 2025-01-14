@@ -52,9 +52,8 @@ const LoginPage = () => {
   return (
     <AuthLayout>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-center text-white">Ulogiraj se!</h1>
+        <h1 className="text-center text-white mb-6">Ulogiraj se!</h1>
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
-
         <Input
           type="email"
           placeholder="Email"
