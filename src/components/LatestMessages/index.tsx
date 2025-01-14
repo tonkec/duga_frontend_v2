@@ -43,6 +43,10 @@ const LatestMessages = () => {
   const { userChats } = useGetAllUserChats(userId as string, true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
 
+  if (!latestChats) {
+    return null;
+  }
+
   return (
     <div>
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>

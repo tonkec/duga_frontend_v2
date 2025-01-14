@@ -39,6 +39,10 @@ const LatestComments = () => {
     return <Loader />;
   }
 
+  if (!allComments) {
+    return null;
+  }
+
   const comments = allComments?.data.slice(0, numberOfComments) || [];
   return (
     <div>

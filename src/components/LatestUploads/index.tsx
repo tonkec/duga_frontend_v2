@@ -16,6 +16,10 @@ const LatestUploads = () => {
     return <img src={NotFoundSvg} alt="Not found" />;
   }
 
+  if (latestUploads.data.length === 0) {
+    return null;
+  }
+
   return (
     <div className="mt-8">
       <h2 className="mb-2">📸 Nedavno dodane fotke</h2>
