@@ -7,7 +7,7 @@ import { SocketContext } from './SocketContext';
 
 const URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://duga-backend.herokuapp.com'
+    ? 'https://dugastaging-394ccba7a9ef.herokuapp.com'
     : 'http://localhost:8080';
 
 // Create Socket Context
