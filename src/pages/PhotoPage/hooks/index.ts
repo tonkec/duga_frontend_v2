@@ -9,6 +9,7 @@ export const useGetSingleImage = (id: string) => {
   } = useQuery({
     queryKey: ['uploads', 'photo', id],
     queryFn: () => getSingleImage(id),
+    enabled: !!id,
   });
 
   return {
