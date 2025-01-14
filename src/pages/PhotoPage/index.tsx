@@ -6,6 +6,7 @@ import Card from '../../components/Card';
 import PhotoComments from '../../components/PhotoComments';
 import PhotoLikes from '../../components/PhotoLikes';
 import Loader from '../../components/Loader';
+import notFound from '../../assets/not_found.svg';
 
 const PhotoPage = () => {
   const { photoId } = useParams();
@@ -15,6 +16,19 @@ const PhotoPage = () => {
     return (
       <AppLayout>
         <Loader />
+      </AppLayout>
+    );
+  }
+
+  if (!singleImage) {
+    return (
+      <AppLayout>
+        <Card>
+          <div className="flex flex-col justify-center items-center max-w-lg mx-auto">
+            <img src={notFound} alt="Not found" />
+            <p className="text-center">Slika nije pronađena ili je obrisana.</p>
+          </div>
+        </Card>
       </AppLayout>
     );
   }
