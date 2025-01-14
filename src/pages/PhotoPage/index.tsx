@@ -40,6 +40,7 @@ const PhotoPage = () => {
           <div>
             <img src={getPhotoUrl(singleImage?.data)} alt="Slika" />
             <PhotoLikes photoId={photoId} />
+            <p className="mt-2 mb-2">{singleImage?.data.description}</p>
           </div>
           <div className="flex-1">
             <PhotoComments />
