@@ -48,7 +48,8 @@ const LatestMessages = () => {
   }
 
   return (
-    <div>
+    <div className="col-span-2">
+      {' '}
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
       <Card className="!p-0 overflow-hidden">
         {latestChats?.map((chat: IChat) =>

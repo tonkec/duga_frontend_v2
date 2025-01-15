@@ -39,13 +39,13 @@ const LatestComments = () => {
     return <Loader />;
   }
 
-  if (!allComments) {
+  if (!allComments?.data.length) {
     return null;
   }
 
   const comments = allComments?.data.slice(0, numberOfComments) || [];
   return (
-    <div>
+    <div className="col-span-2">
       <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
       <Card className="!p-0 overflow-hidden">
         {comments.map((comment: IComment) => (
