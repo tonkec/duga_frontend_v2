@@ -53,6 +53,12 @@ const LoginPage = () => {
     <AuthLayout>
       <form onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-center text-white mb-6">Ulogiraj se!</h1>
+        {process.env.NODE_ENV === 'staging' && (
+          <div className="bg-green p-4 rounded">
+            <p className="text-white text-center">demo1023@admin.app</p>
+            <p className="text-white text-center">10233470</p>
+          </div>
+        )}
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
         <Input
           type="email"

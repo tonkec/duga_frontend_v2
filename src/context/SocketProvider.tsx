@@ -6,7 +6,7 @@ import { SocketContext } from './SocketContext';
 // Type the socket context
 
 const URL =
-  process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
     ? 'https://dugastaging-394ccba7a9ef.herokuapp.com'
     : 'http://localhost:8080';
 
