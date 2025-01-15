@@ -6,7 +6,7 @@ interface IAuthLayoutProps {
 
 const AuthLayout = ({ children }: IAuthLayoutProps) => {
   return (
-    <div className="lg:flex h-screen">
+    <div className="lg:flex h-screen justify-center">
       <div className="flex flex-col items-center justify-center w-full h-full flex-1 pt-5 px-5 xl:max-w-[500px]">
         <div className="bg-blue rounded-lg px-5 py-10 w-full">
           <div className="mx-auto md:w-[400px]">
@@ -16,7 +16,7 @@ const AuthLayout = ({ children }: IAuthLayoutProps) => {
           <div className="mt-10 md:w-[300px] mx-auto">{children}</div>
         </div>
       </div>
-      <div className="p-4 hidden md:flex flex-1 self-center">
+      <div className="p-4 flex flex- self-center">
         <AuthLogo />
       </div>
     </div>
