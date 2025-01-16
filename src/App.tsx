@@ -113,7 +113,7 @@ function App() {
       <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-12">
         <Cta
           className="flex-1"
-          title="Dovrši svoj profil"
+          title="Unaprijedi svoj profil"
           buttonText="Izmijeni profil"
           subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
           onClick={() => navigate(`/edit`)}

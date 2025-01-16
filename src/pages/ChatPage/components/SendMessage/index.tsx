@@ -10,7 +10,9 @@ import { IChat } from '../../../NewChatPage/hooks';
 import { IUser } from '../../../../components/UserCard';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
 import { useSocket } from '../../../../context/useSocket';
-
+import data from '@emoji-mart/data';
+import { SyntheticEvent, useState } from 'react';
+import { init, SearchIndex } from 'emoji-mart';
 type Inputs = {
   content: string;
 };
@@ -30,6 +32,8 @@ interface ISendMessageProps {
 }
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
+  init({ data });
+  const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(currentUserId as string);
@@ -44,6 +48,15 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
+
+  async function search(value) {
+    const emojis = await SearchIndex.search(value);
+    const results = emojis.map((emoji) => {
+      return emoji.skins[0].native;
+    });
+
+    return results;
+  }
 
   const onSubmit = (data: Inputs) => {
     const msg = {
@@ -67,6 +80,14 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           type="text"
           placeholder="Pošalji poruku"
           {...register('content')}
+          onChange={async (e: SyntheticEvent) => {
+            if ((e.target as HTMLInputElement).value.includes(':')) {
+              console.log('EMOJI');
+              const emojis = await search((e.target as HTMLInputElement).value.split(':')[1]);
+              console.log(emojis);
+              setCurrentEmojis(emojis);
+            }
+          }}
           onFocus={() => {
             socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
           }}
@@ -74,6 +95,14 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
             socket.emit('stop-typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
           }}
         />
+
+        <div>
+          {currentEmojis.length > 0 &&
+            currentEmojis.map((emoji, index) => {
+              return <span key={index}>{emoji}</span>;
+            })}
+        </div>
+
         {errors.content && <FieldError message="Poruka je obavezna." />}
         <Button className="mt-2" type="primary">
           Pošalji
