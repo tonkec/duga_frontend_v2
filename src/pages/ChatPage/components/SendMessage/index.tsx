@@ -62,6 +62,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     getValues,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      content: '',
+    },
   });
 
   async function search(value: string) {
