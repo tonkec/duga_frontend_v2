@@ -53,23 +53,19 @@ const LoginPage = () => {
     <AuthLayout>
       <form onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-center text-white mb-6">Ulogiraj se!</h1>
-        {process.env.NODE_ENV === 'staging' && (
-          <div className="bg-green p-4 rounded">
-            <p className="text-white text-center">demo1023@admin.app</p>
-            <p className="text-white text-center">10233470</p>
-          </div>
-        )}
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
         <Input
           type="email"
           placeholder="Email"
           className="mb-2 mt-2"
           {...register('email', { required: true })}
+          defaultValue={process.env.NODE_ENV === 'staging' ? 'demo1023@admin.app' : ''}
         />
         <Input
           type="password"
           placeholder="Lozinka"
           {...register('password', { required: true })}
+          defaultValue={process.env.NODE_ENV === 'staging' ? '10233470' : ''}
         />
         <Button className="w-full mt-2" type="primary">
           Ulogiraj se
