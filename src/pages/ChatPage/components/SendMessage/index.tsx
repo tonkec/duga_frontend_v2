@@ -13,6 +13,7 @@ import { useSocket } from '../../../../context/useSocket';
 import data from '@emoji-mart/data';
 import { SyntheticEvent, useState } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
+import EmojiPicker from '../../../../components/EmojiPicker';
 type Inputs = {
   content: string;
 };
@@ -31,9 +32,16 @@ interface ISendMessageProps {
   otherUserId: number | undefined | null;
 }
 
+interface IEmoji {
+  skins: {
+    native: string;
+  }[];
+}
+
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
   const [currentEmojis, setCurrentEmojis] = useState([]);
+  const [inputValue, setInputValue] = useState('');
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(currentUserId as string);
@@ -49,9 +57,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     resolver: zodResolver(schema),
   });
 
-  async function search(value) {
+  async function search(value: string) {
     const emojis = await SearchIndex.search(value);
-    const results = emojis.map((emoji) => {
+    const results = emojis.map((emoji: IEmoji) => {
       return emoji.skins[0].native;
     });
 
@@ -81,12 +89,17 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           placeholder="Pošalji poruku"
           {...register('content')}
           onChange={async (e: SyntheticEvent) => {
-            if ((e.target as HTMLInputElement).value.includes(':')) {
-              console.log('EMOJI');
-              const emojis = await search((e.target as HTMLInputElement).value.split(':')[1]);
-              console.log(emojis);
-              setCurrentEmojis(emojis);
+            const value = (e.target as HTMLInputElement).value;
+            const emojiRegex = /(?:\s|^):([a-zA-Z0-9_]+)$/;
+            const match = value.match(emojiRegex);
+            if (match) {
+              const emojis = await search(value.split(':')[1]);
+              if (emojis) setCurrentEmojis(emojis);
+            } else {
+              setCurrentEmojis([]);
             }
+
+            setInputValue(value);
           }}
           onFocus={() => {
             socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
@@ -94,14 +107,15 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           onBlur={() => {
             socket.emit('stop-typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
           }}
+          value={inputValue}
         />
 
-        <div>
-          {currentEmojis.length > 0 &&
-            currentEmojis.map((emoji, index) => {
-              return <span key={index}>{emoji}</span>;
-            })}
-        </div>
+        <EmojiPicker
+          onEmojiSelect={(emoji) => {
+            setInputValue(inputValue.slice(0, inputValue.lastIndexOf(':')) + emoji + ' ');
+          }}
+          emojis={currentEmojis}
+        />
 
         {errors.content && <FieldError message="Poruka je obavezna." />}
         <Button className="mt-2" type="primary">
