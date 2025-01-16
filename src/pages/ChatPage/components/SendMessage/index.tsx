@@ -14,6 +14,7 @@ import { SyntheticEvent, useState } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
+import Input from '../../../../components/Input';
 type Inputs = {
   content: string;
 };
@@ -42,8 +43,6 @@ interface IEmoji {
     native: string;
   }[];
 }
-
-const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-[6px] px-4 pr-8 block w-full appearance-none leading-normal focus:border-blue`;
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
@@ -111,8 +110,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           const debouncedSearch = debounce(handleSearch, 300);
 
           return (
-            <input
-              className={inputStyles}
+            <Input
               type="text"
               placeholder="Pošalji poruku"
               {...field}
