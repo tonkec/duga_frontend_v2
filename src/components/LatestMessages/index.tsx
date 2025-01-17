@@ -27,7 +27,6 @@ const groupMessagesByUser = (
     chat.Messages.forEach((message) => {
       const userId = message.User.id;
 
-      // If the user ID does not exist in the groupedMessages, initialize it
       if (!groupedMessages[userId]) {
         groupedMessages[userId] = {
           user: message.User,
@@ -35,7 +34,6 @@ const groupMessagesByUser = (
         };
       }
 
-      // Add the message to the user's group
       groupedMessages[userId].messages.push(message);
     });
   });
@@ -53,7 +51,6 @@ const getLatestMessagesPerUser = (groupedMessages: IGroupedMessages) => {
   };
 
   Object.entries(groupedMessages).forEach(([userId, userData]) => {
-    // Find the latest message by comparing the `createdAt` timestamps
     const latestMessage = userData.messages.reduce((latest: IMessage, current: IMessage) =>
       new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
     );
