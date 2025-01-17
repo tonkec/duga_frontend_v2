@@ -22,7 +22,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
   const { allImages } = useGetAllImages(comment.userId.toString());
   return (
     <div
-      className="flex flex-col gap-1 border-b p-4 hover:bg-blue-dark hover:text-white transition cursor-pointer"
+      className="flex flex-col gap-1 border-b p-4 hover:bg-gray-100 transition cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-center gap-2 mb-2">
