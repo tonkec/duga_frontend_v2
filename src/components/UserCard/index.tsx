@@ -4,6 +4,8 @@ import Card from '../Card';
 import { getUserBio } from '../UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import React from 'react';
+import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
 export interface IUser {
   avatar: string;
   email: string;
@@ -65,16 +67,17 @@ const getUserAge = ({ age }: { age: number }) => {
 };
 
 const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardProps) => {
+  const { allImages } = useGetAllImages(user.id);
   return (
     <Card className="h-full">
       <div className="w-full text-center">
         <Avatar
           name={`${user.firstName} ${user.lastName}`}
-          src={user.avatar}
+          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
           size="100"
           textSizeRatio={3}
           color="#2D46B9"
-          className="w-full mb-4 "
+          className="w-full mb-4"
           round
         />
       </div>
