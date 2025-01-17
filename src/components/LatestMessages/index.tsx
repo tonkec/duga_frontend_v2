@@ -16,6 +16,7 @@ interface IMessage {
     id: number;
     firstName: string;
   };
+  chatId: number;
 }
 
 const groupMessagesByUser = (
@@ -117,7 +118,7 @@ const LatestMessages = () => {
 
   const groupedMessages = groupMessagesByUser(latestChats);
   const latestMessages = getLatestMessagesPerUser(groupedMessages);
-
+  console.log(latestMessages);
   return (
     <div className="col-span-2">
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
@@ -126,7 +127,7 @@ const LatestMessages = () => {
           <LatestMessage
             key={index}
             message={latestMessage.message}
-            onClick={() => navigate(`/chat/${latestMessage.user.id}`)}
+            onClick={() => navigate(`/chat/${latestMessage.message.chatId}`)}
           />
         ))}
       </Card>
