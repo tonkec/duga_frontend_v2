@@ -4,6 +4,10 @@ import Card from '../Card';
 import { IChat } from '../../pages/NewChatPage/hooks';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '../RecordCreatedAt';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
+import Avatar from 'react-avatar';
+import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import { useGetUserById } from '../../hooks/useGetUserById';
 
 interface IMessage {
   id: number;
@@ -15,21 +19,38 @@ interface IMessage {
   };
 }
 
+const LatestMessageAvatar = ({ userId }: { userId: string }) => {
+  const { allImages } = useGetAllImages(userId);
+  const { user } = useGetUserById(userId);
+  return (
+    <div className="flex gap-2">
+      <Avatar
+        color="#F037A5"
+        name={`${user?.data?.firstName} ${user?.data?.lastName}`}
+        src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
+        size="40"
+        round={true}
+        className="cursor-pointer"
+      />
+    </div>
+  );
+};
+
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
   const [userId] = useLocalStorage('userId');
   const getLatestPerson = () => {
     if (message.User.id === Number(userId)) {
-      return 'Od tebe';
+      return <LatestMessageAvatar userId={String(userId)} />;
     }
 
-    return `Od ${message.User.firstName}`;
+    return <LatestMessageAvatar userId={String(message.User.id)} />;
   };
   return (
     <div onClick={onClick}>
-      <p>
+      <div className="flex items-center gap-2 mb-2">
+        {getLatestPerson()}
         <span> {message.message} </span> <br />
-        <span className="text-gray-500 text-sm inline-block mt-2">{getLatestPerson()}</span>
-      </p>
+      </div>
       <RecordCreatedAt createdAt={message.createdAt} />
     </div>
   );
@@ -49,26 +70,26 @@ const LatestMessages = () => {
 
   return (
     <div className="col-span-2">
-      {' '}
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
       <Card className="!p-0 overflow-hidden">
         {latestChats?.map((chat: IChat) =>
-          chat.Messages.slice(0, numberOfMessages).map((message: IMessage, index) => (
-            <div
-              className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer"
-              key={`chat-${index}`}
-            >
-              <p className="text-gray-500 text-sm">
-                Razgovor sa korisnikom_com {chat.Users[0].firstName}{' '}
-              </p>
-              <LatestMessage
-                message={message}
-                onClick={() => {
-                  navigate(`/chat/${chat.id}`);
-                }}
-              />
-            </div>
-          ))
+          chat.Messages.sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+            .slice(0, numberOfMessages)
+            .map((message: IMessage, index) => (
+              <div
+                className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer"
+                key={`chat-${index}`}
+              >
+                <LatestMessage
+                  message={message}
+                  onClick={() => {
+                    navigate(`/chat/${chat.id}`);
+                  }}
+                />
+              </div>
+            ))
         )}
       </Card>
     </div>

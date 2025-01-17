@@ -4,6 +4,9 @@ import Card from '../Card';
 import Loader from '../Loader';
 import RecordCreatedAt from '../RecordCreatedAt';
 import { useGetLatestComments } from './hooks';
+import Avatar from 'react-avatar';
+import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
 
 interface IComment {
   id: number;
@@ -14,16 +17,28 @@ interface IComment {
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
+  const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
+  const { allImages } = useGetAllImages(comment.userId.toString());
   return (
     <div
-      className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer"
+      className="flex flex-col gap-1 border-b p-4 hover:bg-blue-dark hover:text-white transition cursor-pointer"
       onClick={onClick}
     >
-      <p className="text-sm">{comment.comment || 'Nema komentara'}</p>
-      <p className="text-xs text-gray-400">
-        {user?.data.firstName} {user?.data.lastName}
-      </p>
+      <div className="flex items-center gap-2 mb-2">
+        <Avatar
+          color="#2D46B9"
+          name={`${user?.data.firstName} ${user?.data.lastName}`}
+          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
+          size="40"
+          round={true}
+          onClick={() => {
+            navigate(`/user/${comment.userId}`);
+          }}
+          className="cursor-pointer"
+        />
+        <p className="text-sm">{comment.comment || 'Nema komentara'}</p>
+      </div>
       <div className="flex justify-between">
         <RecordCreatedAt createdAt={comment.createdAt} />
       </div>
