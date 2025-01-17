@@ -1,7 +1,6 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 import Card from '../Card';
-import { IChat } from '../../pages/NewChatPage/hooks';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '../RecordCreatedAt';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
@@ -18,6 +17,55 @@ interface IMessage {
     firstName: string;
   };
 }
+
+const groupMessagesByUser = (
+  data: { Messages: IMessage[]; User: { id: number; firstName: string } }[]
+) => {
+  const groupedMessages = {} as IGroupedMessages;
+
+  data.forEach((chat) => {
+    chat.Messages.forEach((message) => {
+      const userId = message.User.id;
+
+      // If the user ID does not exist in the groupedMessages, initialize it
+      if (!groupedMessages[userId]) {
+        groupedMessages[userId] = {
+          user: message.User,
+          messages: [],
+        };
+      }
+
+      // Add the message to the user's group
+      groupedMessages[userId].messages.push(message);
+    });
+  });
+
+  return groupedMessages;
+};
+
+interface IGroupedMessages {
+  [key: string]: { user: { id: number; firstName: string }; messages: IMessage[] };
+}
+
+const getLatestMessagesPerUser = (groupedMessages: IGroupedMessages) => {
+  const latestMessages = {} as {
+    [key: string]: { user: { id: number; firstName: string }; message: IMessage };
+  };
+
+  Object.entries(groupedMessages).forEach(([userId, userData]) => {
+    // Find the latest message by comparing the `createdAt` timestamps
+    const latestMessage = userData.messages.reduce((latest: IMessage, current: IMessage) =>
+      new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
+    );
+
+    latestMessages[userId] = {
+      user: userData.user,
+      message: latestMessage,
+    };
+  });
+
+  return latestMessages;
+};
 
 const LatestMessageAvatar = ({ userId }: { userId: string }) => {
   const { allImages } = useGetAllImages(userId);
@@ -46,7 +94,10 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     return <LatestMessageAvatar userId={String(message.User.id)} />;
   };
   return (
-    <div onClick={onClick}>
+    <div
+      onClick={onClick}
+      className="blue hover:bg-gray-100 cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200"
+    >
       <div className="flex items-center gap-2 mb-2">
         {getLatestPerson()}
         <span> {message.message} </span> <br />
@@ -59,7 +110,6 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 const LatestMessages = () => {
   const navigate = useNavigate();
   const numberOfChats = 4;
-  const numberOfMessages = 2;
   const [userId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(userId as string, true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
@@ -68,29 +118,20 @@ const LatestMessages = () => {
     return null;
   }
 
+  const groupedMessages = groupMessagesByUser(latestChats);
+  const latestMessages = getLatestMessagesPerUser(groupedMessages);
+
   return (
     <div className="col-span-2">
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>
       <Card className="!p-0 overflow-hidden">
-        {latestChats?.map((chat: IChat) =>
-          chat.Messages.sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )
-            .slice(0, numberOfMessages)
-            .map((message: IMessage, index) => (
-              <div
-                className="flex flex-col gap-1 border-b p-4 hover:bg-blue hover:text-white transition cursor-pointer"
-                key={`chat-${index}`}
-              >
-                <LatestMessage
-                  message={message}
-                  onClick={() => {
-                    navigate(`/chat/${chat.id}`);
-                  }}
-                />
-              </div>
-            ))
-        )}
+        {Object.values(latestMessages).map((latestMessage, index) => (
+          <LatestMessage
+            key={index}
+            message={latestMessage.message}
+            onClick={() => navigate(`/chat/${latestMessage.user.id}`)}
+          />
+        ))}
       </Card>
     </div>
   );
