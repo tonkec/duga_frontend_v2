@@ -3,7 +3,7 @@ import { REACT_APP_S3_BUCKET_URL } from '../../../../utils/consts';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
 import { useGetAllImages } from '../../../../hooks/useGetAllImages';
 import Avatar from 'react-avatar';
-import { getProfilePhotoUrl } from '../../../../utils/getProfilePhoto';
+import { getProfilePhoto, getProfilePhotoUrl } from '../../../../utils/getProfilePhoto';
 
 interface IUpload {
   id: string;
@@ -31,7 +31,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
         <Avatar
           color="#2D46B9"
           name={`${user?.data.firstName} ${user?.data.lastName}`}
-          src={getProfilePhotoUrl(allImages?.data.images)}
+          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
           size="40"
           round={true}
           onClick={() => {
