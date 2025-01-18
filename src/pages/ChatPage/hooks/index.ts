@@ -15,6 +15,7 @@ export const useGetAllMessages = (chatId: string, page: number) => {
   } = useQuery({
     queryKey: ['messages', chatId],
     queryFn: () => getChatMessages(chatId, page),
+    enabled: !!chatId,
   });
 
   return {
@@ -35,6 +36,7 @@ export const useGetCurrentChat = (chatId: string) => {
   } = useQuery({
     queryKey: ['chat', chatId],
     queryFn: () => getCurrentChat(chatId),
+    enabled: !!chatId,
   });
 
   return { currentChat, currentChatError, isCurrentChatLoading, isCurrentChatSuccess };

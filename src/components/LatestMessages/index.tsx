@@ -118,7 +118,6 @@ const LatestMessages = () => {
 
   const groupedMessages = groupMessagesByUser(latestChats);
   const latestMessages = getLatestMessagesPerUser(groupedMessages);
-  console.log(latestMessages);
   return (
     <div className="col-span-2">
       <h2 className="mb-2"> 📬 Tvoje nedavne poruke</h2>

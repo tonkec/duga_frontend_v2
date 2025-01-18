@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router';
 import AppLayout from '../../components/AppLayout';
 import Card from '../../components/Card';
 import SendMessage from './components/SendMessage';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
@@ -32,6 +32,7 @@ interface ITypingData {
 }
 
 const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
+  if (!chatUsers) return null;
   return chatUsers.find((user) => user.userId !== Number(currentUserId));
 };
 
@@ -67,12 +68,9 @@ const ChatPage = () => {
   const { chatId } = useParams();
   const { deleteChat } = useDeleteCurrentChat();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
-  const { currentChat, isCurrentChatLoading } = useGetCurrentChat(chatId as string);
+  const { currentChat } = useGetCurrentChat(chatId as string);
 
-  const otherUserId = useMemo(() => {
-    if (!currentChat || isCurrentChatLoading) return null;
-    return getOtherUser(currentChat.data, currentUserId as string)?.userId;
-  }, [currentChat, currentUserId, isCurrentChatLoading]);
+  const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
 
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
@@ -85,15 +83,9 @@ const ChatPage = () => {
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const { user: currentUser } = useGetUserById(currentUserId as string);
 
-  const otherUserName = useMemo(() => {
-    if (!otherUser) return '';
-    return `${otherUser.data.firstName} ${otherUser.data.lastName}`;
-  }, [otherUser]);
+  const otherUserName = otherUser?.data.firstName + ' ' + otherUser?.data.lastName;
 
-  const currentUserName = useMemo(() => {
-    if (!currentUser) return '';
-    return `${currentUser.data.firstName} ${currentUser.data.lastName}`;
-  }, [currentUser]);
+  const currentUserName = currentUser?.data.firstName + ' ' + currentUser?.data.lastName;
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
