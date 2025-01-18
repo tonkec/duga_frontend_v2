@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useCreateUser } from './hooks';
 import FieldError from '../../components/FieldError';
+import { BiSolidUser, BiSolidEnvelope, BiSolidKey } from 'react-icons/bi';
 
 type Inputs = {
   email: string;
@@ -63,38 +64,48 @@ const SignupPage = () => {
   return (
     <AuthLayout>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-center text-white mb-6">Registriraj se!</h1>
+        <h1 className="text-center text-white mb-2">Učlani se!</h1>
+        <p className="text-center text-white mb-6">Pronađi zanimljivu osobicu.</p>
+
         {hasFormError && <FieldError message={getErrorMessage(errors)} />}
         <Input
           type="text"
           placeholder="Ime"
-          className="mb-2 mt-2"
+          className="border-none p-2 mb-2 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
           {...register('firstName', { required: true })}
+          icon={<BiSolidUser className="mt-1" color="rgba(255,255,255,0.7)" />}
         />
 
         <Input
           type="text"
           placeholder="Prezime"
-          className="mb-2 mt-2"
+          className="border-none p-2 mb-2 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
           {...register('lastName', { required: true })}
+          icon={<BiSolidUser className="mt-1" color="rgba(255,255,255,0.7)" />}
         />
         <Input
           type="email"
           placeholder="Email"
-          className="mb-2 mt-2"
+          className="border-none p-2 mb-2 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
           {...register('email', { required: true })}
+          icon={<BiSolidEnvelope className="mt-1" color="rgba(255,255,255,0.7)" />}
         />
         <Input
           type="password"
           placeholder="Lozinka"
+          className="border-none p-2 mb-2 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
+          icon={<BiSolidKey className="mt-1" color="rgba(255,255,255,0.7)" />}
           {...register('password', { required: true })}
         />
-        <Button className="w-full mt-2" type="primary">
+        <Button className="w-full mt-2 py-4 rounded-xl" type="primary">
           Registriraj se!
         </Button>
-        <Link to="/login" className="text-center text-white block mt-2 underline">
-          Ulogiraj se!
-        </Link>
+        <div className="flex text-white items-center justify-center gap-1 mt-6">
+          <p>Već imaš račun?</p>
+          <Link to="/login" className="text-center text-white block underline">
+            Ulogiraj se!
+          </Link>
+        </div>
       </form>
     </AuthLayout>
   );

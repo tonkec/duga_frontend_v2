@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import FieldError from '../../components/FieldError';
 import { useResetPassword, useVerifyToken } from './hooks';
 import { useEffect } from 'react';
+import { BiSolidKey } from 'react-icons/bi';
 
 const schema = z
   .object({
@@ -85,11 +86,12 @@ const ResetPassword = () => {
         <Input
           type="password"
           placeholder="Nova lozinka"
-          className="mb-2"
+          className="border-none p-2 mb-2 mt-6 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
           {...register('password')}
+          icon={<BiSolidKey className="mt-1" color="rgba(255,255,255,0.7)" />}
         />
         <Input type="password" placeholder="Ponovi lozinku" {...register('repeatPassword')} />
-        <Button className="w-full mt-2" type="primary">
+        <Button className="w-full mt-2 py-4 rounded-xl" type="primary">
           Resetiraj lozinku
         </Button>
       </form>

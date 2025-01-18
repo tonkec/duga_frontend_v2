@@ -12,7 +12,7 @@ interface InputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-[6px] px-4 pr-8 block w-full appearance-none leading-normal focus:border-blue`;
+const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded px-4 block w-full appearance-none leading-normal focus:border-blue`;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
@@ -35,7 +35,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           {...props}
           ref={ref}
-          className={`${inputStyles} ${className}`}
+          className={`${inputStyles} ${className} pl-10`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -44,7 +44,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           onFocus={onFocus}
           onBlur={onBlur}
         />
-        {icon && <span className="absolute right-3 top-[10px]">{icon}</span>}
+        {icon && <span className="absolute left-3 top-[8px]">{icon}</span>}
       </div>
     ) : (
       <input
