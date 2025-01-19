@@ -115,7 +115,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           return (
             <Input
               type="text"
-              placeholder="Pošalji poruku. Iskoristi : za emojije"
+              placeholder="Pošalji poruku. Iskoristi : za emojije!"
               {...field}
               onChange={(e: SyntheticEvent) => {
                 const value = (e.target as HTMLInputElement).value;
