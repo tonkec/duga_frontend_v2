@@ -15,6 +15,8 @@ import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
+import { BiPaperclip, BiSend } from 'react-icons/bi';
+
 type Inputs = {
   content: string;
 };
@@ -92,7 +94,13 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 items-center">
+      <BiPaperclip
+        fontSize={30}
+        className="cursor-pointer mt-1"
+        style={{ transform: 'rotate(90deg)' }}
+      />
+
       <Controller
         name="content"
         control={control}
@@ -148,8 +156,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       />
 
       {errors.content && <FieldError message="Poruka je obavezna." />}
-      <Button className="mt-2" type="primary">
-        Pošalji
+      <Button type="primary">
+        <BiSend fontSize={20} />
       </Button>
     </form>
   );
