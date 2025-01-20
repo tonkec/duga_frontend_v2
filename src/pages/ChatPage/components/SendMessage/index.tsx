@@ -49,6 +49,7 @@ interface IEmoji {
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
+  const [messageType, setMessageType] = useState('text');
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
@@ -81,7 +82,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   const onSubmit = (data: Inputs) => {
     const msg = {
-      type: 'text',
+      type: messageType,
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
       toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
@@ -95,52 +96,64 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 items-center">
-      <FileUploader Icon={BiPaperclip} />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex gap-2 items-center">
+        <FileUploader
+          Icon={BiPaperclip}
+          onFileSelect={() => {
+            setMessageType('file');
+          }}
+        />
 
-      <Controller
-        name="content"
-        control={control}
-        render={({ field }) => {
-          const handleSearch = async (value: string) => {
-            const emojiRegex = /(?:\s|^):([^\s:]+)/;
-            const match = value.match(emojiRegex);
+        <Controller
+          name="content"
+          control={control}
+          render={({ field }) => {
+            const handleSearch = async (value: string) => {
+              const emojiRegex = /(?:\s|^):([^\s:]+)/;
+              const match = value.match(emojiRegex);
 
-            if (match) {
-              const searchTerm = match[1];
-              const emojis = await search(searchTerm);
-              setCurrentEmojis(emojis);
-            } else {
-              setCurrentEmojis([]);
-            }
-          };
+              if (match) {
+                const searchTerm = match[1];
+                const emojis = await search(searchTerm);
+                setCurrentEmojis(emojis);
+              } else {
+                setCurrentEmojis([]);
+              }
+            };
 
-          const debouncedSearch = debounce(handleSearch, 300);
+            const debouncedSearch = debounce(handleSearch, 300);
 
-          return (
-            <Input
-              type="text"
-              placeholder="Pošalji poruku. Iskoristi : za emojije!"
-              {...field}
-              onChange={(e: SyntheticEvent) => {
-                const value = (e.target as HTMLInputElement).value;
-                debouncedSearch(value);
-                field.onChange(e);
-              }}
-              onFocus={() => {
-                socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
-              }}
-              onBlur={() => {
-                socket.emit('stop-typing', {
-                  chatId,
-                  userId: currentUserId,
-                  toUserId: [otherUserId],
-                });
-              }}
-            />
-          );
-        }}
-      />
+            return (
+              <Input
+                type="text"
+                placeholder="Pošalji poruku. Iskoristi : za emojije!"
+                {...field}
+                onChange={(e: SyntheticEvent) => {
+                  const value = (e.target as HTMLInputElement).value;
+                  debouncedSearch(value);
+                  field.onChange(e);
+                }}
+                onFocus={() => {
+                  socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+                }}
+                onBlur={() => {
+                  socket.emit('stop-typing', {
+                    chatId,
+                    userId: currentUserId,
+                    toUserId: [otherUserId],
+                  });
+                }}
+              />
+            );
+          }}
+        />
+
+        {errors.content && <FieldError message="Poruka je obavezna." />}
+        <Button type="primary">
+          <BiSend fontSize={20} />
+        </Button>
+      </div>
 
       <EmojiPicker
         emojis={currentEmojis}
@@ -151,11 +164,6 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           setCurrentEmojis([]);
         }}
       />
-
-      {errors.content && <FieldError message="Poruka je obavezna." />}
-      <Button type="primary">
-        <BiSend fontSize={20} />
-      </Button>
     </form>
   );
 };
