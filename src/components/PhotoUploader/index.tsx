@@ -330,7 +330,6 @@ const PhotoUploader = () => {
                       description: '',
                       userId: userId as string,
                       isProfilePhoto: false,
-                      isLocal: true,
                     };
                   });
 

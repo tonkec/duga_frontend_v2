@@ -14,7 +14,6 @@ export interface IImage {
   updatedAt: string;
   url: string;
   userId: string;
-  isLocal?: boolean;
 }
 
 interface IPhotosProps {
