@@ -6,7 +6,7 @@ interface IChat {
   id: number;
   Messages: {
     message: string;
-    userId: string;
+    fromUserId: number;
     chatId: number;
     createdAt: string;
     updatedAt: string;
@@ -32,7 +32,9 @@ const getLastMessage = (userChat: IChat) => {
     return null;
   }
 
-  return userChat.Messages[userChat.Messages.length - 1];
+  return userChat.Messages.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  })[0];
 };
 
 const AllUserChats = ({ userChats }: IAllUserChats) => {

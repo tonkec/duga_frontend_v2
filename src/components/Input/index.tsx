@@ -50,7 +50,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <input
         {...props}
         ref={ref}
-        className={`${inputStyles} ${className}`}
+        className={`${inputStyles} ${className} py-2`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}

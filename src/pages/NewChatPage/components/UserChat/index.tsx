@@ -4,10 +4,11 @@ import Loader from '../../../../components/Loader';
 import { getProfilePhotoUrl } from '../../../../utils/getProfilePhoto';
 import Avatar from 'react-avatar';
 import { useGetIsMessageRead, useMarkMessagesAsRead } from '../../hooks';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 interface IMessage {
   message: string;
-  userId: string;
+  fromUserId: number;
   chatId: number;
   createdAt: string;
   updatedAt: string;
@@ -28,6 +29,7 @@ interface IUserChatProps {
 
 const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
   const { allImages, allImagesLoading } = useGetAllImages(user.id);
+  const [userId] = useLocalStorage('userId');
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { isMessageReadData } = useGetIsMessageRead(String(lastMessage?.id || ''));
   const { is_read } = isMessageReadData?.data || {};
@@ -36,6 +38,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   const isMarkedAsRead = () => {
     if (!lastMessage) return true;
+    if (lastMessage?.fromUserId === Number(userId)) return true;
 
     return is_read;
   };
@@ -44,8 +47,8 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
     <div
       className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
       onClick={() => {
-        if (lastMessage) {
-          onMarkMessagesAsRead(lastMessage.id);
+        if (lastMessage?.fromUserId !== Number(userId)) {
+          onMarkMessagesAsRead(lastMessage?.id || '');
         }
         onClick();
       }}
