@@ -50,7 +50,6 @@ interface IEmoji {
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const { uploadMessageImage } = useUploadMessageImage();
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
@@ -58,6 +57,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { userChats } = useGetAllUserChats(currentUserId as string);
   const { user: currentUser } = useGetUserById(String(currentUserId));
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
+  const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
 
   const {
     handleSubmit,
@@ -122,9 +122,19 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div>
       <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
-        <input name="avatars" type="file" multiple className="hidden" ref={fileInputRef} />
+        <input
+          name="avatars"
+          type="file"
+          multiple
+          className="hidden"
+          ref={fileInputRef}
+          onChange={(e) => {
+            const files = e.target.files as FileList;
+            setCurrentUploadableImage(Array.from(files));
+          }}
+        />
         <BiPaperclip
           fontSize={20}
           style={{
@@ -181,17 +191,31 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <Button type="primary">
           <BiSend fontSize={20} />
         </Button>
-
-        <EmojiPicker
-          emojis={currentEmojis}
-          onEmojiSelect={(emoji: string) => {
-            const currentValue = getValues('content');
-            const updatedValue = currentValue.replace(/(?:\s|^):([^\s:]+)/, emoji);
-            setValue('content', updatedValue, { shouldValidate: true });
-            setCurrentEmojis([]);
-          }}
-        />
       </form>
+
+      <EmojiPicker
+        emojis={currentEmojis}
+        onEmojiSelect={(emoji: string) => {
+          const currentValue = getValues('content');
+          const updatedValue = currentValue.replace(/(?:\s|^):([^\s:]+)/, emoji);
+          setValue('content', updatedValue, { shouldValidate: true });
+          setCurrentEmojis([]);
+        }}
+      />
+
+      {currentUploadableImage &&
+        currentUploadableImage.map((image: File) => {
+          return (
+            <img
+              key={image.name}
+              src={URL.createObjectURL(image)}
+              alt={image.name}
+              width={100}
+              height={100}
+              className="border mt-2"
+            />
+          );
+        })}
     </div>
   );
 };
