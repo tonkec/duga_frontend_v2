@@ -21,6 +21,7 @@ interface IMessage {
   User: {
     id: number;
   };
+  messagePhotoUrl: string;
 }
 
 interface IChatUser {

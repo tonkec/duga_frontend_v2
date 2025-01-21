@@ -9,6 +9,7 @@ interface Message {
   User: {
     id: number;
   };
+  messagePhotoUrl: string;
 }
 
 const PaginatedMessages = ({

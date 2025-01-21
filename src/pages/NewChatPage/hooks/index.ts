@@ -31,6 +31,7 @@ interface Message {
   createdAt: string;
   message: string;
   User: User;
+  messagePhotoUrl: string;
 }
 
 export const useCreateNewChat = () => {
