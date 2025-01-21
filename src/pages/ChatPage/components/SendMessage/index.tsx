@@ -15,8 +15,9 @@ import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
-import { BiSend } from 'react-icons/bi';
+import { BiPaperclip, BiSend } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
+import FileUploader from '../../../../components/FileUploader';
 
 type Inputs = {
   content: string;
@@ -109,13 +110,11 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   return (
-    <>
+    <div className="flex items-center gap-2">
       <form onSubmit={onFormSubmit}>
-        <div>
-          <input type="file" multiple name="avatars" />
-        </div>
+        <FileUploader Icon={BiPaperclip} />
       </form>
-      <form onSubmit={handleSubmit(onMessageSubmit)} className="flex items-center gap-2">
+      <form onSubmit={handleSubmit(onMessageSubmit)} className="flex-1 flex items-center gap-1">
         <Controller
           name="content"
           control={control}
@@ -175,7 +174,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           }}
         />
       </form>
-    </>
+    </div>
   );
 };
 
