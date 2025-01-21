@@ -15,8 +15,8 @@ import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
-import { BiPaperclip, BiSend } from 'react-icons/bi';
-import FileUploader from '../../../../components/FileUploader';
+import { BiSend } from 'react-icons/bi';
+import { useUploadMessageImage } from './hooks';
 
 type Inputs = {
   content: string;
@@ -49,7 +49,7 @@ interface IEmoji {
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
-  const [messageType, setMessageType] = useState('text');
+  const { uploadMessageImage } = useUploadMessageImage();
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
@@ -80,9 +80,22 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     return results;
   }
 
-  const onSubmit = (data: Inputs) => {
+  const onFormSubmit = (e: SyntheticEvent) => {
+    e.preventDefault();
+
+    const files = (e.target as HTMLFormElement).avatars.files as FileList;
+    const formData = new FormData();
+    Array.from(files).forEach((file: File) => {
+      formData.append('avatars', file);
+    });
+    formData.append('chatId', chatId as string);
+    formData.append('fromUserId', currentUserId as string);
+    uploadMessageImage(formData);
+  };
+
+  const onMessageSubmit = (data: Inputs) => {
     const msg = {
-      type: messageType,
+      type: 'text',
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
       toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
@@ -96,15 +109,13 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex gap-2 items-center">
-        <FileUploader
-          Icon={BiPaperclip}
-          onFileSelect={() => {
-            setMessageType('file');
-          }}
-        />
-
+    <>
+      <form onSubmit={onFormSubmit}>
+        <div>
+          <input type="file" multiple name="avatars" />
+        </div>
+      </form>
+      <form onSubmit={handleSubmit(onMessageSubmit)} className="flex items-center gap-2">
         <Controller
           name="content"
           control={control}
@@ -153,18 +164,18 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <Button type="primary">
           <BiSend fontSize={20} />
         </Button>
-      </div>
 
-      <EmojiPicker
-        emojis={currentEmojis}
-        onEmojiSelect={(emoji: string) => {
-          const currentValue = getValues('content');
-          const updatedValue = currentValue.replace(/(?:\s|^):([^\s:]+)/, emoji);
-          setValue('content', updatedValue, { shouldValidate: true });
-          setCurrentEmojis([]);
-        }}
-      />
-    </form>
+        <EmojiPicker
+          emojis={currentEmojis}
+          onEmojiSelect={(emoji: string) => {
+            const currentValue = getValues('content');
+            const updatedValue = currentValue.replace(/(?:\s|^):([^\s:]+)/, emoji);
+            setValue('content', updatedValue, { shouldValidate: true });
+            setCurrentEmojis([]);
+          }}
+        />
+      </form>
+    </>
   );
 };
 

@@ -2,17 +2,10 @@ import { SyntheticEvent } from 'react';
 
 interface IFileUploaderProps {
   Icon?: React.ComponentType<React.ComponentProps<'svg'>>;
-  onFileSelect?: (file: File) => void;
+  onFileSelect?: (file: SyntheticEvent) => void;
 }
 
 const FileUploader = ({ Icon, onFileSelect }: IFileUploaderProps) => {
-  const handleFileUpload = (event: SyntheticEvent) => {
-    const file = (event.target as HTMLFormElement).files[0];
-    if (file && onFileSelect) {
-      onFileSelect(file);
-    }
-  };
-
   return (
     <div>
       <label htmlFor="file-upload" className="cursor-pointer">
@@ -27,7 +20,8 @@ const FileUploader = ({ Icon, onFileSelect }: IFileUploaderProps) => {
         id="file-upload"
         type="file"
         className={Icon ? 'hidden' : ''}
-        onChange={handleFileUpload}
+        onChange={onFileSelect}
+        multiple
       />
     </div>
   );

@@ -28,3 +28,12 @@ export const getLatestUploads = async () => {
   const client = apiClient();
   return client.get(`/uploads/latest`);
 };
+
+export const uploadMessagePhotos = async (data: FormData) => {
+  const client = apiClient();
+  return client.post(`/uploads/message-photos`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
