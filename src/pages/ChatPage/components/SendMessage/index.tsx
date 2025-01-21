@@ -10,12 +10,12 @@ import { IUser } from '../../../../components/UserCard';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
 import { useSocket } from '../../../../context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useState, useRef } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
-import { BiSend } from 'react-icons/bi';
+import { BiPaperclip, BiSend } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
 
 type Inputs = {
@@ -49,6 +49,8 @@ interface IEmoji {
 
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { uploadMessageImage } = useUploadMessageImage();
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
@@ -111,6 +113,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   const onSubmit = messageType === 'text' ? handleSubmit(onMessageSubmit) : onImageSubmit;
 
+  const handleIconClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
@@ -121,6 +129,16 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           }}
           type="file"
           multiple
+          className="hidden"
+          ref={fileInputRef}
+        />
+        <BiPaperclip
+          fontSize={20}
+          style={{
+            transform: 'rotate(90deg)',
+          }}
+          className="cursor-pointer"
+          onClick={handleIconClick}
         />
         <Controller
           name="content"
