@@ -131,6 +131,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           className="hidden"
           ref={fileInputRef}
           onChange={(e) => {
+            socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
             const files = e.target.files as FileList;
             setCurrentUploadableImage((prev) => {
               if (prev) {
