@@ -58,7 +58,6 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { userChats } = useGetAllUserChats(currentUserId as string);
   const { user: currentUser } = useGetUserById(String(currentUserId));
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
-  const [messageType, setMessageType] = useState<string>('text');
 
   const {
     handleSubmit,
@@ -111,7 +110,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     reset();
   };
 
-  const onSubmit = messageType === 'text' ? handleSubmit(onMessageSubmit) : onImageSubmit;
+  const onSubmit = (e: SyntheticEvent) => {
+    handleSubmit(onMessageSubmit)();
+    onImageSubmit(e);
+  };
 
   const handleIconClick = () => {
     if (fileInputRef.current) {
@@ -122,16 +124,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   return (
     <div className="flex items-center gap-2">
       <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
-        <input
-          name="avatars"
-          onChange={() => {
-            setMessageType('file');
-          }}
-          type="file"
-          multiple
-          className="hidden"
-          ref={fileInputRef}
-        />
+        <input name="avatars" type="file" multiple className="hidden" ref={fileInputRef} />
         <BiPaperclip
           fontSize={20}
           style={{
