@@ -13,7 +13,7 @@ export const useGetAllMessages = (chatId: string, page: number) => {
     isSuccess: isAllMessagesSuccess,
     refetch: refetchAllMessages,
   } = useQuery({
-    queryKey: ['messages', chatId],
+    queryKey: ['messages', chatId, page],
     queryFn: () => getChatMessages(chatId, page),
     enabled: !!chatId,
   });

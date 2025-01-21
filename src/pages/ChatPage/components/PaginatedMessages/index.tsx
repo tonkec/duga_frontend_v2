@@ -48,6 +48,7 @@ const PaginatedMessages = ({
           key={message.id}
           message={message}
           otherUserId={otherUserId}
+          messagePhotoUrl={message.messagePhotoUrl}
         />
       ))}
     </div>

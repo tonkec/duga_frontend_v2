@@ -15,9 +15,8 @@ import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
-import { BiPaperclip, BiSend } from 'react-icons/bi';
+import { BiSend } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
-import FileUploader from '../../../../components/FileUploader';
 
 type Inputs = {
   content: string;
@@ -57,6 +56,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { userChats } = useGetAllUserChats(currentUserId as string);
   const { user: currentUser } = useGetUserById(String(currentUserId));
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
+  const [messageType, setMessageType] = useState<string>('text');
 
   const {
     handleSubmit,
@@ -81,7 +81,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     return results;
   }
 
-  const onFormSubmit = (e: SyntheticEvent) => {
+  const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
 
     const files = (e.target as HTMLFormElement).avatars.files as FileList;
@@ -109,12 +109,19 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     reset();
   };
 
+  const onSubmit = messageType === 'text' ? handleSubmit(onMessageSubmit) : onImageSubmit;
+
   return (
     <div className="flex items-center gap-2">
-      <form onSubmit={onFormSubmit}>
-        <FileUploader Icon={BiPaperclip} />
-      </form>
-      <form onSubmit={handleSubmit(onMessageSubmit)} className="flex-1 flex items-center gap-1">
+      <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
+        <input
+          name="avatars"
+          onChange={() => {
+            setMessageType('file');
+          }}
+          type="file"
+          multiple
+        />
         <Controller
           name="content"
           control={control}
