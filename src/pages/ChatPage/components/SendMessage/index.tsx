@@ -132,7 +132,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           ref={fileInputRef}
           onChange={(e) => {
             const files = e.target.files as FileList;
-            setCurrentUploadableImage(Array.from(files));
+            setCurrentUploadableImage((prev) => {
+              if (prev) {
+                return [...prev, ...Array.from(files)];
+              }
+              return Array.from(files);
+            });
           }}
         />
         <BiPaperclip
@@ -203,19 +208,37 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         }}
       />
 
-      {currentUploadableImage &&
-        currentUploadableImage.map((image: File) => {
-          return (
-            <img
-              key={image.name}
-              src={URL.createObjectURL(image)}
-              alt={image.name}
-              width={100}
-              height={100}
-              className="border mt-2"
-            />
-          );
-        })}
+      {currentUploadableImage && (
+        <div className="flex items-end gap-2 flex-wrap">
+          {currentUploadableImage.map((image: File) => {
+            return (
+              <div>
+                <img
+                  key={image.name}
+                  src={URL.createObjectURL(image)}
+                  alt={image.name}
+                  width={150}
+                  height={150}
+                  className="border mt-2"
+                />
+                <Button
+                  type="danger"
+                  onClick={() => {
+                    if (currentUploadableImage) {
+                      setCurrentUploadableImage(
+                        currentUploadableImage.filter((img) => img.name !== image.name)
+                      );
+                    }
+                  }}
+                  className="mt-2"
+                >
+                  Makni sliku
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
