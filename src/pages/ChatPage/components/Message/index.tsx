@@ -38,7 +38,6 @@ interface IMessageContentProps {
 }
 
 const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContentProps) => {
-  console.log(messagePhotoUrl, 'messagePhotoUrl');
   if (messagePhotoUrl) {
     return (
       <div className={messageStyles}>

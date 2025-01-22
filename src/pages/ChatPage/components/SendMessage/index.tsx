@@ -20,21 +20,50 @@ import { useUploadMessageImage } from './hooks';
 
 type Inputs = {
   content: string;
+  files: FileList | null;
 };
 
-const schema = z.object({
-  content: z
-    .string()
-    .min(1, { message: 'Poruka je obavezna.' })
-    .refine(
-      (val) => {
-        return val.trim().length > 0 || /[^\s]/.test(val);
-      },
-      {
-        message: 'Poruka je obavezna.',
-      }
-    ),
-});
+const schema = z
+  .object({
+    content: z
+      .string()
+      .optional()
+      .refine((val) => !val || val.trim().length > 0, { message: 'Poruka ne može biti prazna.' }),
+    files: z
+      .any()
+      .optional()
+      .refine(
+        (files) => {
+          if (!files) return true;
+          return (
+            Array.isArray(files) &&
+            files.every((file) => file instanceof File && file.size <= 5 * 1024 * 1024)
+          );
+        },
+        { message: 'Datoteka mora biti manja od 5MB.' }
+      )
+      .refine(
+        (files) => {
+          if (!files) return true;
+          return (
+            Array.isArray(files) &&
+            files.every((file) => ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type))
+          );
+        },
+        { message: 'Podržani formati su JPG i PNG.' }
+      ),
+  })
+  .refine(
+    (data) => {
+      return (
+        (data.content && data.content.trim().length > 0) || (data.files && data.files.length > 0)
+      );
+    },
+    {
+      message: 'Morate unijeti poruku ili dodati datoteku.',
+      path: ['content'],
+    }
+  );
 
 interface ISendMessageProps {
   chatId: string;
@@ -70,6 +99,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     resolver: zodResolver(schema),
     defaultValues: {
       content: '',
+      files: null,
     },
   });
 
@@ -105,15 +135,17 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
     const files = (e.target as HTMLFormElement).avatars.files as FileList;
     const formData = new FormData();
-    Array.from(files).forEach((file: File) => {
-      formData.append('avatars', file);
-    });
+
     formData.append('chatId', chatId);
     formData.append('fromUserId', currentUserId as string);
     formData.append('timestamp', imageTimestamp);
+    Array.from(files).forEach((file: File) => {
+      formData.append('avatars', file);
+    });
     emitImageToSockets();
     uploadMessageImage(formData);
     setCurrentUploadableImage(null);
+    reset();
   };
 
   const onMessageSubmit = (data: Inputs) => {
@@ -159,6 +191,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           onChange={(e) => {
             socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
             const files = e.target.files as FileList;
+            setValue('files', files);
             setCurrentUploadableImage((prev) => {
               if (prev) {
                 return [...prev, ...Array.from(files)];

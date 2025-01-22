@@ -90,7 +90,6 @@ const ChatPage = () => {
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
-      console.log('received', data);
       setReceivedMessages((prev) => [...prev, data]);
     });
 

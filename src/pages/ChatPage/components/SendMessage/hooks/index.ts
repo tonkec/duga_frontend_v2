@@ -8,9 +8,6 @@ export const useUploadMessageImage = () => {
     isSuccess,
   } = useMutation({
     mutationFn: (data: FormData) => uploadMessagePhotos(data),
-    onSettled: (data) => {
-      console.log(data);
-    },
   });
 
   return { uploadMessageImage, isError, isSuccess };
