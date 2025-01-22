@@ -10,7 +10,7 @@ import { IUser } from '../../../../components/UserCard';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
 import { useSocket } from '../../../../context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState, useRef } from 'react';
+import { SyntheticEvent, useState, useRef, useEffect } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
@@ -37,7 +37,7 @@ const schema = z.object({
 });
 
 interface ISendMessageProps {
-  chatId: string | undefined;
+  chatId: string;
   otherUserId: number | undefined | null;
 }
 
@@ -50,7 +50,6 @@ interface IEmoji {
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadMessageImage } = useUploadMessageImage();
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
@@ -58,6 +57,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { user: currentUser } = useGetUserById(String(currentUserId));
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
+  const [imageTimestamp, setImageTimestamp] = useState('');
 
   const {
     handleSubmit,
@@ -82,6 +82,24 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     return results;
   }
 
+  const emitImageToSockets = () => {
+    if (currentUploadableImage) {
+      Array.from(currentUploadableImage).forEach((file: File) => {
+        socket.emit('message', {
+          type: 'file',
+          fromUserId: currentUserId,
+          fromUser: currentUser?.data,
+          toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+          chatId,
+          messagePhotoUrl: `chat/${chatId}/${imageTimestamp}/${file.name}`,
+          message: null,
+        });
+      });
+    }
+  };
+
+  const { uploadMessageImage } = useUploadMessageImage();
+
   const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
 
@@ -90,9 +108,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     Array.from(files).forEach((file: File) => {
       formData.append('avatars', file);
     });
-    formData.append('chatId', chatId as string);
+    formData.append('chatId', chatId);
     formData.append('fromUserId', currentUserId as string);
+    formData.append('timestamp', imageTimestamp);
+    emitImageToSockets();
     uploadMessageImage(formData);
+    setCurrentUploadableImage(null);
   };
 
   const onMessageSubmit = (data: Inputs) => {
@@ -120,6 +141,11 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       fileInputRef.current.click();
     }
   };
+
+  useEffect(() => {
+    const timestamp = Date.now();
+    setImageTimestamp(String(timestamp));
+  }, []);
 
   return (
     <div>

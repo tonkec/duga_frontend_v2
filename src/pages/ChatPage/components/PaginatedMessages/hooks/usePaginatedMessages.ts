@@ -16,7 +16,6 @@ const usePaginatedMessages = () => {
   const { chatId } = useParams();
   const [page, setPage] = useState(1);
   const { allMessages, refetchAllMessages } = useGetAllMessages(chatId as string, page);
-  console.log(allMessages);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const loadMore = async () => {

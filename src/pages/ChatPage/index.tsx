@@ -90,6 +90,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
+      console.log('received', data);
       setReceivedMessages((prev) => [...prev, data]);
     });
 
@@ -154,7 +155,7 @@ const ChatPage = () => {
             />
           </div>
           {isTyping && <p className="text-sm text-gray-500 mb-0">Tipka...</p>}
-          <SendMessage otherUserId={otherUserId} chatId={chatId} />
+          {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
         </Card>
       </AppLayout>
     </ChatGuard>
