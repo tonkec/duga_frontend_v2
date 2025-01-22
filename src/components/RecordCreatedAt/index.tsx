@@ -1,25 +1,22 @@
 const formatMinutes = (minutes: number) => {
-  if (minutes < 10) {
-    return `0${minutes}`;
-  }
-
-  return minutes;
+  return String(minutes).padStart(2, '0');
 };
 
 const RecordCreatedAt = ({ createdAt, className }: { createdAt: string; className?: string }) => {
   const date = new Date(createdAt);
   const today = new Date();
+
   if (date.getDate() === today.getDate()) {
     return (
       <p className={`${className} text-xs text-gray-400`}>
-        {date.getHours()}:{date.getMinutes()}
+        {date.getHours()}:{formatMinutes(date.getMinutes())}
       </p>
     );
   }
 
   return (
     <p className={`${className} text-xs text-gray-400`}>
-      {date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}: {date.getHours()}:
+      {date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()} {date.getHours()}:
       {formatMinutes(date.getMinutes())}
     </p>
   );
