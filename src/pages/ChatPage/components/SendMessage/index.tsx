@@ -193,11 +193,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           }}
         />
 
-        {errors.content && <FieldError message="Poruka je obavezna." />}
         <Button type="primary">
           <BiSend fontSize={20} />
         </Button>
       </form>
+
+      {errors.content && <FieldError message="Poruka je obavezna." />}
 
       <EmojiPicker
         emojis={currentEmojis}
