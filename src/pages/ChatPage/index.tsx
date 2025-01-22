@@ -70,9 +70,7 @@ const ChatPage = () => {
   const { deleteChat } = useDeleteCurrentChat();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat } = useGetCurrentChat(chatId as string);
-
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
-
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
   const otherUserProfilePhoto = getProfilePhotoUrl(
@@ -85,7 +83,6 @@ const ChatPage = () => {
   const { user: currentUser } = useGetUserById(currentUserId as string);
 
   const otherUserName = otherUser?.data.firstName + ' ' + otherUser?.data.lastName;
-
   const currentUserName = currentUser?.data.firstName + ' ' + currentUser?.data.lastName;
 
   useEffect(() => {

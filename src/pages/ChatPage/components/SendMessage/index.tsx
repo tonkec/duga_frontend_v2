@@ -273,7 +273,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <div className="flex items-end gap-2 flex-wrap">
           {currentUploadableImage.map((image: File) => {
             return (
-              <div>
+              <div key={image.name}>
                 <img
                   key={image.name}
                   src={URL.createObjectURL(image)}

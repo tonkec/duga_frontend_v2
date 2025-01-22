@@ -3,6 +3,7 @@ import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '../../../../components/RecordCreatedAt';
 import { REACT_APP_S3_BUCKET_URL } from '../../../../utils/consts';
+import { useEffect, useState } from 'react';
 
 interface IMessageProps {
   message: {
@@ -38,10 +39,24 @@ interface IMessageContentProps {
 }
 
 const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContentProps) => {
-  if (messagePhotoUrl) {
+  const [src, setSrc] = useState(messagePhotoUrl);
+
+  useEffect(() => {
+    setSrc(`${REACT_APP_S3_BUCKET_URL}/${messagePhotoUrl}?t=${Date.now()}`);
+  }, [messagePhotoUrl]);
+
+  if (src) {
     return (
       <div className={messageStyles}>
-        <img src={`${REACT_APP_S3_BUCKET_URL}/${messagePhotoUrl}`} alt="message" width={100} />
+        <img
+          className="cursor-pointer"
+          src={src}
+          alt="message"
+          width={100}
+          onClick={() => {
+            window.open(src, '_blank');
+          }}
+        />
         <RecordCreatedAt createdAt={createdAt} />
       </div>
     );
