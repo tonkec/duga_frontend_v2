@@ -57,7 +57,7 @@ const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContent
             window.open(src, '_blank');
           }}
         />
-        <RecordCreatedAt createdAt={createdAt} />
+        <RecordCreatedAt className="text-right" createdAt={createdAt} />
       </div>
     );
   }
