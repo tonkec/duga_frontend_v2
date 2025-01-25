@@ -1,14 +1,16 @@
 import { Navigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
+import { useAuth0 } from '@auth0/auth0-react';
 
 interface IAuthGuardProps {
   children: React.ReactNode;
 }
 
 export const AuthGuard = ({ children }: IAuthGuardProps) => {
-  const [cookies] = useCookies(['token']);
+  const { isAuthenticated, error } = useAuth0();
+  console.log(error, 'error');
+  console.log(isAuthenticated, 'isAuthenticated');
 
-  if (!cookies.token) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
 

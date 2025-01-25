@@ -17,6 +17,8 @@ import { AuthGuard } from './guards/AuthGuard';
 const DugaRoutes = () => {
   return (
     <Routes>
+      <Route path="/callback" element={<h1>Hello</h1>} />
+
       <Route
         path="*"
         element={
