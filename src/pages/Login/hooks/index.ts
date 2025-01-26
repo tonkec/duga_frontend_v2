@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 import { login } from '../../../api/auth/login';
 import { useCookies } from 'react-cookie';
+import { register } from '../../../api/auth/register';
 
 interface ILoginProps {
   email: string;
@@ -46,3 +47,28 @@ function useLoginUser() {
 }
 
 export { useLoginUser };
+
+interface ISignupProps {
+  email: string;
+}
+
+export const useCreateUser = () => {
+  const [, setUserId] = useLocalStorage('userId', '');
+  const {
+    mutate: createUser,
+    isPending: isCreating,
+    isError: isSignupError,
+    isSuccess,
+  } = useMutation({
+    mutationFn: ({ email }: ISignupProps) => register(email),
+    onSuccess: (data) => {
+      toast.success('Dobro došao_la', toastConfig);
+      setUserId(data.data.user.id);
+    },
+    onError: (err: Error) => {
+      console.log(err);
+    },
+  });
+
+  return { isCreating, createUser, isSignupError, isSuccess };
+};

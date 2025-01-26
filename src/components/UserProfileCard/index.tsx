@@ -85,7 +85,7 @@ const UserProfileCard = ({
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 mt-20">
+          <div className="flex flex-col gap-2 mt-8">
             <p className="flex items-center text-lg gap-2 mt-[-8px]">
               <b>Tražim:</b> {getLookingForTranslation(user.lookingFor)}
             </p>

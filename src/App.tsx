@@ -27,8 +27,8 @@ function App() {
     value: 'firstName',
     label: 'ime',
   });
-  const [search, setSearch] = useState('');
 
+  const [search, setSearch] = useState('');
   if (isAllUsersLoading || isUserLoading) {
     return (
       <AppLayout>

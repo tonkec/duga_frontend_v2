@@ -27,6 +27,7 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
       clientId={clientId}
       authorizationParams={{
         redirect_uri: redirectUri,
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
       onRedirectCallback={onRedirectCallback}
     >
