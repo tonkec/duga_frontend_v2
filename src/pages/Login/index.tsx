@@ -10,7 +10,6 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log(isAuthenticated, 'login page');
       createUser({
         email: user.email || '',
       });
