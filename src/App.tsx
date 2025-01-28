@@ -22,6 +22,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 function App() {
   const { createUser } = useCreateUser();
   const { user, isAuthenticated } = useAuth0();
+  const [, token] = useLocalStorage('token');
 
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
@@ -34,12 +35,12 @@ function App() {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && !token) {
       createUser({
         email: user.email || '',
       });
     }
-  }, [isAuthenticated, user, createUser]);
+  }, [isAuthenticated, user, createUser, token]);
 
   const [search, setSearch] = useState('');
   if (isAllUsersLoading || isUserLoading) {
