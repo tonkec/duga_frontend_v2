@@ -1,5 +1,5 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { BiExit } from 'react-icons/bi';
 import ProfilePhoto from '../ProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
@@ -7,11 +7,12 @@ import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto
 import { useCookies } from 'react-cookie';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import Loader from '../Loader';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const navigationStyles = 'flex space-x-4 gradient p-4 shadow-sm text-white';
 
 const Navigation = () => {
-  const navigate = useNavigate();
+  const { logout } = useAuth0();
   const [, setCookie] = useCookies(['token']);
   const [userId, saveUserId] = useLocalStorage('userId', null);
   const { allImages } = useGetAllImages(String(userId) || '');
@@ -20,7 +21,11 @@ const Navigation = () => {
   const onLogout = () => {
     setCookie('token', '');
     saveUserId(null);
-    navigate('/login');
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
   };
 
   const currentUserProfilePhoto = getProfilePhoto(allImages?.data.images);
