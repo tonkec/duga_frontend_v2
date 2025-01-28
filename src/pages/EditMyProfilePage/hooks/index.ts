@@ -4,7 +4,7 @@ import { IUserUpdateProps, updateUser } from '../../../api/users';
 import { toast } from 'react-toastify';
 import { toastConfig } from '../../../configs/toast.config';
 
-export const useUpdateUser = () => {
+export const useUpdateUser = (userId: string) => {
   const navigate = useNavigate();
   const {
     mutate: updateUserMutation,
@@ -35,29 +35,32 @@ export const useUpdateUser = () => {
       languages,
       ending,
     }: IUserUpdateProps) =>
-      updateUser({
-        sexuality,
-        age,
-        location,
-        gender,
-        bio,
-        username,
-        lookingFor,
-        relationshipStatus,
-        cigarettes,
-        alcohol,
-        sport,
-        favoriteDay,
-        spirituality,
-        embarasement,
-        tooOldFor,
-        makesMyDay,
-        favoriteSong,
-        favoriteMovie,
-        interests,
-        languages,
-        ending,
-      }),
+      updateUser(
+        {
+          sexuality,
+          age,
+          location,
+          gender,
+          bio,
+          username,
+          lookingFor,
+          relationshipStatus,
+          cigarettes,
+          alcohol,
+          sport,
+          favoriteDay,
+          spirituality,
+          embarasement,
+          tooOldFor,
+          makesMyDay,
+          favoriteSong,
+          favoriteMovie,
+          interests,
+          languages,
+          ending,
+        },
+        userId
+      ),
     onSuccess: () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');
