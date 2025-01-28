@@ -1,20 +1,9 @@
 import AuthLayout from '../../components/AuthLayout';
 import Button from '../../components/Button';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useCreateUser } from './hooks';
-import { useEffect } from 'react';
 
 const LoginPage = () => {
-  const { loginWithRedirect, user, isAuthenticated } = useAuth0();
-  const { createUser } = useCreateUser();
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      createUser({
-        email: user.email || '',
-      });
-    }
-  }, [isAuthenticated, user, createUser]);
+  const { loginWithRedirect } = useAuth0();
 
   return (
     <AuthLayout>
@@ -24,13 +13,13 @@ const LoginPage = () => {
         <Button
           className="w-full mt-2 py-4 rounded-xl"
           type="primary"
-          onClick={() =>
+          onClick={() => {
             loginWithRedirect({
               authorizationParams: {
-                redirect_uri: window.location.origin,
+                redirect_uri: 'http://localhost:5173',
               },
-            })
-          }
+            });
+          }}
         >
           Ulogiraj se
         </Button>

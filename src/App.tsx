@@ -2,7 +2,7 @@ import './App.css';
 import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetUserById } from './hooks/useGetUserById';
 import Paginated from './components/Paginated';
@@ -16,17 +16,30 @@ import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
 import LatestMessages from './components/LatestMessages';
 import LatestComments from './components/LatestComments';
+import { useCreateUser } from './pages/Login/hooks';
+import { useAuth0 } from '@auth0/auth0-react';
 
 function App() {
+  const { createUser } = useCreateUser();
+  const { user, isAuthenticated } = useAuth0();
+
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
-  const { user: currentUser, isUserLoading } = useGetUserById(userId as string);
+  const { user: currentUser, isUserLoading } = useGetUserById(String(userId));
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [selectValue, setSelectValue] = useState({
     value: 'firstName',
     label: 'ime',
   });
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      createUser({
+        email: user.email || '',
+      });
+    }
+  }, [isAuthenticated, user, createUser]);
 
   const [search, setSearch] = useState('');
   if (isAllUsersLoading || isUserLoading) {
