@@ -43,19 +43,19 @@ function App() {
 
   const filteredUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => {
     if (selectValue.value === 'firstName') {
-      return user.firstName.toLowerCase().includes(search.toLowerCase());
+      return user?.firstName?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'gender') {
-      return user.gender?.toLowerCase().includes(search.toLowerCase());
+      return user?.gender?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'sexuality') {
-      return user.sexuality?.toLowerCase().includes(search.toLowerCase());
+      return user?.sexuality?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'location') {
-      return user.location?.toLowerCase().includes(search.toLowerCase());
+      return user?.location?.toLowerCase().includes(search.toLowerCase());
     }
 
     return false;
