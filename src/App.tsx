@@ -20,9 +20,8 @@ import { useCreateUser } from './pages/Login/hooks';
 import { useAuth0 } from '@auth0/auth0-react';
 
 function App() {
-  const { createUser } = useCreateUser();
-  const { user, isAuthenticated } = useAuth0();
-  const [, token] = useLocalStorage('token');
+  const { createOrLoginUser } = useCreateUser();
+  const { user } = useAuth0();
 
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
@@ -35,12 +34,12 @@ function App() {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user && !token) {
-      createUser({
+    if (user) {
+      createOrLoginUser({
         email: user.email || '',
       });
     }
-  }, [isAuthenticated, user, createUser, token]);
+  }, [user, createOrLoginUser]);
 
   const [search, setSearch] = useState('');
   if (isAllUsersLoading || isUserLoading) {

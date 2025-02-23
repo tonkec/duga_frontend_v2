@@ -1,7 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
 import { register } from '../../../api/auth/register';
 
 interface ISignupProps {
@@ -11,14 +9,13 @@ interface ISignupProps {
 export const useCreateUser = () => {
   const [, setUserId] = useLocalStorage('userId', '');
   const {
-    mutate: createUser,
+    mutate: createOrLoginUser,
     isPending: isCreating,
     isError: isSignupError,
     isSuccess,
   } = useMutation({
     mutationFn: ({ email }: ISignupProps) => register(email),
     onSuccess: (data) => {
-      toast.success('Dobro došao_la', toastConfig);
       setUserId(data.data.user.id);
     },
     onError: (err: Error) => {
@@ -26,5 +23,5 @@ export const useCreateUser = () => {
     },
   });
 
-  return { isCreating, createUser, isSignupError, isSuccess };
+  return { isCreating, createOrLoginUser, isSignupError, isSuccess };
 };
