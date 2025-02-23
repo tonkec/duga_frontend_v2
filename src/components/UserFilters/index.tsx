@@ -47,15 +47,15 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           <Input
             type="text"
             placeholder={getPlaceholder(selectValue)}
-            icon={<BiSearch color="grey" fontSize="20px" />}
+            icon={<BiSearch color="grey" fontSize="20px" className="mt-1" />}
             value={search}
             onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-            className="md:min-w-[600px]"
+            className="md:min-w-[600px] py-2"
           />
         </div>
         <div>
           <Select
-            isClearable
+            isClearable={false}
             options={selectOptions}
             placeholder="Pretraži prema..."
             onChange={(e) => {

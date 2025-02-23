@@ -42,7 +42,9 @@ const PhotoPage = () => {
             <PhotoLikes photoId={photoId} />
           </div>
           <div className="flex-1">
-            <p className="mt-2 mb-2 py-2">{singleImage?.data.description}</p>
+            {singleImage?.data?.description && (
+              <p className="mt-2 mb-2 py-2">{singleImage?.data.description}</p>
+            )}
             <PhotoComments />
           </div>
         </div>
