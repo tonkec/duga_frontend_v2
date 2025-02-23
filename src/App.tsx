@@ -56,26 +56,22 @@ function App() {
 
   const filteredUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => {
     if (selectValue.value === 'firstName') {
-      return user.firstName.toLowerCase().includes(search.toLowerCase());
+      return user?.firstName?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'gender') {
-      if (user.gender) {
-        return user.gender.toLowerCase().includes(search.toLowerCase());
-      }
+      return user?.gender?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'sexuality') {
-      if (user.sexuality) {
-        return user.sexuality.toLowerCase().includes(search.toLowerCase());
-      }
+      return user?.sexuality?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'location') {
-      if (user.location) {
-        return user.location.toLowerCase().includes(search.toLowerCase());
-      }
+      return user?.location?.toLowerCase().includes(search.toLowerCase());
     }
+
+    return false;
   });
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
