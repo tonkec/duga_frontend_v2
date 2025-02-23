@@ -42,6 +42,7 @@ const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContent
   const [src, setSrc] = useState(messagePhotoUrl);
 
   useEffect(() => {
+    if (!messagePhotoUrl) return;
     setSrc(`${REACT_APP_S3_BUCKET_URL}/${messagePhotoUrl}?t=${Date.now()}`);
   }, [messagePhotoUrl]);
 
