@@ -34,9 +34,13 @@ export const useUpdateUser = (userId: string) => {
       interests,
       languages,
       ending,
+      firstName,
+      lastName,
     }: IUserUpdateProps) =>
       updateUser(
         {
+          firstName,
+          lastName,
           sexuality,
           age,
           location,
