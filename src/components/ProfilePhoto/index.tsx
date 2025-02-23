@@ -15,7 +15,7 @@ const ProfilePhoto = ({ url, currentUser }: IProfilePhotoProps) => {
         src={url}
         size="40"
         round={true}
-        name={`${currentUser.firstName} ${currentUser.lastName}`}
+        name={`${currentUser?.firstName} ${currentUser?.lastName}`}
       />
     </Link>
   );

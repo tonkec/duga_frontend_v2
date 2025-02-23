@@ -36,7 +36,9 @@ const SendMessageButton = ({
         }
 
         const chat = getChatWithOtherUser(userChats?.data, Number(sendMessageToId));
-        navigate(`/chat/${chat?.id}`);
+        if (chat) {
+          navigate(`/chat/${chat.id}`);
+        }
       }}
       type={buttonType}
     >
