@@ -30,7 +30,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
         <Avatar
           color="#2D46B9"
-          name={`${user?.data.firstName} ${user?.data.lastName}`}
+          name={`${user?.data.username}`}
           src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
           size="40"
           round={true}
@@ -39,7 +39,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
           }}
           className="cursor-pointer"
         />
-        <p>{user?.data.firstName}</p>
+        <p>{user?.data.username}</p>
       </div>
     </div>
   );

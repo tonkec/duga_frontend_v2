@@ -72,7 +72,7 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardPr
     <Card className="h-full">
       <div className="w-full text-center">
         <Avatar
-          name={`${user.firstName} ${user.lastName}`}
+          name={`${user.username}`}
           src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
           size="100"
           textSizeRatio={3}
@@ -83,9 +83,7 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardPr
       </div>
       <div className="flex flex-col justify-between text-center">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">
-            {user.firstName} {user.lastName}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-800">{user.username}</h3>
           {getUserLocation(user)}
           {getUserAge(user)}
           <p className="text-gray-600 mt-2 flex items-center justify-center gap-1">

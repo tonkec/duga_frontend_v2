@@ -8,7 +8,7 @@ const selectOptions: { value: keyof IUser; label: string }[] = [
   { value: 'gender', label: 'rod' },
   { value: 'sexuality', label: 'seksualnost' },
   { value: 'location', label: 'lokacija' },
-  { value: 'firstName', label: 'ime' },
+  { value: 'username', label: 'ime' },
 ];
 
 interface IUserFiltersProps {
@@ -23,7 +23,7 @@ interface IUserFiltersProps {
 
 const getPlaceholder = (selectValue: { value: string; label: string }) => {
   switch (selectValue.value) {
-    case 'firstName':
+    case 'username':
       return 'Pretraži prema imenu...';
     case 'gender':
       return 'Pretraži prema rodu...';

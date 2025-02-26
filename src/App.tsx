@@ -29,7 +29,7 @@ function App() {
   const { user: currentUser, isUserLoading } = useGetUserById(String(userId));
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [selectValue, setSelectValue] = useState({
-    value: 'firstName',
+    value: 'username',
     label: 'ime',
   });
 
@@ -37,6 +37,7 @@ function App() {
     if (user) {
       createOrLoginUser({
         email: user.email || '',
+        username: user.name || '',
       });
     }
   }, [user, createOrLoginUser]);
@@ -55,8 +56,8 @@ function App() {
   );
 
   const filteredUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => {
-    if (selectValue.value === 'firstName') {
-      return user?.firstName?.toLowerCase().includes(search.toLowerCase());
+    if (selectValue.value === 'username') {
+      return user?.username?.toLowerCase().includes(search.toLowerCase());
     }
 
     if (selectValue.value === 'gender') {

@@ -4,6 +4,7 @@ import { register } from '../../../api/auth/register';
 
 interface ISignupProps {
   email: string;
+  username: string;
 }
 
 export const useCreateUser = () => {
@@ -14,7 +15,7 @@ export const useCreateUser = () => {
     isError: isSignupError,
     isSuccess,
   } = useMutation({
-    mutationFn: ({ email }: ISignupProps) => register(email),
+    mutationFn: ({ email, username }: ISignupProps) => register(email, username),
     onSuccess: (data) => {
       setUserId(data.data.user.id);
     },

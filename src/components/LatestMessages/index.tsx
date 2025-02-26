@@ -72,7 +72,7 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
     <div className="flex gap-2">
       <Avatar
         color="#F037A5"
-        name={`${user?.data?.firstName} ${user?.data?.lastName}`}
+        name={`${user?.data?.username}`}
         src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
         size="40"
         round={true}
