@@ -1,6 +1,10 @@
 import AuthLayout from '../../components/AuthLayout';
 import Button from '../../components/Button';
 import { useAuth0 } from '@auth0/auth0-react';
+const URL =
+  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
+    ? 'https://dugastaging.netlify.app'
+    : 'http://localhost:5173';
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
@@ -16,7 +20,7 @@ const LoginPage = () => {
           onClick={() => {
             loginWithRedirect({
               authorizationParams: {
-                redirect_uri: 'http://localhost:5173',
+                redirect_uri: URL,
               },
             });
           }}
