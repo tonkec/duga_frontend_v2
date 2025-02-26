@@ -1,8 +1,6 @@
 import { apiClient } from '..';
 
 export interface IUserUpdateProps {
-  firstName: string;
-  lastName: string;
   bio: string;
   sexuality: string;
   gender: string;

@@ -53,8 +53,6 @@ const daysOfWeek = [
 ];
 
 type Inputs = {
-  firstName: string;
-  lastName: string;
   bio: string;
   age: string;
   location: string;
@@ -79,8 +77,6 @@ type Inputs = {
 };
 
 const schema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
   bio: z.string().optional(),
   age: z.string().optional(),
   location: z.string().optional(),
@@ -121,8 +117,6 @@ const EditMyProfilePage = () => {
   useEffect(() => {
     if (currentUser) {
       reset({
-        firstName: currentUser.data.firstName || '',
-        lastName: currentUser.data.lastName || '',
         username: currentUser.data.username || '',
         bio: currentUser.data.bio || '',
         age: String(currentUser.data.age) || '',
@@ -181,18 +175,6 @@ const EditMyProfilePage = () => {
               <h2 className="mb-2">Općenito</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Ime"
-                    {...register('firstName')}
-                  />
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Prezime"
-                    {...register('lastName')}
-                  />
                   <Input
                     type="text"
                     className="mb-2"
