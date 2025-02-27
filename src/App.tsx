@@ -19,6 +19,8 @@ import LatestComments from './components/LatestComments';
 import { useCreateUser } from './pages/Login/hooks';
 import { useAuth0 } from '@auth0/auth0-react';
 
+const DEFAULT_USERNAME = 'Korisnik';
+
 function App() {
   const { createOrLoginUser } = useCreateUser();
   const { user } = useAuth0();
@@ -37,7 +39,7 @@ function App() {
     if (user) {
       createOrLoginUser({
         email: user.email || '',
-        username: 'Korisnik',
+        username: DEFAULT_USERNAME,
       });
     }
   }, [user, createOrLoginUser]);
