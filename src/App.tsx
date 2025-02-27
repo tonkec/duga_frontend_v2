@@ -37,7 +37,7 @@ function App() {
     if (user) {
       createOrLoginUser({
         email: user.email || '',
-        username: user.name || '',
+        username: 'Korisnik',
       });
     }
   }, [user, createOrLoginUser]);
