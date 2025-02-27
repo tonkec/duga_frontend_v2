@@ -12,7 +12,7 @@ const LoginPage = () => {
   return (
     <AuthLayout>
       <form>
-        <h1 className="text-center text-white mb-2">Evo te natrag!</h1>
+        <h1 className="text-center text-white mb-1">Duga.</h1>
         <p className="text-center text-white mb-6">Pronađi zanimljivu osobicu.</p>
         <Button
           className="w-full mt-2 py-4 rounded-xl"
@@ -25,7 +25,7 @@ const LoginPage = () => {
             });
           }}
         >
-          Ulogiraj se
+          Prijavi se
         </Button>
       </form>
     </AuthLayout>
