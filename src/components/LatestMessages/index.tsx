@@ -7,7 +7,7 @@ import { useGetAllImages } from '../../hooks/useGetAllImages';
 import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useGetUserById } from '../../hooks/useGetUserById';
-import { REACT_APP_S3_BUCKET_URL } from '../../utils/consts';
+import { S3_BUCKET_URL } from '../../utils/consts';
 
 interface IMessage {
   id: number;
@@ -104,7 +104,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
         <div className="flex items-center gap-2 mb-2">
           {getLatestPerson()}
           <img
-            src={`${REACT_APP_S3_BUCKET_URL}/${message.messagePhotoUrl}`}
+            src={`${S3_BUCKET_URL}/${message.messagePhotoUrl}`}
             alt="message"
             className="h-10 w-10"
           />
