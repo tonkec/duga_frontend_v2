@@ -32,6 +32,8 @@ const getErrorMessage = (errors: FieldErrors<Inputs>) => {
   return errorMessage;
 };
 
+const IS_STAGING = import.meta.env.STAGING;
+
 const LoginPage = () => {
   const { loginUser } = useLoginUser();
   const {
@@ -61,14 +63,14 @@ const LoginPage = () => {
           placeholder="Email"
           className="border-none p-2 mb-4 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
           {...register('email', { required: true })}
-          defaultValue={process.env.NODE_ENV === 'staging' ? 'demo1023@admin.app' : ''}
+          defaultValue={IS_STAGING ? 'demo1023@admin.app' : ''}
           icon={<BiSolidEnvelope className="mt-1" color="rgba(255,255,255,0.7)" />}
         />
         <Input
           type="password"
           placeholder="Lozinka"
           {...register('password', { required: true })}
-          defaultValue={process.env.NODE_ENV === 'staging' ? '10233470' : ''}
+          defaultValue={IS_STAGING ? '10233470' : ''}
           className="border-none p-2 mb-2 w-full bg-opacity-10 text-white placeholder-gray-300 focus:ring-2 focus:ring-pink focus:outline-none rounded-lg"
           icon={<BiSolidKey className="mt-1" color="rgba(255,255,255,0.7)" />}
         />
