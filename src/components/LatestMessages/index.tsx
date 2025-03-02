@@ -7,6 +7,7 @@ import { useGetAllImages } from '../../hooks/useGetAllImages';
 import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useGetUserById } from '../../hooks/useGetUserById';
+import { REACT_APP_S3_BUCKET_URL } from '../../utils/consts';
 
 interface IMessage {
   id: number;
@@ -17,6 +18,7 @@ interface IMessage {
     firstName: string;
   };
   chatId: number;
+  messagePhotoUrl: string;
 }
 
 const groupMessagesByUser = (
@@ -83,6 +85,7 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
 };
 
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
+  console.log('message', message);
   const [userId] = useLocalStorage('userId');
   const getLatestPerson = () => {
     if (message.User.id === Number(userId)) {
@@ -91,6 +94,26 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 
     return <LatestMessageAvatar userId={String(message.User.id)} />;
   };
+
+  if (message.messagePhotoUrl) {
+    return (
+      <div
+        onClick={onClick}
+        className="blue hover:bg-gray-100 cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200"
+      >
+        <div className="flex items-center gap-2 mb-2">
+          {getLatestPerson()}
+          <img
+            src={`${REACT_APP_S3_BUCKET_URL}/${message.messagePhotoUrl}`}
+            alt="message"
+            className="h-10 w-10"
+          />
+        </div>
+        <RecordCreatedAt createdAt={message.createdAt} />
+      </div>
+    );
+  }
+
   return (
     <div
       onClick={onClick}

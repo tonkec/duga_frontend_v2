@@ -26,7 +26,7 @@ const usePaginatedMessages = () => {
     if (allMessages?.data?.messages) {
       setMessages((prev) => [...prev, ...allMessages.data.messages]);
     }
-  }, [allMessages]);
+  }, [allMessages?.data?.messages]);
 
   useEffect(() => {
     if (page > 1) {
