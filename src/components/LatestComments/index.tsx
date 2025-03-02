@@ -28,7 +28,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
       <div className="flex items-center gap-2 mb-2">
         <Avatar
           color="#2D46B9"
-          name={`${user?.data.firstName} ${user?.data.lastName}`}
+          name={`${user?.data.username}`}
           src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
           size="40"
           round={true}

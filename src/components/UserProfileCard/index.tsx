@@ -58,7 +58,7 @@ const UserProfileCard = ({
       <div className="xl:flex gap-6">
         <div>
           <Avatar
-            name={`${user.firstName} ${user.lastName}`}
+            name={`${user.username}`}
             src={getProfilePhotoUrl(getProfilePhoto(allImages))}
             size="300"
             color="#2D46B9"
@@ -68,9 +68,7 @@ const UserProfileCard = ({
 
         <div className="flex gap-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-3xl mb-4">
-              {user.firstName} {user.lastName}
-            </h1>
+            <h1 className="text-3xl mb-4">{user.username}</h1>
             <p className="flex items-center text-lg gap-2">
               <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}
             </p>
@@ -85,7 +83,7 @@ const UserProfileCard = ({
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 mt-20">
+          <div className="flex flex-col gap-2 mt-8">
             <p className="flex items-center text-lg gap-2 mt-[-8px]">
               <b>Tražim:</b> {getLookingForTranslation(user.lookingFor)}
             </p>

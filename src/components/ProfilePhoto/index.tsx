@@ -10,13 +10,7 @@ interface IProfilePhotoProps {
 const ProfilePhoto = ({ url, currentUser }: IProfilePhotoProps) => {
   return (
     <Link to={'/profile'}>
-      <Avatar
-        color="#F037A5"
-        src={url}
-        size="40"
-        round={true}
-        name={`${currentUser?.firstName} ${currentUser?.lastName}`}
-      />
+      <Avatar color="#F037A5" src={url} size="40" round={true} name={`${currentUser?.username}`} />
     </Link>
   );
 };

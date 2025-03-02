@@ -8,7 +8,7 @@ const selectOptions: { value: keyof IUser; label: string }[] = [
   { value: 'gender', label: 'rod' },
   { value: 'sexuality', label: 'seksualnost' },
   { value: 'location', label: 'lokacija' },
-  { value: 'firstName', label: 'ime' },
+  { value: 'username', label: 'ime' },
 ];
 
 interface IUserFiltersProps {
@@ -23,7 +23,7 @@ interface IUserFiltersProps {
 
 const getPlaceholder = (selectValue: { value: string; label: string }) => {
   switch (selectValue.value) {
-    case 'firstName':
+    case 'username':
       return 'Pretraži prema imenu...';
     case 'gender':
       return 'Pretraži prema rodu...';
@@ -47,15 +47,15 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           <Input
             type="text"
             placeholder={getPlaceholder(selectValue)}
-            icon={<BiSearch color="grey" fontSize="20px" />}
+            icon={<BiSearch color="grey" fontSize="20px" className="mt-1" />}
             value={search}
             onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-            className="md:min-w-[600px]"
+            className="md:min-w-[600px] py-2"
           />
         </div>
         <div>
           <Select
-            isClearable
+            isClearable={false}
             options={selectOptions}
             placeholder="Pretraži prema..."
             onChange={(e) => {

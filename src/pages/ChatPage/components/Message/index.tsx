@@ -30,7 +30,7 @@ interface IMessageTemplateProps {
   messagePhotoUrl: string;
 }
 
-const messageStyles = 'p-4 rounded mb-2 text-white bg-blue flex flex-col gap-2';
+const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
 
 interface IMessageContentProps {
   messagePhotoUrl: string;
@@ -108,7 +108,7 @@ const OtherUserMessageTemplate = ({
       >
         <Avatar name={userName} src={profilePhoto} size="22" round />
       </div>
-      <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
+      <div className={messageStyles}>
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
     </div>

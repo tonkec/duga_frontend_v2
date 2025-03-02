@@ -22,6 +22,7 @@ interface IUserChatProps {
     lastName: string;
     email: string;
     id: string;
+    username: string;
   };
   onClick: () => void;
   lastMessage: IMessage | null;
@@ -56,15 +57,13 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
       <div className="flex items-center">
         <Avatar
           color="#2D46B9"
-          name={`${user.firstName} ${user.lastName}`}
+          name={`${user.username}`}
           src={getProfilePhotoUrl(allImages?.data.images)}
           size="40"
           round={true}
         />
         <div className="ml-4">
-          <h1 className="text-lg font-semibold">
-            {user.firstName} {user.lastName}
-          </h1>
+          <h1 className="text-lg font-semibold">{user.username}</h1>
         </div>
 
         <div className="ml-4">
