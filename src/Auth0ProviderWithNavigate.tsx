@@ -18,7 +18,7 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
   };
 
   if (!(domain && clientId && redirectUri)) {
-    return null;
+    return <p>Configuration for auth0 is missing</p>;
   }
 
   return (
