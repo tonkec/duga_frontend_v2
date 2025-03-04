@@ -28,8 +28,9 @@ const NewChatPage = () => {
     ? allUsers?.data
         .filter((user: IUser) => {
           return (
-            user.firstName.toLowerCase().includes(search.toLowerCase()) ||
-            user.lastName.toLowerCase().includes(search.toLowerCase())
+            user?.username?.toLowerCase().includes(search.toLowerCase()) ||
+            user?.firstName?.toLowerCase().includes(search.toLowerCase()) ||
+            user?.lastName?.toLowerCase().includes(search.toLowerCase())
           );
         })
         .filter((user: IUser) => user.id !== currentUserId)

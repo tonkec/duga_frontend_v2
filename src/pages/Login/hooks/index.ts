@@ -1,48 +1,28 @@
 import { useMutation } from '@tanstack/react-query';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
-import { login } from '../../../api/auth/login';
-import { useCookies } from 'react-cookie';
+import { register } from '../../../api/auth/register';
 
-interface ILoginProps {
+interface ISignupProps {
   email: string;
-  password: string;
+  username: string;
 }
 
-function useLoginUser() {
-  const [, setCookie] = useCookies(['token']);
-
-  const navigate = useNavigate();
-  const [, saveUserId] = useLocalStorage('userId', null);
-
+export const useCreateUser = () => {
+  const [, setUserId] = useLocalStorage('userId', '');
   const {
-    mutate: loginUser,
-    isPending: isLoggingIn,
-    isError: isLoginError,
+    mutate: createOrLoginUser,
+    isPending: isCreating,
+    isError: isSignupError,
     isSuccess,
   } = useMutation({
-    mutationFn: ({ email, password }: ILoginProps) => login(email, password),
+    mutationFn: ({ email, username }: ISignupProps) => register(email, username),
     onSuccess: (data) => {
-      if (data.data.isVerified) {
-        setCookie('token', data.data.token);
-        saveUserId(data.data.id);
-        toast.success('Uspješno si se ulogirao_la!', toastConfig);
-        navigate('/');
-      }
-
-      if (!data.data.isVerified) {
-        toast.error('Email nije verificiran!', toastConfig);
-        navigate('/login');
-      }
+      setUserId(data.data.user.id);
     },
-    onError: () => {
-      toast.error('Greška! Probaj opet.', toastConfig);
+    onError: (err: Error) => {
+      console.log(err);
     },
   });
 
-  return { isLoggingIn, loginUser, isLoginError, isSuccess };
-}
-
-export { useLoginUser };
+  return { isCreating, createOrLoginUser, isSignupError, isSuccess };
+};

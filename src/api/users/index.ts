@@ -33,7 +33,7 @@ export const getUserById = async (id: string) => {
   return client.get(`/users/${id}`);
 };
 
-export const updateUser = async (data: IUserUpdateProps) => {
+export const updateUser = async (data: IUserUpdateProps, userId: string) => {
   const client = apiClient();
-  return client.post(`/users/update-user`, { data: data });
+  return client.post(`/users/update-user`, { data: data }, { params: { userId: userId } });
 };

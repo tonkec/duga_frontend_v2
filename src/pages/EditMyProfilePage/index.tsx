@@ -103,7 +103,7 @@ const schema = z.object({
 const EditMyProfilePage = () => {
   const [userId] = useLocalStorage('userId');
   const { user: currentUser } = useGetUserById(userId as string);
-  const { updateUserMutation } = useUpdateUser();
+  const { updateUserMutation } = useUpdateUser(userId as string);
   const {
     register,
     handleSubmit,
