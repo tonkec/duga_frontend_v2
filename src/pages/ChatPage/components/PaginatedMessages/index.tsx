@@ -1,8 +1,9 @@
+import { useParams } from 'react-router';
 import Message from '../Message';
 import { debounceScroll } from '../../../../utils/debounceScroll';
-import usePaginatedMessages from './hooks/usePaginatedMessages';
+import { useGetAllMessages } from '../../hooks';
 
-interface Message {
+export interface Message {
   id: string;
   message: string;
   createdAt: string;
@@ -27,7 +28,8 @@ const PaginatedMessages = ({
   otherUserId: number | undefined;
   receivedMessages: Message[];
 }) => {
-  const { messages, loadMore } = usePaginatedMessages();
+  const { chatId } = useParams();
+  const { messages, fetchNextPage } = useGetAllMessages(chatId!);
   const allMessages = [...receivedMessages, ...messages];
   const sortedMessages = allMessages.sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -36,7 +38,7 @@ const PaginatedMessages = ({
   return (
     <div
       onScroll={debounceScroll(() => {
-        loadMore();
+        fetchNextPage();
       }, 500)}
       style={{ height: '500px', overflow: 'auto' }}
     >
