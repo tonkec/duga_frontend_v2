@@ -9,9 +9,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { SocketProvider } from './context/SocketProvider.tsx';
 import { Auth0ProviderWithNavigate } from './Auth0ProviderWithNavigate.tsx';
 
-alert('Vite is running!');
-console.log('Vite JS Loaded!');
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
