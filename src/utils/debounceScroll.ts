@@ -1,8 +1,8 @@
 export const debounceScroll = (callback: () => void, wait: number) => {
-  let timeout: ReturnType<typeof setTimeout>;
+  let timeout: number;
   return () => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => {
+    timeout = window.setTimeout(() => {
       callback();
     }, wait);
   };
