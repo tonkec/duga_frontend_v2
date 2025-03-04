@@ -13,6 +13,8 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '../../configs/toast.config';
 import { getImageUrl } from '../../utils/getImageUrl';
 import ConfirmModal from '../ConfirmModal';
+import Loader from '../Loader';
+
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -120,6 +122,7 @@ const PhotoUploader = () => {
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []
   );
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
 
   const isDescriptionValid = (description: string) => {
     return description.length > 0 && description.length < 100;
@@ -147,7 +150,9 @@ const PhotoUploader = () => {
     }
     formData.append('text', JSON.stringify(newImageDescriptions));
     formData.append('userId', userId as string);
+    setLoadingSpinner(true);
     onUploadPhotos(formData);
+    setLoadingSpinner(false);
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
@@ -187,6 +192,7 @@ const PhotoUploader = () => {
     const formData = new FormData();
     formData.append('text', JSON.stringify(updatedImageDescriptions));
     formData.append('userId', userId as string);
+
     onUploadPhotos(formData);
   };
 
@@ -279,7 +285,7 @@ const PhotoUploader = () => {
         <form onSubmit={onSubmitHandler}>
           <h2 className="font-bold mt-5 mb-2"> Dodaj nove fotografije </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-            {newImages &&
+            {!loadingSpinner && newImages ? (
               newImages.map((image) => {
                 return (
                   <div key={image.name} className="mb-4 max-w-[400px]">
@@ -291,7 +297,10 @@ const PhotoUploader = () => {
                     />
                   </div>
                 );
-              })}
+              })
+            ) : (
+              <Loader />
+            )}
           </div>
 
           <div className="mb-4">
@@ -338,6 +347,7 @@ const PhotoUploader = () => {
               }}
             />
           </div>
+          {/* {loadingSpinner && <Loader />} */}
           {newImages && newImages.length > 0 && (
             <Button type="primary">
               <span>Spremi</span>
