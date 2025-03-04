@@ -8,6 +8,8 @@ const URL = IS_STAGING ? 'https://dugastaging.netlify.app' : 'http://localhost:5
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
 
+  console.log('URL', URL);
+
   return (
     <AuthLayout>
       <form>
