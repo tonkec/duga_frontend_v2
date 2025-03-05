@@ -22,7 +22,7 @@ const VerifyEmailPage = () => {
           type="primary"
           className="w-full mt-4 py-4 rounded-xl"
           onClick={() => {
-            navigate('/');
+            navigate('/login');
           }}
         >
           Natrag na login
