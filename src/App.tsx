@@ -40,6 +40,7 @@ function App() {
       createOrLoginUser({
         email: user.email || '',
         username: DEFAULT_USERNAME,
+        isVerified: user.email_verified || false,
       });
     }
   }, [user, createOrLoginUser]);

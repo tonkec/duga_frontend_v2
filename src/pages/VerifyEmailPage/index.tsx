@@ -1,5 +1,4 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import Loader from '../../components/Loader';
 import { Navigate, useNavigate } from 'react-router';
 import AuthLayout from '../../components/AuthLayout';
 import Button from '../../components/Button';
@@ -10,7 +9,7 @@ const VerifyEmailPage = () => {
   const isUserVerified = user?.email_verified;
 
   if (!user) {
-    return <Loader />;
+    return <Navigate to="/login" />;
   }
 
   if (!isUserVerified) {
