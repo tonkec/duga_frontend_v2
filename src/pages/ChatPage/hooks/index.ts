@@ -1,29 +1,37 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { getChatMessages } from '../../../api/chatMessages';
 import { deleteCurrentChat, getCurrentChat } from '../../../api/chats';
 import { toastConfig } from '../../../configs/toast.config';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
 
-export const useGetAllMessages = (chatId: string, page: number) => {
+export const useGetAllMessages = (chatId: string) => {
   const {
-    data: allMessages,
+    data,
     error: allMessagesError,
     isPending: isAllMessagesLoading,
     isSuccess: isAllMessagesSuccess,
-    refetch: refetchAllMessages,
-  } = useQuery({
-    queryKey: ['messages', chatId, page],
-    queryFn: () => getChatMessages(chatId, page),
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['messages', chatId],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => getChatMessages(chatId, pageParam),
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.data.pagination) return null;
+      if (lastPage.data.pagination.page < lastPage.data.pagination.totalPages) {
+        return lastPage.data.pagination.page + 1;
+      }
+      return null;
+    },
     enabled: !!chatId,
   });
 
   return {
-    refetchAllMessages,
-    allMessages,
+    messages: data?.pages.flatMap((page) => page.data.messages).filter(Boolean) ?? [],
     allMessagesError,
     isAllMessagesLoading,
     isAllMessagesSuccess,
+    fetchNextPage,
   };
 };
 

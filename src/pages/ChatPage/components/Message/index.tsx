@@ -32,7 +32,7 @@ interface IMessageTemplateProps {
   showAvatar: boolean;
 }
 
-const messageStyles = 'p-4 rounded mb-2 text-white bg-blue flex flex-col gap-2';
+const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
 
 interface IMessageContentProps {
   messagePhotoUrl: string;

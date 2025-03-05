@@ -45,7 +45,7 @@ The backend is designed to handle real-time interactions, file uploads, and rela
 Before you begin, ensure you have the following installed:
 
 - **Node.js** (v16 or later)
-- **npm** or **yarn**
+- **npm**
 - **PostgreSQL** (configured for the backend)
 - **Git**
 

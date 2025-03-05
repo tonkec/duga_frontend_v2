@@ -1,8 +1,15 @@
 import { apiClient } from '..';
+import type { Message } from '../../pages/ChatPage/components/PaginatedMessages';
 
 export const getChatMessages = async (chatId: string, page: number) => {
   const client = apiClient();
-  return client.get(`/chats/messages/`, {
+  return client.get<{
+    messages: Message[];
+    pagination?: {
+      page: number;
+      totalPages: number;
+    };
+  }>(`/chats/messages/`, {
     params: {
       id: chatId,
       page,
