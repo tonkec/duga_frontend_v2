@@ -74,7 +74,7 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
     <div className="flex gap-2">
       <Avatar
         color="#F037A5"
-        name={`${user?.data?.firstName} ${user?.data?.lastName}`}
+        name={`${user?.data?.username}`}
         src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
         size="40"
         round={true}
@@ -132,10 +132,9 @@ const LatestMessages = () => {
   const navigate = useNavigate();
   const numberOfChats = 4;
   const [userId] = useLocalStorage('userId');
-  const { userChats } = useGetAllUserChats(userId as string, true);
+  const { userChats } = useGetAllUserChats(String(userId), true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
-
-  if (!latestChats) {
+  if (!latestChats?.length) {
     return null;
   }
 

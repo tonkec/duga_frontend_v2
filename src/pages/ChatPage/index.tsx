@@ -82,8 +82,8 @@ const ChatPage = () => {
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const { user: currentUser } = useGetUserById(currentUserId as string);
 
-  const otherUserName = otherUser?.data.firstName + ' ' + otherUser?.data.lastName;
-  const currentUserName = currentUser?.data.firstName + ' ' + currentUser?.data.lastName;
+  const otherUserName = otherUser?.data.username;
+  const currentUserName = currentUser?.data.username;
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {

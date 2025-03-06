@@ -7,6 +7,8 @@ import DugaRoutes from './routes/index.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SocketProvider } from './context/SocketProvider.tsx';
+import { Auth0ProviderWithNavigate } from './Auth0ProviderWithNavigate.tsx';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -20,14 +22,16 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
         <SocketProvider>
-          <DugaRoutes />
+          <Auth0ProviderWithNavigate>
+            <DugaRoutes />
+          </Auth0ProviderWithNavigate>
         </SocketProvider>
+        <ReactQueryDevtools />
         <ToastContainer />
-      </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   </StrictMode>
 );
