@@ -9,6 +9,7 @@ import NewChatPage from '../pages/NewChatPage';
 import ChatPage from '../pages/ChatPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
+import VerifyEmailPage from '../pages/VerifyEmailPage';
 
 const DugaRoutes = () => {
   return (
@@ -83,6 +84,8 @@ const DugaRoutes = () => {
           </AuthGuard>
         }
       />
+
+      <Route path="verify-email" element={<VerifyEmailPage />} />
     </Routes>
   );
 };

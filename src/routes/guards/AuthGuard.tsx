@@ -10,7 +10,8 @@ interface IAuthGuardProps {
 
 export const AuthGuard = ({ children }: IAuthGuardProps) => {
   const [, setCookie] = useCookies(['token']);
-  const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently, isLoading, user } = useAuth0();
+  const isUserVerified = user?.email_verified;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -26,9 +27,13 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
           console.error('Error getting access token:', error);
         });
     }
-  }, [isAuthenticated, getAccessTokenSilently, setCookie]);
+  }, [isAuthenticated, getAccessTokenSilently, setCookie, user]);
 
   if (isLoading) return <Loader />;
+
+  if (!isUserVerified) {
+    return <Navigate to="/verify-email " />;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
