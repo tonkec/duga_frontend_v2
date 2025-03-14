@@ -24,8 +24,10 @@ const NewChatPage = () => {
     );
   }
 
+  const verifiedUsers = allUsers?.data.filter((user: IUser) => user.isVerified);
+
   const filteredUsers = search
-    ? allUsers?.data
+    ? verifiedUsers
         .filter((user: IUser) => {
           return (
             user?.username?.toLowerCase().includes(search.toLowerCase()) ||
