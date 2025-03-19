@@ -50,10 +50,10 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
             icon={<BiSearch color="grey" fontSize="20px" className="mt-1" />}
             value={search}
             onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-            className="md:min-w-[600px] py-2"
+            className="md:min-w-[600px] py-[6px]"
           />
         </div>
-        <div>
+        <div className="min-w-[200px]">
           <Select
             isClearable={false}
             options={selectOptions}
