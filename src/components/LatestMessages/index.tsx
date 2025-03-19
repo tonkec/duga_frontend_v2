@@ -92,7 +92,6 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   const [userId] = useLocalStorage('userId');
   const isFromSameUser = message.User.id === Number(userId);
 
-  console.log('is_read', is_read);
   const messageBackgroundColor = () => {
     if (isFromSameUser) {
       return 'bg-white text-black hover:bg-blue hover:text-white';
