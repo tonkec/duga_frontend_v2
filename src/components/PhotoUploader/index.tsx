@@ -139,15 +139,15 @@ const PhotoUploader = () => {
     const files = (e.target as HTMLFormElement)?.avatars?.files;
     const formData = new FormData();
     if (files) {
+      formData.append('text', JSON.stringify(newImageDescriptions));
+      formData.append('userId', userId as string);
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
 
         formData.append('avatars', file);
       }
+      onUploadPhotos(formData);
     }
-    formData.append('text', JSON.stringify(newImageDescriptions));
-    formData.append('userId', userId as string);
-    onUploadPhotos(formData);
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
