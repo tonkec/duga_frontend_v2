@@ -8,6 +8,22 @@ const VerifyEmailPage = () => {
   const { user } = useAuth0();
   const isUserVerified = user?.email_verified;
 
+  const resendVerificationEmail = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}/send-verification-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.sub }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Failed to resend verification email:', error);
+    }
+  };
+
   if (!user) {
     return <Navigate to="/login" />;
   }
@@ -15,16 +31,23 @@ const VerifyEmailPage = () => {
   if (!isUserVerified) {
     return (
       <AuthLayout>
-        <h1 className="text-white"> Molimo te da verificiraš svoj e-mail </h1>
+        <h1 className="text-white">Molimo te da verificiraš svoj e-mail</h1>
         <p className="text-white mt-2">Ako želiš koristiti aplikaciju, potvrdi svoj e-mail.</p>
+
         <Button
           type="primary"
           className="w-full mt-4 py-4 rounded-xl"
-          onClick={() => {
-            navigate('/login');
-          }}
+          onClick={() => navigate('/login')}
         >
           Natrag na login
+        </Button>
+
+        <Button
+          type="secondary"
+          className="w-full mt-4 py-4 rounded-xl"
+          onClick={resendVerificationEmail}
+        >
+          Pošalji e-mail
         </Button>
       </AuthLayout>
     );
