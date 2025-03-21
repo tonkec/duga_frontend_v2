@@ -10,7 +10,7 @@ const VerifyEmailPage = () => {
 
   const resendVerificationEmail = async () => {
     try {
-      const response = await fetch(`${import.meta.env.BASE_URL}/send-verification-email`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/send-verification-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user?.sub }),
