@@ -90,10 +90,17 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { is_read } = isMessageReadData?.data || {};
   const [userId] = useLocalStorage('userId');
+  const isFromSameUser = message.User.id === Number(userId);
 
-  const messageBackgroundColor = is_read
-    ? 'bg-white text-black hover:bg-blue hover:text-white'
-    : 'bg-blue text-white hover:bg-pink';
+  const messageBackgroundColor = () => {
+    if (isFromSameUser) {
+      return 'bg-white text-black hover:bg-blue hover:text-white';
+    }
+
+    return is_read
+      ? 'bg-white text-black hover:bg-blue hover:text-white'
+      : 'bg-blue text-white hover:bg-pink';
+  };
 
   const getLatestPerson = () => {
     if (message.User.id === Number(userId)) {
@@ -139,7 +146,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     >
       <div className="flex items-center gap-2 mb-2">
         {getLatestPerson()}
-        <span> {message.message} </span> <br />
+        <span className="text-black"> {message.message} </span> <br />
       </div>
       <RecordCreatedAt createdAt={message.createdAt} />
     </div>
