@@ -2,6 +2,8 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate, useNavigate } from 'react-router';
 import AuthLayout from '../../components/AuthLayout';
 import Button from '../../components/Button';
+import { toast } from 'react-toastify';
+import { toastConfig } from '../../configs/toast.config';
 
 const VerifyEmailPage = () => {
   const navigate = useNavigate();
@@ -19,7 +21,12 @@ const VerifyEmailPage = () => {
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
+
+      if (response.ok) {
+        toast.success('E-mail je uspješno poslan.', toastConfig);
+      }
     } catch (error) {
+      toast.error('Došlo je do greške prilikom slanja e-maila.', toastConfig);
       console.error('Failed to resend verification email:', error);
     }
   };
