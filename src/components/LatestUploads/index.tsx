@@ -16,7 +16,7 @@ const LatestUploads = () => {
     return <img src={NotFoundSvg} alt="Not found" />;
   }
 
-  if (latestUploads.data.length === 0) {
+  if (latestUploads.data.length < 3) {
     return null;
   }
 
