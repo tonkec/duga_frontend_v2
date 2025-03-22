@@ -8,6 +8,8 @@ import { useCookies } from 'react-cookie';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import Loader from '../Loader';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useGetAllNotifcations } from './hooks';
+import NotificationDropdown from './components/Notifications';
 
 const navigationStyles = 'flex space-x-4 gradient p-4 shadow-sm text-white';
 
@@ -15,6 +17,7 @@ const Navigation = () => {
   const { logout } = useAuth0();
   const [, setCookie] = useCookies(['token']);
   const [userId, saveUserId] = useLocalStorage('userId', null);
+  const { allNotifications } = useGetAllNotifcations(String(userId) || '');
   const { allImages } = useGetAllImages(String(userId) || '');
   const { user: currentUser, isUserLoading } = useGetUserById(userId || '');
 
@@ -32,6 +35,8 @@ const Navigation = () => {
 
   if (isUserLoading) return <Loader />;
 
+  console.log('allNotifications', allNotifications);
+
   return (
     <nav className={navigationStyles}>
       <ul className="flex w-full gap-2 space-x-4 items-center">
@@ -41,6 +46,7 @@ const Navigation = () => {
             url={getProfilePhotoUrl(currentUserProfilePhoto)}
           />
         </li>
+        <NotificationDropdown userId={userId} />
         <li>
           <Link to="/" className="flex items-center gap-1">
             <span>Početna</span>
