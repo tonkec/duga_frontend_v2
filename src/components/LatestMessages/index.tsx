@@ -159,7 +159,11 @@ const LatestMessages = () => {
   const [userId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(String(userId), true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
-  if (!latestChats?.length) {
+  if (!latestChats) {
+    return null;
+  }
+
+  if (latestChats?.length < 3) {
     return null;
   }
 
