@@ -7,6 +7,8 @@ import { useGetAllImages } from '../../hooks/useGetAllImages';
 import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useGetUserById } from '../../hooks/useGetUserById';
+import { S3_BUCKET_URL } from '../../utils/consts';
+import { useGetIsMessageRead, useMarkMessagesAsRead } from '../../pages/NewChatPage/hooks';
 
 interface IMessage {
   id: number;
@@ -17,6 +19,7 @@ interface IMessage {
     firstName: string;
   };
   chatId: number;
+  messagePhotoUrl: string;
 }
 
 const groupMessagesByUser = (
@@ -83,7 +86,22 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
 };
 
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
+  const { isMessageReadData } = useGetIsMessageRead(String(message?.id) || '');
+  const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
+  const { is_read } = isMessageReadData?.data || {};
   const [userId] = useLocalStorage('userId');
+  const isFromSameUser = message.User.id === Number(userId);
+
+  const messageBackgroundColor = () => {
+    if (isFromSameUser) {
+      return 'bg-white text-black hover:bg-blue hover:text-white';
+    }
+
+    return is_read
+      ? 'bg-white text-black hover:bg-blue hover:text-white'
+      : 'bg-blue text-white hover:bg-pink';
+  };
+
   const getLatestPerson = () => {
     if (message.User.id === Number(userId)) {
       return <LatestMessageAvatar userId={String(userId)} />;
@@ -91,14 +109,44 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 
     return <LatestMessageAvatar userId={String(message.User.id)} />;
   };
+
+  if (message.messagePhotoUrl) {
+    return (
+      <div
+        onClick={() => {
+          if (message.User.id !== Number(userId)) {
+            onMarkMessagesAsRead(String(message.id));
+          }
+          onClick();
+        }}
+        className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          {getLatestPerson()}
+          <img
+            src={`${S3_BUCKET_URL}/${message.messagePhotoUrl}`}
+            alt="message"
+            className="h-10 w-10"
+          />
+        </div>
+        <RecordCreatedAt createdAt={message.createdAt} />
+      </div>
+    );
+  }
+
   return (
     <div
-      onClick={onClick}
-      className="blue hover:bg-gray-100 cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200"
+      onClick={() => {
+        if (message.User.id !== Number(userId)) {
+          onMarkMessagesAsRead(String(message.id));
+        }
+        onClick();
+      }}
+      className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
       <div className="flex items-center gap-2 mb-2">
         {getLatestPerson()}
-        <span> {message.message} </span> <br />
+        <span className="text-black"> {message.message} </span> <br />
       </div>
       <RecordCreatedAt createdAt={message.createdAt} />
     </div>
@@ -111,7 +159,11 @@ const LatestMessages = () => {
   const [userId] = useLocalStorage('userId');
   const { userChats } = useGetAllUserChats(String(userId), true);
   const latestChats = userChats?.data?.slice(0, numberOfChats);
-  if (!latestChats?.length) {
+  if (!latestChats) {
+    return null;
+  }
+
+  if (latestChats?.length < 3) {
     return null;
   }
 

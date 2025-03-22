@@ -1,7 +1,6 @@
 import Card from '../Card';
 import LatestUpload from './components/LatestUpload';
 import { useGetLatestUploads } from './hooks';
-import NotFoundSvg from '../../assets/not_found.svg';
 
 interface IUpload {
   id: string;
@@ -13,10 +12,10 @@ const LatestUploads = () => {
   const { latestUploads } = useGetLatestUploads();
 
   if (!latestUploads) {
-    return <img src={NotFoundSvg} alt="Not found" />;
+    return null;
   }
 
-  if (latestUploads.data.length === 0) {
+  if (latestUploads.data.length < 3) {
     return null;
   }
 

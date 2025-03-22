@@ -54,7 +54,7 @@ const LatestComments = () => {
     return <Loader />;
   }
 
-  if (!allComments?.data.length) {
+  if (allComments?.data.length < numberOfComments) {
     return null;
   }
 

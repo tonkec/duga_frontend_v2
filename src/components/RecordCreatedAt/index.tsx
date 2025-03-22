@@ -5,6 +5,9 @@ const formatMinutes = (minutes: number) => {
 const RecordCreatedAt = ({ createdAt, className }: { createdAt: string; className?: string }) => {
   const date = new Date(createdAt);
   const today = new Date();
+  if (!className) {
+    className = '';
+  }
 
   if (date.getDate() === today.getDate()) {
     return (

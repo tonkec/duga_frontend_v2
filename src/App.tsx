@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
 import { useGetWindowSize } from './hooks/useGetWindowSize';
 import SendMessageButton from './components/SendMessageButton';
-import notFound from './assets/not_found.svg';
 import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
 import LatestMessages from './components/LatestMessages';
@@ -30,6 +29,8 @@ function App() {
   const [userId] = useLocalStorage('userId');
   const { user: currentUser, isUserLoading } = useGetUserById(String(userId));
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const [search, setSearch] = useState('');
+
   const [selectValue, setSelectValue] = useState({
     value: 'username',
     label: 'ime',
@@ -40,11 +41,11 @@ function App() {
       createOrLoginUser({
         email: user.email || '',
         username: DEFAULT_USERNAME,
+        isVerified: user.email_verified || false,
       });
     }
   }, [user, createOrLoginUser]);
 
-  const [search, setSearch] = useState('');
   if (isAllUsersLoading || isUserLoading) {
     return (
       <AppLayout>
@@ -57,7 +58,9 @@ function App() {
     (user: IUser) => user.id !== currentUser?.data.id
   );
 
-  const filteredUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => {
+  const allVerifiedUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => user.isVerified);
+
+  const filteredUsers = allVerifiedUsers?.filter((user: IUser) => {
     if (selectValue.value === 'username') {
       return user?.username?.toLowerCase().includes(search.toLowerCase());
     }
@@ -93,7 +96,7 @@ function App() {
       <div className="mt-12">
         {!renderedUsers?.length && (
           <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
-            <img src={notFound} alt="No users found" className="mx-auto" />
+            <h2 className="mb-4">Nema korisnika 😢</h2>
           </div>
         )}
         <Paginated<IUser>
