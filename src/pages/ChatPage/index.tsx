@@ -140,7 +140,7 @@ const ChatPage = () => {
           <h1 className="underline cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
             {otherUserName}
           </h1>
-          <div className="mt-4">
+          <div className="mt-4 mb-2">
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}
