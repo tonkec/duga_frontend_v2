@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { getAllNotifications } from '../../../api/notifications';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { getAllNotifications, markAsReadNotification } from '../../../api/notifications';
 
 export const useGetAllNotifcations = (userId: string) => {
   const {
@@ -13,4 +13,22 @@ export const useGetAllNotifcations = (userId: string) => {
   });
 
   return { allNotifications, allNotificationsError, areAllNotificationsLoading };
+};
+
+export const useMarkAsReadNotification = () => {
+  const {
+    mutate: mutateMarkAsRead,
+    isPending: isMarkingAsRead,
+    isError: isMarkAsReadError,
+    isSuccess: isMarkAsReadSuccess,
+  } = useMutation({
+    mutationFn: (notificationId: string) => markAsReadNotification(notificationId),
+  });
+
+  return {
+    mutateMarkAsRead,
+    isMarkingAsRead,
+    isMarkAsReadError,
+    isMarkAsReadSuccess,
+  };
 };

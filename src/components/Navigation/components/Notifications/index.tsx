@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGetAllNotifcations } from '../../hooks';
+import { useGetAllNotifcations, useMarkAsReadNotification } from '../../hooks';
 import { useSocket } from '../../../../context/useSocket';
 
 export type Notification = {
@@ -15,6 +15,7 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { allNotifications } = useGetAllNotifcations(String(userId) || '');
+  const { mutateMarkAsRead } = useMarkAsReadNotification();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -66,6 +67,19 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
               <div
                 key={n.id}
                 className={`px-4 py-2 text-sm border-b cursor-pointer ${n.isRead ? 'bg-white' : 'bg-rose hover:bg-pink'}`}
+                onClick={() => {
+                  if (!n.isRead) {
+                    mutateMarkAsRead(String(n.id));
+                    setNotifications((prev) =>
+                      prev.map((notification) => {
+                        if (notification.id === n.id) {
+                          return { ...notification, isRead: true };
+                        }
+                        return notification;
+                      })
+                    );
+                  }
+                }}
               >
                 <p className="text-black"> {n.content}</p>
               </div>
