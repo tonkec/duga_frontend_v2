@@ -42,10 +42,15 @@ export const useDownvoteUpload = () => {
     isSuccess: isDownvoteUploadSuccess,
   } = useMutation({
     mutationFn: (photoLike: { userId: string; uploadId: string }) => removeUploadLike(photoLike),
-    onSuccess: (data) => {
-      socket.emit('downvote-upload', data.data);
+    onSuccess: (_, variables) => {
+      socket.emit('downvote-upload', {
+        userId: variables.userId,
+        uploadId: variables.uploadId,
+      });
+
       toast.success('Fotografija je dislajkana', toastConfig);
     },
+
     onError: (e) => {
       console.log(e);
       toast.error('Došlo je do greške.', toastConfig);
