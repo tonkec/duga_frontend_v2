@@ -16,7 +16,6 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { allNotifications } = useGetAllNotifcations(String(userId) || '');
   const { mutateMarkAsRead } = useMarkAsReadNotification();
-
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
