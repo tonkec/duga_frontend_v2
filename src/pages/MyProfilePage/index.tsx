@@ -17,7 +17,7 @@ const MyProfilePage = () => {
   const [userId] = useLocalStorage('userId');
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: currentUser } = useGetUserById(userId as string);
-
+  console.log('allImages', allImages);
   if (allImagesLoading) {
     return (
       <AppLayout>
