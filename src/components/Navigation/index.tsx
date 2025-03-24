@@ -8,6 +8,7 @@ import { useCookies } from 'react-cookie';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import Loader from '../Loader';
 import { useAuth0 } from '@auth0/auth0-react';
+import NotificationDropdown from './components/Notifications';
 
 const navigationStyles = 'flex space-x-4 gradient p-4 shadow-sm text-white';
 
@@ -41,6 +42,7 @@ const Navigation = () => {
             url={getProfilePhotoUrl(currentUserProfilePhoto)}
           />
         </li>
+        <NotificationDropdown userId={userId} />
         <li>
           <Link to="/" className="flex items-center gap-1">
             <span>Početna</span>

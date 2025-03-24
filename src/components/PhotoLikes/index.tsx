@@ -19,8 +19,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const { mutateDownvoteUpload } = useDownvoteUpload();
   const { allUploadUpvotes, areUploadUpvotesLoading } = useGetUploadUpvotes(photoId as string);
   const [allLikes, setAllLikes] = useState<ILike[]>([]);
-
-  const hasUserLiked = allLikes.some((like) => like.userId === currentUser);
+  const hasUserLiked = allLikes?.some((like) => like.userId === currentUser);
 
   const onUpvote = () => {
     if (!currentUser || !photoId) {
@@ -45,25 +44,36 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   };
 
   useEffect(() => {
-    socket.on('upvote-upload', (data: ILike[]) => {
-      setAllLikes(data);
-    });
+    const handleUpvote = (data: { uploadId: number; likes: ILike[] }) => {
+      if (String(data.uploadId) === String(photoId)) {
+        setAllLikes(data.likes);
+      }
+    };
 
-    socket.on('downvote-upload', (data: ILike[]) => {
-      setAllLikes(data);
-    });
+    const handleDownvote = (data: { uploadId: number; likes: ILike[] }) => {
+      if (String(data.uploadId) === String(photoId)) {
+        setAllLikes(data.likes);
+      }
+    };
+
+    socket.on('upvote-upload', handleUpvote);
+    socket.on('downvote-upload', handleDownvote);
 
     return () => {
-      socket.off('upvote-upload');
-      socket.off('downvote-upload');
+      socket.off('upvote-upload', handleUpvote);
+      socket.off('downvote-upload', handleDownvote);
     };
-  }, [allLikes, currentUser]);
+  }, [photoId, socket]);
 
   useEffect(() => {
     if (!areUploadUpvotesLoading) {
       setAllLikes(allUploadUpvotes?.data);
     }
   }, [allUploadUpvotes, areUploadUpvotesLoading]);
+
+  if (!photoId) {
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-2 mt-2">
@@ -72,7 +82,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
       ) : (
         <BiHeart color="red" className="cursor-pointer" fontSize={30} onClick={onUpvote} />
       )}
-      <span>{allLikes.length}</span>
+      <span>{allLikes?.length || 0}</span>
     </div>
   );
 };
