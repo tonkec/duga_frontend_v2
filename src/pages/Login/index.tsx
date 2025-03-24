@@ -32,7 +32,7 @@ const LoginPage = () => {
           </Button>
         </nav>
 
-        <div className="flex py-36 mt-14 items-center justify-center">
+        <div className="flex py-36 px-8 mt-14 items-center justify-center">
           <div className="flex flex-col items-center">
             <h1 className="text-8xl font-bold mt-4 text-white">Duga</h1>
             <p className="text-center mt-8 text-white">
