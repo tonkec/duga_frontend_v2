@@ -43,7 +43,7 @@ const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContent
 
   useEffect(() => {
     if (!messagePhotoUrl) return;
-    setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}?t=${Date.now()}`);
+    setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}`);
   }, [messagePhotoUrl]);
 
   if (src) {
@@ -103,7 +103,7 @@ const OtherUserMessageTemplate = ({
     <div className="flex">
       <div
         style={{ marginRight: '2px' }}
-        onClick={() => navigate(`/user/${otherUserId}`)}
+        onClick={() => navigate(`/ user / ${otherUserId}`)}
         className="cursor-pointer"
       >
         <Avatar name={userName} src={profilePhoto} size="22" round />
