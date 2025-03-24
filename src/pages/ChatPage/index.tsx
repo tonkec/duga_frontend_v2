@@ -22,6 +22,7 @@ interface IMessage {
     id: number;
   };
   messagePhotoUrl: string;
+  showAvatar: boolean;
 }
 
 interface IChatUser {
