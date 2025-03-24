@@ -73,7 +73,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="flex-1">
-                  <img src={Image2} alt="" className="rounded-sm mt-8" />
+                  <img src={Image2} alt="Potrudi se oko svog profila" className="rounded-sm mt-8" />
                 </div>
               </div>
             </div>
@@ -93,7 +93,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="flex-1">
-                  <img src={Image3} alt="" className="rounded-sm mt-8" />
+                  <img src={Image3} alt="Pokaži se na fotkama" className="rounded-sm mt-8" />
                 </div>
               </div>
             </div>
@@ -111,7 +111,7 @@ const LoginPage = () => {
             </div>
 
             <div className="flex-1">
-              <img src={Image1} alt="" className="rounded-sm mt-8" />
+              <img src={Image1} alt="Pretraži korisnike" className="rounded-sm mt-8" />
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@ const LoginPage = () => {
             </div>
 
             <div className="flex-1">
-              <img src={Image4} alt="" className="rounded-sm mt-8" />
+              <img src={Image4} alt="Pošalji poruku" className="rounded-sm mt-8" />
             </div>
           </div>
         </div>
@@ -143,7 +143,11 @@ const LoginPage = () => {
             Upoznaš super osobicu pa se zajedno možete glupirati po planinama.
           </p>
 
-          <img src={Homepage} alt="" className="mx-auto mt-12" />
+          <img
+            src={Homepage}
+            alt="Upoznaš super osobicu pa se zajedno možete glupirati po planinama."
+            className="mx-auto mt-12"
+          />
         </div>
       </section>
 
