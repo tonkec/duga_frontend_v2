@@ -15,7 +15,6 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
   const { allImages } = useGetAllImages(upload.userId);
-  console.log('allImages', allImages);
   return (
     <div className="flex flex-col gap-1">
       <img
