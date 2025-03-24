@@ -151,9 +151,9 @@ const LoginPage = () => {
           <div className="flex flex-col items-center mx-auto">
             <h2 className="text-4xl font-bold text-center"> Tražimo contributore! </h2>
             <p className="text-center max-w-xl">
-              Duga je open source aplikacija bazirana na React tehnologijama. U potrazi smo za novim
-              članovima tima. Ako si zainteresiran_a za rad na ovom projektu, slobodno se javi našem
-              adminu{' '}
+              Duga je open source aplikacija bazirana na <b>React</b> tehnologijama. U potrazi smo
+              za novim članovima tima. Ako si zainteresiran_a za rad na ovom projektu, slobodno se
+              javi našem adminu{' '}
               <a className="underline" href="mailto:admin@duga.app">
                 admin@duga.app{' '}
               </a>
