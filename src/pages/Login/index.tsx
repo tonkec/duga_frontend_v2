@@ -58,6 +58,7 @@ const LoginPage = () => {
       <section className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto p-4">
           <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
+          <p className="text-center">Jednostavno i učinkovito!</p>
 
           <section className="bg-gray-100 py-16">
             <div className="max-w-7xl mx-auto p-4">
