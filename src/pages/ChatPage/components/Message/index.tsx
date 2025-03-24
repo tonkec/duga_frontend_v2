@@ -2,7 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '../../../../components/RecordCreatedAt';
-import { S3_BUCKET_URL } from '../../../../utils/consts';
+import { S3_URL } from '../../../../utils/consts';
 import { useEffect, useState } from 'react';
 
 interface IMessageProps {
@@ -43,7 +43,7 @@ const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContent
 
   useEffect(() => {
     if (!messagePhotoUrl) return;
-    setSrc(`${S3_BUCKET_URL}/${messagePhotoUrl}?t=${Date.now()}`);
+    setSrc(`${S3_URL}/${messagePhotoUrl}?t=${Date.now()}`);
   }, [messagePhotoUrl]);
 
   if (src) {
