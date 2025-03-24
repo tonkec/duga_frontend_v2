@@ -62,7 +62,7 @@ const LoginPage = () => {
 
           <section className="bg-gray-100 py-16">
             <div className="max-w-7xl mx-auto p-4">
-              <div className="flex items-center mx-auto">
+              <div className="lg:flex items-center mx-auto">
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mt-4">1. Potrudi se oko svog profila ✍️ </h2>
                   <p className="mt-2 max-w-md">
@@ -81,7 +81,7 @@ const LoginPage = () => {
 
           <section className="bg-gray-100 py-16">
             <div className="max-w-7xl mx-auto p-4">
-              <div className="flex items-center mx-auto">
+              <div className="lg:flex items-center mx-auto">
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mt-4">2. Pokaži se na fotkama 📸</h2>
                   <p className="mt-2 max-w-md">
@@ -99,7 +99,7 @@ const LoginPage = () => {
             </div>
           </section>
 
-          <div className="flex items-center mx-auto">
+          <div className="lg:flex items-center mx-auto">
             <div className="flex-1">
               <h2 className="text-2xl font-bold mt-4">3. Pretraži korisnike 🔍</h2>
               <p className="mt-2 max-w-md">
@@ -119,7 +119,7 @@ const LoginPage = () => {
 
       <section className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto p-4">
-          <div className="flex items-center mx-auto">
+          <div className="lg:flex items-center mx-auto">
             <div className="flex-1">
               <h2 className="text-2xl font-bold mt-4">4. Pošalji poruku ✉️</h2>
               <p className="mt-2 max-w-md">
