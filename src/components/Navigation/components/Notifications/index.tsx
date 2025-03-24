@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGetAllNotifcations, useMarkAsReadNotification } from '../../hooks';
 import { useSocket } from '../../../../context/useSocket';
+import { useNavigate } from 'react-router-dom';
 
 export type Notification = {
   id: number;
@@ -9,9 +10,12 @@ export type Notification = {
   content: string;
   isRead: boolean;
   createdAt: string;
+  actionId: number | null;
+  actionType: 'upload' | 'comment' | 'message' | null;
 };
 
 const NotificationDropdown = ({ userId }: { userId: number | null }) => {
+  const navigate = useNavigate();
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { allNotifications } = useGetAllNotifcations(String(userId) || '');
@@ -70,13 +74,26 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
                   if (!n.isRead) {
                     mutateMarkAsRead(String(n.id));
                     setNotifications((prev) =>
-                      prev.map((notification) => {
-                        if (notification.id === n.id) {
-                          return { ...notification, isRead: true };
-                        }
-                        return notification;
-                      })
+                      prev.map((notification) =>
+                        notification.id === n.id ? { ...notification, isRead: true } : notification
+                      )
                     );
+                  }
+
+                  if (n.actionType && n.actionId) {
+                    switch (n.actionType) {
+                      case 'upload':
+                        navigate(`/photo/${n.actionId}`);
+                        break;
+                      case 'comment':
+                        navigate(`/photo/${n.actionId}`);
+                        break;
+                      case 'message':
+                        navigate(`/chat/${n.actionId}`);
+                        break;
+                      default:
+                        break;
+                    }
                   }
                 }}
               >
