@@ -64,7 +64,7 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
       {open && (
         <div className="absolute left-0 right-0 mt-2 w-52 bg-white shadow-xl rounded-lg z-10 max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="p-4 text-sm text-gray">No notifications</div>
+            <div className="p-4 text-sm text-black">No notifications</div>
           ) : (
             notifications.map((n) => (
               <div
