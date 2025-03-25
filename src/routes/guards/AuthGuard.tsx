@@ -21,7 +21,7 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
         },
       })
         .then((token) => {
-          setCookie('token', token, { path: '/' });
+          setCookie('token', token);
         })
         .catch((error) => {
           console.error('Error getting access token:', error);
