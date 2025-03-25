@@ -22,6 +22,7 @@ interface IMessage {
     id: number;
   };
   messagePhotoUrl: string;
+  showAvatar: boolean;
 }
 
 interface IChatUser {
@@ -140,7 +141,7 @@ const ChatPage = () => {
           <h1 className="underline cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
             {otherUserName}
           </h1>
-          <div className="mt-4">
+          <div className="mt-4 mb-2">
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}

@@ -9,8 +9,8 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: 'public/_redirects', // Source file
-          dest: '', // Copies to "dist/"
+          src: 'public/_redirects',
+          dest: '',
         },
       ],
     }),

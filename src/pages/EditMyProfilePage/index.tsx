@@ -119,7 +119,7 @@ const EditMyProfilePage = () => {
       reset({
         username: currentUser.data.username || '',
         bio: currentUser.data.bio || '',
-        age: String(currentUser.data.age) || '',
+        age: String(currentUser.data.age ?? '0'),
         location: currentUser.data.location || '',
         sexuality: currentUser.data.sexuality || '',
         gender: currentUser.data.gender || '',
