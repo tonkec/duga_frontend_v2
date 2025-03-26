@@ -3,9 +3,9 @@ import Avatar from 'react-avatar';
 import Card from '../Card';
 import { getUserBio } from '../UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
-import React from 'react';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
+import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
 export interface IUser {
   avatar: string;
   email: string;
@@ -28,6 +28,7 @@ interface IUserCardProps {
   onButtonClick: () => void;
   buttonText: string;
   secondButton?: React.ReactNode;
+  isOnline?: boolean;
 }
 
 const getUserLocation = ({ location }: { location: string }) => {
@@ -68,6 +69,9 @@ const getUserAge = ({ age }: { age: number }) => {
 
 const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardProps) => {
   const { allImages } = useGetAllImages(user.id);
+  const { statusMap } = useStatusMap();
+  const isOnline = statusMap.get(Number(user.id)) === 'online';
+
   return (
     <Card className="h-full">
       <div className="w-full text-center">
@@ -83,7 +87,15 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardPr
       </div>
       <div className="flex flex-col justify-between text-center">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">{user.username}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
+            {user.username}
+            <span
+              className={`inline-block w-2 h-2 rounded-full ${
+                isOnline ? 'bg-green' : 'bg-gray-400'
+              }`}
+              title={isOnline ? 'Online' : 'Offline'}
+            />
+          </h3>
           {getUserLocation(user)}
           {getUserAge(user)}
           <p className="text-gray-600 mt-2 flex items-center justify-center gap-1">
