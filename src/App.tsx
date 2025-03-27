@@ -147,6 +147,12 @@ function App() {
           title="Želiš li nam pomoći?"
           buttonText="Javi nam se"
           subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike 🙏"
+          onClick={() =>
+            window.open(
+              'https://github.com/tonkec/duga_frontend_v2?tab=readme-ov-file#contribution',
+              '_blank'
+            )
+          }
         />
       </div>
     </AppLayout>
