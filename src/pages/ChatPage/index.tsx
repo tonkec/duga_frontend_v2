@@ -13,6 +13,7 @@ import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto
 import Button from '../../components/Button';
 import { useSocket } from '../../context/useSocket';
 import ConfirmModal from '../../components/ConfirmModal';
+import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
 
 interface IMessage {
   id: string;
@@ -62,6 +63,7 @@ const DeleteChatModal = ({
 };
 
 const ChatPage = () => {
+  const { statusMap } = useStatusMap();
   const [isTyping, setIsTyping] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const socket = useSocket();
@@ -72,6 +74,8 @@ const ChatPage = () => {
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat } = useGetCurrentChat(chatId as string);
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
+  const isOnline = statusMap.get(Number(otherUserId)) === 'online';
+
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
   const otherUserProfilePhoto = getProfilePhotoUrl(
@@ -138,9 +142,12 @@ const ChatPage = () => {
           Izbriši razgovor
         </Button>
         <Card>
-          <h1 className="underline cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
-            {otherUserName}
-          </h1>
+          <div className="flex items-center gap-1 border-b mb-4">
+            <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
+            <h1 className="cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
+              {otherUserName}
+            </h1>
+          </div>
           <div className="mt-4 mb-2">
             <PaginatedMessages
               currentUserName={currentUserName}

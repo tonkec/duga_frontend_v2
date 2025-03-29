@@ -9,6 +9,7 @@ import { useGetUserById } from '../../hooks/useGetUserById';
 import Loader from '../Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import NotificationDropdown from './components/Notifications';
+import OnlineStatus from './components/OnlineStatus';
 
 const navigationStyles = 'flex space-x-4 gradient p-4 shadow-sm text-white';
 
@@ -61,6 +62,7 @@ const Navigation = () => {
             {String.fromCodePoint(parseInt('1F9D1', 16))}
           </Link>
         </li>
+        <OnlineStatus userId={userId} />
       </ul>
       <div className="float-right mt-2">
         <span className="cursor-pointer flex items-center gap-1" onClick={onLogout}>
