@@ -9,6 +9,7 @@ import { z } from 'zod';
 import FieldError from '../../FieldError';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Input from '../../Input';
+import { Link } from 'react-router-dom';
 
 interface Inputs {
   comment: string;
@@ -39,6 +40,24 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     }
   };
 
+  const renderFormattedComment = (text: string) => {
+    const parts = text.split(/(@\w+)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('@')) {
+        return (
+          <Link
+            to={`/profile/${part.slice(1)}`}
+            key={index}
+            className="text-blue-600 font-semibold hover:underline"
+          >
+            {part}
+          </Link>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   const renderContent = () => {
     if (isEditing) {
       return (
@@ -63,7 +82,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
 
     return (
       <div className="flex gap-2 justify-between">
-        <p className="text-lg">{comment.comment}</p>
+        <p className="text-lg">{renderFormattedComment(comment.comment)}</p>
         {currentUser === comment.userId && (
           <div className="flex gap-2">
             <Button type="tertiary" onClick={() => setIsEditing(true)}>
