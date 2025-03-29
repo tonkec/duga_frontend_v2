@@ -45,11 +45,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
         return (
-          <Link
-            to={`/profile/${part.slice(1)}`}
-            key={index}
-            className="text-blue-600 font-semibold hover:underline"
-          >
+          <Link to={`/profile/${part.slice(1)}`} key={index} className="text-blue underline">
             {part}
           </Link>
         );
