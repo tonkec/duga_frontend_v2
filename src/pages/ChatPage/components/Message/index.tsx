@@ -19,6 +19,7 @@ interface IMessageProps {
   currentUserName: string;
   otherUserId: number | undefined;
   messagePhotoUrl: string;
+  showAvatar: boolean;
 }
 
 interface IMessageTemplateProps {
@@ -28,6 +29,7 @@ interface IMessageTemplateProps {
   otherUserId?: number;
   createdAt: string;
   messagePhotoUrl: string;
+  showAvatar: boolean;
 }
 
 const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
@@ -77,15 +79,25 @@ const CurrentUserMessageTemplate = ({
   message,
   createdAt,
   messagePhotoUrl,
+  showAvatar,
 }: IMessageTemplateProps) => {
   return (
-    <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
+    <div
+      className="flex flex-end"
+      style={{
+        marginLeft: 'auto',
+        maxWidth: 'fit-content',
+        marginRight: showAvatar ? '0px' : '26px',
+      }}
+    >
       <div className="flex">
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
-      <div style={{ marginLeft: '2px' }}>
-        <Avatar name={userName} src={profilePhoto} size="24" round />
-      </div>
+      {showAvatar && (
+        <div style={{ marginLeft: '2px' }}>
+          <Avatar name={userName} src={profilePhoto} size="24" round />
+        </div>
+      )}
     </div>
   );
 };
@@ -97,18 +109,24 @@ const OtherUserMessageTemplate = ({
   otherUserId,
   createdAt,
   messagePhotoUrl,
+  showAvatar,
 }: IMessageTemplateProps) => {
   const navigate = useNavigate();
   return (
     <div className="flex">
+      {showAvatar && (
+        <div
+          style={{ marginRight: '2px' }}
+          onClick={() => navigate(`/user/${otherUserId}`)}
+          className="cursor-pointer"
+        >
+          <Avatar name={userName} src={profilePhoto} size="24" round />
+        </div>
+      )}
       <div
-        style={{ marginRight: '2px' }}
-        onClick={() => navigate(`/user/${otherUserId}`)}
-        className="cursor-pointer"
+        className={messageStyles}
+        style={!showAvatar ? { marginLeft: '26px' } : { marginLeft: '0px' }}
       >
-        <Avatar name={userName} src={profilePhoto} size="22" round />
-      </div>
-      <div className={messageStyles}>
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
     </div>
@@ -123,6 +141,7 @@ const Message = ({
   currentUserName,
   otherUserId,
   messagePhotoUrl,
+  showAvatar,
 }: IMessageProps) => {
   const [currentUserId] = useLocalStorage('userId');
   const isFromCurrentUser = message.User.id === Number(currentUserId);
@@ -133,6 +152,7 @@ const Message = ({
       message={message.message}
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
+      showAvatar={showAvatar}
     />
   ) : (
     <OtherUserMessageTemplate
@@ -142,6 +162,7 @@ const Message = ({
       otherUserId={otherUserId}
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
+      showAvatar={showAvatar}
     />
   );
 };

@@ -11,6 +11,7 @@ export interface Message {
     id: number;
   };
   messagePhotoUrl: string;
+  showAvatar: boolean;
 }
 
 const PaginatedMessages = ({
@@ -42,18 +43,24 @@ const PaginatedMessages = ({
       }, 500)}
       style={{ height: '500px', overflow: 'auto' }}
     >
-      {sortedMessages.map((message) => (
-        <Message
-          otherUserName={otherUserName}
-          currentUserName={currentUserName}
-          currentUserProfilePhoto={currentUserProfilePhoto}
-          otherUserProfilePhoto={otherUserProfilePhoto}
-          key={message.id}
-          message={message}
-          otherUserId={otherUserId}
-          messagePhotoUrl={message.messagePhotoUrl}
-        />
-      ))}
+      {sortedMessages.map((message, index) => {
+        const previousMessage = sortedMessages[index - 1];
+        const showAvatar = !previousMessage || previousMessage.User.id !== message.User.id;
+
+        return (
+          <Message
+            otherUserName={otherUserName}
+            currentUserName={currentUserName}
+            currentUserProfilePhoto={currentUserProfilePhoto}
+            otherUserProfilePhoto={otherUserProfilePhoto}
+            key={message.id}
+            message={message}
+            otherUserId={otherUserId}
+            messagePhotoUrl={message.messagePhotoUrl}
+            showAvatar={showAvatar} // Novi prop koji određuje da li se avatar prikazuje
+          />
+        );
+      })}
     </div>
   );
 };
