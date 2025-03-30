@@ -57,7 +57,7 @@ const PaginatedMessages = ({
             message={message}
             otherUserId={otherUserId}
             messagePhotoUrl={message.messagePhotoUrl}
-            showAvatar={showAvatar} // Novi prop koji određuje da li se avatar prikazuje
+            showAvatar={showAvatar}
           />
         );
       })}
