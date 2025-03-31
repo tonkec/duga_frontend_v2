@@ -42,14 +42,21 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
 
   const renderFormattedComment = (text: string) => {
     const parts = text.split(/(@\w+)/g);
+
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
-        return (
-          <Link to={`/profile/${part.slice(1)}`} key={index} className="text-blue underline">
-            {part}
-          </Link>
-        );
+        const username = part.slice(1);
+        const matchedUser = comment.taggedUsers?.find((u) => u.username === username);
+
+        if (matchedUser) {
+          return (
+            <Link to={`/user/${matchedUser.id}`} key={index} className="text-blue underline">
+              {part}
+            </Link>
+          );
+        }
       }
+
       return <span key={index}>{part}</span>;
     });
   };

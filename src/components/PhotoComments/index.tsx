@@ -32,6 +32,7 @@ export interface IComment {
   userId: string;
   uploadId: string;
   createdAt: string;
+  taggedUsers?: { id: number; username: string }[];
 }
 
 const PhotoComments = () => {
@@ -43,7 +44,7 @@ const PhotoComments = () => {
     photoId as string
   );
   const [allComments, setAllComments] = useState<IComment[]>([]);
-  const [, setTaggedUsers] = useState<IUser[]>([]);
+  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
 
   const {
     handleSubmit,
@@ -61,9 +62,11 @@ const PhotoComments = () => {
       userId: String(userId),
       uploadId: photoId,
       comment: data.comment,
+      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
     });
 
     reset();
+    setTaggedUsers([]);
   };
 
   useEffect(() => {
@@ -104,7 +107,7 @@ const PhotoComments = () => {
       socket.off('delete-comment');
       socket.off('update-comment');
     };
-  }, [areCommentsLoading, allCommentsData]);
+  }, [areCommentsLoading, allCommentsData, socket]);
 
   const sortedComments = allComments?.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
