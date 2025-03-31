@@ -10,12 +10,12 @@ import { IUser } from '../../../../components/UserCard';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
 import { useSocket } from '../../../../context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState, useRef, useEffect } from 'react';
+import { SyntheticEvent, useState, useRef, useEffect, useMemo } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
-import { BiPaperclip, BiSend } from 'react-icons/bi';
+import { BiPaperclip, BiSend, BiSolidFileGif } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
 
 type Inputs = {
@@ -23,6 +23,7 @@ type Inputs = {
   files: FileList | null;
 };
 
+//     console.log({ "GIPHY_API_KEY": import.meta.env.VITE_GIPHY_API_KEY });
 const schema = z
   .object({
     content: z
@@ -76,6 +77,19 @@ interface IEmoji {
   }[];
 }
 
+interface GiphyResult {
+  id: string;
+  title: string;
+  images: {
+    fixed_height: {
+      url: string;
+    };
+    original: {
+      url: string;
+    };
+  };
+}
+
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -87,6 +101,53 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
+  const [showGiphySearch, setShowGiphySearch] = useState(false);
+  const [giphySearchTerm, setGiphySearchTerm] = useState('');
+  const [giphyResults, setGiphyResults] = useState<GiphyResult[]>([]);
+
+  const API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
+
+  const debouncedSearchGiphy = useMemo(
+    () =>
+      debounce(async (term: string) => {
+        try {
+          const baseUrl = 'https://api.giphy.com/v1/gifs/';
+          const endpoint = term ? 'search' : 'trending';
+          const query = term ? `q=${encodeURIComponent(term)}&` : '';
+          const url = `${baseUrl}${endpoint}?${query}api_key=${API_KEY}&limit=8`;
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`GIPHY API error: ${response.status}`);
+          }
+          const gifs = await response.json();
+          setGiphyResults(gifs.data);
+        } catch (error) {
+          console.error('Giphy search error:', error);
+          setGiphyResults([]);
+        }
+      }, 500),
+    [API_KEY]
+  );
+
+  useEffect(() => {
+    if (showGiphySearch) {
+      debouncedSearchGiphy(giphySearchTerm);
+    }
+  }, [showGiphySearch, giphySearchTerm, debouncedSearchGiphy]);
+
+  const sendGif = (gifUrl: string) => {
+    const msg = {
+      type: 'gif',
+      fromUserId: currentUserId,
+      fromUser: currentUser?.data,
+      toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+      chatId,
+      message: gifUrl,
+      messagePhotoUrl: gifUrl,
+    };
+    socket.emit('message', msg);
+    setShowGiphySearch(false);
+  };
 
   const {
     handleSubmit,
@@ -208,6 +269,13 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           className="cursor-pointer"
           onClick={handleIconClick}
         />
+
+        <BiSolidFileGif
+          fontSize={20}
+          className="cursor-pointer"
+          onClick={() => setShowGiphySearch(!showGiphySearch)}
+        />
+
         <Controller
           name="content"
           control={control}
@@ -256,7 +324,50 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           <BiSend fontSize={20} />
         </Button>
       </form>
+      {showGiphySearch && (
+        <div className="mt-2 p-2 border rounded bg-white">
+          <Input
+            type="text"
+            placeholder="Search GIPHY..."
+            value={giphySearchTerm}
+            onChange={(e) => {
+              const value = e.target.value;
+              setGiphySearchTerm(value);
+              debouncedSearchGiphy(value);
+            }}
+            className="mb-2"
+          />
 
+          {giphyResults.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto">
+              {giphyResults.map((gif) => (
+                <button
+                  key={gif.id}
+                  type="button"
+                  onClick={() => {
+                    sendGif(gif.images.original.url);
+                    setGiphySearchTerm('');
+                    setGiphyResults([]);
+                  }}
+                  className="relative group rounded overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all"
+                >
+                  <img
+                    src={gif.images.fixed_height.url}
+                    alt={gif.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all" />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-20 text-gray-500">
+              {giphySearchTerm ? 'No GIFs found' : 'Search for GIFs'}
+            </div>
+          )}
+        </div>
+      )}
       {errors.content && <FieldError message="Poruka je obavezna." />}
 
       <EmojiPicker
