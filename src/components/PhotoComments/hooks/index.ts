@@ -80,7 +80,7 @@ export const useDeleteUploadComment = () => {
     mutationFn: (commentId: number) => deleteUploadComment(commentId),
     onSuccess: (data) => {
       socket.emit('delete-comment', data);
-      toast.success('Komentar uspešno obrisan.', toastConfig);
+      toast.success('Komentar uspiješno obrisan.', toastConfig);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
