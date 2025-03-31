@@ -21,7 +21,7 @@ const schema = z.object({
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser] = useLocalStorage('userId');
-  const { user, isUserLoading } = useGetUserById(comment.userId.toString());
+  const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
   const { mutateEditUploadComment } = useEditUploadComment();
 

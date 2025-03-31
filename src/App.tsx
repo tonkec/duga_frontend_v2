@@ -22,8 +22,7 @@ const DEFAULT_USERNAME = 'Korisnik';
 
 function App() {
   const { createOrLoginUser } = useCreateUser();
-  const { user } = useAuth0();
-
+  const { user: auth0User } = useAuth0();
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
@@ -37,14 +36,21 @@ function App() {
   });
 
   useEffect(() => {
-    if (user) {
+    const handleAuth0 = () => {
+      if (!auth0User) {
+        navigate('/login');
+        return;
+      }
+
       createOrLoginUser({
-        email: user.email || '',
+        email: auth0User.email || '',
         username: DEFAULT_USERNAME,
-        isVerified: user.email_verified || false,
+        isVerified: auth0User.email_verified || false,
       });
-    }
-  }, [user, createOrLoginUser]);
+    };
+
+    handleAuth0();
+  }, [auth0User, createOrLoginUser, navigate]);
 
   if (isAllUsersLoading || isUserLoading) {
     return (
@@ -147,6 +153,12 @@ function App() {
           title="Želiš li nam pomoći?"
           buttonText="Javi nam se"
           subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike 🙏"
+          onClick={() =>
+            window.open(
+              'https://github.com/tonkec/duga_frontend_v2?tab=readme-ov-file#contribution',
+              '_blank'
+            )
+          }
         />
       </div>
     </AppLayout>

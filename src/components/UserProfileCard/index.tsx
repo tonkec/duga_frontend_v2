@@ -117,13 +117,6 @@ const UserProfileCard = ({
                 )}
               </p>
             </div>
-
-            {shouldRenderField(user.favoriteDayOfWeek) && (
-              <p className="flex items-center text-lg gap-2">
-                <b>Najdraži dan u tjednu:</b>
-                {getFavoriteDayOfWeekTranslation(user.favoriteDayOfWeek)}
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -132,6 +125,13 @@ const UserProfileCard = ({
         <div className="mb-10">
           <h2 className="font-bold mt-5">O meni</h2>
           <p>{getUserBio(user.bio)}</p>
+        </div>
+      )}
+
+      {shouldRenderField(user.favoriteDayOfWeek) && (
+        <div className="mb-10">
+          <h2 className="font-bold mt-5">Najdraži dan u tjednu:</h2>
+          {getFavoriteDayOfWeekTranslation(user.favoriteDayOfWeek)}
         </div>
       )}
 

@@ -2,7 +2,7 @@ import { apiClient } from '..';
 
 export const getAllImages = async (id: string) => {
   const client = apiClient();
-  return client.get(`/uploads/avatar/${id}`);
+  return client.get(`/uploads/user/${id}`);
 };
 
 export const deleteImage = async (url: string) => {

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { S3_BUCKET_URL } from '../../../../utils/consts';
+import { S3_URL } from '../../../../utils/consts';
 import { useGetUserById } from '../../../../hooks/useGetUserById';
 import { useGetAllImages } from '../../../../hooks/useGetAllImages';
 import Avatar from 'react-avatar';
@@ -19,7 +19,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
     <div className="flex flex-col gap-1">
       <img
         className="border rounded cursor-pointer"
-        src={`${S3_BUCKET_URL}/${upload.url}`}
+        src={`${S3_URL}/${upload.url}`}
         alt={upload.id}
         onClick={() => {
           navigate(`/photo/${upload.id}`);

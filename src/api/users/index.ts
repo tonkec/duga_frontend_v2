@@ -37,3 +37,8 @@ export const updateUser = async (data: IUserUpdateProps, userId: string) => {
   const client = apiClient();
   return client.post(`/users/update-user`, { data: data }, { params: { userId: userId } });
 };
+
+export const deleteUser = async (userId: string, auth0UserId: string | undefined) => {
+  const client = apiClient();
+  return client.delete(`/delete-user`, { params: { userId, auth0UserId } });
+};
