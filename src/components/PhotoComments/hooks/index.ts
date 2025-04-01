@@ -23,8 +23,8 @@ export const useEditUploadComment = () => {
     isError: isEditUploadCommentError,
     isSuccess: isEditUploadCommentSuccess,
   } = useMutation({
-    mutationFn: (comment: { id: number; comment: string }) =>
-      editUploadComment(comment.id, comment.comment),
+    mutationFn: (comment: { id: number; comment: string; taggedUserIds: number[] }) =>
+      editUploadComment(comment.id, comment.comment, comment.taggedUserIds),
     onSuccess: (data) => {
       toast.success('Komentar uspješno izmijenjen.', toastConfig);
       socket.emit('edit-comment', data);

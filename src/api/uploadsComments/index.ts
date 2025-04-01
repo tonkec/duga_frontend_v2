@@ -32,10 +32,15 @@ export const deleteUploadComment = async (commentId: number) => {
   return client.delete(`/comments/delete-comment/${commentId}`);
 };
 
-export const editUploadComment = async (commentId: number, comment: string) => {
+export const editUploadComment = async (
+  commentId: number,
+  comment: string,
+  taggedUserIds: number[]
+) => {
   const client = apiClient();
   return client.put(`/comments/update-comment/${commentId}`, {
     comment,
+    taggedUserIds,
   });
 };
 

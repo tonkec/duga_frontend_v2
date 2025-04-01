@@ -3,13 +3,14 @@ import { IComment } from '..';
 import { useGetUserById } from '../../../hooks/useGetUserById';
 import Button from '../../Button';
 import { useDeleteUploadComment, useEditUploadComment } from '../hooks';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FieldError from '../../FieldError';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import Input from '../../Input';
+import MentionInput from '../../MentionInput';
 import { Link } from 'react-router-dom';
+import { IUser } from '../../UserCard';
 
 interface Inputs {
   comment: string;
@@ -21,23 +22,31 @@ const schema = z.object({
 
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
   const [currentUser] = useLocalStorage('userId');
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
   const { mutateEditUploadComment } = useEditUploadComment();
 
   const {
-    register,
     handleSubmit,
+    control,
     formState: { errors, isValid },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
+    defaultValues: { comment: comment.comment },
   });
 
   const onSubmit = (data: Inputs) => {
-    if (isValid) {
-      mutateEditUploadComment({ id: Number(comment.id), comment: data.comment });
-    }
+    if (!isValid) return;
+
+    mutateEditUploadComment({
+      id: Number(comment.id),
+      comment: data.comment,
+      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
+    });
+
+    setIsEditing(false);
   };
 
   const renderFormattedComment = (text: string) => {
@@ -46,8 +55,10 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
         const username = part.slice(1);
-        const matchedUser = comment.taggedUsers?.find((u) => u.username === username);
-
+        console.log(comment);
+        const matchedUser = comment.taggedUsers?.find(
+          (u) => u.username.toLowerCase() === username.toLowerCase()
+        );
         if (matchedUser) {
           return (
             <Link to={`/user/${matchedUser.id}`} key={index} className="text-blue underline">
@@ -64,20 +75,27 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const renderContent = () => {
     if (isEditing) {
       return (
-        <form className="flex gap-2 justify-between" onSubmit={handleSubmit(onSubmit)}>
-          {errors.comment && <FieldError message="Komentar je obavezan." />}
-          <Input
-            placeholder="Izmijeni komentar"
-            defaultValue={comment.comment}
-            type="text"
-            className="w-full"
-            {...register('comment')}
-          />
-          <div className="flex gap-2">
+        <form className="flex gap-2 justify-between w-full" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col w-full">
+            <Controller
+              name="comment"
+              control={control}
+              render={({ field }) => (
+                <MentionInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  onTagUsersChange={setTaggedUsers}
+                  placeholder="Izmijeni komentar"
+                />
+              )}
+            />
+            {errors.comment && <FieldError message="Komentar je obavezan." />}
+          </div>
+          <div className="flex gap-2 items-start pt-1">
             <Button type="tertiary" onClick={() => setIsEditing(false)}>
               Otkaži
             </Button>
-            <Button type="tertiary">Sačuvaj</Button>
+            <Button type="tertiary">Spremi</Button>
           </div>
         </form>
       );
