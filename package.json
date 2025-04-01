@@ -14,6 +14,7 @@
     "@auth0/auth0-react": "^2.3.0",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
+    "@giphy/react-components": "^10.0.1",
     "@hookform/resolvers": "^3.9.1",
     "@tanstack/react-query": "^5.62.9",
     "@tanstack/react-query-devtools": "^5.62.9",
