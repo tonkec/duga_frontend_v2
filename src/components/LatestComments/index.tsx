@@ -14,12 +14,42 @@ interface IComment {
   createdAt: string;
   uploadId: number;
   userId: number;
+  taggedUsers?: { id: number; username: string }[];
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
   const { allImages } = useGetAllImages(comment.userId.toString());
+
+  const renderFormattedComment = (text: string) => {
+    const parts = text.split(/(@\w+)/g);
+
+    return parts.map((part, index) => {
+      if (part.startsWith('@')) {
+        const username = part.slice(1);
+        const matchedUser = comment.taggedUsers?.find((u) => u.username === username);
+
+        if (matchedUser) {
+          return (
+            <span
+              key={index}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/user/${matchedUser.id}`);
+              }}
+              className="text-blue underline cursor-pointer"
+            >
+              {part}
+            </span>
+          );
+        }
+      }
+
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <div
       className="flex flex-col gap-1 border-b p-4 hover:bg-gray-100 transition cursor-pointer"
@@ -37,7 +67,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
           }}
           className="cursor-pointer"
         />
-        <p className="text-sm">{comment.comment || 'Nema komentara'}</p>
+        <p className="text-sm">{renderFormattedComment(comment.comment)}</p>
       </div>
       <div className="flex justify-between">
         <RecordCreatedAt createdAt={comment.createdAt} />
