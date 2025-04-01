@@ -55,7 +55,6 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
         const username = part.slice(1);
-        console.log(comment);
         const matchedUser = comment.taggedUsers?.find(
           (u) => u.username.toLowerCase() === username.toLowerCase()
         );

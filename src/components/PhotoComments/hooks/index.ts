@@ -54,7 +54,7 @@ export const useAddUploadComment = () => {
       addUploadComment({ userId, uploadId, comment, taggedUserIds }),
     onSuccess: (data) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
-      socket.emit('send-comment', data);
+      socket.emit('send-comment', data.data);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
