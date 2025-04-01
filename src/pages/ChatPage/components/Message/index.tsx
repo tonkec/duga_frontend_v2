@@ -120,7 +120,7 @@ const OtherUserMessageTemplate = ({
       ) : (
         <div style={{ width: '22px', height: '22px', marginRight: '2px' }}></div>
       )}
-      <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
+      <div className={messageStyles}>
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
     </div>
