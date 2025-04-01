@@ -20,10 +20,13 @@ interface GiphySearchProps {
 
 const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { allGIFS, gifsError, isGIFSLoading } = useGIFS(searchTerm);
+  const [page, setPage] = useState(1);
+  const limit = 8;
+  const { allGIFS, gifsError, isGIFSLoading } = useGIFS(searchTerm, page, limit);
 
   const debouncedSetSearchTerm = debounce((term: string) => {
     setSearchTerm(term);
+    setPage(1);
   }, 500);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +36,20 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
   const handleGifSelect = (gifUrl: string) => {
     onGifSelect(gifUrl);
     setSearchTerm('');
+    setPage(1);
     onClose();
+  };
+
+  const handleNextPage = () => {
+    if (!isGIFSLoading && allGIFS?.length === limit) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (!isGIFSLoading && page > 1) {
+      setPage((prev) => prev - 1);
+    }
   };
 
   if (!isOpen) return null;
@@ -75,6 +91,26 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
       ) : (
         <div className="flex items-center justify-center h-20 text-gray-500">
           {searchTerm ? 'Nema pronađenih GIF-ova' : 'Pretraži GIF-ove'}
+        </div>
+      )}
+
+      {allGIFS && allGIFS.length > 0 && (
+        <div className="mt-2 flex items-center justify-between">
+          <button
+            onClick={handlePrevPage}
+            disabled={page === 1 || isGIFSLoading}
+            className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+          >
+            Prethodna
+          </button>
+          <span className="text-sm text-gray-600">Stranica {page}</span>
+          <button
+            onClick={handleNextPage}
+            disabled={isGIFSLoading || allGIFS.length < limit}
+            className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+          >
+            Sljedeća
+          </button>
         </div>
       )}
     </div>

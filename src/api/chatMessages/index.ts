@@ -1,6 +1,7 @@
 import { apiClient } from '..';
 import type { Message } from '../../pages/ChatPage/components/PaginatedMessages';
-const API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
+import { API_KEY } from '../../utils/consts';
+
 export const getChatMessages = async (chatId: string, page: number) => {
   const client = apiClient();
   return client.get<{
@@ -33,18 +34,20 @@ export const isMessageRead = async (messageId: string) => {
   });
 };
 
-export const getTrendingGIFS = async () => {
+export const getTrendingGIFS = async (page: number = 1, limit: number = 8) => {
   const client = apiClient();
+  const offset = (page - 1) * limit;
   const response = await client.get(
-    `https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=8`
+    `https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=${limit}&offset=${offset}`
   );
   return response.data.data;
 };
 
-export const getSearchGIFS = async (term: string) => {
+export const getSearchGIFS = async (term: string, page: number = 1, limit: number = 8) => {
   const client = apiClient();
+  const offset = (page - 1) * limit;
   const response = await client.get(
-    `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${term}&limit=8`
+    `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${term}&limit=${limit}&offset=${offset}`
   );
   return response.data.data;
 };
