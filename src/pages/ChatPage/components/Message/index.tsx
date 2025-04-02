@@ -82,16 +82,14 @@ const CurrentUserMessageTemplate = ({
   showAvatar,
 }: IMessageTemplateProps) => {
   return (
-    <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
+    <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className="flex">
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
-      {showAvatar ? (
-        <div style={{ marginLeft: '2px' }}>
+      {showAvatar && (
+        <div className="ml-0.5">
           <Avatar name={userName} src={profilePhoto} size="24" round />
         </div>
-      ) : (
-        <div style={{ width: '24px', height: '24px', marginLeft: '2px' }}></div>
       )}
     </div>
   );
@@ -109,18 +107,12 @@ const OtherUserMessageTemplate = ({
   const navigate = useNavigate();
   return (
     <div className="flex">
-      {showAvatar ? (
-        <div
-          style={{ marginRight: '2px' }}
-          onClick={() => navigate(`/user/${otherUserId}`)}
-          className="cursor-pointer"
-        >
-          <Avatar name={userName} src={profilePhoto} size="22" round />
+      {showAvatar && (
+        <div className="cursor-pointer mr-0.5" onClick={() => navigate(`/user/${otherUserId}`)}>
+          <Avatar name={userName} src={profilePhoto} size="24" round />
         </div>
-      ) : (
-        <div style={{ width: '22px', height: '22px', marginRight: '2px' }}></div>
       )}
-      <div className={messageStyles}>
+      <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
     </div>
