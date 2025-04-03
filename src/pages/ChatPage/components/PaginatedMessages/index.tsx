@@ -10,6 +10,7 @@ export interface Message {
   User: {
     id: number;
   };
+  type: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
 }
