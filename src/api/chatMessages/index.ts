@@ -1,5 +1,6 @@
 import { apiClient } from '..';
 import type { Message } from '../../pages/ChatPage/components/PaginatedMessages';
+import { API_KEY } from '../../utils/consts';
 
 export const getChatMessages = async (chatId: string, page: number) => {
   const client = apiClient();
@@ -31,4 +32,22 @@ export const isMessageRead = async (messageId: string) => {
       id: messageId,
     },
   });
+};
+
+export const getTrendingGIFS = async (page: number = 1, limit: number = 8) => {
+  const client = apiClient();
+  const offset = (page - 1) * limit;
+  const response = await client.get(
+    `https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=${limit}&offset=${offset}`
+  );
+  return response.data.data;
+};
+
+export const getSearchGIFS = async (term: string, page: number = 1, limit: number = 8) => {
+  const client = apiClient();
+  const offset = (page - 1) * limit;
+  const response = await client.get(
+    `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${term}&limit=${limit}&offset=${offset}`
+  );
+  return response.data.data;
 };
