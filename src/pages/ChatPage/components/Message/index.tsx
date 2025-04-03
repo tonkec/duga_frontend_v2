@@ -12,6 +12,7 @@ interface IMessageProps {
     User: {
       id: number;
     };
+    type: string;
   };
   otherUserProfilePhoto: string;
   currentUserProfilePhoto: string;
@@ -30,6 +31,7 @@ interface IMessageTemplateProps {
   createdAt: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
+  messageType: string;
 }
 
 const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
@@ -38,15 +40,29 @@ interface IMessageContentProps {
   messagePhotoUrl: string;
   message: string;
   createdAt: string;
+  messageType: string;
 }
 
-const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContentProps) => {
+const MessageContent = ({
+  messagePhotoUrl,
+  message,
+  createdAt,
+  messageType,
+}: IMessageContentProps) => {
   const [src, setSrc] = useState(messagePhotoUrl);
-
   useEffect(() => {
     if (!messagePhotoUrl) return;
-    setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}`);
-  }, [messagePhotoUrl]);
+    const shouldRenderS3Image = messageType === 'file' && messagePhotoUrl;
+    const shouldRenderGiphy = messageType === 'gif' && messagePhotoUrl;
+
+    if (shouldRenderS3Image) {
+      setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}`);
+    }
+
+    if (shouldRenderGiphy) {
+      setSrc(messagePhotoUrl);
+    }
+  }, [messagePhotoUrl, messageType]);
 
   if (src) {
     return (
@@ -80,11 +96,17 @@ const CurrentUserMessageTemplate = ({
   createdAt,
   messagePhotoUrl,
   showAvatar,
+  messageType,
 }: IMessageTemplateProps) => {
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className="flex">
-        <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
+        <MessageContent
+          messageType={messageType}
+          messagePhotoUrl={messagePhotoUrl}
+          message={message}
+          createdAt={createdAt}
+        />
       </div>
       {showAvatar && (
         <div className="ml-0.5">
@@ -103,6 +125,7 @@ const OtherUserMessageTemplate = ({
   createdAt,
   messagePhotoUrl,
   showAvatar,
+  messageType,
 }: IMessageTemplateProps) => {
   const navigate = useNavigate();
   return (
@@ -113,7 +136,12 @@ const OtherUserMessageTemplate = ({
         </div>
       )}
       <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
-        <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
+        <MessageContent
+          messageType={messageType}
+          messagePhotoUrl={messagePhotoUrl}
+          message={message}
+          createdAt={createdAt}
+        />
       </div>
     </div>
   );
@@ -139,6 +167,7 @@ const Message = ({
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}
+      messageType={message.type}
     />
   ) : (
     <OtherUserMessageTemplate
@@ -149,6 +178,7 @@ const Message = ({
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}
+      messageType={message.type}
     />
   );
 };

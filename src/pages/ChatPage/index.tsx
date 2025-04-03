@@ -21,6 +21,7 @@ interface IMessage {
   User: {
     id: number;
   };
+  type: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
 }
