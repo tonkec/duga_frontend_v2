@@ -4,14 +4,21 @@ interface IAddCommentProps {
   userId: string;
   uploadId: string;
   comment: string;
+  taggedUserIds: number[];
 }
 
-export const addUploadComment = async ({ userId, uploadId, comment }: IAddCommentProps) => {
+export const addUploadComment = async ({
+  userId,
+  uploadId,
+  comment,
+  taggedUserIds,
+}: IAddCommentProps) => {
   const client = apiClient();
   return client.post(`/comments/add-comment`, {
     userId,
     uploadId,
     comment,
+    taggedUserIds,
   });
 };
 
@@ -25,10 +32,15 @@ export const deleteUploadComment = async (commentId: number) => {
   return client.delete(`/comments/delete-comment/${commentId}`);
 };
 
-export const editUploadComment = async (commentId: number, comment: string) => {
+export const editUploadComment = async (
+  commentId: number,
+  comment: string,
+  taggedUserIds: number[]
+) => {
   const client = apiClient();
   return client.put(`/comments/update-comment/${commentId}`, {
     comment,
+    taggedUserIds,
   });
 };
 

@@ -1,6 +1,5 @@
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import Button from '../Button';
-import Input from '../Input';
 import { useAddUploadComment, useGetUploadComments } from './hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,9 +10,16 @@ import FieldError from '../FieldError';
 import { useEffect, useState } from 'react';
 import Paginated from '../Paginated';
 import { useSocket } from '../../context/useSocket';
+import MentionInput from '../MentionInput';
+import { IUser } from '../UserCard';
 
 const schema = z.object({
-  comment: z.string().nonempty('Komentar je obavezan.'),
+  comment: z
+    .string()
+    .min(1, 'Komentar je obavezan.')
+    .refine((val) => val.trim().length > 0, {
+      message: 'Komentar je obavezan.',
+    }),
 });
 
 interface Inputs {
@@ -26,6 +32,7 @@ export interface IComment {
   userId: string;
   uploadId: string;
   createdAt: string;
+  taggedUsers?: { id: number; username: string }[];
 }
 
 const PhotoComments = () => {
@@ -37,28 +44,29 @@ const PhotoComments = () => {
     photoId as string
   );
   const [allComments, setAllComments] = useState<IComment[]>([]);
+  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
 
   const {
-    register,
     handleSubmit,
     formState: { isValid, errors },
     reset,
+    control,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = (data: Inputs) => {
-    if (!isValid || !userId || !photoId) {
-      return;
-    }
+    if (!userId || !photoId || !isValid) return;
 
-    const dataToSubmit = {
-      userId: userId as string,
+    mutateAddUploadComment({
+      userId: String(userId),
       uploadId: photoId,
       comment: data.comment,
-    };
-    mutateAddUploadComment(dataToSubmit);
+      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
+    });
+
     reset();
+    setTaggedUsers([]);
   };
 
   useEffect(() => {
@@ -99,7 +107,7 @@ const PhotoComments = () => {
       socket.off('delete-comment');
       socket.off('update-comment');
     };
-  }, [areCommentsLoading, allCommentsData]);
+  }, [areCommentsLoading, allCommentsData, socket]);
 
   const sortedComments = allComments?.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -124,10 +132,23 @@ const PhotoComments = () => {
         className="flex w-full justify-between gap-2 items-center"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <Input type="text" placeholder="Dodaj komentar" {...register('comment')} />
+        <Controller
+          name="comment"
+          control={control}
+          render={({ field }) => (
+            <MentionInput
+              value={field.value}
+              onChange={field.onChange}
+              onTagUsersChange={setTaggedUsers}
+              placeholder="Dodaj komentar"
+              className="flex-grow"
+            />
+          )}
+        />
         <Button type="primary">Komentiraj</Button>
       </form>
-      {errors.comment && <FieldError message={errors.comment.message || ''} />}
+
+      {errors.comment && <FieldError message="Komentar je obavezan" />}
     </>
   );
 };

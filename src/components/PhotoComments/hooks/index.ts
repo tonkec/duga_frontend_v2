@@ -12,6 +12,7 @@ interface IAddUploadCommentProps {
   userId: string;
   uploadId: string;
   comment: string;
+  taggedUserIds: number[];
 }
 
 export const useEditUploadComment = () => {
@@ -22,8 +23,8 @@ export const useEditUploadComment = () => {
     isError: isEditUploadCommentError,
     isSuccess: isEditUploadCommentSuccess,
   } = useMutation({
-    mutationFn: (comment: { id: number; comment: string }) =>
-      editUploadComment(comment.id, comment.comment),
+    mutationFn: (comment: { id: number; comment: string; taggedUserIds: number[] }) =>
+      editUploadComment(comment.id, comment.comment, comment.taggedUserIds),
     onSuccess: (data) => {
       toast.success('Komentar uspješno izmijenjen.', toastConfig);
       socket.emit('edit-comment', data);
@@ -49,11 +50,11 @@ export const useAddUploadComment = () => {
     isError: isAddUploadCommentError,
     isSuccess: isAddUploadCommentSuccess,
   } = useMutation({
-    mutationFn: ({ userId, uploadId, comment }: IAddUploadCommentProps) =>
-      addUploadComment({ userId, uploadId, comment }),
+    mutationFn: ({ userId, uploadId, comment, taggedUserIds }: IAddUploadCommentProps) =>
+      addUploadComment({ userId, uploadId, comment, taggedUserIds }),
     onSuccess: (data) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
-      socket.emit('send-comment', data);
+      socket.emit('send-comment', data.data);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
@@ -80,7 +81,7 @@ export const useDeleteUploadComment = () => {
     mutationFn: (commentId: number) => deleteUploadComment(commentId),
     onSuccess: (data) => {
       socket.emit('delete-comment', data);
-      toast.success('Komentar uspešno obrisan.', toastConfig);
+      toast.success('Komentar uspiješno obrisan.', toastConfig);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
@@ -101,8 +102,9 @@ export const useGetUploadComments = (uploadId: string) => {
     error: allCommentsError,
     isPending: areCommentsLoading,
   } = useQuery({
-    queryKey: ['comments'],
+    queryKey: ['comments', uploadId],
     queryFn: () => getUploadComments(uploadId),
+    enabled: !!uploadId,
   });
 
   return { allComments, allCommentsError, areCommentsLoading };
