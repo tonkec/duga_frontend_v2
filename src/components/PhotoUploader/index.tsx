@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '../../configs/toast.config';
 import { getImageUrl } from '../../utils/getImageUrl';
 import ConfirmModal from '../ConfirmModal';
+import Loader from '../Loader';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -115,7 +116,7 @@ const PhotoUploader = () => {
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto(userId as string);
-  const { onUploadPhotos } = useUploadPhotos(userId as string);
+  const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos(userId as string);
   const [newImages, setNewImages] = useState<IImage[]>();
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []
@@ -293,6 +294,12 @@ const PhotoUploader = () => {
                 );
               })}
           </div>
+
+          {isUploadingPhotos && (
+            <div className="flex justify-center">
+              <Loader />
+            </div>
+          )}
 
           <div className="mb-4">
             <input
