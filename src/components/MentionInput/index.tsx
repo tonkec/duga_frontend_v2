@@ -76,7 +76,7 @@ const MentionInput = ({
     const newVal = `${before}@${user.username} `;
     onChange(newVal);
 
-    if (!taggedUsers.find((u) => u.id === user.id)) {
+    if (!taggedUsers.some((u) => u.id === user.id)) {
       const updated = [...taggedUsers, user];
       setTaggedUsers(updated);
       onTagUsersChange?.(updated);
