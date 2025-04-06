@@ -62,7 +62,7 @@ const Navigation = () => {
             {String.fromCodePoint(parseInt('1F9D1', 16))}
           </Link>
         </li>
-        <OnlineStatus userId={userId} />
+        {userId && <OnlineStatus userId={Number(userId)} />}
       </ul>
       <div className="float-right mt-2">
         <span className="cursor-pointer flex items-center gap-1" onClick={onLogout}>

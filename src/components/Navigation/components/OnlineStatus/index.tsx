@@ -5,8 +5,6 @@ const StatusDropdown = ({ userId }: { userId: number | null }) => {
   const socket = useSocket();
   const [status, setStatus] = useState<'online' | 'offline'>('online');
 
-  if (typeof userId !== 'number') return null;
-
   return (
     <select
       value={status}
