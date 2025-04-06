@@ -44,7 +44,7 @@ function App() {
 
       createOrLoginUser({
         email: auth0User.email || '',
-        username: DEFAULT_USERNAME,
+        username: DEFAULT_USERNAME.toLowerCase(),
         isVerified: auth0User.email_verified || false,
       });
     };
