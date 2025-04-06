@@ -15,7 +15,7 @@ const MentionInput = ({
   value,
   onChange,
   onTagUsersChange,
-  placeholder = 'Write a comment...',
+  placeholder = 'Napiši komentar...',
   className = '',
 }: MentionInputProps) => {
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
