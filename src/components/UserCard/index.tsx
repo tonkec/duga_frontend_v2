@@ -6,6 +6,7 @@ import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
+import clsx from 'clsx';
 export interface IUser {
   avatar: string;
   email: string;
@@ -90,10 +91,10 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardPr
           <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
             {user.username}
             <span
-              className={`inline-block w-2 h-2 rounded-full ${
+              className={clsx(
+                'inline-block w-2 h-2 rounded-full',
                 isOnline ? 'bg-green' : 'bg-gray-400'
-              }`}
-              title={isOnline ? 'Online' : 'Offline'}
+              )}
             />
           </h3>
           {getUserLocation(user)}

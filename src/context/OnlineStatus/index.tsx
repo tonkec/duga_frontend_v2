@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSocket } from './../useSocket';
 import { StatusContext } from './useStatusMap';
 
@@ -20,5 +20,7 @@ export const StatusProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [socket]);
 
-  return <StatusContext.Provider value={{ statusMap }}>{children}</StatusContext.Provider>;
+  const contextValue = useMemo(() => ({ statusMap }), [statusMap]);
+
+  return <StatusContext.Provider value={contextValue}>{children}</StatusContext.Provider>;
 };
