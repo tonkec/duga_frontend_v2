@@ -24,7 +24,9 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
   const { allImages } = useGetAllImages(comment.userId.toString());
 
   const renderFormattedComment = (text: string) => {
-    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
+    if (!cleanText) return null;
+
     const parts = cleanText.split(/(@\w+)/g);
 
     return parts.map((part, index) => {

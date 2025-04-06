@@ -51,7 +51,8 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   };
 
   const renderFormattedComment = (text: string) => {
-    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
+    if (!cleanText) return null;
     const parts = cleanText.split(/(@\w+)/g);
 
     return parts.map((part, index) => {
