@@ -11,6 +11,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import MentionInput from '../../MentionInput';
 import { Link } from 'react-router-dom';
 import { IUser } from '../../UserCard';
+import DOMPurify from 'dompurify';
 
 interface Inputs {
   comment: string;
@@ -50,7 +51,8 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   };
 
   const renderFormattedComment = (text: string) => {
-    const parts = text.split(/(@\w+)/g);
+    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    const parts = cleanText.split(/(@\w+)/g);
 
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
@@ -58,6 +60,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
         const matchedUser = comment.taggedUsers?.find(
           (u) => u.username.toLowerCase() === username.toLowerCase()
         );
+
         if (matchedUser) {
           return (
             <Link to={`/user/${matchedUser.id}`} key={index} className="text-blue underline">

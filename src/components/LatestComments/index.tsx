@@ -7,6 +7,7 @@ import { useGetLatestComments } from './hooks';
 import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
+import DOMPurify from 'dompurify';
 
 interface IComment {
   id: number;
@@ -23,7 +24,8 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
   const { allImages } = useGetAllImages(comment.userId.toString());
 
   const renderFormattedComment = (text: string) => {
-    const parts = text.split(/(@\w+)/g);
+    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    const parts = cleanText.split(/(@\w+)/g);
 
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
