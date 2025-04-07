@@ -41,34 +41,32 @@ interface IMessageContentProps {
 }
 
 const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContentProps) => {
-  const [src, setSrc] = useState(messagePhotoUrl);
+  const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
     if (!messagePhotoUrl) return;
-    setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}`);
+
+    const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURI(messagePhotoUrl)}`;
+    const timeout = setTimeout(() => setSrc(url), 1000);
+
+    return () => clearTimeout(timeout);
   }, [messagePhotoUrl]);
 
-  if (src) {
-    return (
-      <div className={messageStyles}>
+  return (
+    <div className={messageStyles}>
+      {src ? (
         <img
           className="cursor-pointer"
           src={src}
           alt="message"
           width={100}
-          onClick={() => {
-            window.open(src, '_blank');
-          }}
+          onClick={() => window.open(src, '_blank')}
+          referrerPolicy="no-referrer"
         />
-        <RecordCreatedAt className="text-right" createdAt={createdAt} />
-      </div>
-    );
-  }
-
-  return (
-    <div className={messageStyles}>
-      <p>{message}</p>
-      <RecordCreatedAt createdAt={createdAt} />
+      ) : (
+        <p>{message}</p>
+      )}
+      <RecordCreatedAt className="text-right" createdAt={createdAt} />
     </div>
   );
 };
