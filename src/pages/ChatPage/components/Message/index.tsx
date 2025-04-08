@@ -5,36 +5,40 @@ import RecordCreatedAt from '../../../../components/RecordCreatedAt';
 import { S3_CHAT_PHOTO_ENVIRONMENT, S3_URL } from '../../../../utils/consts';
 import { useEffect, useState } from 'react';
 
-interface IMessageProps {
-  message: {
-    message: string;
-    createdAt: string;
-    User: {
-      id: number;
-    };
-    type: string;
+type MessageType = 'text' | 'file' | 'gif';
+
+interface BaseMessageTemplateProps {
+  userName: string;
+  profilePhoto: string;
+  message: string;
+  createdAt: string;
+  messagePhotoUrl: string;
+  showAvatar: boolean;
+  messageType: MessageType;
+}
+
+export interface IMessage {
+  message: string;
+  createdAt: string;
+  type: MessageType;
+  User: {
+    id: number;
   };
+}
+
+interface IMessageProps {
+  message: IMessage;
   otherUserProfilePhoto: string;
   currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
-  otherUserId: number | undefined;
-  messagePhotoUrl: string;
-  showAvatar: boolean;
-}
-
-interface IMessageTemplateProps {
-  userName: string;
-  profilePhoto: string;
-  message: string;
   otherUserId?: number;
-  createdAt: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
-  messageType: string;
 }
-
-const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
+interface IMessageTemplateProps extends BaseMessageTemplateProps {
+  otherUserId?: number;
+}
 
 interface IMessageContentProps {
   messagePhotoUrl: string;
@@ -42,6 +46,8 @@ interface IMessageContentProps {
   createdAt: string;
   messageType: string;
 }
+
+const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
 
 const MessageContent = ({
   messagePhotoUrl,

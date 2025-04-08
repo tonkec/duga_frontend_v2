@@ -13,18 +13,7 @@ import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto
 import Button from '../../components/Button';
 import { useSocket } from '../../context/useSocket';
 import ConfirmModal from '../../components/ConfirmModal';
-
-interface IMessage {
-  id: string;
-  message: string;
-  createdAt: string;
-  User: {
-    id: number;
-  };
-  type: string;
-  messagePhotoUrl: string;
-  showAvatar: boolean;
-}
+import { IMessage } from './components/Message';
 
 interface IChatUser {
   userId: number;
