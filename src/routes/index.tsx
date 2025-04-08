@@ -10,6 +10,7 @@ import ChatPage from '../pages/ChatPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
+import { Layout } from '../components/HelmetLayout/index';
 
 const DugaRoutes = () => {
   return (
@@ -17,75 +18,105 @@ const DugaRoutes = () => {
       <Route
         path="*"
         element={
-          <AuthGuard>
-            <NotFoundPage />
-          </AuthGuard>
+          <Layout title="Not Found | Duga">
+            <AuthGuard>
+              <NotFoundPage />
+            </AuthGuard>
+          </Layout>
         }
       />
       <Route
         path="/"
         element={
-          <AuthGuard>
-            <App />
-          </AuthGuard>
+          <Layout title="Home | Duga">
+            <AuthGuard>
+              <App />
+            </AuthGuard>
+          </Layout>
         }
       />
-      <Route path="login" element={<LoginPage />} />
+      <Route
+        path="login"
+        element={
+          <Layout title="Login | Duga">
+            <LoginPage />
+          </Layout>
+        }
+      />
       <Route
         path="/profile"
         element={
-          <AuthGuard>
-            <MyProfilePage />
-          </AuthGuard>
+          <Layout title="My Profile | Duga">
+            <AuthGuard>
+              <MyProfilePage />
+            </AuthGuard>
+          </Layout>
         }
       />
 
       <Route
         path="/edit"
         element={
-          <AuthGuard>
-            <EditMyProfilePage />
-          </AuthGuard>
+          <Layout title="Edit Profile | Duga">
+            <AuthGuard>
+              <EditMyProfilePage />
+            </AuthGuard>
+          </Layout>
         }
       />
 
       <Route
         path="/user/:userId"
         element={
-          <AuthGuard>
-            <OtherUserPage />
-          </AuthGuard>
+          <Layout title="User Profile | Duga">
+            <AuthGuard>
+              <OtherUserPage />
+            </AuthGuard>
+          </Layout>
         }
       />
 
       <Route
         path="/photo/:photoId"
         element={
-          <AuthGuard>
-            <PhotoPage />
-          </AuthGuard>
+          <Layout title="Photo | Duga">
+            <AuthGuard>
+              <PhotoPage />
+            </AuthGuard>
+          </Layout>
         }
       />
 
       <Route
         path="/new-chat"
         element={
-          <AuthGuard>
-            <NewChatPage />
-          </AuthGuard>
+          <Layout title="New Chat | Duga">
+            <AuthGuard>
+              <NewChatPage />
+            </AuthGuard>
+          </Layout>
         }
       />
 
       <Route
         path="/chat/:chatId"
         element={
-          <AuthGuard>
-            <ChatPage />
-          </AuthGuard>
+          <Layout title="Chat | Duga">
+            <AuthGuard>
+              <ChatPage />
+            </AuthGuard>
+          </Layout>
         }
       />
 
-      <Route path="verify-email" element={<VerifyEmailPage />} />
+      <Route
+        path="verify-email"
+        element={
+          <Layout title="Verify Email | Duga">
+            <VerifyEmailPage />
+          </Layout>
+        }
+      />
     </Routes>
   );
 };
