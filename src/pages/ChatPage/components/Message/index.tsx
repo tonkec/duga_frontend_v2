@@ -24,6 +24,8 @@ export interface IMessage {
   User: {
     id: number;
   };
+  id: string;
+  messagePhotoUrl: string;
 }
 
 interface IMessageProps {
