@@ -46,7 +46,7 @@ const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContent
   useEffect(() => {
     if (!messagePhotoUrl) return;
 
-    const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURI(messagePhotoUrl)}`;
+    const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURIComponent(messagePhotoUrl)}`;
     const timeout = setTimeout(() => setSrc(url), 1000);
 
     return () => clearTimeout(timeout);
