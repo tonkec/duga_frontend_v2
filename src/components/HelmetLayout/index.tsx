@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import { Outlet } from 'react-router-dom';
 
 interface LayoutProps {
   title?: string;
@@ -12,7 +11,7 @@ export const Layout: React.FC<LayoutProps> = ({ title = 'Duga', children }) => {
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      {children || <Outlet />}
+      {children}
     </>
   );
 };
