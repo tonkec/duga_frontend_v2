@@ -28,11 +28,11 @@ const DugaRoutes = () => {
       <Route
         path="/"
         element={
-          <Layout title="Home | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="Home | Duga">
               <App />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
       <Route
@@ -46,66 +46,66 @@ const DugaRoutes = () => {
       <Route
         path="/profile"
         element={
-          <Layout title="My Profile | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="My Profile | Duga">
               <MyProfilePage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
 
       <Route
         path="/edit"
         element={
-          <Layout title="Edit Profile | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="Edit Profile | Duga">
               <EditMyProfilePage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
 
       <Route
         path="/user/:userId"
         element={
-          <Layout title="User Profile | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="User Profile | Duga">
               <OtherUserPage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
 
       <Route
         path="/photo/:photoId"
         element={
-          <Layout title="Photo | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="Photo | Duga">
               <PhotoPage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
 
       <Route
         path="/new-chat"
         element={
-          <Layout title="New Chat | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="New Chat | Duga">
               <NewChatPage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
 
       <Route
         path="/chat/:chatId"
         element={
-          <Layout title="Chat | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="Chat | Duga">
               <ChatPage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
 
