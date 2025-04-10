@@ -18,11 +18,11 @@ const DugaRoutes = () => {
       <Route
         path="*"
         element={
-          <Layout title="Not Found | Duga">
-            <AuthGuard>
+          <AuthGuard>
+            <Layout title="Not Found | Duga">
               <NotFoundPage />
-            </AuthGuard>
-          </Layout>
+            </Layout>
+          </AuthGuard>
         }
       />
       <Route
