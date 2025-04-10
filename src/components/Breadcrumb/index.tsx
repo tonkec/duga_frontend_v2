@@ -46,14 +46,14 @@ const Breadcrumb = () => {
   ];
 
   return (
-    <nav className="flex items-center gap-1 text-sm text-gray-500">
+    <nav className="flex items-center gap-2 text-sm text-gray-700">
       {breadcrumbItems.map((item, index) => (
         <React.Fragment key={item.path}>
-          {index > 0 && <BiChevronRight className="text-gray-400" />}
+          {index > 0 && <BiChevronRight className="text-gray-500" />}
           {index === breadcrumbItems.length - 1 ? (
-            <span>{item.title}</span>
+            <span className="font-medium">{item.title}</span>
           ) : (
-            <Link to={item.path} className="hover:text-gray-700">
+            <Link to={item.path} className="hover:text-gray-900 transition-colors duration-200">
               {item.title}
             </Link>
           )}
