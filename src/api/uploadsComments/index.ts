@@ -4,14 +4,25 @@ interface IAddCommentProps {
   userId: string;
   uploadId: string;
   comment: string;
+  photos: File[];
 }
 
-export const addUploadComment = async ({ userId, uploadId, comment }: IAddCommentProps) => {
+export const addUploadComment = async ({ userId, uploadId, comment, photos }: IAddCommentProps) => {
   const client = apiClient();
-  return client.post(`/comments/add-comment`, {
-    userId,
-    uploadId,
-    comment,
+  const formData = new FormData();
+  formData.append('userId', userId);
+  formData.append('uploadId', uploadId);
+  formData.append('comment', comment);
+  if (photos && photos.length > 0) {
+    for (let i = 0; i < photos.length; i++) {
+      formData.append('photos', photos[i]);
+    }
+  }
+
+  return client.post(`/comments/add-comment`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 };
 

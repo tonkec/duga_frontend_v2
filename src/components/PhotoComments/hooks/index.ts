@@ -12,6 +12,7 @@ interface IAddUploadCommentProps {
   userId: string;
   uploadId: string;
   comment: string;
+  photos: File[];
 }
 
 export const useEditUploadComment = () => {
@@ -49,8 +50,8 @@ export const useAddUploadComment = () => {
     isError: isAddUploadCommentError,
     isSuccess: isAddUploadCommentSuccess,
   } = useMutation({
-    mutationFn: ({ userId, uploadId, comment }: IAddUploadCommentProps) =>
-      addUploadComment({ userId, uploadId, comment }),
+    mutationFn: ({ userId, uploadId, comment, photos }: IAddUploadCommentProps) =>
+      addUploadComment({ userId, uploadId, comment, photos }),
     onSuccess: (data) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
       socket.emit('send-comment', data);
