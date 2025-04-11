@@ -20,7 +20,7 @@ const StatusDropdown = ({ userId }: { userId: number | null }) => {
       }}
       className="py-2 bg-transparent text-white focus:outline-none"
     >
-      <option value="" disabled hidden>
+      <option disabled hidden>
         Set status
       </option>
       <option value="online">Online 🟢</option>
