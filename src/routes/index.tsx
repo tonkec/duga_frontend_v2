@@ -10,6 +10,7 @@ import ChatPage from '../pages/ChatPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
+import { Layout } from '../components/HelmetLayout/index';
 
 const DugaRoutes = () => {
   return (
@@ -18,7 +19,9 @@ const DugaRoutes = () => {
         path="*"
         element={
           <AuthGuard>
-            <NotFoundPage />
+            <Layout title="Not Found | Duga">
+              <NotFoundPage />
+            </Layout>
           </AuthGuard>
         }
       />
@@ -26,16 +29,27 @@ const DugaRoutes = () => {
         path="/"
         element={
           <AuthGuard>
-            <App />
+            <Layout title="Home | Duga">
+              <App />
+            </Layout>
           </AuthGuard>
         }
       />
-      <Route path="login" element={<LoginPage />} />
+      <Route
+        path="login"
+        element={
+          <Layout title="Login | Duga">
+            <LoginPage />
+          </Layout>
+        }
+      />
       <Route
         path="/profile"
         element={
           <AuthGuard>
-            <MyProfilePage />
+            <Layout title="My Profile | Duga">
+              <MyProfilePage />
+            </Layout>
           </AuthGuard>
         }
       />
@@ -44,7 +58,9 @@ const DugaRoutes = () => {
         path="/edit"
         element={
           <AuthGuard>
-            <EditMyProfilePage />
+            <Layout title="Edit Profile | Duga">
+              <EditMyProfilePage />
+            </Layout>
           </AuthGuard>
         }
       />
@@ -53,7 +69,9 @@ const DugaRoutes = () => {
         path="/user/:userId"
         element={
           <AuthGuard>
-            <OtherUserPage />
+            <Layout title="User Profile | Duga">
+              <OtherUserPage />
+            </Layout>
           </AuthGuard>
         }
       />
@@ -62,7 +80,9 @@ const DugaRoutes = () => {
         path="/photo/:photoId"
         element={
           <AuthGuard>
-            <PhotoPage />
+            <Layout title="Photo | Duga">
+              <PhotoPage />
+            </Layout>
           </AuthGuard>
         }
       />
@@ -71,7 +91,9 @@ const DugaRoutes = () => {
         path="/new-chat"
         element={
           <AuthGuard>
-            <NewChatPage />
+            <Layout title="New Chat | Duga">
+              <NewChatPage />
+            </Layout>
           </AuthGuard>
         }
       />
@@ -80,12 +102,21 @@ const DugaRoutes = () => {
         path="/chat/:chatId"
         element={
           <AuthGuard>
-            <ChatPage />
+            <Layout title="Chat | Duga">
+              <ChatPage />
+            </Layout>
           </AuthGuard>
         }
       />
 
-      <Route path="verify-email" element={<VerifyEmailPage />} />
+      <Route
+        path="verify-email"
+        element={
+          <Layout title="Verify Email | Duga">
+            <VerifyEmailPage />
+          </Layout>
+        }
+      />
     </Routes>
   );
 };
