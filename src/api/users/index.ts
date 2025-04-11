@@ -45,5 +45,5 @@ export const deleteUser = async (userId: string, auth0UserId: string | undefined
 
 export const getUserByUsername = async (username: string) => {
   const client = apiClient();
-  return client.get(`/users/${username}`);
+  return client.get(`/users/username/${username}`);
 };
