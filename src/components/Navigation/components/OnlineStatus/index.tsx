@@ -9,7 +9,12 @@ const StatusDropdown = ({ userId }: { userId: number | null }) => {
     <select
       value={status}
       onChange={(e) => {
-        const newStatus = e.target.value as 'online' | 'offline';
+        const newStatus = e.target.value;
+        if (newStatus !== 'online' && newStatus !== 'offline') {
+          throw new Error(
+            `Unexpected status "${e.target.value}", expected one of: online, offline`
+          );
+        }
         setStatus(newStatus);
         socket.emit('set-status', { userId, status: newStatus });
       }}
