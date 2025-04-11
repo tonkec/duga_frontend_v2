@@ -15,8 +15,9 @@ import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '../../../../components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '../../../../components/Input';
-import { BiPaperclip, BiSend } from 'react-icons/bi';
+import { BiPaperclip, BiSend, BiSolidFileGif } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
+import GiphySearch from '../../../../components/GiphySearch';
 
 type Inputs = {
   content: string;
@@ -87,6 +88,19 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
+  const [showGiphySearch, setShowGiphySearch] = useState(false);
+  const sendGif = (gifUrl: string) => {
+    const msg = {
+      type: 'gif',
+      fromUserId: currentUserId,
+      fromUser: currentUser?.data,
+      toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+      chatId,
+      messagePhotoUrl: gifUrl,
+    };
+    socket.emit('message', msg);
+    setShowGiphySearch(false);
+  };
 
   const {
     handleSubmit,
@@ -208,6 +222,13 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           className="cursor-pointer"
           onClick={handleIconClick}
         />
+
+        <BiSolidFileGif
+          fontSize={20}
+          className="cursor-pointer"
+          onClick={() => setShowGiphySearch(!showGiphySearch)}
+        />
+
         <Controller
           name="content"
           control={control}
@@ -256,7 +277,11 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           <BiSend fontSize={20} />
         </Button>
       </form>
-
+      <GiphySearch
+        onGifSelect={sendGif}
+        isOpen={showGiphySearch}
+        onClose={() => setShowGiphySearch(false)}
+      />
       {errors.content && <FieldError message="Poruka je obavezna." />}
 
       <EmojiPicker

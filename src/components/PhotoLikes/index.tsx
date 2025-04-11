@@ -3,6 +3,7 @@ import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
 import { useEffect, useState } from 'react';
 import { useSocket } from '../../context/useSocket';
+import PhotoLikeDropdown from './components/LikesList';
 
 interface IPhotoLikesProps {
   photoId: string | undefined;
@@ -10,6 +11,7 @@ interface IPhotoLikesProps {
 
 interface ILike {
   userId: string;
+  id: number;
 }
 
 const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
@@ -82,7 +84,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
       ) : (
         <BiHeart color="red" className="cursor-pointer" fontSize={30} onClick={onUpvote} />
       )}
-      <span>{allLikes?.length || 0}</span>
+      <PhotoLikeDropdown likes={allLikes} />
     </div>
   );
 };

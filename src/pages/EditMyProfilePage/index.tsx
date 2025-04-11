@@ -170,7 +170,10 @@ const EditMyProfilePage = () => {
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
     if (isValid) {
-      updateUserMutation(data);
+      updateUserMutation({
+        ...data,
+        username: data?.username?.toLowerCase() || '',
+      });
     }
   };
 

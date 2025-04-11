@@ -17,7 +17,7 @@ const Paginated = <T,>({
 }: IPaginatedProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = data.length ? Math.ceil(data.length / itemsPerPage) : 0;
 
   const currentPageData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -32,6 +32,8 @@ const Paginated = <T,>({
   if (totalPages === 0) {
     return null;
   }
+
+  if (!data) return null;
 
   return (
     <div className="h-full mt-4">

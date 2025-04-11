@@ -41,34 +41,32 @@ interface IMessageContentProps {
 }
 
 const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContentProps) => {
-  const [src, setSrc] = useState(messagePhotoUrl);
+  const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
     if (!messagePhotoUrl) return;
-    setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}`);
+
+    const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURIComponent(messagePhotoUrl)}`;
+    const timeout = setTimeout(() => setSrc(url), 1000);
+
+    return () => clearTimeout(timeout);
   }, [messagePhotoUrl]);
 
-  if (src) {
-    return (
-      <div className={messageStyles}>
+  return (
+    <div className={messageStyles}>
+      {src ? (
         <img
           className="cursor-pointer"
           src={src}
           alt="message"
           width={100}
-          onClick={() => {
-            window.open(src, '_blank');
-          }}
+          onClick={() => window.open(src, '_blank')}
+          referrerPolicy="no-referrer"
         />
-        <RecordCreatedAt className="text-right" createdAt={createdAt} />
-      </div>
-    );
-  }
-
-  return (
-    <div className={messageStyles}>
-      <p>{message}</p>
-      <RecordCreatedAt createdAt={createdAt} />
+      ) : (
+        <p>{message}</p>
+      )}
+      <RecordCreatedAt className="text-right" createdAt={createdAt} />
     </div>
   );
 };
@@ -82,16 +80,14 @@ const CurrentUserMessageTemplate = ({
   showAvatar,
 }: IMessageTemplateProps) => {
   return (
-    <div className="flex flex-end" style={{ marginLeft: 'auto', maxWidth: 'fit-content' }}>
+    <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className="flex">
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
-      {showAvatar ? (
-        <div style={{ marginLeft: '2px' }}>
+      {showAvatar && (
+        <div className="ml-0.5">
           <Avatar name={userName} src={profilePhoto} size="24" round />
         </div>
-      ) : (
-        <div style={{ width: '24px', height: '24px', marginLeft: '2px' }}></div>
       )}
     </div>
   );
@@ -109,18 +105,12 @@ const OtherUserMessageTemplate = ({
   const navigate = useNavigate();
   return (
     <div className="flex">
-      {showAvatar ? (
-        <div
-          style={{ marginRight: '2px' }}
-          onClick={() => navigate(`/user/${otherUserId}`)}
-          className="cursor-pointer"
-        >
-          <Avatar name={userName} src={profilePhoto} size="22" round />
+      {showAvatar && (
+        <div className="cursor-pointer mr-0.5" onClick={() => navigate(`/user/${otherUserId}`)}>
+          <Avatar name={userName} src={profilePhoto} size="24" round />
         </div>
-      ) : (
-        <div style={{ width: '22px', height: '22px', marginRight: '2px' }}></div>
       )}
-      <div className={messageStyles} style={{ backgroundColor: '#F037A5' }}>
+      <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
         <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
       </div>
     </div>
