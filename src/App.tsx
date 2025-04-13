@@ -17,6 +17,19 @@ import LatestMessages from './components/LatestMessages';
 import LatestComments from './components/LatestComments';
 import { useCreateUser } from './pages/Login/hooks';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useGetAllUserChats } from './hooks/useGetAllUserChats';
+
+interface ChatUser {
+  chatId: number;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Chat {
+  ChatUser: ChatUser;
+  Users: { ChatUser: ChatUser }[];
+}
 
 const DEFAULT_USERNAME = 'Korisnik';
 
@@ -35,6 +48,8 @@ function App() {
     label: 'ime',
   });
 
+  const { userChats, isUserChatsLoading } = useGetAllUserChats(userId as string);
+
   useEffect(() => {
     const handleAuth0 = () => {
       if (!auth0User) {
@@ -52,7 +67,7 @@ function App() {
     handleAuth0();
   }, [auth0User, createOrLoginUser, navigate]);
 
-  if (isAllUsersLoading || isUserLoading) {
+  if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
     return (
       <AppLayout>
         <Loader />
@@ -101,26 +116,37 @@ function App() {
 
       <div className="mt-12">
         {!renderedUsers?.length && (
-          <div className="text-center text-lg mt-4 max-w-md mx-auto mt-12">
+          <div className="text-center text-lg max-w-md mx-auto mt-12">
             <h2 className="mb-4">Nema korisnika 😢</h2>
           </div>
         )}
+
         <Paginated<IUser>
           gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
           data={renderedUsers}
           itemsPerPage={itemsPerPage}
-          paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
-            <UserCard
-              user={singleEntry}
-              onButtonClick={() => {
-                navigate(`/user/${singleEntry.id}`);
-              }}
-              buttonText="Pogledaj profil 👀"
-              secondButton={
-                <SendMessageButton sendMessageToId={singleEntry.id} buttonType="blue" />
-              }
-            />
-          )}
+          paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => {
+            const hasChatWithUser = userChats?.data?.some((chat: Chat) =>
+              chat.Users?.some((user) => user.ChatUser.userId === Number(singleEntry.id))
+            );
+
+            return (
+              <UserCard
+                user={singleEntry}
+                onButtonClick={() => {
+                  navigate(`/user/${singleEntry.id}`);
+                }}
+                buttonText="Pogledaj profil 👀"
+                secondButton={
+                  <SendMessageButton
+                    sendMessageToId={singleEntry.id}
+                    buttonType="blue"
+                    disabled={hasChatWithUser}
+                  />
+                }
+              />
+            );
+          }}
         />
       </div>
 

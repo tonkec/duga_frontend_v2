@@ -14,12 +14,14 @@ interface ISendMessageButtonProps {
   sendMessageToId: string;
   buttonType: ButtonType;
   buttonClasses?: string;
+  disabled?: boolean;
 }
 
 const SendMessageButton = ({
   sendMessageToId,
   buttonType,
   buttonClasses,
+  disabled = false,
 }: ISendMessageButtonProps) => {
   const [isQueryEnabled, setIsQueryEnabled] = useState(false);
   const navigate = useNavigate();
@@ -41,6 +43,7 @@ const SendMessageButton = ({
         }
       }}
       type={buttonType}
+      disabled={disabled}
     >
       Pošalji poruku ✉️
     </Button>

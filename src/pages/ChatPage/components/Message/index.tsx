@@ -59,40 +59,40 @@ const MessageContent = ({
 }: IMessageContentProps) => {
   const [src, setSrc] = useState(messagePhotoUrl);
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (!messagePhotoUrl) return;
     const shouldRenderS3Image = messageType === 'file' && messagePhotoUrl;
     const shouldRenderGiphy = messageType === 'gif' && messagePhotoUrl;
 
     if (shouldRenderS3Image) {
-      setSrc(`${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${messagePhotoUrl}`);
+      const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURIComponent(messagePhotoUrl)}`;
+      timeout = setTimeout(() => setSrc(url), 1000);
     }
 
     if (shouldRenderGiphy) {
       setSrc(messagePhotoUrl);
     }
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
   }, [messagePhotoUrl, messageType]);
 
-  if (src) {
-    return (
-      <div className={messageStyles}>
+  return (
+    <div className={messageStyles}>
+      {src ? (
         <img
           className="cursor-pointer"
           src={src}
           alt="message"
           width={100}
-          onClick={() => {
-            window.open(src, '_blank');
-          }}
+          onClick={() => window.open(src, '_blank')}
+          referrerPolicy="no-referrer"
         />
-        <RecordCreatedAt className="text-right" createdAt={createdAt} />
-      </div>
-    );
-  }
-
-  return (
-    <div className={messageStyles}>
-      <p>{message}</p>
-      <RecordCreatedAt createdAt={createdAt} />
+      ) : (
+        <p>{message}</p>
+      )}
+      <RecordCreatedAt className="text-right" createdAt={createdAt} />
     </div>
   );
 };

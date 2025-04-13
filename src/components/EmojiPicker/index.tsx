@@ -9,10 +9,14 @@ const EmojiPicker = ({ emojis, onEmojiSelect }: IEmojiPickerProps) => {
   }
 
   return (
-    <div className="bg-black px-4 py-2 rounded-lg mt-2 flex flex-wrap gap-2">
+    <div className="absolute bg-gray-100 border border-gray-200 shadow-lg rounded-lg ml-20 p-2 max-h-24 overflow-y-auto w-80 grid grid-cols-8 gap-1">
       {emojis.map((emoji, index) => {
         return (
-          <span className="cursor-pointer" key={index} onClick={() => onEmojiSelect(emoji)}>
+          <span
+            className="cursor-pointer text-lg p-1 hover:bg-gray-200 rounded-md block"
+            key={index}
+            onClick={() => onEmojiSelect(emoji)}
+          >
             {emoji}
           </span>
         );
