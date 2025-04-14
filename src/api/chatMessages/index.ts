@@ -1,11 +1,11 @@
 import { apiClient } from '..';
-import type { Message } from '../../pages/ChatPage/components/PaginatedMessages';
+import { IMessage } from '../../pages/ChatPage/components/Message';
 import { API_KEY } from '../../utils/consts';
 
 export const getChatMessages = async (chatId: string, page: number) => {
   const client = apiClient();
   return client.get<{
-    messages: Message[];
+    messages: IMessage[];
     pagination?: {
       page: number;
       totalPages: number;

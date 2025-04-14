@@ -14,17 +14,7 @@ import Button from '../../components/Button';
 import { useSocket } from '../../context/useSocket';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
-
-interface IMessage {
-  id: string;
-  message: string;
-  createdAt: string;
-  User: {
-    id: number;
-  };
-  messagePhotoUrl: string;
-  showAvatar: boolean;
-}
+import { IMessage } from './components/Message';
 
 interface IChatUser {
   userId: number;

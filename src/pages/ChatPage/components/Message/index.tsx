@@ -5,52 +5,78 @@ import RecordCreatedAt from '../../../../components/RecordCreatedAt';
 import { S3_CHAT_PHOTO_ENVIRONMENT, S3_URL } from '../../../../utils/consts';
 import { useEffect, useState } from 'react';
 
-interface IMessageProps {
-  message: {
-    message: string;
-    createdAt: string;
-    User: {
-      id: number;
-    };
+type MessageType = 'text' | 'file' | 'gif';
+
+interface BaseMessageTemplateProps {
+  userName: string;
+  profilePhoto: string;
+  message: string;
+  createdAt: string;
+  messagePhotoUrl: string;
+  showAvatar: boolean;
+  messageType: MessageType;
+}
+
+export interface IMessage {
+  message: string;
+  createdAt: string;
+  type: MessageType;
+  User: {
+    id: number;
   };
+  id: string;
+  messagePhotoUrl: string;
+}
+
+interface IMessageProps {
+  message: IMessage;
   otherUserProfilePhoto: string;
   currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
-  otherUserId: number | undefined;
-  messagePhotoUrl: string;
-  showAvatar: boolean;
-}
-
-interface IMessageTemplateProps {
-  userName: string;
-  profilePhoto: string;
-  message: string;
   otherUserId?: number;
-  createdAt: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
 }
-
-const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
+interface IMessageTemplateProps extends BaseMessageTemplateProps {
+  otherUserId?: number;
+}
 
 interface IMessageContentProps {
   messagePhotoUrl: string;
   message: string;
   createdAt: string;
+  messageType: string;
 }
 
-const MessageContent = ({ messagePhotoUrl, message, createdAt }: IMessageContentProps) => {
-  const [src, setSrc] = useState<string | null>(null);
+const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
 
+const MessageContent = ({
+  messagePhotoUrl,
+  message,
+  createdAt,
+  messageType,
+}: IMessageContentProps) => {
+  const [src, setSrc] = useState(messagePhotoUrl);
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (!messagePhotoUrl) return;
+    const shouldRenderS3Image = messageType === 'file' && messagePhotoUrl;
+    const shouldRenderGiphy = messageType === 'gif' && messagePhotoUrl;
 
-    const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURIComponent(messagePhotoUrl)}`;
-    const timeout = setTimeout(() => setSrc(url), 1000);
+    if (shouldRenderS3Image) {
+      const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURIComponent(messagePhotoUrl)}`;
+      timeout = setTimeout(() => setSrc(url), 1000);
+    }
 
-    return () => clearTimeout(timeout);
-  }, [messagePhotoUrl]);
+    if (shouldRenderGiphy) {
+      setSrc(messagePhotoUrl);
+    }
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [messagePhotoUrl, messageType]);
 
   return (
     <div className={messageStyles}>
@@ -78,11 +104,17 @@ const CurrentUserMessageTemplate = ({
   createdAt,
   messagePhotoUrl,
   showAvatar,
+  messageType,
 }: IMessageTemplateProps) => {
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className="flex">
-        <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
+        <MessageContent
+          messageType={messageType}
+          messagePhotoUrl={messagePhotoUrl}
+          message={message}
+          createdAt={createdAt}
+        />
       </div>
       {showAvatar && (
         <div className="ml-0.5">
@@ -101,6 +133,7 @@ const OtherUserMessageTemplate = ({
   createdAt,
   messagePhotoUrl,
   showAvatar,
+  messageType,
 }: IMessageTemplateProps) => {
   const navigate = useNavigate();
   return (
@@ -111,7 +144,12 @@ const OtherUserMessageTemplate = ({
         </div>
       )}
       <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
-        <MessageContent messagePhotoUrl={messagePhotoUrl} message={message} createdAt={createdAt} />
+        <MessageContent
+          messageType={messageType}
+          messagePhotoUrl={messagePhotoUrl}
+          message={message}
+          createdAt={createdAt}
+        />
       </div>
     </div>
   );
@@ -137,6 +175,7 @@ const Message = ({
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}
+      messageType={message.type}
     />
   ) : (
     <OtherUserMessageTemplate
@@ -147,6 +186,7 @@ const Message = ({
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}
+      messageType={message.type}
     />
   );
 };
