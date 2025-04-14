@@ -148,7 +148,21 @@ const ChatPage = () => {
               receivedMessages={receivedMessages}
             />
           </div>
-          {isTyping && <p className="text-sm text-gray-500 mb-0">Tipka...</p>}
+          {isTyping && (
+            <div className="flex items-end gap-2 mb-2 relative">
+              <div className="relative bg-gray-200 px-4 py-3 rounded-2xl rounded-bl-sm max-w-max">
+                {/* chat bubble */}
+                <div className="absolute -bottom-1 left-0 w-4 h-4 bg-gray-200 rounded-full transform -translate-x-1/2"></div>
+
+                {/* three dots */}
+                <div className="flex space-x-1">
+                  <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+                  <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+                </div>
+              </div>
+            </div>
+          )}
           {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
         </Card>
       </AppLayout>
