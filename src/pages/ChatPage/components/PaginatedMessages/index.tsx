@@ -30,7 +30,7 @@ const PaginatedMessages = ({
       onScroll={debounceScroll(() => {
         fetchNextPage();
       }, 500)}
-      style={{ height: '500px', overflow: 'auto' }}
+      style={{ height: 'screen', overflow: 'auto' }}
     >
       {sortedMessages.map((message, index) => {
         const previousMessage = sortedMessages[index - 1];
