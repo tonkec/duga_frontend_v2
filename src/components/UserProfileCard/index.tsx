@@ -12,6 +12,7 @@ import {
 import Iframe from 'react-iframe';
 import { IImage } from '../Photos';
 import Loader from '../Loader';
+import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
 
 export interface IUserProfileCardProps {
   bio: string;
@@ -38,6 +39,7 @@ export interface IUserProfileCardProps {
   firstName: string;
   lastName: string;
   favoriteDayOfWeek: string;
+  id: string;
 }
 
 const UserProfileCard = ({
@@ -49,6 +51,9 @@ const UserProfileCard = ({
   allImages: IImage[];
   allImagesLoading: boolean;
 }) => {
+  const { statusMap } = useStatusMap();
+  const isOnline = statusMap.get(Number(user.id)) === 'online';
+
   if (allImagesLoading) {
     return <Loader />;
   }
@@ -68,7 +73,10 @@ const UserProfileCard = ({
 
         <div className="flex gap-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-3xl mb-4">{user.username}</h1>
+            <div className="flex items-center gap-1 mb-4">
+              <h1 className="cursor-pointer">{user.username}</h1>
+              <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
+            </div>
             <p className="flex items-center text-lg gap-2">
               <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}
             </p>
