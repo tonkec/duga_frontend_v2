@@ -74,7 +74,7 @@ const PhotoComments = () => {
     const formData = new FormData();
     formData.append('userId', String(userId));
     formData.append('uploadId', photoId);
-    formData.append('comment', data.comment);
+    formData.append('comment', data?.comment || '');
     if (taggedUsers.length > 0) {
       formData.append('taggedUserIds', JSON.stringify(taggedUsers.map((u) => u.id)));
     }
@@ -141,7 +141,7 @@ const PhotoComments = () => {
     const url = URL.createObjectURL(selectedImageFile);
     setPreviewUrl(url);
 
-    return () => URL.revokeObjectURL(url); // cleanup
+    return () => URL.revokeObjectURL(url);
   }, [selectedImageFile]);
 
   const sortedComments = allComments?.sort((a, b) => {

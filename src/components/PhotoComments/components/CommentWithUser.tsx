@@ -24,12 +24,11 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     });
     setIsEditing(false);
   };
-
   return (
     <div className="bg-gray-100 p-2 rounded">
       {isEditing ? (
         <CommentEditForm
-          defaultValue={comment.comment}
+          defaultValue={comment?.comment || ''}
           onCancel={() => setIsEditing(false)}
           onSubmitForm={handleEditSubmit}
         />
