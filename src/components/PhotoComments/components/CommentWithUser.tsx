@@ -76,6 +76,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   };
 
   const renderContent = () => {
+    if (comment.imageUrl) return null;
     if (isEditing) {
       return (
         <form className="flex gap-2 justify-between w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -124,6 +125,14 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   return (
     <div className="flex flex-col gap-1 bg-gray-100 p-2 rounded">
       {renderContent()}
+      {comment.imageUrl && (
+        <img
+          src={comment.imageUrl}
+          alt="comment image"
+          className="max-w-xs rounded-xs mt-2 object-cover aspect-ratio"
+        />
+      )}
+
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
       ) : (
