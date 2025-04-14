@@ -20,9 +20,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-document.head.innerHTML += `<link rel="icon" href="/favicon.png" />`;
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
