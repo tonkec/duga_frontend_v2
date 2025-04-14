@@ -21,6 +21,10 @@ const schema = z.object({
   comment: z.string().min(1),
 });
 
+const Commenter = ({ isUserLoading, user }: { isUserLoading: boolean; user: IUser }) => {
+  return isUserLoading ? <p className="text-xs">Loading user...</p> : <p>od: {user?.username}</p>;
+};
+
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
@@ -50,33 +54,47 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     setIsEditing(false);
   };
 
-  const renderFormattedComment = (text: string) => {
-    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
-    if (!cleanText) return null;
-    const parts = cleanText.split(/(@\w+)/g);
+  const renderFormattedComment = (text: string, imageUrl: string | undefined) => {
+    if (comment.imageUrl) {
+      return (
+        imageUrl && (
+          <img
+            src={imageUrl}
+            alt="comment image"
+            className="max-w-xs rounded-xs mt-2 object-cover aspect-ratio"
+          />
+        )
+      );
+    }
 
-    return parts.map((part, index) => {
-      if (part.startsWith('@')) {
-        const username = part.slice(1);
-        const matchedUser = comment.taggedUsers?.find(
-          (u) => u.username.toLowerCase() === username.toLowerCase()
-        );
-
-        if (matchedUser) {
-          return (
-            <Link to={`/user/${matchedUser.id}`} key={index} className="text-blue underline">
-              {part}
-            </Link>
+    if (comment.comment) {
+      const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
+      if (!cleanText) return null;
+      const parts = cleanText.split(/(@\w+)/g);
+      return parts.map((part, index) => {
+        if (part.startsWith('@')) {
+          const username = part.slice(1);
+          const matchedUser = comment.taggedUsers?.find(
+            (u) => u.username.toLowerCase() === username.toLowerCase()
           );
-        }
-      }
 
-      return <span key={index}>{part}</span>;
-    });
+          if (matchedUser) {
+            return (
+              <Link to={`/user/${matchedUser.id}`} key={index} className="text-blue underline">
+                {part}
+              </Link>
+            );
+          }
+        }
+
+        return <span key={index}>{part}</span>;
+      });
+    }
+
+    return null;
   };
 
   const renderContent = () => {
-    if (comment.imageUrl) return null;
     if (isEditing) {
       return (
         <form className="flex gap-2 justify-between w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -106,40 +124,27 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     }
 
     return (
-      <div className="flex gap-2 justify-between">
-        <p className="text-lg">{renderFormattedComment(comment.comment)}</p>
-        {currentUser === comment.userId && (
-          <div className="flex gap-2">
-            <Button type="tertiary" onClick={() => setIsEditing(true)}>
-              Izmijeni
-            </Button>
-            <Button type="tertiary" onClick={() => mutateDeleteUploadComment(Number(comment.id))}>
-              Obriši
-            </Button>
-          </div>
-        )}
-      </div>
+      <>
+        <p className="text-lg">{renderFormattedComment(comment.comment, comment.imageUrl)}</p>
+        <div className="flex items-center justify-between gap-2 mt-4">
+          <Commenter isUserLoading={isUserLoading} user={user?.data} />
+
+          {currentUser === comment.userId && (
+            <div className="flex gap-2">
+              <Button type="tertiary" onClick={() => setIsEditing(true)}>
+                Izmijeni
+              </Button>
+              <Button type="tertiary" onClick={() => mutateDeleteUploadComment(Number(comment.id))}>
+                Obriši
+              </Button>
+            </div>
+          )}
+        </div>
+      </>
     );
   };
 
-  return (
-    <div className="flex flex-col gap-1 bg-gray-100 p-2 rounded">
-      {renderContent()}
-      {comment.imageUrl && (
-        <img
-          src={comment.imageUrl}
-          alt="comment image"
-          className="max-w-xs rounded-xs mt-2 object-cover aspect-ratio"
-        />
-      )}
-
-      {isUserLoading ? (
-        <p className="text-xs">Loading user...</p>
-      ) : (
-        <p>od: {user?.data.username || `User ${comment.userId}`}</p>
-      )}
-    </div>
-  );
+  return <div className="bg-gray-100 p-2 rounded">{renderContent()}</div>;
 };
 
 export default CommentWithUser;
