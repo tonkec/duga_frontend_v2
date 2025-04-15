@@ -110,19 +110,15 @@ const PhotoComments = () => {
       });
     });
 
-    socket.on('update-comment', (data) => {
-      setAllComments((prev) => {
-        const updatedComments = prev.map((comment) => {
-          if (Number(comment.id) === Number(data.data.id)) {
-            return {
-              ...comment,
-              comment: data.data.comment,
-            };
-          }
-          return comment;
-        });
-        return updatedComments;
-      });
+    socket.on('update-comment', (response) => {
+      const updatedComment = response.data?.data;
+      if (!updatedComment?.id) return;
+
+      setAllComments((prev) =>
+        prev.map((comment) =>
+          Number(comment.id) === Number(updatedComment.id) ? updatedComment : comment
+        )
+      );
     });
 
     return () => {
