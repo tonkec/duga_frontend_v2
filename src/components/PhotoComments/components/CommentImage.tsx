@@ -8,7 +8,7 @@ const CommentImage = ({ comment }: { comment: IComment }) => {
         alt="comment image"
         className="w-full h-auto rounded-lg max-w-[300px] max-h-[300px] object-cover"
       />
-      <p>{comment?.comment}</p>
+      {comment?.comment && <p>{comment?.comment}</p>}
     </>
   );
 };
