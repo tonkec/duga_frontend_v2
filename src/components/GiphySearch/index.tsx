@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { debounce } from 'lodash';
-import Input from '../Input';
+import Input from '@app/components/Input';
 import { useGIFS } from './hooks';
 
 interface GiphyResult {

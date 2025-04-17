@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { deleteUser, IUserUpdateProps, updateUser } from '../../../api/users';
+import { deleteUser, IUserUpdateProps, updateUser } from '@app/api/users';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
+import { toastConfig } from '@app/configs/toast.config';
 import { useAuth0 } from '@auth0/auth0-react';
 
 export const useUpdateUser = (userId: string) => {

@@ -1,16 +1,16 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import AppLayout from '../../components/AppLayout';
-import Card from '../../components/Card';
-import Cta from '../../components/Cta';
-import Photos from '../../components/Photos';
+import AppLayout from '@app/components/AppLayout';
+import Card from '@app/components/Card';
+import Cta from '@app/components/Cta';
+import Photos from '@app/components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
-import UserProfileCard from '../../components/UserProfileCard';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
+import UserProfileCard from '@app/components/UserProfileCard';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import 'react-tabs/style/react-tabs.css';
-import { useGetUserById } from '../../hooks/useGetUserById';
-import Loader from '../../components/Loader';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import Loader from '@app/components/Loader';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import AppLayout from '../../components/AppLayout';
-import Input from '../../components/Input';
-import { useGetAllUsers } from '../../hooks/useGetAllUsers';
-import UserCard, { IUser } from '../../components/UserCard';
+import AppLayout from '@app/components/AppLayout';
+import Input from '@app/components/Input';
+import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
+import UserCard, { IUser } from '@app/components/UserCard';
 import { useCreateNewChat } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import Loader from '../../components/Loader';
-import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
+import Loader from '@app/components/Loader';
+import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
 
 const NewChatPage = () => {

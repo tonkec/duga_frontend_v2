@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { IComment } from '..';
-import { useGetUserById } from '../../../hooks/useGetUserById';
-import Button from '../../Button';
-import { useDeleteUploadComment, useEditUploadComment } from '../hooks';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import Button from '@app/components/Button';
+import { useDeleteUploadComment, useEditUploadComment } from '@app/components/PhotoComments/hooks';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import FieldError from '../../FieldError';
+import FieldError from '@app/components/FieldError';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import MentionInput from '../../MentionInput';
+import MentionInput from '@app/components/MentionInput';
 import { Link } from 'react-router-dom';
-import { IUser } from '../../UserCard';
+import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 
 interface Inputs {

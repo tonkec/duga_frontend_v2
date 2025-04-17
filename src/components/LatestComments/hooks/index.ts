@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getLatestUploadComments } from '../../../api/uploadsComments';
+import { getLatestUploadComments } from '@app/api/uploadsComments';
 
 export const useGetLatestComments = () => {
   const {

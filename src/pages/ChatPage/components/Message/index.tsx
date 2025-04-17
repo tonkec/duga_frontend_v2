@@ -1,8 +1,8 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
-import RecordCreatedAt from '../../../../components/RecordCreatedAt';
-import { S3_CHAT_PHOTO_ENVIRONMENT, S3_URL } from '../../../../utils/consts';
+import RecordCreatedAt from '@app/components/RecordCreatedAt';
+import { S3_CHAT_PHOTO_ENVIRONMENT, S3_URL } from '@app/utils/consts';
 import { useEffect, useState } from 'react';
 
 type MessageType = 'text' | 'file' | 'gif';

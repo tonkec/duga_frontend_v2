@@ -1,14 +1,14 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
-import Card from '../Card';
+import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
+import Card from '@app/components/Card';
 import { useNavigate } from 'react-router';
-import RecordCreatedAt from '../RecordCreatedAt';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
+import RecordCreatedAt from '@app/components/RecordCreatedAt';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
-import { useGetUserById } from '../../hooks/useGetUserById';
-import { S3_URL } from '../../utils/consts';
-import { useGetIsMessageRead, useMarkMessagesAsRead } from '../../pages/NewChatPage/hooks';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import { S3_URL } from '@app/utils/consts';
+import { useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 
 interface IMessage {
   id: number;

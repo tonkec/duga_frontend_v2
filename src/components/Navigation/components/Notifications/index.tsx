@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGetAllNotifcations, useMarkAsReadNotification } from '../../hooks';
-import { useSocket } from '../../../../context/useSocket';
+import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
+import { useSocket } from '@app/context/useSocket';
 import { useNavigate } from 'react-router-dom';
 
 export type Notification = {

@@ -1,6 +1,6 @@
 import Avatar from 'react-avatar';
 import { Link } from 'react-router';
-import { IUser } from '../UserCard';
+import { IUser } from '@app/components/UserCard';
 
 interface IProfilePhotoProps {
   url: string;

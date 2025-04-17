@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createChat } from '../../../api/chats';
+import { createChat } from '@app/api/chats';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
+import { toastConfig } from '@app/configs/toast.config';
 import { useNavigate } from 'react-router';
-import { isMessageRead, markMessagesAsRead } from '../../../api/chatMessages';
+import { isMessageRead, markMessagesAsRead } from '@app/api/chatMessages';
 
 interface CreateChatInput {
   userId: number;

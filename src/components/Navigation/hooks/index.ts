@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { getAllNotifications, markAsReadNotification } from '../../../api/notifications';
+import { getAllNotifications, markAsReadNotification } from '@app/api/notifications';
 
 export const useGetAllNotifcations = (userId: string) => {
   const {

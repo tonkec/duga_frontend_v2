@@ -1,7 +1,7 @@
 import { SyntheticEvent } from 'react';
-import AppContainer from '../AppContainer';
-import Footer from '../Footer';
-import Navigation from '../Navigation';
+import AppContainer from '@app/components/AppContainer';
+import Footer from '@app/components/Footer';
+import Navigation from '@app/components/Navigation';
 
 interface IAppLayoutProps {
   children: React.ReactNode;

@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
-import Loader from '../../components/Loader';
+import Loader from '@app/components/Loader';
 
 interface IAuthGuardProps {
   children: React.ReactNode;
