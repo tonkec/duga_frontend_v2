@@ -2,7 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
 import { useEffect, useState } from 'react';
-import { useSocket } from '../../context/useSocket';
+import { useSocket } from '@app/context/useSocket';
 import PhotoLikeDropdown from './components/LikesList';
 
 interface IPhotoLikesProps {

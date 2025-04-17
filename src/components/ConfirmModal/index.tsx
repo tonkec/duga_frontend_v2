@@ -1,5 +1,5 @@
 import Modal from 'react-modal';
-import Button from '../Button';
+import Button from '@app/components/Button';
 
 interface IConfirmModalProps {
   isOpen: boolean;

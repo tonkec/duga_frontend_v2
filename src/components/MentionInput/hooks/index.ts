@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getUserByUsername } from '../../../api/users';
+import { getUserByUsername } from '@app/api/users';
 
 export const useGetUserByUsername = (username: string) => {
   const {

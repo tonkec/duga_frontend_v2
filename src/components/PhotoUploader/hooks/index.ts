@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
-import { uploadPhotos } from '../../../api/uploads';
+import { toastConfig } from '@app/configs/toast.config';
+import { uploadPhotos } from '@app/api/uploads';
 
 export const useUploadPhotos = (id: string) => {
   const queryClient = useQueryClient();

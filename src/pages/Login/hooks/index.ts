@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { register } from '../../../api/auth/register';
+import { register } from '@app/api/auth/register';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
+import { toastConfig } from '@app/configs/toast.config';
 import { useNavigate } from 'react-router';
 
 interface ISignupProps {

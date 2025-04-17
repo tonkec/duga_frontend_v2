@@ -1,11 +1,11 @@
-import Button from '../Button';
+import Button from '@app/components/Button';
 import Avatar from 'react-avatar';
-import Card from '../Card';
-import { getUserBio } from '../UserProfileCard/utils';
+import Card from '@app/components/Card';
+import { getUserBio } from '@app/components/UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
-import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 import clsx from 'clsx';
 export interface IUser {
   avatar: string;

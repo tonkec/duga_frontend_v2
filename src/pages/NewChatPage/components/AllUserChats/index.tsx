@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
-import { IUser } from '../../../../components/UserCard';
-import UserChat from '../UserChat';
+import { IUser } from '@app/components/UserCard';
+import UserChat from '@app/pages/NewChatPage/components/UserChat';
 
 interface IChat {
   id: number;

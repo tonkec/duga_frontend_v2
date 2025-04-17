@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router';
-import { useGetCurrentChat } from '../../hooks';
+import { useGetCurrentChat } from '@app/pages/ChatPage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useEffect } from 'react';
 

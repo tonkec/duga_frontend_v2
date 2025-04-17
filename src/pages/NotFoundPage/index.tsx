@@ -1,5 +1,5 @@
-import AppLayout from '../../components/AppLayout';
-import NotFoundPageSvg from '../../assets/not_found_page.svg';
+import AppLayout from '@app/components/AppLayout';
+import NotFoundPageSvg from '@app/assets/not_found_page.svg';
 
 const NotFoundPage = () => {
   return (

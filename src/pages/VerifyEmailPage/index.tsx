@@ -1,9 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate, useNavigate } from 'react-router';
-import AuthLayout from '../../components/AuthLayout';
-import Button from '../../components/Button';
+import AuthLayout from '@app/components/AuthLayout';
+import Button from '@app/components/Button';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../configs/toast.config';
+import { toastConfig } from '@app/configs/toast.config';
 
 const VerifyEmailPage = () => {
   const navigate = useNavigate();

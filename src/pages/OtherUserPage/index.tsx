@@ -1,15 +1,15 @@
 import { useParams } from 'react-router';
-import AppLayout from '../../components/AppLayout';
+import AppLayout from '@app/components/AppLayout';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
-import UserProfileCard from '../../components/UserProfileCard';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
-import Cta from '../../components/Cta';
-import Card from '../../components/Card';
-import Photos from '../../components/Photos';
-import { useGetUserById } from '../../hooks/useGetUserById';
-import Loader from '../../components/Loader';
-import SendMessageButton from '../../components/SendMessageButton';
+import UserProfileCard from '@app/components/UserProfileCard';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import Cta from '@app/components/Cta';
+import Card from '@app/components/Card';
+import Photos from '@app/components/Photos';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import Loader from '@app/components/Loader';
+import SendMessageButton from '@app/components/SendMessageButton';
 
 const OtherUserPage = () => {
   const { userId } = useParams();

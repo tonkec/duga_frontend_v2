@@ -4,10 +4,10 @@ import {
   deleteUploadComment,
   editUploadComment,
   getUploadComments,
-} from '../../../api/uploadsComments';
+} from '@app/api/uploadsComments';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../../configs/toast.config';
-import { useSocket } from '../../../context/useSocket';
+import { toastConfig } from '@app/configs/toast.config';
+import { useSocket } from '@app/context/useSocket';
 interface IAddUploadCommentProps {
   userId: string;
   uploadId: string;

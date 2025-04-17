@@ -1,18 +1,18 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { IImage } from '../Photos';
+import { IImage } from '@app/components/Photos';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
-import Button from '../Button';
-import Input from '../Input';
+import Button from '@app/components/Button';
+import Input from '@app/components/Input';
 import { BiTrash } from 'react-icons/bi';
-import { removeSpacesAndDashes } from '../../utils/removeSpacesAndDashes';
-import Card from '../Card';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
-import { useDeletePhoto } from '../Photos/hooks';
+import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
+import Card from '@app/components/Card';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { toast } from 'react-toastify';
-import { toastConfig } from '../../configs/toast.config';
-import { getImageUrl } from '../../utils/getImageUrl';
-import ConfirmModal from '../ConfirmModal';
+import { toastConfig } from '@app/configs/toast.config';
+import { getImageUrl } from '@app/utils/getImageUrl';
+import ConfirmModal from '@app/components/ConfirmModal';
 export interface ImageDescription {
   description: string;
   imageId: string;

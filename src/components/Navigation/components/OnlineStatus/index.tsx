@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSocket } from '../../../../context/useSocket';
+import { useSocket } from '@app/context/useSocket';
 
 const StatusDropdown = ({ userId }: { userId: number | null }) => {
   const socket = useSocket();
