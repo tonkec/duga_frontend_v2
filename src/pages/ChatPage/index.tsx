@@ -15,6 +15,7 @@ import { useSocket } from '../../context/useSocket';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
 import { IMessage } from './components/Message';
+import ChatBubble from '../../components/ChatBubble';
 
 interface IChatUser {
   userId: number;
@@ -148,7 +149,7 @@ const ChatPage = () => {
               receivedMessages={receivedMessages}
             />
           </div>
-          {isTyping && <p className="text-sm text-gray-500 mb-0">Tipka...</p>}
+          {isTyping && <ChatBubble />}
           {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
         </Card>
       </AppLayout>
