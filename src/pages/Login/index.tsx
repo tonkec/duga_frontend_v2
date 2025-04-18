@@ -1,10 +1,10 @@
-import Button from '../../components/Button';
+import Button from '@app/components/Button';
 import { useAuth0 } from '@auth0/auth0-react';
-import Image1 from '../../assets/image1.png';
-import Image2 from '../../assets/image2.png';
-import Image3 from '../../assets/image3.png';
-import Image4 from '../../assets/image4.png';
-import Homepage from '../../assets/homepage.svg';
+import Image1 from '@app/assets/image1.png';
+import Image2 from '@app/assets/image2.png';
+import Image3 from '@app/assets/image3.png';
+import Image4 from '@app/assets/image4.png';
+import Homepage from '@app/assets/homepage.svg';
 
 const IS_STAGING = import.meta.env.STAGING;
 const URL = IS_STAGING ? 'https://dugastaging.netlify.app' : 'http://localhost:5173';

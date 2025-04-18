@@ -1,20 +1,20 @@
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
-import AppLayout from '../../components/AppLayout';
-import Card from '../../components/Card';
-import PhotoUploader from '../../components/PhotoUploader';
+import AppLayout from '@app/components/AppLayout';
+import Card from '@app/components/Card';
+import PhotoUploader from '@app/components/PhotoUploader';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import Input from '../../components/Input';
+import Input from '@app/components/Input';
 import Select from 'react-select';
-import TextArea from '../../components/Textarea';
-import { useGetUserById } from '../../hooks/useGetUserById';
+import TextArea from '@app/components/Textarea';
+import { useGetUserById } from '@app/hooks/useGetUserById';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useDeleteUser, useUpdateUser } from './hooks';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
-import Button from '../../components/Button';
-import ConfirmModal from '../../components/ConfirmModal';
+import Button from '@app/components/Button';
+import ConfirmModal from '@app/components/ConfirmModal';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getErrorMessage } from '../utils/getErrorMessage';
+import { getErrorMessage } from '@app/utils/getErrorMessage';
 
 const getCookie = (name: string) => {
   const cookies = document.cookie.split('; ');

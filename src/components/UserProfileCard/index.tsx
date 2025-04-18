@@ -1,5 +1,5 @@
-import Card from '../Card';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import Card from '@app/components/Card';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import Avatar from 'react-avatar';
 import { BiBody, BiBoltCircle, BiCheckCircle, BiSolidMap, BiStopwatch, BiX } from 'react-icons/bi';
 import {
@@ -10,9 +10,9 @@ import {
   shouldRenderField,
 } from './utils';
 import Iframe from 'react-iframe';
-import { IImage } from '../Photos';
-import Loader from '../Loader';
-import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
+import { IImage } from '@app/components/Photos';
+import Loader from '@app/components/Loader';
+import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 
 export interface IUserProfileCardProps {
   bio: string;

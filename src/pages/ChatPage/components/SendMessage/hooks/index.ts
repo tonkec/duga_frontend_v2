@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { uploadMessagePhotos } from '../../../../../api/uploads';
+import { uploadMessagePhotos } from '@app/api/uploads';
 
 export const useUploadMessageImage = () => {
   const {

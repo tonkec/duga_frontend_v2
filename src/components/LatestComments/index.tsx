@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router';
-import { useGetUserById } from '../../hooks/useGetUserById';
-import Card from '../Card';
-import Loader from '../Loader';
-import RecordCreatedAt from '../RecordCreatedAt';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import Card from '@app/components/Card';
+import Loader from '@app/components/Loader';
+import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetLatestComments } from './hooks';
 import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import DOMPurify from 'dompurify';
 
 interface IComment {

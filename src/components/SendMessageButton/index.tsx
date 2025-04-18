@@ -1,7 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { IChat, useCreateNewChat } from '../../pages/NewChatPage/hooks';
-import Button, { ButtonType } from '../Button';
-import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
+import { IChat, useCreateNewChat } from '@app/pages/NewChatPage/hooks';
+import Button, { ButtonType } from '@app/components/Button';
+import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { useNavigate } from 'react-router';
 import { hasAlreadyChatted } from './utils/hasAlreadyChatted';
 import { useState } from 'react';

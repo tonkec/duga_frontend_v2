@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { IUser } from '../UserCard';
+import { IUser } from '@app/components/UserCard';
 import { useGetUserByUsername } from './hooks';
-import { debounceScroll } from '../../utils/debounceScroll';
+import { debounceScroll } from '@app/utils/debounceScroll';
 
 interface MentionInputProps {
   value: string;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useSocket } from '../../../../context/useSocket';
-import { useUserOnlineStatus } from '../../../../context/OnlineStatus/hooks';
+import { useUserOnlineStatus } from '@app/context/OnlineStatus/hooks';
+
+import { useSocket } from '@app/context/useSocket';
 
 const StatusDropdown = ({ userId }: { userId: number | null }) => {
   const socket = useSocket();

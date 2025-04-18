@@ -1,7 +1,7 @@
-import Input from '../Input';
+import Input from '@app/components/Input';
 import { BiSearch } from 'react-icons/bi';
 import Select from 'react-select';
-import { IUser } from '../UserCard';
+import { IUser } from '@app/components/UserCard';
 import { SyntheticEvent } from 'react';
 
 const selectOptions: { value: keyof IUser; label: string }[] = [

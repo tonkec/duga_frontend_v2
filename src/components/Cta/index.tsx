@@ -1,4 +1,4 @@
-import Button from '../Button';
+import Button from '@app/components/Button';
 
 interface ICtaProps {
   title: string;
