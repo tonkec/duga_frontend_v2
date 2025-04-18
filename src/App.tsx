@@ -19,6 +19,12 @@ import { useCreateUser } from './pages/Login/hooks';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 
+interface Message {
+  id: number;
+  content: string;
+  timestamp: string;
+}
+
 interface ChatUser {
   chatId: number;
   userId: number;
@@ -29,6 +35,7 @@ interface ChatUser {
 interface Chat {
   ChatUser: ChatUser;
   Users: { ChatUser: ChatUser }[];
+  Messages: Message[];
 }
 
 const DEFAULT_USERNAME = 'Korisnik';
@@ -126,8 +133,10 @@ function App() {
           data={renderedUsers}
           itemsPerPage={itemsPerPage}
           paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => {
-            const hasChatWithUser = userChats?.data?.some((chat: Chat) =>
-              chat.Users?.some((user) => user.ChatUser.userId === Number(singleEntry.id))
+            const hasChatWithUser = userChats?.data?.some(
+              (chat: Chat) =>
+                chat.Users?.some((user) => user.ChatUser.userId === Number(singleEntry.id)) &&
+                chat.Messages?.length > 0
             );
 
             return (
