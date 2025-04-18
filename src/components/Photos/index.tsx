@@ -1,9 +1,9 @@
 import { SetStateAction } from 'react';
-import notFound from '../../assets/not_found.svg';
-import { ImageDescription } from '../PhotoUploader';
+import notFound from '@app/assets/not_found.svg';
+import { ImageDescription } from '@app/components/PhotoUploader';
 import { useNavigate } from 'react-router';
-import { getImageUrl } from '../../utils/getImageUrl';
-import PhotoLikes from '../PhotoLikes';
+import { getImageUrl } from '@app/utils/getImageUrl';
+import PhotoLikes from '@app/components/PhotoLikes';
 export interface IImage {
   createdAt: string;
   description: string;

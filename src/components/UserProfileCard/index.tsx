@@ -1,5 +1,5 @@
-import Card from '../Card';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import Card from '@app/components/Card';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import Avatar from 'react-avatar';
 import { BiBody, BiBoltCircle, BiCheckCircle, BiSolidMap, BiStopwatch, BiX } from 'react-icons/bi';
 import {
@@ -10,8 +10,9 @@ import {
   shouldRenderField,
 } from './utils';
 import Iframe from 'react-iframe';
-import { IImage } from '../Photos';
-import Loader from '../Loader';
+import { IImage } from '@app/components/Photos';
+import Loader from '@app/components/Loader';
+import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 
 export interface IUserProfileCardProps {
   bio: string;
@@ -38,6 +39,7 @@ export interface IUserProfileCardProps {
   firstName: string;
   lastName: string;
   favoriteDayOfWeek: string;
+  id: string;
 }
 
 const UserProfileCard = ({
@@ -49,6 +51,9 @@ const UserProfileCard = ({
   allImages: IImage[];
   allImagesLoading: boolean;
 }) => {
+  const { statusMap } = useStatusMap();
+  const isOnline = statusMap.get(Number(user.id)) === 'online';
+
   if (allImagesLoading) {
     return <Loader />;
   }
@@ -68,7 +73,10 @@ const UserProfileCard = ({
 
         <div className="flex gap-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-3xl mb-4">{user.username}</h1>
+            <div className="flex items-center gap-1 mb-4">
+              <h1>{user.username}</h1>
+              <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
+            </div>
             <p className="flex items-center text-lg gap-2">
               <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}
             </p>

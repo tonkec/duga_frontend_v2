@@ -1,12 +1,12 @@
 import { useParams } from 'react-router';
-import AppLayout from '../../components/AppLayout';
+import AppLayout from '@app/components/AppLayout';
 import { useGetSingleImage } from './hooks';
-import { getPhotoUrl } from '../../utils/getPhotoUrl';
-import Card from '../../components/Card';
-import PhotoComments from '../../components/PhotoComments';
-import PhotoLikes from '../../components/PhotoLikes';
-import Loader from '../../components/Loader';
-import notFound from '../../assets/not_found.svg';
+import { getPhotoUrl } from '@app/utils/getPhotoUrl';
+import Card from '@app/components/Card';
+import PhotoComments from '@app/components/PhotoComments';
+import PhotoLikes from '@app/components/PhotoLikes';
+import Loader from '@app/components/Loader';
+import notFound from '@app/assets/not_found.svg';
 
 const PhotoPage = () => {
   const { photoId } = useParams();

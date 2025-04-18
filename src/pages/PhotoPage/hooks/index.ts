@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getSingleImage } from '../../../api/uploads';
+import { getSingleImage } from '@app/api/uploads';
 
 export const useGetSingleImage = (id: string) => {
   const {

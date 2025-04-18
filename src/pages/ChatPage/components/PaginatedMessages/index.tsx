@@ -1,18 +1,7 @@
 import { useParams } from 'react-router';
-import Message from '../Message';
-import { debounceScroll } from '../../../../utils/debounceScroll';
-import { useGetAllMessages } from '../../hooks';
-
-export interface Message {
-  id: string;
-  message: string;
-  createdAt: string;
-  User: {
-    id: number;
-  };
-  messagePhotoUrl: string;
-  showAvatar: boolean;
-}
+import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
+import { debounceScroll } from '@app/utils/debounceScroll';
+import { useGetAllMessages } from '@app/pages/ChatPage/hooks';
 
 const PaginatedMessages = ({
   otherUserProfilePhoto,
@@ -27,7 +16,7 @@ const PaginatedMessages = ({
   otherUserName: string;
   currentUserName: string;
   otherUserId: number | undefined;
-  receivedMessages: Message[];
+  receivedMessages: IMessage[];
 }) => {
   const { chatId } = useParams();
   const { messages, fetchNextPage } = useGetAllMessages(chatId!);

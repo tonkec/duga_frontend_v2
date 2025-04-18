@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from '../Button';
+import Button from '@app/components/Button';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 
 interface IPaginatedProps<T> {

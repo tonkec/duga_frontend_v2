@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { getChatMessages } from '../../../api/chatMessages';
-import { deleteCurrentChat, getCurrentChat } from '../../../api/chats';
-import { toastConfig } from '../../../configs/toast.config';
+import { getChatMessages } from '@app/api/chatMessages';
+import { deleteCurrentChat, getCurrentChat } from '@app/api/chats';
+import { toastConfig } from '@app/configs/toast.config';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
 
