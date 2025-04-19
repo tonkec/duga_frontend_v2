@@ -47,3 +47,8 @@ export const getUserByUsername = async (username: string) => {
   const client = apiClient();
   return client.get(`/users/username/${username}`);
 };
+
+export const getUserOnlineStatus = async (userId: string) => {
+  const client = apiClient();
+  return client.get(`/users/online-status/${userId}`);
+};
