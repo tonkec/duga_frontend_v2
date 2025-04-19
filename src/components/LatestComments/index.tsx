@@ -2,78 +2,23 @@ import { useNavigate } from 'react-router';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Card from '@app/components/Card';
 import Loader from '@app/components/Loader';
-import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetLatestComments } from './hooks';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import DOMPurify from 'dompurify';
-
-interface IComment {
-  id: number;
-  comment: string;
-  createdAt: string;
-  uploadId: number;
-  userId: number;
-  taggedUsers?: { id: number; username: string }[];
-}
+import CommentContent from '../PhotoComments/components/CommentContent';
+import Commenter from '../PhotoComments/components/Commenter';
+import { IComment } from '../PhotoComments';
+import RecordCreatedAt from '../RecordCreatedAt';
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
-  const navigate = useNavigate();
-  const { user } = useGetUserById(comment.userId.toString());
-  const { allImages } = useGetAllImages(comment.userId.toString());
-
-  const renderFormattedComment = (text: string) => {
-    const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
-    if (!cleanText) return null;
-
-    const parts = cleanText.split(/(@\w+)/g);
-
-    return parts.map((part, index) => {
-      if (part.startsWith('@')) {
-        const username = part.slice(1);
-        const matchedUser = comment.taggedUsers?.find((u) => u.username === username);
-
-        if (matchedUser) {
-          return (
-            <span
-              key={index}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/user/${matchedUser.id}`);
-              }}
-              className="text-blue underline cursor-pointer"
-            >
-              {part}
-            </span>
-          );
-        }
-      }
-
-      return <span key={index}>{part}</span>;
-    });
-  };
+  const { user, isUserLoading } = useGetUserById(comment.userId.toString());
 
   return (
     <div
       className="flex flex-col gap-1 border-b p-4 hover:bg-gray-100 transition cursor-pointer"
       onClick={onClick}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <Avatar
-          color="#2D46B9"
-          name={`${user?.data.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="40"
-          round={true}
-          onClick={() => {
-            navigate(`/user/${comment.userId}`);
-          }}
-          className="cursor-pointer"
-        />
-        <p className="text-sm">{renderFormattedComment(comment.comment)}</p>
-      </div>
-      <div className="flex justify-between">
+      <CommentContent comment={comment} />
+      <div className="flex items-center justify-between gap-2 mt-4">
+        <Commenter isUserLoading={isUserLoading} user={user?.data} />
         <RecordCreatedAt createdAt={comment.createdAt} />
       </div>
     </div>
