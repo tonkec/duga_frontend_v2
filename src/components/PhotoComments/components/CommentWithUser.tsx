@@ -8,6 +8,7 @@ import Button from '@app/components/Button';
 import { useDeleteUploadComment, useEditUploadComment } from '@app/components/PhotoComments/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { IUser } from '@app/components/UserCard';
+import RecordCreatedAt from '@app/components/RecordCreatedAt';
 
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -52,6 +53,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
               </div>
             )}
           </div>
+          <RecordCreatedAt createdAt={comment.createdAt} />
         </>
       )}
     </div>
