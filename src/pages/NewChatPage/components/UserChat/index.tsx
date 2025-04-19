@@ -1,9 +1,9 @@
 import { BiChevronRight } from 'react-icons/bi';
-import { useGetAllImages } from '../../../../hooks/useGetAllImages';
-import Loader from '../../../../components/Loader';
-import { getProfilePhotoUrl } from '../../../../utils/getProfilePhoto';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import Loader from '@app/components/Loader';
+import { getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import Avatar from 'react-avatar';
-import { useGetIsMessageRead, useMarkMessagesAsRead } from '../../hooks';
+import { useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 
 interface IMessage {

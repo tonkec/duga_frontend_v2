@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router';
-import { S3_URL } from '../../../../utils/consts';
-import { useGetUserById } from '../../../../hooks/useGetUserById';
-import { useGetAllImages } from '../../../../hooks/useGetAllImages';
+import { S3_URL } from '@app/utils/consts';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../../../utils/getProfilePhoto';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 
 interface IUpload {
   id: string;

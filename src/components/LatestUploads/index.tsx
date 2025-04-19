@@ -1,4 +1,4 @@
-import Card from '../Card';
+import Card from '@app/components/Card';
 import LatestUpload from './components/LatestUpload';
 import { useGetLatestUploads } from './hooks';
 

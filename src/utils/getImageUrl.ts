@@ -1,4 +1,4 @@
-import { IImage } from '../components/Photos';
+import { IImage } from '@app/components/Photos';
 import { S3_URL } from './consts';
 
 export const getImageUrl = (image: IImage) => {

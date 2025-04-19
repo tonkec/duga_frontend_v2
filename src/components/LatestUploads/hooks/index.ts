@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getLatestUploads } from '../../../api/uploads';
+import { getLatestUploads } from '@app/api/uploads';
 
 export const useGetLatestUploads = () => {
   const {

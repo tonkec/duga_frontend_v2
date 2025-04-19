@@ -1,15 +1,15 @@
 import { Route, Routes } from 'react-router';
-import App from '../App';
-import LoginPage from '../pages/Login';
-import MyProfilePage from '../pages/MyProfilePage';
-import EditMyProfilePage from '../pages/EditMyProfilePage';
-import OtherUserPage from '../pages/OtherUserPage';
-import PhotoPage from '../pages/PhotoPage';
-import NewChatPage from '../pages/NewChatPage';
-import ChatPage from '../pages/ChatPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import App from '@app/App';
+import LoginPage from '@app/pages/Login';
+import MyProfilePage from '@app/pages/MyProfilePage';
+import EditMyProfilePage from '@app/pages/EditMyProfilePage';
+import OtherUserPage from '@app/pages/OtherUserPage';
+import PhotoPage from '@app/pages/PhotoPage';
+import NewChatPage from '@app/pages/NewChatPage';
+import ChatPage from '@app/pages/ChatPage';
+import NotFoundPage from '@app/pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
-import VerifyEmailPage from '../pages/VerifyEmailPage';
+import VerifyEmailPage from '@app/pages/VerifyEmailPage';
 
 const DugaRoutes = () => {
   return (

@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
-import Message, { IMessage } from '../Message';
-import { debounceScroll } from '../../../../utils/debounceScroll';
-import { useGetAllMessages } from '../../hooks';
+import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
+import { debounceScroll } from '@app/utils/debounceScroll';
+import { useGetAllMessages } from '@app/pages/ChatPage/hooks';
 
 const PaginatedMessages = ({
   otherUserProfilePhoto,

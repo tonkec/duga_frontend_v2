@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useGetUserById } from '../../../hooks/useGetUserById';
-import { useDeleteUploadComment, useEditUploadComment } from '../hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
-import Button from '../../Button';
-import { IUser } from '../../UserCard';
 import { IComment } from '..';
 import CommentEditForm from './CommentEditForm';
 import CommentContent from './CommentContent';
 import Commenter from './Commenter';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import Button from '@app/components/Button';
+import { useDeleteUploadComment, useEditUploadComment } from '@app/components/PhotoComments/hooks';
+import { useLocalStorage } from '@uidotdev/usehooks';
+import { IUser } from '@app/components/UserCard';
 
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);

@@ -1,20 +1,21 @@
 import { useNavigate, useParams } from 'react-router';
-import AppLayout from '../../components/AppLayout';
-import Card from '../../components/Card';
+import AppLayout from '@app/components/AppLayout';
+import Card from '@app/components/Card';
 import SendMessage from './components/SendMessage';
 import { useEffect, useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
 import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
-import { useGetUserById } from '../../hooks/useGetUserById';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
-import Button from '../../components/Button';
-import { useSocket } from '../../context/useSocket';
-import ConfirmModal from '../../components/ConfirmModal';
-import { useStatusMap } from '../../context/OnlineStatus/useStatusMap';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import Button from '@app/components/Button';
+import { useSocket } from '@app/context/useSocket';
+import ConfirmModal from '@app/components/ConfirmModal';
+import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 import { IMessage } from './components/Message';
+import ChatBubble from '@app/components/ChatBubble';
 
 interface IChatUser {
   userId: number;
@@ -148,7 +149,7 @@ const ChatPage = () => {
               receivedMessages={receivedMessages}
             />
           </div>
-          {isTyping && <p className="text-sm text-gray-500 mb-0">Tipka...</p>}
+          {isTyping && <ChatBubble />}
           {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
         </Card>
       </AppLayout>

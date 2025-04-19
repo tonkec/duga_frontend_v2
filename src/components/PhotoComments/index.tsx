@@ -1,19 +1,19 @@
 import { Controller, useForm } from 'react-hook-form';
-import Button from '../Button';
+import Button from '@app/components/Button';
 import { useAddUploadComment, useGetUploadComments } from './hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
-import FieldError from '../FieldError';
+import FieldError from '@app/components/FieldError';
 import { useEffect, useState } from 'react';
-import Paginated from '../Paginated';
-import { useSocket } from '../../context/useSocket';
-import MentionInput from '../MentionInput';
-import { IUser } from '../UserCard';
 import { BiPaperclip } from 'react-icons/bi';
 import { useRef } from 'react';
+import Paginated from '@app/components/Paginated';
+import { useSocket } from '@app/context/useSocket';
+import MentionInput from '@app/components/MentionInput';
+import { IUser } from '@app/components/UserCard';
 
 const schema = z
   .object({

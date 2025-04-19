@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAllUserChats } from '../api/chats';
+import { getAllUserChats } from '@app/api/chats';
 
 export const useGetAllUserChats = (userId: string, isQueryEnabled?: boolean) => {
   const {

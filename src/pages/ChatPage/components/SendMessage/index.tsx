@@ -1,23 +1,23 @@
 import { useForm, Controller } from 'react-hook-form';
-import Button from '../../../../components/Button';
+import Button from '@app/components/Button';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import FieldError from '../../../../components/FieldError';
+import FieldError from '@app/components/FieldError';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useGetAllUserChats } from '../../../../hooks/useGetAllUserChats';
-import { IChat } from '../../../NewChatPage/hooks';
-import { IUser } from '../../../../components/UserCard';
-import { useGetUserById } from '../../../../hooks/useGetUserById';
-import { useSocket } from '../../../../context/useSocket';
+import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
+import { IChat } from '@app/pages/NewChatPage/hooks';
+import { IUser } from '@app/components/UserCard';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
 import { SyntheticEvent, useState, useRef, useEffect } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
-import EmojiPicker from '../../../../components/EmojiPicker';
+import EmojiPicker from '@app/components/EmojiPicker';
 import { debounce } from 'lodash';
-import Input from '../../../../components/Input';
+import Input from '@app/components/Input';
 import { BiPaperclip, BiSend, BiSolidFileGif } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
-import GiphySearch from '../../../../components/GiphySearch';
+import GiphySearch from '@app/components/GiphySearch';
 
 type Inputs = {
   content: string;

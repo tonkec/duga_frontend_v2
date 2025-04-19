@@ -1,4 +1,4 @@
-import { truncateString } from '../../../utils/truncateString';
+import { truncateString } from '@app/utils/truncateString';
 
 export const getLookingForTranslation = (lookingFor: string) => {
   switch (lookingFor) {

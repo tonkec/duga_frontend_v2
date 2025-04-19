@@ -1,12 +1,12 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link } from 'react-router';
 import { BiExit } from 'react-icons/bi';
-import ProfilePhoto from '../ProfilePhoto';
-import { useGetAllImages } from '../../hooks/useGetAllImages';
-import { getProfilePhoto, getProfilePhotoUrl } from '../../utils/getProfilePhoto';
+import ProfilePhoto from '@app/components/ProfilePhoto';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useCookies } from 'react-cookie';
-import { useGetUserById } from '../../hooks/useGetUserById';
-import Loader from '../Loader';
+import { useGetUserById } from '@app/hooks/useGetUserById';
+import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import NotificationDropdown from './components/Notifications';
 import OnlineStatus from './components/OnlineStatus';
