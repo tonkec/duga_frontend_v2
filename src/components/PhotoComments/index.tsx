@@ -14,6 +14,7 @@ import Paginated from '@app/components/Paginated';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { IUser } from '@app/components/UserCard';
+import { toast } from 'react-toastify';
 
 const schema = z
   .object({
@@ -111,14 +112,19 @@ const PhotoComments = () => {
     });
 
     socket.on('update-comment', (response) => {
-      const updatedComment = response.data?.data;
-      if (!updatedComment?.id) return;
+      try {
+        const updatedComment = response.data?.data;
+        if (!updatedComment?.id) return;
 
-      setAllComments((prev) =>
-        prev.map((comment) =>
-          Number(comment.id) === Number(updatedComment.id) ? updatedComment : comment
-        )
-      );
+        setAllComments((prev) =>
+          prev.map((comment) =>
+            Number(comment.id) === Number(updatedComment.id) ? updatedComment : comment
+          )
+        );
+      } catch (error) {
+        console.error('Error updating comment:', error);
+        toast.error('Greška prilikom ažuriranja komentara');
+      }
     });
 
     return () => {
