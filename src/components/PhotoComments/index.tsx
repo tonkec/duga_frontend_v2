@@ -56,7 +56,6 @@ const PhotoComments = () => {
   const { allUserImages } = useGetAllUserImages(userId as string);
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
-  console.log(allUserImages);
   const {
     handleSubmit,
     formState: { isValid, errors },
