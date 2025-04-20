@@ -15,6 +15,8 @@ import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { IUser } from '@app/components/UserCard';
 import { toast } from 'react-toastify';
+import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 
 const schema = z
   .object({
@@ -51,9 +53,10 @@ const PhotoComments = () => {
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string
   );
+  const { allUserImages } = useGetAllUserImages(userId as string);
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
-
+  console.log(allUserImages);
   const {
     handleSubmit,
     formState: { isValid, errors },
@@ -71,6 +74,11 @@ const PhotoComments = () => {
 
   const onSubmit = async (data: Inputs) => {
     if (!userId || !photoId || !isValid) return;
+
+    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+      toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+      return;
+    }
 
     const formData = new FormData();
     formData.append('userId', String(userId));
