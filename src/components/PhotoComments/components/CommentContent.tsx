@@ -7,11 +7,7 @@ const CommentContent = ({ comment }: { comment: IComment }) => {
     return <CommentImage comment={comment} />;
   }
 
-  if (comment.comment) {
-    return <CommentWithMention comment={comment} />;
-  }
-
-  return null;
+  return <CommentWithMention comment={comment} />;
 };
 
 export default CommentContent;
