@@ -5,7 +5,7 @@ const CommentImage = ({ comment }: { comment: IComment }) => {
     <>
       <img
         src={comment.imageUrl}
-        alt="comment image"
+        alt="Slika komentara"
         className="w-full h-auto rounded-lg max-w-[300px] max-h-[300px] object-cover"
       />
       {comment?.comment && <p>{comment?.comment}</p>}

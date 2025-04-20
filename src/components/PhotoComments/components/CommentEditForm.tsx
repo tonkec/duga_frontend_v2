@@ -55,7 +55,7 @@ const CommentEditForm = ({ defaultValue, defaultImageUrl, onCancel, onSubmitForm
         <div className="w-fit">
           <img
             src={defaultImageUrl}
-            alt="Attached"
+            alt="Slika"
             className="max-w-[150px] rounded-md border border-gray-300"
           />
         </div>
