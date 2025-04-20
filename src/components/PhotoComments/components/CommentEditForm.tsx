@@ -29,7 +29,7 @@ const CommentEditForm = ({ defaultValue, defaultImageUrl, onCancel, onSubmitForm
   });
 
   const onSubmit = (data: { comment: string }) => {
-    if (!data.comment?.trim()) return;
+    if (!data.comment) return;
     onSubmitForm(data.comment.trim(), taggedUsers);
   };
 
