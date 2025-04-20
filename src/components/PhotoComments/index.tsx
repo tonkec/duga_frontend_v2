@@ -216,7 +216,7 @@ const PhotoComments = () => {
               className="max-w-[150px] rounded-md border border-gray-300"
             />
             <Button type="danger" className="mt-2" onClick={clearImage}>
-              Remove
+              Makni
             </Button>
           </div>
         )}
