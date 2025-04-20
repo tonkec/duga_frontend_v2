@@ -1,10 +1,6 @@
 import { apiClient } from '..';
 
 export const addUploadComment = async (formData: FormData) => {
-  for (const [key, value] of formData.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-
   const client = apiClient();
   return client.post(`/comments/add-comment`, formData, {
     headers: {
