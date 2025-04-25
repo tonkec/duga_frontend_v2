@@ -11,6 +11,7 @@ import AllUserChats from './components/AllUserChats';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
+  const hasRejectedCookies = localStorage.getItem('cookieRejectedAt');
   const { userChats, isUserChatsLoading } = useGetAllUserChats(currentUserId as string);
   const [search, setSearch] = useState('');
   const { onCreateChat } = useCreateNewChat();
@@ -20,6 +21,17 @@ const NewChatPage = () => {
     return (
       <AppLayout>
         <Loader />
+      </AppLayout>
+    );
+  }
+
+  if (hasRejectedCookies) {
+    return (
+      <AppLayout>
+        <div className="text-center mt-10 text-red font-semibold">
+          Nije moguće slati poruke jer ste odbili kolačiće. Ako želite slati poruke, molimo vas da
+          prihvatite kolačiće.
+        </div>
       </AppLayout>
     );
   }
