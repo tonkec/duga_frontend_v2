@@ -90,10 +90,10 @@ const PhotoComments = () => {
     socket.on('update-comment', (data) => {
       setAllComments((prev) => {
         const updatedComments = prev.map((comment) => {
-          if (Number(comment.id) === Number(data.data.id)) {
+          if (Number(comment.id) === Number(data.data.data.id)) {
             return {
               ...comment,
-              comment: data.data.comment,
+              comment: data.data.data.comment,
             };
           }
           return comment;
