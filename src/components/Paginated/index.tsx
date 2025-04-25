@@ -44,7 +44,7 @@ const Paginated = <T,>({
           </li>
         ))}
       </ul>
-      {totalPages > 1 && (
+      {totalPages >= 1 && (
         <div className="flex justify-center items-center w-full p-4 gap-4">
           <Button
             className="flex items-center"
