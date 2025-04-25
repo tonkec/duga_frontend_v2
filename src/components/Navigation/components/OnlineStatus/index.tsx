@@ -34,8 +34,12 @@ const StatusDropdown = ({ userId }: { userId: number | null }) => {
       onChange={handleChange}
       className="py-2 bg-transparent text-white focus:outline-none"
     >
-      <option value="online">Online 🟢</option>
-      <option value="offline">Offline 🔴</option>
+      <option value="online" className="bg-gray-800 text-white">
+        Online 🟢
+      </option>
+      <option value="offline" className="bg-gray-800 text-white">
+        Offline 🔴
+      </option>
     </select>
   );
 };
