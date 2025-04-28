@@ -283,7 +283,13 @@ const PhotoUploader = () => {
               newImages.map((image) => {
                 return (
                   <div key={image.name} className="mb-4 max-w-[400px]">
-                    <img src={image.url} alt={image.name} />
+                    <div className="relative w-full aspect-[1/1] overflow-hidden rounded-md">
+                      <img
+                        src={image.url}
+                        alt={image.name}
+                        className="absolute top-0 left-0 w-full h-full object-cover"
+                      />
+                    </div>
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDeleteFromState(image)}
