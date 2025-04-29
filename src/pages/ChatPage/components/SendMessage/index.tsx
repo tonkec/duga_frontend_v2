@@ -71,7 +71,7 @@ interface ISendMessageProps {
   otherUserId: number | undefined | null;
 }
 
-interface IEmoji {
+export interface IEmoji {
   skins: {
     native: string;
   }[];

@@ -13,6 +13,12 @@ import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { IUser } from '@app/components/UserCard';
 
+import data from '@emoji-mart/data';
+import { init, SearchIndex } from 'emoji-mart';
+import EmojiPicker from '@app/components/EmojiPicker';
+import { debounce } from 'lodash';
+import { IEmoji } from '@app/pages/ChatPage/components/SendMessage';
+
 const schema = z.object({
   comment: z
     .string()
@@ -45,29 +51,18 @@ const PhotoComments = () => {
   );
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
+  const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
 
   const {
     handleSubmit,
     formState: { isValid, errors },
     reset,
     control,
+    setValue,
+    getValues,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
-
-  const onSubmit = (data: Inputs) => {
-    if (!userId || !photoId || !isValid) return;
-
-    mutateAddUploadComment({
-      userId: String(userId),
-      uploadId: photoId,
-      comment: data.comment,
-      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
-    });
-
-    reset();
-    setTaggedUsers([]);
-  };
 
   useEffect(() => {
     if (!areCommentsLoading) {
@@ -109,6 +104,44 @@ const PhotoComments = () => {
     };
   }, [areCommentsLoading, allCommentsData, socket]);
 
+  const onSubmit = (data: Inputs) => {
+    if (!userId || !photoId || !isValid) return;
+
+    // Init emoji search
+    init({ data });
+
+    mutateAddUploadComment({
+      userId: String(userId),
+      uploadId: photoId,
+      comment: data.comment,
+      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
+    });
+
+    reset();
+    setTaggedUsers([]);
+  };
+
+  async function search(value: string) {
+    const emojis = await SearchIndex.search(value);
+    const results = emojis.map((emoji: IEmoji) => emoji.skins[0].native);
+    return results;
+  }
+
+  const handleSearch = async (value: string) => {
+    const emojiRegex = /(?:\s|^):([^\s:]+)/;
+    const match = value.match(emojiRegex);
+
+    if (match) {
+      const searchTerm = match[1];
+      const emojis = await search(searchTerm);
+      setCurrentEmojis(emojis);
+    } else {
+      setCurrentEmojis([]);
+    }
+  };
+
+  const debouncedSearch = debounce(handleSearch, 300);
+
   const sortedComments = allComments?.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
@@ -138,12 +171,25 @@ const PhotoComments = () => {
           render={({ field }) => (
             <MentionInput
               value={field.value}
-              onChange={field.onChange}
+              // onChange={field.onChange}
+              onChange={(value) => {
+                field.onChange(value);
+                debouncedSearch(value);
+              }}
               onTagUsersChange={setTaggedUsers}
               placeholder="Dodaj komentar"
               className="flex-grow"
             />
           )}
+        />
+        <EmojiPicker
+          emojis={currentEmojis}
+          onEmojiSelect={(emoji: string) => {
+            const currentValue = getValues('comment');
+            const updatedValue = currentValue.replace(/(?:\s|^):([^\s:]+)/, emoji);
+            setValue('comment', updatedValue, { shouldValidate: true });
+            setCurrentEmojis([]);
+          }}
         />
         <Button type="primary">Komentiraj</Button>
       </form>
