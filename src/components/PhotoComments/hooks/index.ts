@@ -8,12 +8,6 @@ import {
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useSocket } from '@app/context/useSocket';
-interface IAddUploadCommentProps {
-  userId: string;
-  uploadId: string;
-  comment: string;
-  taggedUserIds: number[];
-}
 
 export const useEditUploadComment = () => {
   const socket = useSocket();
@@ -50,8 +44,7 @@ export const useAddUploadComment = () => {
     isError: isAddUploadCommentError,
     isSuccess: isAddUploadCommentSuccess,
   } = useMutation({
-    mutationFn: ({ userId, uploadId, comment, taggedUserIds }: IAddUploadCommentProps) =>
-      addUploadComment({ userId, uploadId, comment, taggedUserIds }),
+    mutationFn: (formData: FormData) => addUploadComment(formData),
     onSuccess: (data) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
       socket.emit('send-comment', data.data);

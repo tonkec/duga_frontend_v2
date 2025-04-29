@@ -13,6 +13,8 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
+import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -111,6 +113,8 @@ const PhotoUploader = () => {
   const maxNumberOfImages = 5;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
+  const { allUserImages } = useGetAllUserImages(userId as string);
+
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
@@ -136,6 +140,12 @@ const PhotoUploader = () => {
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
+
+    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+      toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+      return;
+    }
+
     const files = (e.target as HTMLFormElement)?.avatars?.files;
     const formData = new FormData();
     if (files) {
