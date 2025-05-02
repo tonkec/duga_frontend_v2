@@ -11,7 +11,7 @@ export const StatusProvider = ({ children }: { children: React.ReactNode }) => {
   const [statusMap, setStatusMap] = useState<StatusMap>(new Map());
   const [userId] = useLocalStorage('userId');
 
-  const { data } = useUserOnlineStatus(String(userId));
+  const { data } = useUserOnlineStatus(String(userId || ''));
 
   useEffect(() => {
     if (data?.status && userId) {
@@ -34,5 +34,9 @@ export const StatusProvider = ({ children }: { children: React.ReactNode }) => {
 
   const contextValue = useMemo(() => ({ statusMap }), [statusMap]);
 
-  return <StatusContext.Provider value={contextValue}>{children}</StatusContext.Provider>;
+  return userId ? (
+    <StatusContext.Provider value={contextValue}>{children}</StatusContext.Provider>
+  ) : (
+    <>{children}</>
+  );
 };
