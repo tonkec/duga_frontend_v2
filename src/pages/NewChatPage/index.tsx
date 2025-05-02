@@ -64,7 +64,7 @@ const NewChatPage = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-        {filteredUserWithoutExistingChat.length
+        {filteredUserWithoutExistingChat?.length
           ? filteredUserWithoutExistingChat.map((user: IUser) => {
               return (
                 <UserCard
