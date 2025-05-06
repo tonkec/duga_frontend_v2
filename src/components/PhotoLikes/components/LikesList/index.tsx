@@ -37,7 +37,11 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
         className="cursor-pointer text-sm text-blue-600 hover:underline"
         onClick={() => setOpen((prev) => !prev)}
       >
-        {likes.length} {likes.length === 1 ? 'lajk' : 'lajkova'}
+        {!likes || likes.length === 0
+          ? '0 lajkova'
+          : likes.length === 1
+            ? `${likes.length} lajk`
+            : `${likes.length} lajkova`}
       </span>
 
       {open && (
