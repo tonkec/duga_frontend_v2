@@ -15,6 +15,7 @@ import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -154,6 +155,8 @@ const PhotoUploader = () => {
       }
       onUploadPhotos(formData);
     }
+
+    setNewImages([]);
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
