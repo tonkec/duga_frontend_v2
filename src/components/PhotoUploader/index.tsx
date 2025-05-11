@@ -15,6 +15,7 @@ import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -125,10 +126,6 @@ const PhotoUploader = () => {
     []
   );
 
-  const isDescriptionValid = (description: string) => {
-    return description.length > 0 && description.length < 100;
-  };
-
   useEffect(() => {
     if (allExistingImages && allExistingImages.data.images.length > 0) {
       const checkboxes = allExistingImages.data.images.map((image: IImage, index: number) => {
@@ -158,14 +155,11 @@ const PhotoUploader = () => {
       }
       onUploadPhotos(formData);
     }
+
+    setNewImages([]);
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
-    if (!isDescriptionValid((e.target as HTMLInputElement).value)) {
-      toast.error('Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!', toastConfig);
-      return;
-    }
-
     setNewImageDescriptions((prevState) => {
       const target = e.target as HTMLInputElement;
       const description = target.value;
@@ -217,14 +211,6 @@ const PhotoUploader = () => {
                         setUpdatedImageDescriptions((prev) => {
                           const target = e.target as HTMLInputElement;
                           const description = target.value;
-
-                          if (!isDescriptionValid(description)) {
-                            toast.error(
-                              'Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!',
-                              toastConfig
-                            );
-                            return prev;
-                          }
 
                           const imageId = removeSpacesAndDashes(image.name);
                           const newImage = { description, imageId };

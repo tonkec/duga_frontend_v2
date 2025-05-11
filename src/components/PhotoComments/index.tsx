@@ -122,12 +122,19 @@ const PhotoComments = () => {
       try {
         const updatedComment = response.data?.data;
         if (!updatedComment?.id) return;
+        setAllComments((prev) => {
+          const updatedComments = prev.map((comment) => {
+            if (Number(comment.id) === Number(response.data.data.id)) {
+              return {
+                ...comment,
+                comment: response.data.data.comment,
+              };
+            }
+            return comment;
+          });
 
-        setAllComments((prev) =>
-          prev.map((comment) =>
-            Number(comment.id) === Number(updatedComment.id) ? updatedComment : comment
-          )
-        );
+          return updatedComments;
+        });
       } catch (error) {
         console.error('Error updating comment:', error);
         toast.error('Greška prilikom ažuriranja komentara');

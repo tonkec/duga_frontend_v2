@@ -35,7 +35,6 @@ const DugaRoutes = () => {
           </AuthGuard>
         }
       />
-      <Route path="login" element={<LoginPage />} />
       <Route
         path="/profile"
         element={
@@ -107,6 +106,14 @@ const DugaRoutes = () => {
         element={
           <PageTitle title="Verifikacija emaila">
             <VerifyEmailPage />
+          </PageTitle>
+        }
+      />
+      <Route
+        path="login"
+        element={
+          <PageTitle title="Login">
+            <LoginPage />
           </PageTitle>
         }
       />
