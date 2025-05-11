@@ -30,7 +30,6 @@ const DugaRoutes = () => {
           </AuthGuard>
         }
       />
-      <Route path="login" element={<LoginPage />} />
       <Route
         path="/profile"
         element={
@@ -84,7 +83,7 @@ const DugaRoutes = () => {
           </AuthGuard>
         }
       />
-
+      <Route path="login" element={<LoginPage />} />
       <Route path="verify-email" element={<VerifyEmailPage />} />
     </Routes>
   );

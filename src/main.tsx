@@ -24,13 +24,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <SocketProvider>
-          <Auth0ProviderWithNavigate>
+        <Auth0ProviderWithNavigate>
+          <SocketProvider>
             <StatusProvider>
               <DugaRoutes />
             </StatusProvider>
-          </Auth0ProviderWithNavigate>
-        </SocketProvider>
+          </SocketProvider>
+        </Auth0ProviderWithNavigate>
         <ReactQueryDevtools />
         <ToastContainer />
       </QueryClientProvider>
