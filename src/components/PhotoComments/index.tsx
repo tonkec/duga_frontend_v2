@@ -118,12 +118,11 @@ const PhotoComments = () => {
       });
     });
 
- socket.on('update-comment', (response) => {
-      try{
+    socket.on('update-comment', (response) => {
+      try {
         const updatedComment = response.data?.data;
         if (!updatedComment?.id) return;
         setAllComments((prev) => {
-          
           const updatedComments = prev.map((comment) => {
             if (Number(comment.id) === Number(response.data.data.id)) {
               return {
@@ -134,15 +133,12 @@ const PhotoComments = () => {
             return comment;
           });
 
-
           return updatedComments;
         });
-      }catch (error) {
+      } catch (error) {
         console.error('Error updating comment:', error);
         toast.error('Greška prilikom ažuriranja komentara');
       }
-
-
     });
 
     return () => {

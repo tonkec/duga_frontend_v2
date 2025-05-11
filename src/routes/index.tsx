@@ -10,6 +10,7 @@ import ChatPage from '@app/pages/ChatPage';
 import NotFoundPage from '@app/pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 import VerifyEmailPage from '@app/pages/VerifyEmailPage';
+import { PageTitle } from '@app/components/PageTitle';
 
 const DugaRoutes = () => {
   return (
@@ -18,7 +19,9 @@ const DugaRoutes = () => {
         path="*"
         element={
           <AuthGuard>
-            <NotFoundPage />
+            <PageTitle title="Stranica nije pronađena">
+              <NotFoundPage />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -26,7 +29,9 @@ const DugaRoutes = () => {
         path="/"
         element={
           <AuthGuard>
-            <App />
+            <PageTitle title="Duga">
+              <App />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -34,7 +39,9 @@ const DugaRoutes = () => {
         path="/profile"
         element={
           <AuthGuard>
-            <MyProfilePage />
+            <PageTitle title="Moj profil">
+              <MyProfilePage />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -43,7 +50,9 @@ const DugaRoutes = () => {
         path="/edit"
         element={
           <AuthGuard>
-            <EditMyProfilePage />
+            <PageTitle title="Uredi profil">
+              <EditMyProfilePage />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -52,7 +61,9 @@ const DugaRoutes = () => {
         path="/user/:userId"
         element={
           <AuthGuard>
-            <OtherUserPage />
+            <PageTitle title="Profil korisnika">
+              <OtherUserPage />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -61,7 +72,9 @@ const DugaRoutes = () => {
         path="/photo/:photoId"
         element={
           <AuthGuard>
-            <PhotoPage />
+            <PageTitle title="Fotografija">
+              <PhotoPage />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -70,7 +83,9 @@ const DugaRoutes = () => {
         path="/new-chat"
         element={
           <AuthGuard>
-            <NewChatPage />
+            <PageTitle title="Novi chat">
+              <NewChatPage />
+            </PageTitle>
           </AuthGuard>
         }
       />
@@ -79,12 +94,29 @@ const DugaRoutes = () => {
         path="/chat/:chatId"
         element={
           <AuthGuard>
-            <ChatPage />
+            <PageTitle title="Chat">
+              <ChatPage />
+            </PageTitle>
           </AuthGuard>
         }
       />
-      <Route path="login" element={<LoginPage />} />
-      <Route path="verify-email" element={<VerifyEmailPage />} />
+
+      <Route
+        path="verify-email"
+        element={
+          <PageTitle title="Verifikacija emaila">
+            <VerifyEmailPage />
+          </PageTitle>
+        }
+      />
+      <Route
+        path="login"
+        element={
+          <PageTitle title="Login">
+            <LoginPage />
+          </PageTitle>
+        }
+      />
     </Routes>
   );
 };
