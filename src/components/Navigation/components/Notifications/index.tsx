@@ -55,7 +55,7 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button onClick={() => setOpen((prev) => !prev)} className="relative">
-        <span className="text-white">Notifikacije 🔔</span>
+        <span className="text-white">Obavijesti 🔔</span>
         {notifications.some((n) => !n.isRead) && (
           <span className="absolute top-0 right-0 h-2 w-2 bg-red rounded-full" />
         )}
