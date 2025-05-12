@@ -91,7 +91,7 @@ const PhotoComments = () => {
     }
 
     mutateAddUploadComment(formData);
-    reset();
+    reset({ comment: '', image: undefined });
     setTaggedUsers([]);
   };
 
