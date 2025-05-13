@@ -14,7 +14,7 @@ import { NavigationItems } from '../NavigationLinks';
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { width } = useWindowSize();
-  const isMobile = width < 768;
+  const isMobile = width! < 768;
   const { logout } = useAuth0();
   const [, setCookie] = useCookies(['token']);
   const [userId, saveUserId] = useLocalStorage('userId', null);
@@ -45,7 +45,7 @@ const Navigation = () => {
     <>
       {!isMobile && (
         <nav className="flex justify-between items-center gradient p-4 shadow-sm text-white">
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center space-between w-full">
             <ProfilePhoto
               currentUser={currentUser?.data}
               url={getProfilePhotoUrl(currentUserProfilePhoto)}
@@ -74,10 +74,10 @@ const Navigation = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          <div className="relative max-w-xs h-full p-6 shadow-lg">
+          <div className="relative h-full p-6 shadow-lg">
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute top-4 right-4 text-white"
+              className="absolute top-4 right-2 text-white"
             >
               <FiX size={24} />
             </button>
