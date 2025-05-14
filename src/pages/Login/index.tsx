@@ -5,6 +5,7 @@ import Image2 from '@app/assets/image2.png';
 import Image3 from '@app/assets/image3.png';
 import Image4 from '@app/assets/image4.png';
 import Homepage from '@app/assets/homepage.svg';
+import CookieBanner from '@app/components/CookieBanner';
 
 const IS_STAGING = import.meta.env.STAGING;
 const URL = IS_STAGING ? 'https://dugastaging.netlify.app' : 'http://localhost:5173';
@@ -15,6 +16,7 @@ const LoginPage = () => {
   return (
     <>
       <header className="gradient">
+        <CookieBanner />
         <nav className="gradient py-2 px-4 flex justify-between items-center fixed top-0 left-0 w-full z-10">
           <h1 className="text-white">Duga 🏳️‍🌈</h1>
           <Button
