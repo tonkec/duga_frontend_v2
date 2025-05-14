@@ -8,10 +8,12 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '@app/components/Loader';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
+import { useCookies } from 'react-cookie';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
-  const hasRejectedCookies = localStorage.getItem('cookieRejectedAt');
+  const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
+  const hasRejectedCookies = cookies.cookieRejectedAt;
   const { userChats, isUserChatsLoading } = useGetAllUserChats(currentUserId as string);
   const [search, setSearch] = useState('');
   const { onCreateChat } = useCreateNewChat();
@@ -29,8 +31,8 @@ const NewChatPage = () => {
     return (
       <AppLayout>
         <div className="text-center mt-10 text-red font-semibold">
-          Nije moguće slati poruke jer ste odbili kolačiće. Ako želite slati poruke, molimo vas da
-          prihvatite kolačiće.
+          Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da
+          prihvatiš kolačiće.
         </div>
       </AppLayout>
     );
