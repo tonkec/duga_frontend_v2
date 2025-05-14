@@ -52,3 +52,8 @@ export const getUserOnlineStatus = async (userId: string) => {
   const client = apiClient();
   return client.get(`/users/online-status/${userId}`);
 };
+
+export const getAllUserPhotos = async (userId: string) => {
+  const client = apiClient();
+  return client.get(`/uploads/user-photos/${userId}`);
+};
