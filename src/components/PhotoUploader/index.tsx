@@ -13,6 +13,9 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
+import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -111,6 +114,8 @@ const PhotoUploader = () => {
   const maxNumberOfImages = 5;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
+  const { allUserImages } = useGetAllUserImages(userId as string);
+
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
@@ -120,10 +125,6 @@ const PhotoUploader = () => {
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []
   );
-
-  const isDescriptionValid = (description: string) => {
-    return description.length > 0 && description.length < 100;
-  };
 
   useEffect(() => {
     if (allExistingImages && allExistingImages.data.images.length > 0) {
@@ -136,6 +137,12 @@ const PhotoUploader = () => {
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
+
+    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+      toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+      return;
+    }
+
     const files = (e.target as HTMLFormElement)?.avatars?.files;
     const formData = new FormData();
     if (files) {
@@ -148,14 +155,11 @@ const PhotoUploader = () => {
       }
       onUploadPhotos(formData);
     }
+
+    setNewImages([]);
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
-    if (!isDescriptionValid((e.target as HTMLInputElement).value)) {
-      toast.error('Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!', toastConfig);
-      return;
-    }
-
     setNewImageDescriptions((prevState) => {
       const target = e.target as HTMLInputElement;
       const description = target.value;
@@ -207,14 +211,6 @@ const PhotoUploader = () => {
                         setUpdatedImageDescriptions((prev) => {
                           const target = e.target as HTMLInputElement;
                           const description = target.value;
-
-                          if (!isDescriptionValid(description)) {
-                            toast.error(
-                              'Opis fotografije mora biti dulji od 0 i kraći od 100 znakova!',
-                              toastConfig
-                            );
-                            return prev;
-                          }
 
                           const imageId = removeSpacesAndDashes(image.name);
                           const newImage = { description, imageId };
@@ -283,7 +279,13 @@ const PhotoUploader = () => {
               newImages.map((image) => {
                 return (
                   <div key={image.name} className="mb-4 max-w-[400px]">
-                    <img src={image.url} alt={image.name} />
+                    <div className="relative w-full aspect-[1/1] overflow-hidden rounded-md">
+                      <img
+                        src={image.url}
+                        alt={image.name}
+                        className="absolute top-0 left-0 w-full h-full object-cover"
+                      />
+                    </div>
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDeleteFromState(image)}
