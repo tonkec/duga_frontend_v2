@@ -17,11 +17,20 @@ import { IUser } from '@app/components/UserCard';
 import { toast } from 'react-toastify';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { init, SearchIndex } from 'emoji-mart';
+import { IEmoji } from '@app/pages/ChatPage/components/SendMessage';
+import { debounce } from 'lodash';
+import EmojiPicker from '../EmojiPicker';
+import data from '@emoji-mart/data';
 
 const schema = z
   .object({
     comment: z.string().optional(),
     image: z.any().optional(),
+    content: z
+      .string()
+      .optional()
+      .refine((val) => !val || val.trim().length > 0, { message: 'Poruka ne može biti prazna.' }),
   })
   .refine((data) => (data.comment && data.comment.trim().length > 0) || data.image?.length > 0, {
     message: 'Unesi komentar ili dodaj sliku',
@@ -31,6 +40,7 @@ const schema = z
 interface Inputs {
   comment: string;
   image?: FileList;
+  content: string;
 }
 
 export interface IComment {
@@ -44,8 +54,9 @@ export interface IComment {
 }
 
 const PhotoComments = () => {
+  init({ data });
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+  const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const { mutateAddUploadComment } = useAddUploadComment();
   const [userId] = useLocalStorage('userId');
@@ -63,8 +74,12 @@ const PhotoComments = () => {
     control,
     watch,
     setValue,
+    getValues,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      content: '',
+    },
   });
 
   const imageFileList = watch('image');
@@ -74,7 +89,7 @@ const PhotoComments = () => {
   const onSubmit = async (data: Inputs) => {
     if (!userId || !photoId || !isValid) return;
 
-    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (!!data?.image?.length && allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
@@ -91,8 +106,9 @@ const PhotoComments = () => {
     }
 
     mutateAddUploadComment(formData);
-    reset({ comment: '', image: undefined });
     setTaggedUsers([]);
+    setCurrentEmojis([]);
+    reset({ comment: '', content: '', image: undefined });
   };
 
   const clearImage = () => {
@@ -164,6 +180,15 @@ const PhotoComments = () => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
+  async function search(value: string) {
+    const emojis = await SearchIndex.search(value);
+    const results = emojis.map((emoji: IEmoji) => {
+      return emoji.skins[0].native;
+    });
+
+    return results;
+  }
+
   return (
     <>
       <div className="flex flex-col gap-2 ">
@@ -214,15 +239,45 @@ const PhotoComments = () => {
           <Controller
             name="comment"
             control={control}
-            render={({ field }) => (
-              <MentionInput
-                value={field.value}
-                onChange={field.onChange}
-                onTagUsersChange={setTaggedUsers}
-                placeholder="Dodaj komentar"
-                className="flex-grow"
-              />
-            )}
+            render={({ field }) => {
+              const handleSearch = async (value: string) => {
+                const emojiRegex = /(?:\s|^):([^\s:]+)/;
+                const match = value.match(emojiRegex);
+
+                if (match) {
+                  const searchTerm = match[1];
+                  const emojis = await search(searchTerm);
+                  setCurrentEmojis(emojis);
+                } else {
+                  setCurrentEmojis([]);
+                }
+              };
+
+              const debouncedSearch = debounce(handleSearch, 300);
+              return (
+                <MentionInput
+                  value={field.value}
+                  onChange={(e) => {
+                    const value = e;
+                    debouncedSearch(value);
+                    field.onChange(value);
+                  }}
+                  onTagUsersChange={setTaggedUsers}
+                  placeholder="Dodaj komentar"
+                  className="flex-grow"
+                />
+              );
+            }}
+          />
+
+          <EmojiPicker
+            emojis={currentEmojis}
+            onEmojiSelect={(emoji: string) => {
+              const currentComment = getValues('comment');
+              const updatedComment = currentComment?.replace(/(?:\s|^):([^\s:]+)?/, emoji);
+              setValue('comment', updatedComment, { shouldValidate: true });
+              setCurrentEmojis([]);
+            }}
           />
 
           <Button type="primary">Komentiraj</Button>
