@@ -108,7 +108,7 @@ const PhotoComments = () => {
     mutateAddUploadComment(formData);
     setTaggedUsers([]);
     setCurrentEmojis([]);
-    reset({ comment: '', content: '' });
+    reset({ comment: '', content: '', image: undefined });
   };
 
   const clearImage = () => {
