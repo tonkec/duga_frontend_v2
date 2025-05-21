@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { BiExit } from 'react-icons/bi';
-import OnlineStatus from '../Navigation/components/OnlineStatus';
 import NotificationDropdown from '../Navigation/components/Notifications';
 
 interface NavigationItemsProps {
@@ -55,7 +54,7 @@ export const NavigationItems = ({
             <span>Postavke</span>
             {!isMobile && String.fromCodePoint(9881, 65039)}
           </Link>
-          {numericUserId && <OnlineStatus userId={numericUserId} />}
+
           <div>
             <NotificationDropdown userId={numericUserId} />
           </div>

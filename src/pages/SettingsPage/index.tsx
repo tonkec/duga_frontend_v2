@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useDeleteUser } from '../EditMyProfilePage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Card from '@app/components/Card';
+import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -45,10 +46,10 @@ const SettingsPage = () => {
 
       <Card>
         <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
-        <p className="mb-4">
-          Ovdje možeš obrisati svoj profil. Brisanje profila briše sve tvoje fotografije, komentare,
-          lajkove i poruke.
-        </p>
+
+        <div>{String(userId) && <OnlineStatus userId={String(userId)} />}</div>
+
+        <hr className="mb-5" />
 
         <Button type="danger" onClick={() => setIsDeleteModalOpen(true)}>
           Obriši svoj profil

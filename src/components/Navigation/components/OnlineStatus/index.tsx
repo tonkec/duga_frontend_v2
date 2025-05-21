@@ -3,7 +3,7 @@ import { useUserOnlineStatus } from '@app/context/OnlineStatus/hooks';
 
 import { useSocket } from '@app/context/useSocket';
 
-const StatusDropdown = ({ userId }: { userId: number | null }) => {
+const StatusDropdown = ({ userId }: { userId: string }) => {
   const socket = useSocket();
   const { data, isLoading } = useUserOnlineStatus(String(userId));
 
@@ -15,7 +15,7 @@ const StatusDropdown = ({ userId }: { userId: number | null }) => {
     }
   }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newStatus = e.target.value as 'online' | 'offline';
 
     if (!['online', 'offline'].includes(newStatus)) {
@@ -29,18 +29,33 @@ const StatusDropdown = ({ userId }: { userId: number | null }) => {
   if (isLoading) return null;
 
   return (
-    <select
-      value={status}
-      onChange={handleChange}
-      className="py-2 bg-transparent text-white focus:outline-none"
-    >
-      <option value="online" className="bg-gray-800 text-white">
-        Online 🟢
-      </option>
-      <option value="offline" className="bg-gray-800 text-white">
-        Offline 🔴
-      </option>
-    </select>
+    <form className="mb-6">
+      <p className="mt-2 text-sm text-black mb-4">Odaberi svoj trenutni online status.</p>
+      <input
+        type="radio"
+        name="status"
+        value="online"
+        id="online"
+        className="mr-2"
+        checked={status === 'online'}
+        onChange={handleChange}
+      />
+      <label htmlFor="online" className="mr-4 text-sm font-medium text-black">
+        Želim biti online
+      </label>
+      <input
+        type="radio"
+        name="status"
+        value="offline"
+        id="offline"
+        className="mr-2"
+        checked={status === 'offline'}
+        onChange={handleChange}
+      />
+      <label htmlFor="offline" className="mr-4 text-sm font-medium text-black">
+        Želim biti offline
+      </label>
+    </form>
   );
 };
 
