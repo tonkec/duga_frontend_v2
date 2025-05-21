@@ -18,6 +18,9 @@ import Input from '@app/components/Input';
 import { BiPaperclip, BiSend, BiSolidFileGif } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
 import GiphySearch from '@app/components/GiphySearch';
+import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+import { toast } from 'react-toastify';
+import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 
 type Inputs = {
   content: string;
@@ -89,6 +92,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
+  const { allUserImages } = useGetAllUserImages(currentUserId as string);
+
   const sendGif = (gifUrl: string) => {
     const msg = {
       type: 'gif',
@@ -156,6 +161,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     Array.from(files).forEach((file: File) => {
       formData.append('avatars', file);
     });
+
+    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+      toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+      return;
+    }
+
     emitImageToSockets();
     uploadMessageImage(formData);
     setCurrentUploadableImage(null);

@@ -126,6 +126,7 @@ const EditMyProfilePage = () => {
   const { user: currentUser } = useGetUserById(userId as string);
   const { updateUserMutation } = useUpdateUser(userId as string);
   const { deleteUserMutation } = useDeleteUser(userId as string);
+
   const {
     register,
     handleSubmit,
