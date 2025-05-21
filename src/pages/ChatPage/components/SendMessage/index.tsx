@@ -162,7 +162,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       formData.append('avatars', file);
     });
 
-    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (!!files.length && allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }

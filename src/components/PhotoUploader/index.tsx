@@ -138,12 +138,13 @@ const PhotoUploader = () => {
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
 
-    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    const files = (e.target as HTMLFormElement)?.avatars?.files;
+
+    if (!!files.length && allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
 
-    const files = (e.target as HTMLFormElement)?.avatars?.files;
     const formData = new FormData();
     if (files) {
       formData.append('text', JSON.stringify(newImageDescriptions));
