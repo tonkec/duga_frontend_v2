@@ -46,6 +46,15 @@ export const NavigationItems = ({
             <span>Profil</span>
             {!isMobile && String.fromCodePoint(parseInt('1F9D1', 16))}
           </Link>
+
+          <Link
+            to="/settings"
+            onClick={onItemClick}
+            className={`flex items-center gap-1 ${isMobile && 'text-white text-lg'}`}
+          >
+            <span>Postavke</span>
+            {!isMobile && String.fromCodePoint(9881, 65039)}
+          </Link>
           {numericUserId && <OnlineStatus userId={numericUserId} />}
           <div>
             <NotificationDropdown userId={numericUserId} />
