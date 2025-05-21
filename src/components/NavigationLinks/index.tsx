@@ -20,7 +20,7 @@ export const NavigationItems = ({
   return (
     <>
       <div className="flex items-center space-between w-full">
-        <div className={`${isMobile ? 'block' : 'flex'}  items-center space-between gap-4`}>
+        <div className={`${isMobile ? 'block' : 'flex'}  items-center space-between gap-6`}>
           <Link
             to="/"
             onClick={onItemClick}
