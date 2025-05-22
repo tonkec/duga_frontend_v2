@@ -111,7 +111,6 @@ const PhotoActionButtons = ({
 };
 
 const PhotoUploader = () => {
-  const maxNumberOfImages = 5;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
   const { allUserImages } = useGetAllUserImages(userId as string);
@@ -157,6 +156,9 @@ const PhotoUploader = () => {
       onUploadPhotos(formData);
     }
 
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setNewImages([]);
   };
 
@@ -311,10 +313,10 @@ const PhotoUploader = () => {
                     files.length +
                       (newImages?.length || 0) +
                       allExistingImages?.data?.images?.length >
-                    maxNumberOfImages
+                    MAXIMUM_NUMBER_OF_IMAGES
                   ) {
                     toast.error(
-                      `Maksimalan broj fotografija je ${maxNumberOfImages}!`,
+                      `Maksimalan broj fotografija je ${MAXIMUM_NUMBER_OF_IMAGES}!`,
                       toastConfig
                     );
                     return;
