@@ -68,9 +68,9 @@ const Navigation = () => {
       )}
 
       {isMobile && isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50 max-w-[200px]">
           <div
-            className="absolute inset-0 bg-black bg-opacity-50"
+            className="absolute inset-0 bg-blue opacity-90"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
