@@ -1,24 +1,11 @@
 import { apiClient } from '..';
 
-interface IAddCommentProps {
-  userId: string;
-  uploadId: string;
-  comment: string;
-  taggedUserIds: number[];
-}
-
-export const addUploadComment = async ({
-  userId,
-  uploadId,
-  comment,
-  taggedUserIds,
-}: IAddCommentProps) => {
+export const addUploadComment = async (formData: FormData) => {
   const client = apiClient();
-  return client.post(`/comments/add-comment`, {
-    userId,
-    uploadId,
-    comment,
-    taggedUserIds,
+  return client.post(`/comments/add-comment`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 };
 

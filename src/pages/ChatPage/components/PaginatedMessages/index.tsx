@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
 import { debounceScroll } from '@app/utils/debounceScroll';
@@ -27,16 +27,25 @@ const PaginatedMessages = ({
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevScrollHeightRef = useRef(0);
 
   const scrollToBottom = () => {
     if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      const scrollHeight = containerRef.current.scrollHeight;
+      const clientHeight = containerRef.current.clientHeight;
+      containerRef.current.scrollTop = scrollHeight - clientHeight;
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, receivedMessages]);
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+
+    const scrollHeight = containerRef.current.scrollHeight;
+    if (scrollHeight > prevScrollHeightRef.current) {
+      scrollToBottom();
+      prevScrollHeightRef.current = scrollHeight;
+    }
+  }, [messages.length, receivedMessages.length]);
 
   return (
     <div
@@ -44,7 +53,7 @@ const PaginatedMessages = ({
       onScroll={debounceScroll(() => {
         fetchNextPage();
       }, 500)}
-      style={{ height: '100vh', overflow: 'auto' }}
+      className="overflow-auto h-[calc(100vh-435px)]"
     >
       {sortedMessages.map((message, index) => {
         const previousMessage = sortedMessages[index - 1];
