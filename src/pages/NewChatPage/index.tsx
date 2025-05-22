@@ -32,7 +32,7 @@ const NewChatPage = () => {
       <AppLayout>
         <div className="text-center mt-10 text-red font-semibold">
           Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da
-          prihvatiš kolačiće.
+          prihvatiš kolačiće u postavkama.
         </div>
       </AppLayout>
     );
