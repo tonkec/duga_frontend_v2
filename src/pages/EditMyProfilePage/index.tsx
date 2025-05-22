@@ -8,13 +8,12 @@ import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useDeleteUser, useUpdateUser } from './hooks';
+import { useUpdateUser } from './hooks';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Button from '@app/components/Button';
-import ConfirmModal from '@app/components/ConfirmModal';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -101,32 +100,10 @@ const schema = z.object({
   ending: z.string().optional(),
 });
 
-interface IDeleteProfileModalProp {
-  isOpen: boolean;
-  onClose: () => void;
-  onDelete: () => void;
-}
-
-const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalProp) => {
-  return (
-    <ConfirmModal isOpen={isOpen} onClose={onClose} onConfirm={onDelete}>
-      <div>
-        <h2 className="text-xl mb-2">Jesi li siguran_na da želiš obrisati svoj profil?</h2>
-        <p className="text-sm">
-          Brisanje profila briše sve tvoje fotografije, komentare, lajkove i poruke.
-        </p>
-      </div>
-    </ConfirmModal>
-  );
-};
-
 const EditMyProfilePage = () => {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userId] = useLocalStorage('userId');
   const { user: currentUser } = useGetUserById(userId as string);
   const { updateUserMutation } = useUpdateUser(userId as string);
-  const { deleteUserMutation } = useDeleteUser(userId as string);
-
   const {
     register,
     handleSubmit,
@@ -180,16 +157,6 @@ const EditMyProfilePage = () => {
 
   return (
     <AppLayout>
-      <DeleteProfileModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onDelete={() => {
-          setIsDeleteModalOpen(false);
-          if (userId) {
-            deleteUserMutation();
-          }
-        }}
-      />
       <Tabs selectedTabClassName="bg-black text-white rounded-t-md">
         <TabList style={{ borderBottom: 'none', marginBottom: 0 }}>
           <Tab style={{ border: 'none' }}>
@@ -448,13 +415,6 @@ const EditMyProfilePage = () => {
                 </div>
               </div>
             </form>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3 mt-3">
-              <div className="col-span-2">
-                <Button type="danger" className="w-full" onClick={() => setIsDeleteModalOpen(true)}>
-                  Obriši svoj profil
-                </Button>
-              </div>
-            </div>
           </Card>
         </TabPanel>
 

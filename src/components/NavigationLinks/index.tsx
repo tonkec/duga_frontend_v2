@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { BiExit } from 'react-icons/bi';
-import OnlineStatus from '../Navigation/components/OnlineStatus';
 import NotificationDropdown from '../Navigation/components/Notifications';
 
 interface NavigationItemsProps {
@@ -21,7 +20,7 @@ export const NavigationItems = ({
   return (
     <>
       <div className="flex items-center space-between w-full">
-        <div className={`${isMobile ? 'block' : 'flex'}  items-center space-between gap-4`}>
+        <div className={`${isMobile ? 'block' : 'flex'}  items-center space-between gap-6`}>
           <Link
             to="/"
             onClick={onItemClick}
@@ -46,7 +45,16 @@ export const NavigationItems = ({
             <span>Profil</span>
             {!isMobile && String.fromCodePoint(parseInt('1F9D1', 16))}
           </Link>
-          {numericUserId && <OnlineStatus userId={numericUserId} />}
+
+          <Link
+            to="/settings"
+            onClick={onItemClick}
+            className={`flex items-center gap-1 ${isMobile && 'text-white text-lg'}`}
+          >
+            <span>Postavke</span>
+            {!isMobile && String.fromCodePoint(9881, 65039)}
+          </Link>
+
           <div>
             <NotificationDropdown userId={numericUserId} />
           </div>

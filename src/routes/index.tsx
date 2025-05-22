@@ -10,6 +10,7 @@ import ChatPage from '@app/pages/ChatPage';
 import NotFoundPage from '@app/pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 import VerifyEmailPage from '@app/pages/VerifyEmailPage';
+import SettingsPage from '@app/pages/SettingsPage';
 import { PageTitle } from '@app/components/PageTitle';
 
 const DugaRoutes = () => {
@@ -96,6 +97,17 @@ const DugaRoutes = () => {
           <AuthGuard>
             <PageTitle title="Chat">
               <ChatPage />
+            </PageTitle>
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <AuthGuard>
+            <PageTitle title="Postavke">
+              <SettingsPage />
             </PageTitle>
           </AuthGuard>
         }
