@@ -27,7 +27,13 @@ const CookieBanner = () => {
           <button onClick={rejectCookies} className="bg-slate-900 text-white px-4 py-2 rounded">
             Odbij
           </button>
-          <button onClick={acceptCookies} className="bg-pink text-white px-4 py-2 rounded">
+          <button
+            onClick={() => {
+              acceptCookies();
+              setShowBanner(false);
+            }}
+            className="bg-pink text-white px-4 py-2 rounded"
+          >
             Prihvati
           </button>
         </div>
