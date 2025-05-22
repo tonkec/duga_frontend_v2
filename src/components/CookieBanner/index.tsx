@@ -1,11 +1,11 @@
+import { useCookieConsent } from '@app/hooks/useCookieConsent';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import { useCookies } from 'react-cookie';
-import { toastConfig } from '@app/configs/toast.config';
 
 const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
+  const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
+  const { acceptCookies, rejectCookies } = useCookieConsent();
 
   useEffect(() => {
     const accepted = cookies.cookieAccepted;
@@ -15,21 +15,6 @@ const CookieBanner = () => {
       setShowBanner(true);
     }
   }, [cookies]);
-
-  const acceptCookies = () => {
-    setCookie('cookieAccepted', 'true', { path: '/', maxAge: 60 * 60 * 24 * 365 });
-    removeCookie('cookieRejectedAt', { path: '/' });
-    setShowBanner(false);
-  };
-
-  const rejectCookies = () => {
-    const now = new Date().toISOString();
-    setCookie('cookieRejectedAt', now, { path: '/', maxAge: 60 * 60 * 24 * 7 });
-    removeCookie('cookieAccepted', { path: '/' });
-    setShowBanner(false);
-
-    toast.info('Neke funkcije neće raditi jer ste odbili kolačiće.', toastConfig);
-  };
 
   if (!showBanner) return null;
 

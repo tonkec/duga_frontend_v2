@@ -6,9 +6,8 @@ import { useDeleteUser } from '../EditMyProfilePage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Card from '@app/components/Card';
 import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
-import { toast } from 'react-toastify';
-import { toastConfig } from '@app/configs/toast.config';
 import { useCookies } from 'react-cookie';
+import { useCookieConsent } from '@app/hooks/useCookieConsent';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -32,22 +31,7 @@ const SettingsPage = () => {
   const [userId] = useLocalStorage('userId');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { deleteUserMutation } = useDeleteUser(userId as string);
-  const [, setCookie, removeCookie] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
-
-  const acceptCookies = () => {
-    setCookie('cookieAccepted', 'true', { path: '/', maxAge: 60 * 60 * 24 * 365 });
-    removeCookie('cookieRejectedAt', { path: '/' });
-    toast.success('Kolačići su prihvaćeni.', toastConfig);
-  };
-
-  const rejectCookies = () => {
-    const now = new Date().toISOString();
-    setCookie('cookieRejectedAt', now, { path: '/', maxAge: 60 * 60 * 24 * 7 });
-    removeCookie('cookieAccepted', { path: '/' });
-
-    toast.info('Neke funkcije neće raditi jer ste odbili kolačiće.', toastConfig);
-  };
-
+  const { acceptCookies, rejectCookies } = useCookieConsent();
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
 
