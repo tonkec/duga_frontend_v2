@@ -61,7 +61,7 @@ export const NavigationItems = ({
         </div>
       </div>
 
-      <div className="absolute bottom-2 left-6 right-6">
+      <div className={isMobile ? 'absolute bottom-2 left-6 right-6' : 'relative'}>
         <button
           onClick={onLogout}
           className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black flex-1 px-2 py-1 rounded mb-2 w-full flex-1 justify-center '}`}
