@@ -1,5 +1,6 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllNotifications, markAsReadNotification } from '@app/api/notifications';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 export const useGetAllNotifcations = (userId: string) => {
   const {
@@ -12,10 +13,16 @@ export const useGetAllNotifcations = (userId: string) => {
     enabled: !!userId,
   });
 
-  return { allNotifications, allNotificationsError, areAllNotificationsLoading };
+  return {
+    allNotifications,
+    allNotificationsError,
+    areAllNotificationsLoading,
+  };
 };
 
 export const useMarkAsReadNotification = () => {
+  const userId = useLocalStorage('userId')[0];
+  const queryClient = useQueryClient();
   const {
     mutate: mutateMarkAsRead,
     isPending: isMarkingAsRead,
@@ -23,6 +30,11 @@ export const useMarkAsReadNotification = () => {
     isSuccess: isMarkAsReadSuccess,
   } = useMutation({
     mutationFn: (notificationId: string) => markAsReadNotification(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', userId],
+      });
+    },
   });
 
   return {

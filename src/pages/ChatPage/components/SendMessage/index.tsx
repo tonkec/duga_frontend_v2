@@ -18,6 +18,7 @@ import Input from '@app/components/Input';
 import { BiPaperclip, BiSend, BiSolidFileGif } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
 import GiphySearch from '@app/components/GiphySearch';
+import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
 
 type Inputs = {
   content: string;
@@ -77,8 +78,16 @@ export interface IEmoji {
   }[];
 }
 
+interface INotification {
+  id: number;
+  type: string;
+  chatId: number;
+  isRead: boolean;
+}
+
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
@@ -89,6 +98,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
+  const { allNotifications } = useGetAllNotifcations(String(currentUserId) || '');
+  const { mutateMarkAsRead } = useMarkAsReadNotification();
+
   const sendGif = (gifUrl: string) => {
     const msg = {
       type: 'gif',
@@ -193,6 +205,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     setImageTimestamp(String(timestamp));
   }, []);
 
+  console.log(allNotifications);
+
   return (
     <div>
       <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
@@ -260,6 +274,27 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                 }}
                 onFocus={() => {
                   socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+                  socket.emit('markAsRead', {
+                    userId: currentUserId,
+                    notificationId: allNotifications?.data.find(
+                      (notification: INotification) =>
+                        notification.type === 'message' &&
+                        notification.chatId === Number(chatId) &&
+                        !notification.isRead
+                    )?.id,
+                  });
+
+                  if (allNotifications?.data) {
+                    allNotifications.data.forEach((notification: INotification) => {
+                      if (
+                        notification.type === 'message' &&
+                        notification.chatId === Number(chatId) &&
+                        !notification.isRead
+                      ) {
+                        mutateMarkAsRead(String(notification.id));
+                      }
+                    });
+                  }
                 }}
                 onBlur={() => {
                   socket.emit('stop-typing', {
