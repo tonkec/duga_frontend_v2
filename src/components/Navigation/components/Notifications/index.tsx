@@ -14,7 +14,13 @@ export type Notification = {
   actionType: 'upload' | 'comment' | 'message' | null;
 };
 
-const NotificationDropdown = ({ userId }: { userId: number | null }) => {
+const NotificationDropdown = ({
+  userId,
+  isMobile,
+}: {
+  userId: number | null;
+  isMobile: boolean;
+}) => {
   const navigate = useNavigate();
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -53,23 +59,33 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
   if (!userId) return null;
 
   return (
-    <div className="relative inline-block" ref={dropdownRef}>
-      <button onClick={() => setOpen((prev) => !prev)} className="relative">
-        <span className="text-white">Obavijesti 🔔</span>
+    <div className="relative inline-block w-full" ref={dropdownRef}>
+      <button onClick={() => setOpen((prev) => !prev)} className="relative w-full">
+        <span
+          className={
+            isMobile
+              ? 'hover:bg-white hover:text-black text-lg bg-black text-white w-full inline-block px-2 py-1 rounded mb-2'
+              : 'text-white'
+          }
+        >
+          Obavijesti 🔔
+        </span>
         {notifications.some((n) => !n.isRead) && (
           <span className="absolute top-0 right-0 h-2 w-2 bg-red rounded-full" />
         )}
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 mt-2 w-52 bg-white shadow-xl rounded-lg z-10 max-h-96 overflow-y-auto">
+        <div
+          className={`absolute left-0 right-0 mt-1 w-52 ${isMobile ? 'bg-black' : 'bg-white'} shadow-xl rounded-lg z-10 max-h-96 overflow-y-auto`}
+        >
           {notifications.length === 0 ? (
             <div className="p-4 text-sm text-black">Nema obavijesti</div>
           ) : (
             notifications.map((n) => (
               <div
                 key={n.id}
-                className={`px-4 py-2 text-sm border-b cursor-pointer ${n.isRead ? 'bg-white' : 'bg-rose hover:bg-pink'}`}
+                className={`px-4 py-2 text-sm cursor-pointer ${n.isRead ? (isMobile ? 'bg-black text-white' : 'bg-white') : 'bg-rose hover:bg-pink'}`}
                 onClick={() => {
                   if (!n.isRead) {
                     mutateMarkAsRead(String(n.id));
@@ -97,7 +113,7 @@ const NotificationDropdown = ({ userId }: { userId: number | null }) => {
                   }
                 }}
               >
-                <p className="text-black"> {n.content}</p>
+                <p className={isMobile ? 'text-white' : 'text-black'}> {n.content}</p>
               </div>
             ))
           )}
