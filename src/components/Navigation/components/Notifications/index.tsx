@@ -47,6 +47,24 @@ const NotificationDropdown = ({
   }, [userId, socket]);
 
   useEffect(() => {
+    if (!socket) return;
+    socket.on('markAsRead', (notificationFromSocket) => {
+      console.log('on markAsRead from socket', notificationFromSocket);
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === notificationFromSocket.id
+            ? { ...notification, isRead: true }
+            : notification
+        )
+      );
+    });
+
+    return () => {
+      socket.off('markAsRead');
+    };
+  }, [userId, socket, notifications]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpen(false);
