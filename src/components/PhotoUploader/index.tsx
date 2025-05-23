@@ -139,7 +139,7 @@ const PhotoUploader = () => {
 
     const files = (e.target as HTMLFormElement)?.avatars?.files;
 
-    if (!!files.length && allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
