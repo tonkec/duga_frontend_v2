@@ -20,11 +20,11 @@ export const NavigationItems = ({
   return (
     <>
       <div className="flex items-center space-between w-full">
-        <div className={`${isMobile ? 'block' : 'flex'}  items-center space-between gap-6`}>
+        <div className={`${isMobile ? 'block w-full' : 'flex'}  items-center space-between gap-6`}>
           <Link
             to="/"
             onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-white text-lg'}`}
+            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black flex-1 px-2 py-1 rounded mb-2 w-full justify-center '}`}
           >
             <span>Početna</span>
             {!isMobile && String.fromCodePoint(parseInt('1F3D8', 16))}
@@ -32,7 +32,7 @@ export const NavigationItems = ({
           <Link
             to="/new-chat"
             onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-white text-lg'}`}
+            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
           >
             <span>Poruke</span>
             {!isMobile && String.fromCodePoint(parseInt('1F4EB', 16))}
@@ -40,7 +40,7 @@ export const NavigationItems = ({
           <Link
             to="/profile"
             onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-white text-lg'}`}
+            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
           >
             <span>Profil</span>
             {!isMobile && String.fromCodePoint(parseInt('1F9D1', 16))}
@@ -49,27 +49,27 @@ export const NavigationItems = ({
           <Link
             to="/settings"
             onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-white text-lg'}`}
+            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
           >
             <span>Postavke</span>
             {!isMobile && String.fromCodePoint(9881, 65039)}
           </Link>
 
           <div>
-            <NotificationDropdown userId={numericUserId} />
+            <NotificationDropdown userId={numericUserId} isMobile={isMobile} />
           </div>
         </div>
       </div>
 
-      <div>
+      <div className={isMobile ? 'absolute bottom-2 left-6 right-6' : 'relative'}>
         <button
           onClick={onLogout}
-          className={`flex items-center gap-1 ${isMobile && 'text-white text-lg mt-8'}`}
+          className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black flex-1 px-2 py-1 rounded mb-2 w-full flex-1 justify-center '}`}
         >
           {isMobile ? (
             <>
-              <BiExit fontSize={20} />
               <span>Odjava</span>
+              <BiExit fontSize={20} />
             </>
           ) : (
             <BiExit fontSize={25} />

@@ -90,8 +90,8 @@ const PhotoComments = () => {
   const onSubmit = async (data: Inputs) => {
     if (!userId || !photoId || !isValid) return;
 
-    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
-      toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+    if (!!data?.image?.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+      toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
 

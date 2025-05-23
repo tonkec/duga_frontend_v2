@@ -119,6 +119,7 @@ const ChatPage = () => {
           onDeleteChat={() => {
             if (!chatId) return;
             deleteChat({ chatId });
+            navigate('/chats');
           }}
         />
         <Button

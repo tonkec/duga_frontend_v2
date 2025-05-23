@@ -6,6 +6,8 @@ import { useDeleteUser } from '../EditMyProfilePage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Card from '@app/components/Card';
 import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
+import { useCookies } from 'react-cookie';
+import { useCookieConsent } from '@app/hooks/useCookieConsent';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -27,9 +29,11 @@ const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalPr
 };
 const SettingsPage = () => {
   const [userId] = useLocalStorage('userId');
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { deleteUserMutation } = useDeleteUser(userId as string);
+  const { acceptCookies, rejectCookies } = useCookieConsent();
+  const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
+  const hasRejectedCookies = cookies.cookieRejectedAt;
 
   return (
     <AppLayout>
@@ -48,6 +52,20 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
 
         <div>{String(userId) && <OnlineStatus userId={String(userId)} />}</div>
+
+        <hr className="mb-5" />
+
+        <div className="mb-5 flex gap-2">
+          {hasRejectedCookies ? (
+            <Button type="primary" onClick={acceptCookies}>
+              Prihvati kolačiće
+            </Button>
+          ) : (
+            <Button type="primary" onClick={rejectCookies}>
+              Odbij kolačiće
+            </Button>
+          )}
+        </div>
 
         <hr className="mb-5" />
 
