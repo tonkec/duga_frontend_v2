@@ -65,6 +65,7 @@ const PhotoComments = () => {
     photoId as string
   );
   const { allUserImages } = useGetAllUserImages(userId as string);
+
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
   const {
@@ -89,7 +90,7 @@ const PhotoComments = () => {
   const onSubmit = async (data: Inputs) => {
     if (!userId || !photoId || !isValid) return;
 
-    if (!!data?.image?.length && allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (!!data?.image?.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
