@@ -105,8 +105,17 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     }
 
     return (
-      <div className="flex gap-2 justify-between">
-        <p className="text-lg">{renderFormattedComment(comment.comment)}</p>
+      <div className="flex gap-2 justify-between items-start">
+        <div>
+          {comment.comment && <p className="text-lg">{renderFormattedComment(comment.comment)}</p>}
+          {comment.imageUrl && (
+            <img
+              src={comment.imageUrl}
+              alt="Comment attachment"
+              className="max-h-32 max-w-full object-cover rounded"
+            />
+          )}
+        </div>
         {currentUser === comment.userId && (
           <div className="flex gap-2">
             <Button type="tertiary" onClick={() => setIsEditing(true)}>
