@@ -29,9 +29,14 @@ interface Message {
   id: number;
   content: string;
   createdAt: string;
-  message: string;
   User: User;
   messagePhotoUrl: string;
+  fromUserId: number;
+  chatId: number;
+  message: {
+    message: string;
+    createdAt: string;
+  };
 }
 
 export const useCreateNewChat = () => {
