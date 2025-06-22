@@ -9,7 +9,7 @@ const EmojiPicker = ({ emojis, onEmojiSelect }: IEmojiPickerProps) => {
   }
 
   return (
-    <div className="absolute bg-gray-100 border border-gray-200 shadow-lg rounded-lg ml-20 p-2 max-h-24 overflow-y-auto w-80 grid grid-cols-8 gap-1">
+    <div className="absolute bg-gray-100 border border-gray-200 shadow-lg rounded-lg ml-11 p-2 max-h-24 overflow-y-auto w-80 grid grid-cols-8 gap-1">
       {emojis.map((emoji, index) => {
         return (
           <span

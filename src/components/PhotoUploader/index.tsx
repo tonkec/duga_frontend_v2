@@ -111,7 +111,6 @@ const PhotoActionButtons = ({
 };
 
 const PhotoUploader = () => {
-  const maxNumberOfImages = 5;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
   const { allUserImages } = useGetAllUserImages(userId as string);
@@ -138,12 +137,13 @@ const PhotoUploader = () => {
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
 
-    if (allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
-      toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+    const files = (e.target as HTMLFormElement)?.avatars?.files;
+
+    if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+      toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
 
-    const files = (e.target as HTMLFormElement)?.avatars?.files;
     const formData = new FormData();
     if (files) {
       formData.append('text', JSON.stringify(newImageDescriptions));
@@ -156,6 +156,9 @@ const PhotoUploader = () => {
       onUploadPhotos(formData);
     }
 
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setNewImages([]);
   };
 
@@ -310,10 +313,10 @@ const PhotoUploader = () => {
                     files.length +
                       (newImages?.length || 0) +
                       allExistingImages?.data?.images?.length >
-                    maxNumberOfImages
+                    MAXIMUM_NUMBER_OF_IMAGES
                   ) {
                     toast.error(
-                      `Maksimalan broj fotografija je ${maxNumberOfImages}!`,
+                      `Maksimalan broj fotografija je ${MAXIMUM_NUMBER_OF_IMAGES}!`,
                       toastConfig
                     );
                     return;

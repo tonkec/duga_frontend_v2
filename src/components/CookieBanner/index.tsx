@@ -24,7 +24,13 @@ const CookieBanner = () => {
         <h2 className="text-xl font-bold mb-4">Kolačići</h2>
         <p className="mb-6">Koristimo kolačiće za poboljšanje korisničkog iskustva.</p>
         <div className="flex justify-center gap-4">
-          <button onClick={rejectCookies} className="bg-slate-900 text-white px-4 py-2 rounded">
+          <button
+            onClick={() => {
+              rejectCookies();
+              setShowBanner(false);
+            }}
+            className="bg-slate-900 text-white px-4 py-2 rounded"
+          >
             Odbij
           </button>
           <button
