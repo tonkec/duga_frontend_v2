@@ -1,40 +1,50 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSocket } from './../useSocket';
 import { StatusContext } from './useStatusMap';
 import { useUserOnlineStatus } from './hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
+import { useSocket } from '../useSocket';
 
 export type StatusMap = Map<number, 'online' | 'offline'>;
 
-export const StatusProvider = ({ children }: { children: React.ReactNode }) => {
+export const StatusProvider = ({
+  onlineUserId,
+  children,
+}: {
+  onlineUserId: number | null;
+  children: React.ReactNode;
+}) => {
   const socket = useSocket();
   const [statusMap, setStatusMap] = useState<StatusMap>(new Map());
-  const [userId] = useLocalStorage('userId');
 
-  const { data } = useUserOnlineStatus(String(userId || ''));
-
+  const { data } = useUserOnlineStatus(String(onlineUserId || ''));
   useEffect(() => {
-    if (data?.status && userId) {
-      setStatusMap((prev) => new Map(prev.set(Number(userId), data.status)));
+    if (data?.status && onlineUserId) {
+      setStatusMap((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(Number(onlineUserId), data.status);
+        return newMap;
+      });
     }
-  }, [data, userId]);
+  }, [data, onlineUserId]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (socket && onlineUserId) {
+      socket.on('status-update', (userId: number, status: 'online' | 'offline') => {
+        setStatusMap((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(userId, status);
+          return newMap;
+        });
+      });
 
-    const handler = ({ userId, status }: { userId: number; status: 'online' | 'offline' }) => {
-      setStatusMap((prev) => new Map(prev.set(userId, status)));
-    };
-
-    socket.on('status-update', handler);
-    return () => {
-      socket.off('status-update', handler);
-    };
-  }, [socket]);
+      return () => {
+        socket.off('status-update');
+      };
+    }
+  }, [socket, onlineUserId]);
 
   const contextValue = useMemo(() => ({ statusMap }), [statusMap]);
 
-  return userId ? (
+  return onlineUserId ? (
     <StatusContext.Provider value={contextValue}>{children}</StatusContext.Provider>
   ) : (
     <>{children}</>

@@ -12,7 +12,8 @@ import {
 import Iframe from 'react-iframe';
 import { IImage } from '@app/components/Photos';
 import Loader from '@app/components/Loader';
-import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
+import { useSocket } from '@app/context/useSocket';
+import { useEffect, useState } from 'react';
 
 export interface IUserProfileCardProps {
   bio: string;
@@ -40,6 +41,7 @@ export interface IUserProfileCardProps {
   lastName: string;
   favoriteDayOfWeek: string;
   id: string;
+  status: string;
 }
 
 const UserProfileCard = ({
@@ -51,8 +53,23 @@ const UserProfileCard = ({
   allImages: IImage[];
   allImagesLoading: boolean;
 }) => {
-  const { statusMap } = useStatusMap();
-  const isOnline = statusMap.get(Number(user.id)) === 'online';
+  const [isOnlineState, setIsOnlineState] = useState<boolean>(false);
+  const socket = useSocket();
+  useEffect(() => {
+    if (!socket || !user.id) return;
+
+    socket.on('status-update', (data) => {
+      if (Number(data.userId) === Number(user.id)) {
+        setIsOnlineState(data.status === 'online');
+      }
+    });
+  }, [socket, user.id]);
+
+  useEffect(() => {
+    if (socket && user.id) {
+      setIsOnlineState(user.status === 'online');
+    }
+  }, [socket, user.id, user.status]);
 
   if (allImagesLoading) {
     return <Loader />;
@@ -75,7 +92,7 @@ const UserProfileCard = ({
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-1 mb-4">
               <h1>{user.username}</h1>
-              <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
+              <span className="text-xs mt-1">{isOnlineState ? '🟢' : '🔴'}</span>
             </div>
             <p className="flex items-center text-lg gap-2">
               <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}

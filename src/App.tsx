@@ -91,7 +91,6 @@ function App() {
   });
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
-
   const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
 
   return (
@@ -135,6 +134,7 @@ function App() {
                     disabled={hasChatWithUser}
                   />
                 }
+                isOnline={singleEntry.status === 'online'}
               />
             );
           }}

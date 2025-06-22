@@ -25,7 +25,7 @@ interface ITypingData {
   userId: number;
 }
 
-const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
+export const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
   if (!chatUsers) return null;
   return chatUsers.find((user) => user.userId !== Number(currentUserId));
 };
@@ -66,7 +66,6 @@ const ChatPage = () => {
   const { currentChat } = useGetCurrentChat(chatId as string);
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
   const isOnline = statusMap.get(Number(otherUserId)) === 'online';
-
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
   const otherUserProfilePhoto = getProfilePhotoUrl(

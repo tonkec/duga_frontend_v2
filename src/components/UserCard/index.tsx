@@ -5,8 +5,9 @@ import { getUserBio } from '@app/components/UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 import clsx from 'clsx';
+import { useSocket } from '@app/context/useSocket';
+import { useEffect, useState } from 'react';
 export interface IUser {
   avatar: string;
   email: string;
@@ -22,6 +23,7 @@ export interface IUser {
   updatedAt: string;
   username: string;
   age: number;
+  status: 'online' | 'offline';
 }
 
 interface IUserCardProps {
@@ -68,10 +70,24 @@ const getUserAge = ({ age }: { age: number }) => {
   );
 };
 
-const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardProps) => {
+const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
   const { allImages } = useGetAllImages(user.id);
-  const { statusMap } = useStatusMap();
-  const isOnline = statusMap.get(Number(user.id)) === 'online';
+  const socket = useSocket();
+  const [isOnlineState, setIsOnlineState] = useState(isOnline);
+
+  useEffect(() => {
+    if (!socket || !user.id) return;
+
+    socket.on('status-update', (data: { userId: number; status: 'online' | 'offline' }) => {
+      if (Number(data.userId) === Number(user.id)) {
+        setIsOnlineState(data.status === 'online');
+      }
+    });
+  }, [socket, user.id]);
+
+  useEffect(() => {
+    setIsOnlineState(isOnline);
+  }, [isOnline]);
 
   return (
     <Card className="h-full">
@@ -93,7 +109,7 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardPr
             <span
               className={clsx(
                 'inline-block w-2 h-2 rounded-full',
-                isOnline ? 'bg-green' : 'bg-gray-400'
+                isOnlineState ? 'bg-green' : 'bg-gray-400'
               )}
             />
           </h3>
