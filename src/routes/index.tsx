@@ -6,12 +6,12 @@ import EditMyProfilePage from '@app/pages/EditMyProfilePage';
 import OtherUserPage from '@app/pages/OtherUserPage';
 import PhotoPage from '@app/pages/PhotoPage';
 import NewChatPage from '@app/pages/NewChatPage';
-import ChatPage from '@app/pages/ChatPage';
 import NotFoundPage from '@app/pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 import VerifyEmailPage from '@app/pages/VerifyEmailPage';
 import SettingsPage from '@app/pages/SettingsPage';
 import { PageTitle } from '@app/components/PageTitle';
+import ChatPageWrapper from '@app/pages/ChatPage/ChatPageWrapper';
 
 const DugaRoutes = () => {
   return (
@@ -96,7 +96,7 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Chat">
-              <ChatPage />
+              <ChatPageWrapper />
             </PageTitle>
           </AuthGuard>
         }

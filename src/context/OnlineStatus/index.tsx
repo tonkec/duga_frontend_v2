@@ -1,40 +1,53 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSocket } from './../useSocket';
 import { StatusContext } from './useStatusMap';
 import { useUserOnlineStatus } from './hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
+import { useSocket } from '../useSocket';
 
 export type StatusMap = Map<number, 'online' | 'offline'>;
 
-export const StatusProvider = ({ children }: { children: React.ReactNode }) => {
+export const StatusProvider = ({
+  otherUserId,
+  children,
+}: {
+  otherUserId: number | null;
+  children: React.ReactNode;
+}) => {
   const socket = useSocket();
   const [statusMap, setStatusMap] = useState<StatusMap>(new Map());
-  const [userId] = useLocalStorage('userId');
 
-  const { data } = useUserOnlineStatus(String(userId || ''));
+  const { data } = useUserOnlineStatus(String(otherUserId || ''));
 
   useEffect(() => {
-    if (data?.status && userId) {
-      setStatusMap((prev) => new Map(prev.set(Number(userId), data.status)));
+    if (data?.status && otherUserId) {
+      setStatusMap((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(Number(otherUserId), data.status);
+        return newMap;
+      });
     }
-  }, [data, userId]);
+  }, [data, otherUserId]);
+
+  console.log('StatusProvider rendered', statusMap);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !otherUserId) return;
 
-    const handler = ({ userId, status }: { userId: number; status: 'online' | 'offline' }) => {
-      setStatusMap((prev) => new Map(prev.set(userId, status)));
-    };
+    socket.emit('status-update', {
+      userId: Number(otherUserId),
+      status: 'online',
+    });
 
-    socket.on('status-update', handler);
     return () => {
-      socket.off('status-update', handler);
+      socket.emit('status-update', {
+        userId: Number(otherUserId),
+        status: 'offline',
+      });
     };
-  }, [socket]);
+  }, [socket, otherUserId]);
 
   const contextValue = useMemo(() => ({ statusMap }), [statusMap]);
 
-  return userId ? (
+  return otherUserId ? (
     <StatusContext.Provider value={contextValue}>{children}</StatusContext.Provider>
   ) : (
     <>{children}</>
