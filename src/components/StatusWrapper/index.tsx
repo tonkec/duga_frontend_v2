@@ -6,10 +6,10 @@ import { getOtherUser } from '@app/pages/ChatPage';
 
 const StatusWrapper = ({
   children,
-  isCurrentUser,
+  isCurrentUser = false,
 }: {
   children: React.ReactNode;
-  isCurrentUser: boolean;
+  isCurrentUser?: boolean;
 }) => {
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();

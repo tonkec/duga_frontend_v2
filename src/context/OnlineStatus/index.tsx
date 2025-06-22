@@ -27,6 +27,8 @@ export const StatusProvider = ({
     }
   }, [data, onlineUserId]);
 
+  console.log('StatusProvider rendered', statusMap);
+
   useEffect(() => {
     if (!socket || !onlineUserId) return;
 

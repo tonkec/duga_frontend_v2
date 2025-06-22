@@ -5,7 +5,6 @@ import { getUserBio } from '@app/components/UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 import clsx from 'clsx';
 export interface IUser {
   avatar: string;
@@ -22,6 +21,7 @@ export interface IUser {
   updatedAt: string;
   username: string;
   age: number;
+  status: 'online' | 'offline';
 }
 
 interface IUserCardProps {
@@ -68,10 +68,8 @@ const getUserAge = ({ age }: { age: number }) => {
   );
 };
 
-const UserCard = ({ user, onButtonClick, buttonText, secondButton }: IUserCardProps) => {
+const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
   const { allImages } = useGetAllImages(user.id);
-  const { statusMap } = useStatusMap();
-  const isOnline = statusMap.get(Number(user.id)) === 'online';
 
   return (
     <Card className="h-full">
