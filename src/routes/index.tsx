@@ -30,7 +30,7 @@ const DugaRoutes = () => {
         path="/"
         element={
           <AuthGuard>
-            <PageTitle title="Duga">
+            <PageTitle title="Početna">
               <App />
             </PageTitle>
           </AuthGuard>
