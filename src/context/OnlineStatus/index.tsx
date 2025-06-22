@@ -16,7 +16,6 @@ export const StatusProvider = ({
   const [statusMap, setStatusMap] = useState<StatusMap>(new Map());
 
   const { data } = useUserOnlineStatus(String(onlineUserId || ''));
-
   useEffect(() => {
     if (data?.status && onlineUserId) {
       setStatusMap((prev) => {
@@ -28,19 +27,19 @@ export const StatusProvider = ({
   }, [data, onlineUserId]);
 
   useEffect(() => {
-    if (!socket || !onlineUserId) return;
-
-    socket.emit('status-update', {
-      userId: Number(onlineUserId),
-      status: 'online',
-    });
-
-    return () => {
-      socket.emit('status-update', {
-        userId: Number(onlineUserId),
-        status: 'offline',
+    if (socket && onlineUserId) {
+      socket.on('status-update', (userId: number, status: 'online' | 'offline') => {
+        setStatusMap((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(userId, status);
+          return newMap;
+        });
       });
-    };
+
+      return () => {
+        socket.off('status-update');
+      };
+    }
   }, [socket, onlineUserId]);
 
   const contextValue = useMemo(() => ({ statusMap }), [statusMap]);

@@ -66,7 +66,9 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Profil korisnika">
-              <OtherUserPage />
+              <StatusWrapper>
+                <OtherUserPage />
+              </StatusWrapper>
             </PageTitle>
           </AuthGuard>
         }
