@@ -42,7 +42,9 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Moj profil">
-              <MyProfilePage />
+              <StatusWrapper isCurrentUser>
+                <MyProfilePage />
+              </StatusWrapper>
             </PageTitle>
           </AuthGuard>
         }
@@ -97,7 +99,7 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Chat">
-              <StatusWrapper>
+              <StatusWrapper isCurrentUser={false}>
                 <ChatPage />
               </StatusWrapper>
             </PageTitle>

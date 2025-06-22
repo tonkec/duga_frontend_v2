@@ -6,48 +6,46 @@ import { useSocket } from '../useSocket';
 export type StatusMap = Map<number, 'online' | 'offline'>;
 
 export const StatusProvider = ({
-  otherUserId,
+  onlineUserId,
   children,
 }: {
-  otherUserId: number | null;
+  onlineUserId: number | null;
   children: React.ReactNode;
 }) => {
   const socket = useSocket();
   const [statusMap, setStatusMap] = useState<StatusMap>(new Map());
 
-  const { data } = useUserOnlineStatus(String(otherUserId || ''));
+  const { data } = useUserOnlineStatus(String(onlineUserId || ''));
 
   useEffect(() => {
-    if (data?.status && otherUserId) {
+    if (data?.status && onlineUserId) {
       setStatusMap((prev) => {
         const newMap = new Map(prev);
-        newMap.set(Number(otherUserId), data.status);
+        newMap.set(Number(onlineUserId), data.status);
         return newMap;
       });
     }
-  }, [data, otherUserId]);
-
-  console.log('StatusProvider rendered', statusMap);
+  }, [data, onlineUserId]);
 
   useEffect(() => {
-    if (!socket || !otherUserId) return;
+    if (!socket || !onlineUserId) return;
 
     socket.emit('status-update', {
-      userId: Number(otherUserId),
+      userId: Number(onlineUserId),
       status: 'online',
     });
 
     return () => {
       socket.emit('status-update', {
-        userId: Number(otherUserId),
+        userId: Number(onlineUserId),
         status: 'offline',
       });
     };
-  }, [socket, otherUserId]);
+  }, [socket, onlineUserId]);
 
   const contextValue = useMemo(() => ({ statusMap }), [statusMap]);
 
-  return otherUserId ? (
+  return onlineUserId ? (
     <StatusContext.Provider value={contextValue}>{children}</StatusContext.Provider>
   ) : (
     <>{children}</>

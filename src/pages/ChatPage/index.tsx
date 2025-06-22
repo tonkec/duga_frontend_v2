@@ -66,7 +66,6 @@ const ChatPage = () => {
   const { currentChat } = useGetCurrentChat(chatId as string);
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
   const isOnline = statusMap.get(Number(otherUserId)) === 'online';
-  console.log(statusMap, 'statusMap');
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
   const otherUserProfilePhoto = getProfilePhotoUrl(
