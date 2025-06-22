@@ -6,6 +6,8 @@ import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import clsx from 'clsx';
+import { useSocket } from '@app/context/useSocket';
+import { useEffect, useState } from 'react';
 export interface IUser {
   avatar: string;
   email: string;
@@ -70,6 +72,18 @@ const getUserAge = ({ age }: { age: number }) => {
 
 const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
   const { allImages } = useGetAllImages(user.id);
+  const socket = useSocket();
+  const [isOnlineState, setIsOnlineState] = useState(isOnline);
+
+  useEffect(() => {
+    if (!socket || !user.id) return;
+
+    socket.on('status-update', (data: { userId: number; status: 'online' | 'offline' }) => {
+      if (Number(data.userId) === Number(user.id)) {
+        setIsOnlineState(data.status === 'online');
+      }
+    });
+  }, [socket, user.id]);
 
   return (
     <Card className="h-full">
@@ -91,7 +105,7 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
             <span
               className={clsx(
                 'inline-block w-2 h-2 rounded-full',
-                isOnline ? 'bg-green' : 'bg-gray-400'
+                isOnlineState ? 'bg-green' : 'bg-gray-400'
               )}
             />
           </h3>

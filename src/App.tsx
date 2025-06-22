@@ -91,7 +91,6 @@ function App() {
   });
 
   const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
-  console.log('Rendered Users:', renderedUsers);
   const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
 
   return (
