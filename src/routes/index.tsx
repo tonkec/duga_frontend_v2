@@ -11,7 +11,8 @@ import { AuthGuard } from './guards/AuthGuard';
 import VerifyEmailPage from '@app/pages/VerifyEmailPage';
 import SettingsPage from '@app/pages/SettingsPage';
 import { PageTitle } from '@app/components/PageTitle';
-import ChatPageWrapper from '@app/pages/ChatPage/ChatPageWrapper';
+import ChatPage from '@app/pages/ChatPage';
+import StatusWrapper from '@app/components/StatusWrapper';
 
 const DugaRoutes = () => {
   return (
@@ -96,7 +97,9 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Chat">
-              <ChatPageWrapper />
+              <StatusWrapper>
+                <ChatPage />
+              </StatusWrapper>
             </PageTitle>
           </AuthGuard>
         }

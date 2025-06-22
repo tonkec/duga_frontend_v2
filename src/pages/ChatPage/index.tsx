@@ -16,7 +16,6 @@ import ConfirmModal from '@app/components/ConfirmModal';
 import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 import { IMessage } from './components/Message';
 import ChatBubble from '@app/components/ChatBubble';
-import { StatusProvider } from '@app/context/OnlineStatus';
 
 interface IChatUser {
   userId: number;
@@ -112,51 +111,49 @@ const ChatPage = () => {
   }, [socket, otherUserId]);
 
   return (
-    <StatusProvider otherUserId={otherUserId ?? null}>
-      <ChatGuard>
-        <AppLayout>
-          <DeleteChatModal
-            isDeleteModalVisible={isDeleteModalVisible}
-            setIsDeleteModalVisible={setIsDeleteModalVisible}
-            onDeleteChat={() => {
-              if (!chatId) return;
-              deleteChat({ chatId });
-              navigate('/chats');
-            }}
-          />
-          <Button
-            className="mb-2"
-            type="danger"
-            onClick={(e) => {
-              e?.preventDefault();
-              setIsDeleteModalVisible(true);
-            }}
-          >
-            Izbriši razgovor
-          </Button>
-          <Card>
-            <div className="flex items-center gap-1 border-b mb-4">
-              <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
-              <h1 className="cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
-                {otherUserName}
-              </h1>
-            </div>
-            <div className="mt-4 mb-2">
-              <PaginatedMessages
-                currentUserName={currentUserName}
-                otherUserName={otherUserName}
-                currentUserProfilePhoto={currentUserProfilePhoto}
-                otherUserProfilePhoto={otherUserProfilePhoto}
-                otherUserId={otherUserId as number}
-                receivedMessages={receivedMessages}
-              />
-            </div>
-            {isTyping && <ChatBubble />}
-            {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
-          </Card>
-        </AppLayout>
-      </ChatGuard>
-    </StatusProvider>
+    <ChatGuard>
+      <AppLayout>
+        <DeleteChatModal
+          isDeleteModalVisible={isDeleteModalVisible}
+          setIsDeleteModalVisible={setIsDeleteModalVisible}
+          onDeleteChat={() => {
+            if (!chatId) return;
+            deleteChat({ chatId });
+            navigate('/chats');
+          }}
+        />
+        <Button
+          className="mb-2"
+          type="danger"
+          onClick={(e) => {
+            e?.preventDefault();
+            setIsDeleteModalVisible(true);
+          }}
+        >
+          Izbriši razgovor
+        </Button>
+        <Card>
+          <div className="flex items-center gap-1 border-b mb-4">
+            <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
+            <h1 className="cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
+              {otherUserName}
+            </h1>
+          </div>
+          <div className="mt-4 mb-2">
+            <PaginatedMessages
+              currentUserName={currentUserName}
+              otherUserName={otherUserName}
+              currentUserProfilePhoto={currentUserProfilePhoto}
+              otherUserProfilePhoto={otherUserProfilePhoto}
+              otherUserId={otherUserId as number}
+              receivedMessages={receivedMessages}
+            />
+          </div>
+          {isTyping && <ChatBubble />}
+          {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
+        </Card>
+      </AppLayout>
+    </ChatGuard>
   );
 };
 
