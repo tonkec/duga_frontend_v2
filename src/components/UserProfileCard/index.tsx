@@ -41,6 +41,7 @@ export interface IUserProfileCardProps {
   lastName: string;
   favoriteDayOfWeek: string;
   id: string;
+  status: string;
 }
 
 const UserProfileCard = ({
@@ -63,6 +64,12 @@ const UserProfileCard = ({
       }
     });
   }, [socket, user.id]);
+
+  useEffect(() => {
+    if (socket && user.id) {
+      setIsOnlineState(user.status === 'online');
+    }
+  }, [socket, user.id, user.status]);
 
   if (allImagesLoading) {
     return <Loader />;
