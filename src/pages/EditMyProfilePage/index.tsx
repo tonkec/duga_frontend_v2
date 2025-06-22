@@ -98,15 +98,45 @@ const schema = z.object({
   makesMyDay: z.string().optional(),
   favoriteSong: z
     .string()
-    .refine((val) => val === '' || z.string().url().safeParse(val).success, {
-      message: 'Unesite ispravan URL za najdražu pjesmu',
-    })
+    .refine(
+      (val) => {
+        if (val === '') return true;
+        try {
+          const url = new URL(val);
+          return (
+            url.hostname === 'www.youtube.com' ||
+            url.hostname === 'youtube.com' ||
+            url.hostname === 'youtu.be'
+          );
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: 'Mora biti YouTube link (youtube.com ili youtu.be)',
+      }
+    )
     .optional(),
   favoriteMovie: z
     .string()
-    .refine((val) => val === '' || z.string().url().safeParse(val).success, {
-      message: 'Unesite ispravan URL za trailer filma',
-    })
+    .refine(
+      (val) => {
+        if (val === '') return true;
+        try {
+          const url = new URL(val);
+          return (
+            url.hostname === 'www.youtube.com' ||
+            url.hostname === 'youtube.com' ||
+            url.hostname === 'youtu.be'
+          );
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: 'Mora biti YouTube link (youtube.com ili youtu.be)',
+      }
+    )
     .optional(),
   interests: z.string().optional(),
   languages: z.string().optional(),
