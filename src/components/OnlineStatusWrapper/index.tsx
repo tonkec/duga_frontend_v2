@@ -5,7 +5,7 @@ import { useGetCurrentChat } from '@app/pages/ChatPage/hooks';
 import { getOtherUser } from '@app/pages/ChatPage';
 import { useEffect, useState } from 'react';
 
-const StatusWrapper = ({
+const OnlineStatusWrapper = ({
   children,
   isCurrentUser = false,
 }: {
@@ -36,4 +36,4 @@ const StatusWrapper = ({
   );
 };
 
-export default StatusWrapper;
+export default OnlineStatusWrapper;

@@ -12,7 +12,7 @@ import VerifyEmailPage from '@app/pages/VerifyEmailPage';
 import SettingsPage from '@app/pages/SettingsPage';
 import { PageTitle } from '@app/components/PageTitle';
 import ChatPage from '@app/pages/ChatPage';
-import StatusWrapper from '@app/components/StatusWrapper';
+import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
 
 const DugaRoutes = () => {
   return (
@@ -42,9 +42,9 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Moj profil">
-              <StatusWrapper isCurrentUser>
+              <OnlineStatusWrapper isCurrentUser>
                 <MyProfilePage />
-              </StatusWrapper>
+              </OnlineStatusWrapper>
             </PageTitle>
           </AuthGuard>
         }
@@ -66,9 +66,9 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Profil korisnika">
-              <StatusWrapper>
+              <OnlineStatusWrapper>
                 <OtherUserPage />
-              </StatusWrapper>
+              </OnlineStatusWrapper>
             </PageTitle>
           </AuthGuard>
         }
@@ -101,9 +101,9 @@ const DugaRoutes = () => {
         element={
           <AuthGuard>
             <PageTitle title="Chat">
-              <StatusWrapper>
+              <OnlineStatusWrapper>
                 <ChatPage />
-              </StatusWrapper>
+              </OnlineStatusWrapper>
             </PageTitle>
           </AuthGuard>
         }
