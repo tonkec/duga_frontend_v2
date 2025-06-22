@@ -284,12 +284,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
                   socket.emit('markAsRead', {
                     userId: currentUserId,
-                    notificationId: allNotifications?.data.find(
-                      (notification: INotification) =>
-                        notification.type === 'message' &&
-                        notification.chatId === Number(chatId) &&
-                        !notification.isRead
-                    )?.id,
+                    chatId: Number(chatId),
                   });
 
                   if (allNotifications?.data) {
