@@ -14,6 +14,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect } from 'react';
 import Button from '@app/components/Button';
+import 'react-tooltip/dist/react-tooltip.css';
+import { Tooltip } from 'react-tooltip';
+import Label from '@app/components/Label';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -186,7 +189,6 @@ const EditMyProfilePage = () => {
         <TabPanel>
           <Card>
             <form onSubmit={handleSubmit(onSubmitForm)}>
-              <h2 className="mb-2">Općenito</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
                   <Input
@@ -194,53 +196,71 @@ const EditMyProfilePage = () => {
                     className="mb-2"
                     placeholder="Korisničko ime"
                     {...register('username')}
+                    label="Korisničko ime"
                   />
                   <Input
                     type="text"
                     className="mb-2"
                     placeholder="Lokacija"
+                    label="Lokacija"
                     {...register('location')}
                   />
-                  <Input type="text" className="mb-2" placeholder="Rod" {...register('gender')} />
                   <Input
+                    type="text"
+                    className="mb-2"
+                    placeholder="Rod"
+                    {...register('gender')}
+                    label="Rod"
+                  />
+                  <Input
+                    label="Seksualnost"
                     type="text"
                     className="mb-2"
                     placeholder="Seksualnost"
                     {...register('sexuality')}
                   />
-                  <Input type="text" className="mb-2" placeholder="Godine" {...register('age')} />
+                  <Input
+                    type="text"
+                    className="mb-2"
+                    placeholder="Godine"
+                    {...register('age')}
+                    label="Dob"
+                  />
+                  <Label>Biografija</Label>
                   <TextArea placeholder="Nešto ukratko o tebi" {...register('bio')} />
                 </div>
               </div>
 
-              <h2 className="mb-2">Tražim...</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
                   <Controller
                     name="lookingFor"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        isClearable
-                        {...field}
-                        options={lookingForOptions}
-                        placeholder="Trenutno tražim..."
-                        className="mb-2"
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: '#F037A5',
-                            primary: 'black',
-                          },
-                        })}
-                        value={
-                          lookingForOptions.find((option) => option.value === field.value) || null
-                        }
-                        onChange={(selectedOption) =>
-                          field.onChange(selectedOption ? selectedOption.value : null)
-                        }
-                      />
+                      <>
+                        <Label>Trenutno tražim</Label>
+                        <Select
+                          isClearable
+                          {...field}
+                          options={lookingForOptions}
+                          placeholder="Trenutno tražim..."
+                          className="mb-2"
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: '#F037A5',
+                              primary: 'black',
+                            },
+                          })}
+                          value={
+                            lookingForOptions.find((option) => option.value === field.value) || null
+                          }
+                          onChange={(selectedOption) =>
+                            field.onChange(selectedOption ? selectedOption.value : null)
+                          }
+                        />
+                      </>
                     )}
                   />
                   <Controller
@@ -251,36 +271,39 @@ const EditMyProfilePage = () => {
                         value === undefined || value === null || value.length > 1 || true,
                     }}
                     render={({ field }) => (
-                      <Select
-                        isClearable
-                        {...field}
-                        options={relationshipStatusOptions}
-                        placeholder="Trenutno sam..."
-                        className="mb-2"
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: '#F037A5',
-                            primary: 'black',
-                          },
-                        })}
-                        value={
-                          relationshipStatusOptions.find(
-                            (option) => option.value === field.value
-                          ) || null
-                        }
-                        onChange={(selectedOption) =>
-                          field.onChange(selectedOption ? selectedOption.value : null)
-                        }
-                      />
+                      <>
+                        <Label> Trenutni status veze</Label>
+                        <Select
+                          isClearable
+                          {...field}
+                          options={relationshipStatusOptions}
+                          placeholder="Trenutno sam..."
+                          className="mb-2"
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: '#F037A5',
+                              primary: 'black',
+                            },
+                          })}
+                          value={
+                            relationshipStatusOptions.find(
+                              (option) => option.value === field.value
+                            ) || null
+                          }
+                          onChange={(selectedOption) =>
+                            field.onChange(selectedOption ? selectedOption.value : null)
+                          }
+                        />
+                      </>
                     )}
                   />
                 </div>
               </div>
-              <h2 className="mb-2">Stil života</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
                 <div className="col-span-2">
+                  <Label>Zdravstveni i životni stil</Label>
                   <Controller
                     name="cigarettes"
                     control={control}
@@ -330,54 +353,75 @@ const EditMyProfilePage = () => {
                 </div>
               </div>
 
-              <h2 className="mb-2">Fun facts</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
                   <Controller
                     name="favoriteDay"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        isClearable
-                        {...field}
-                        options={daysOfWeek}
-                        placeholder="Najdraži dan u tjednu"
-                        className="mb-2"
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: '#F037A5',
-                            primary: 'black',
-                          },
-                        })}
-                        value={daysOfWeek.find((option) => option.value === field.value) || null}
-                        onChange={(selectedOption) =>
-                          field.onChange(selectedOption ? selectedOption.value : null)
-                        }
-                      />
+                      <>
+                        <Label>Moj najdraži dan u tjednu</Label>
+                        <Select
+                          isClearable
+                          {...field}
+                          options={daysOfWeek}
+                          placeholder="Najdraži dan u tjednu"
+                          className="mb-2"
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: '#F037A5',
+                              primary: 'black',
+                            },
+                          })}
+                          value={daysOfWeek.find((option) => option.value === field.value) || null}
+                          onChange={(selectedOption) =>
+                            field.onChange(selectedOption ? selectedOption.value : null)
+                          }
+                        />
+                      </>
                     )}
                   />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
+                  <Label>Najsramotnija stvar koja mi se dogodila</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Najsramotnija stvar koja mi se dogodila..."
                     {...register('embarasement')}
                   />
+                  <Label>Imam previše godina za...</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Imam previše godina za...."
                     {...register('tooOldFor')}
                   />
+                  <Label>Stvari koje mi uljepšavaju dan</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Dan mi je ljepši ako..."
                     {...register('makesMyDay')}
                   />
                   <Input
+                    label={
+                      <>
+                        <span data-tooltip-id="youtubesong">
+                          Unesi svoju najdražu pjesmu sa Youtube-a
+                        </span>
+                        <Tooltip
+                          id="youtubesong"
+                          style={{
+                            backgroundColor: 'black',
+                            color: 'white',
+                          }}
+                        >
+                          Unesi link u formatu <code>https://www.youtube.com/embed/</code>
+                        </Tooltip>
+                      </>
+                    }
                     type="text"
                     className="mb-2"
                     placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
@@ -386,6 +430,22 @@ const EditMyProfilePage = () => {
                   />
 
                   <Input
+                    label={
+                      <>
+                        <span data-tooltip-id="youtubetrailer">
+                          Unesi trailer svog najdražeg filma
+                        </span>
+                        <Tooltip
+                          id="youtubetrailer"
+                          style={{
+                            backgroundColor: 'black',
+                            color: 'white',
+                          }}
+                        >
+                          Unesi link u formatu <code>https://www.youtube.com/embed/</code>
+                        </Tooltip>
+                      </>
+                    }
                     type="text"
                     className="mb-2"
                     placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
@@ -394,9 +454,9 @@ const EditMyProfilePage = () => {
                   />
                 </div>
               </div>
-              <h2 className="mb-2">Ostalo</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
                 <div className="col-span-2">
+                  <Label>Duhovnost/religioznost</Label>
                   <TextArea
                     className="mb-2"
                     placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
@@ -411,13 +471,16 @@ const EditMyProfilePage = () => {
                     className="mb-2"
                     placeholder="Interesi (odvojeni zarezom)"
                     {...register('interests')}
+                    label="Interesi"
                   />
                   <Input
                     type="text"
                     className="mb-2"
                     placeholder="Jezici koje govorim (odvojeni zarezom)"
                     {...register('languages')}
+                    label="Jezici"
                   />
+                  <Label>Za kraj, još nešto o meni</Label>
                   <TextArea placeholder="Za kraj još nešto o meni" {...register('ending')} />
                 </div>
               </div>

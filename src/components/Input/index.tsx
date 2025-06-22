@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import Label from '../Label';
 
 interface InputProps {
   placeholder: string;
@@ -12,6 +13,7 @@ interface InputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   name?: string;
   error?: string;
+  label?: string | React.ReactNode;
 }
 
 const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded px-4 block w-full appearance-none leading-normal focus:border-blue`;
@@ -30,12 +32,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       onBlur,
       name,
       error,
+      label,
       ...props
     },
     ref
   ) => {
     return icon ? (
       <div className="relative">
+        {label && <Label>{label}</Label>}
         <input
           {...props}
           ref={ref}
@@ -54,6 +58,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       </div>
     ) : (
       <>
+        {label && <Label>{label}</Label>}
         <input
           {...props}
           ref={ref}
