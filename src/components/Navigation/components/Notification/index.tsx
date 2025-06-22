@@ -11,7 +11,6 @@ interface INotificationProps {
 const Notification = ({ n, isMobile, setNotifications }: INotificationProps) => {
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const navigate = useNavigate();
-  console.log('Notification component rendered', n);
 
   return (
     <div
