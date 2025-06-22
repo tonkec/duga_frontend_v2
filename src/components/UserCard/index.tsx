@@ -85,6 +85,10 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
     });
   }, [socket, user.id]);
 
+  useEffect(() => {
+    setIsOnlineState(isOnline);
+  }, [isOnline]);
+
   return (
     <Card className="h-full">
       <div className="w-full text-center">
