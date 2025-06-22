@@ -93,8 +93,18 @@ const schema = z.object({
   embarasement: z.string().optional(),
   tooOldFor: z.string().optional(),
   makesMyDay: z.string().optional(),
-  favoriteSong: z.string().optional(),
-  favoriteMovie: z.string().optional(),
+  favoriteSong: z
+    .string()
+    .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+      message: 'Unesite ispravan URL za najdražu pjesmu',
+    })
+    .optional(),
+  favoriteMovie: z
+    .string()
+    .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+      message: 'Unesite ispravan URL za trailer filma',
+    })
+    .optional(),
   interests: z.string().optional(),
   languages: z.string().optional(),
   ending: z.string().optional(),
@@ -110,6 +120,7 @@ const EditMyProfilePage = () => {
     formState: { isValid },
     reset,
     control,
+    formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
@@ -371,12 +382,15 @@ const EditMyProfilePage = () => {
                     className="mb-2"
                     placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
                     {...register('favoriteSong')}
+                    error={errors.favoriteSong?.message}
                   />
+
                   <Input
                     type="text"
                     className="mb-2"
                     placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
                     {...register('favoriteMovie')}
+                    error={errors.favoriteMovie?.message}
                   />
                 </div>
               </div>
