@@ -1,4 +1,4 @@
-import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
+import { BiInfoCircle, BiSolidCamera, BiSolidFile } from 'react-icons/bi';
 import AppLayout from '@app/components/AppLayout';
 import Card from '@app/components/Card';
 import PhotoUploader from '@app/components/PhotoUploader';
@@ -407,9 +407,10 @@ const EditMyProfilePage = () => {
                   />
                   <Input
                     label={
-                      <>
+                      <div className="flex items-center gap-1">
+                        <span>Unesi svoju najdražu pjesmu sa Youtube-a</span>
                         <span data-tooltip-id="youtubesong">
-                          Unesi svoju najdražu pjesmu sa Youtube-a
+                          <BiInfoCircle fontSize={20} />
                         </span>
                         <Tooltip
                           id="youtubesong"
@@ -420,7 +421,7 @@ const EditMyProfilePage = () => {
                         >
                           Unesi link u formatu <code>https://www.youtube.com/embed/</code>
                         </Tooltip>
-                      </>
+                      </div>
                     }
                     type="text"
                     className="mb-2"
@@ -431,9 +432,10 @@ const EditMyProfilePage = () => {
 
                   <Input
                     label={
-                      <>
+                      <div className="flex items-center gap-1">
+                        <span>Unesi svoju najdraži film sa Youtube-a</span>
                         <span data-tooltip-id="youtubetrailer">
-                          Unesi trailer svog najdražeg filma
+                          <BiInfoCircle fontSize={20} />
                         </span>
                         <Tooltip
                           id="youtubetrailer"
@@ -444,7 +446,7 @@ const EditMyProfilePage = () => {
                         >
                           Unesi link u formatu <code>https://www.youtube.com/embed/</code>
                         </Tooltip>
-                      </>
+                      </div>
                     }
                     type="text"
                     className="mb-2"
