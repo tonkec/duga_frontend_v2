@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
+import { useGetAllNotifcations } from '@app/components/Navigation/hooks';
 import { useSocket } from '@app/context/useSocket';
-import { useNavigate } from 'react-router-dom';
+import Notification from './../Notification';
 
-export type Notification = {
+export type INotification = {
   id: number;
   userId: number;
   type: string;
@@ -21,12 +21,11 @@ const NotificationDropdown = ({
   userId: number | null;
   isMobile: boolean;
 }) => {
-  const navigate = useNavigate();
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { allNotifications } = useGetAllNotifcations(String(userId) || '');
-  const { mutateMarkAsRead } = useMarkAsReadNotification();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const [notifications, setNotifications] = useState<INotification[]>([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -49,9 +48,8 @@ const NotificationDropdown = ({
   useEffect(() => {
     if (!socket) return;
     socket.on('markAsRead', (notificationFromSocket) => {
-      console.log('on markAsRead from socket', notificationFromSocket);
       setNotifications((prev) =>
-        prev.map((notification) =>
+        prev.map((notification: INotification) =>
           notification.id === notificationFromSocket.id
             ? { ...notification, isRead: true }
             : notification
@@ -101,38 +99,7 @@ const NotificationDropdown = ({
             <div className="p-4 text-sm text-black">Nema obavijesti</div>
           ) : (
             notifications.map((n) => (
-              <div
-                key={n.id}
-                className={`px-4 py-2 text-sm cursor-pointer ${n.isRead ? (isMobile ? 'bg-black text-white' : 'bg-white') : 'bg-rose hover:bg-pink'}`}
-                onClick={() => {
-                  if (!n.isRead) {
-                    mutateMarkAsRead(String(n.id));
-                    setNotifications((prev) =>
-                      prev.map((notification) =>
-                        notification.id === n.id ? { ...notification, isRead: true } : notification
-                      )
-                    );
-                  }
-
-                  if (n.actionType && n.actionId) {
-                    switch (n.actionType) {
-                      case 'upload':
-                        navigate(`/photo/${n.actionId}`);
-                        break;
-                      case 'comment':
-                        navigate(`/photo/${n.actionId}`);
-                        break;
-                      case 'message':
-                        navigate(`/chat/${n.actionId}`);
-                        break;
-                      default:
-                        break;
-                    }
-                  }
-                }}
-              >
-                <p className={isMobile ? 'text-white' : 'text-black'}> {n.content}</p>
-              </div>
+              <Notification n={n} isMobile={isMobile} setNotifications={setNotifications} />
             ))
           )}
         </div>
