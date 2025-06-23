@@ -16,6 +16,7 @@ interface IComment {
   uploadId: number;
   userId: number;
   taggedUsers?: { id: number; username: string }[];
+  imageUrl: string;
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
@@ -60,20 +61,31 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
       onClick={onClick}
     >
       <div className="flex items-center gap-2 mb-2">
+        <p className="text-sm">
+          {comment.imageUrl ? (
+            <img
+              src={comment.imageUrl}
+              alt="User Avatar"
+              className="w-36 h-36"
+              onClick={() => navigate(`/user/${comment.userId}`)}
+            />
+          ) : (
+            <span className="text-gray-500">{renderFormattedComment(comment.comment)}</span>
+          )}
+        </p>
+      </div>
+      <div className="flex items-center gap-2 text-sm text-gray-500">
         <Avatar
           color="#2D46B9"
           name={`${user?.data.username}`}
           src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="40"
+          size="20"
           round={true}
           onClick={() => {
             navigate(`/user/${comment.userId}`);
           }}
           className="cursor-pointer"
         />
-        <p className="text-sm">{renderFormattedComment(comment.comment)}</p>
-      </div>
-      <div className="flex justify-between">
         <RecordCreatedAt createdAt={comment.createdAt} />
       </div>
     </div>
