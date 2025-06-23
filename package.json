@@ -44,6 +44,7 @@
     "react-select": "^5.9.0",
     "react-tabs": "^6.1.0",
     "react-toastify": "^11.0.2",
+    "react-tooltip": "^5.29.1",
     "socket.io-client": "^4.8.1",
     "vite-plugin-static-copy": "^2.3.0",
     "zod": "^3.24.1"

@@ -15,6 +15,19 @@ import Loader from '@app/components/Loader';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 
+const isYouTubeUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.hostname === 'www.youtube.com' ||
+      parsed.hostname === 'youtube.com' ||
+      parsed.hostname === 'youtu.be'
+    );
+  } catch {
+    return false;
+  }
+};
+
 export interface IUserProfileCardProps {
   bio: string;
   sexuality: string;
@@ -205,14 +218,22 @@ const UserProfileCard = ({
       {shouldRenderField(user.favoriteSong) && (
         <div className="mb-10">
           <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
-          <Iframe url={user.favoriteSong} width="600" height="400" />
+          {isYouTubeUrl(user.favoriteSong) ? (
+            <Iframe url={user.favoriteSong} width="600" height="400" />
+          ) : (
+            <p className="text-red-500">Neispravan YouTube URL</p>
+          )}
         </div>
       )}
 
       {shouldRenderField(user.favoriteMovie) && (
         <div className="mb-10">
           <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
-          <Iframe url={user.favoriteMovie} width="600" height="400" />
+          {isYouTubeUrl(user.favoriteMovie) ? (
+            <Iframe url={user.favoriteMovie} width="600" height="400" />
+          ) : (
+            <p className="text-red-500">Neispravan YouTube URL</p>
+          )}
         </div>
       )}
 
