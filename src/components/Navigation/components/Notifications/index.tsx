@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGetAllNotifcations } from '@app/components/Navigation/hooks';
+import {
+  useGetAllNotifcations,
+  useMarkAllAsReadNotifications,
+} from '@app/components/Navigation/hooks';
 import { useSocket } from '@app/context/useSocket';
 import Notification from './../Notification';
+import Button from '@app/components/Button';
 
 export type INotification = {
   id: number;
@@ -24,9 +28,9 @@ const NotificationDropdown = ({
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { allNotifications } = useGetAllNotifcations(String(userId) || '');
-
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [open, setOpen] = useState(false);
+  const { mutateMarkAllAsRead } = useMarkAllAsReadNotifications();
 
   useEffect(() => {
     if (allNotifications) {
@@ -95,6 +99,16 @@ const NotificationDropdown = ({
         <div
           className={`absolute left-0 right-0 mt-1 w-52 ${isMobile ? 'bg-black' : 'bg-white'} shadow-xl rounded-lg z-10 max-h-96 overflow-y-auto`}
         >
+          <Button
+            type="transparent"
+            className="w-full"
+            onClick={() => {
+              mutateMarkAllAsRead();
+              setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+            }}
+          >
+            Označi sve kao pročitano
+          </Button>
           {notifications.length === 0 ? (
             <div className="p-4 text-sm text-black">Nema obavijesti</div>
           ) : (
