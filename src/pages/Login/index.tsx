@@ -15,6 +15,11 @@ const URL = IS_PRODUCTION
     ? 'https://staging--dugaprod.netlify.app'
     : 'http://localhost:5173';
 
+console.log(
+  `Environment: ${IS_PRODUCTION ? 'Production' : IS_STAGING ? 'Staging' : 'Development'}`
+);
+console.log(`Redirect URL: ${URL}`);
+
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
 
