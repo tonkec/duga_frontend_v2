@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 
 const URL =
-  import.meta.env.PROD || import.meta.env.STAGING
+  import.meta.env.PRODUCTION || import.meta.env.STAGING
     ? 'https://dugastaging-394ccba7a9ef.herokuapp.com'
     : 'http://localhost:8080';
 

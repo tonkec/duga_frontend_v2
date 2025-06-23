@@ -8,7 +8,12 @@ import Homepage from '@app/assets/homepage.svg';
 import CookieBanner from '@app/components/CookieBanner';
 
 const IS_STAGING = import.meta.env.STAGING;
-const URL = IS_STAGING ? 'https://dugastaging.netlify.app' : 'http://localhost:5173';
+const IS_PRODUCTION = import.meta.env.PRODUCTION;
+const URL = IS_PRODUCTION
+  ? 'https://duga.app'
+  : IS_STAGING
+    ? 'https://dugastaging.netlify.app'
+    : 'http://localhost:5173';
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
