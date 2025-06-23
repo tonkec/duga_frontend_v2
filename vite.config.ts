@@ -16,12 +16,13 @@ export default defineConfig({
       ],
     }),
   ],
-  resolve:{
+  resolve: {
     alias: {
       '@app': path.resolve(__dirname, 'src'),
-    }
+    },
   },
   define: {
     'import.meta.env.STAGING': JSON.stringify(Boolean(process.env.STAGING)),
+    'import.meta.env.PRODUCTION': JSON.stringify(Boolean(process.env.PRODUCTION)),
   },
 });

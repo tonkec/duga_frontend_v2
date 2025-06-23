@@ -43,7 +43,7 @@ const LoginPage = () => {
           <div className="flex flex-col items-center">
             <h1 className="text-8xl font-bold mt-4 text-white">Duga</h1>
             <p className="text-center mt-8 text-white">
-              Dejting aplikacija namijenjena LGBT osobama na Balkanu.
+              Aplikacija za upoznavanje LGBT osoba na Balkanu.
             </p>
             <Button
               type="primary"
