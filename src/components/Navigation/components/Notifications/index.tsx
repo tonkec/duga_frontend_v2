@@ -101,7 +101,7 @@ const NotificationDropdown = ({
         >
           <Button
             type="transparent"
-            className="w-full"
+            className="w-full text-left"
             onClick={() => {
               mutateMarkAllAsRead();
               setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
