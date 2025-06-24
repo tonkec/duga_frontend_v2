@@ -9,7 +9,7 @@ export const useGetAllImages = (id: string) => {
   } = useQuery({
     queryKey: ['uploads', 'avatar', id],
     queryFn: () => getAllImages(id),
-    enabled: !!id,
+    enabled: !!id && id !== 'undefined' && id !== 'null',
   });
 
   return { allImages, allImagesError, allImagesLoading };

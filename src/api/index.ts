@@ -25,6 +25,16 @@ const apiClient = (isAuth?: boolean) => {
     if (isAuth) return config;
     const token = getCookie('token');
     const isLoggedIn = !!token;
+
+    if (!isLoggedIn) {
+      return Promise.reject({
+        response: {
+          status: 401,
+          data: { message: 'Not authenticated: token missing' },
+        },
+      });
+    }
+
     config.headers.Authorization = isLoggedIn ? `Bearer ${token}` : '';
     return config;
   });
@@ -33,12 +43,8 @@ const apiClient = (isAuth?: boolean) => {
     (response) => response,
     (error) => {
       const errorMessage = getErrorMessage(error);
-      if (
-        error.response.status === 401 &&
-        (errorMessage === 'Invalid token.' || errorMessage.includes('Invalid token.'))
-      ) {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
+      if (errorMessage) {
+        console.error('API Error:', errorMessage);
       }
       return Promise.reject(error);
     }
