@@ -4,10 +4,11 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 
 const getBackendUrl = () => {
-  if (import.meta.env.PRODUCTION) {
+  const { hostname } = window.location;
+  if (hostname.includes('duga.app')) {
     return 'https://duga-backend-c67896e8029c.herokuapp.com/';
   }
-  if (import.meta.env.STAGING) {
+  if (hostname.includes('staging--dugaprod.netlify.app')) {
     return 'https://duga-staging-backend-394ccba7a9ef.herokuapp.com/';
   }
   return 'http://localhost:8080/';
