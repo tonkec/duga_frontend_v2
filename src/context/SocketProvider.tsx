@@ -3,10 +3,16 @@ import { useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 
-const URL =
-  import.meta.env.PRODUCTION || import.meta.env.STAGING
-    ? 'https://dugastaging-394ccba7a9ef.herokuapp.com'
-    : 'http://localhost:8080';
+const getBackendUrl = () => {
+  if (import.meta.env.PRODUCTION) {
+    return 'https://duga-backend-c67896e8029c.herokuapp.com/';
+  }
+  if (import.meta.env.STAGING) {
+    return 'https://duga-staging-backend-394ccba7a9ef.herokuapp.com/';
+  }
+  return 'http://localhost:8080/';
+};
+const URL = getBackendUrl();
 
 const socket: Socket = io(URL);
 
