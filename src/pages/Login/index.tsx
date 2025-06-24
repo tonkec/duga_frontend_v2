@@ -7,13 +7,18 @@ import Image4 from '@app/assets/image4.png';
 import Homepage from '@app/assets/homepage.svg';
 import CookieBanner from '@app/components/CookieBanner';
 
-const IS_STAGING = import.meta.env.STAGING;
-const IS_PRODUCTION = import.meta.env.PRODUCTION;
-const URL = IS_PRODUCTION
-  ? 'https://duga.app'
-  : IS_STAGING
-    ? 'https://dugastaging.netlify.app'
-    : 'http://localhost:5173';
+const getDomainPath = () => {
+  const { hostname } = window.location;
+  if (hostname.includes('duga.app')) {
+    return 'https://duga.app';
+  } else if (hostname.includes('staging--dugaprod.netlify.app')) {
+    return 'https://staging--dugaprod.netlify.app';
+  } else {
+    return 'http://localhost:5173';
+  }
+};
+
+const URL = getDomainPath();
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
