@@ -9,7 +9,7 @@ const getBackendUrl = () => {
     return 'https://duga-backend-c67896e8029c.herokuapp.com/';
   }
   if (hostname.includes('staging--dugaprod.netlify.app')) {
-    return 'https://duga-staging-backend-394ccba7a9ef.herokuapp.com/';
+    return 'https://dugastaging-394ccba7a9ef.herokuapp.com';
   }
   return 'http://localhost:8080/';
 };
