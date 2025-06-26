@@ -13,7 +13,6 @@ import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto'
 import Button from '@app/components/Button';
 import { useSocket } from '@app/context/useSocket';
 import ConfirmModal from '@app/components/ConfirmModal';
-import { useStatusMap } from '@app/context/OnlineStatus/useStatusMap';
 import { IMessage } from './components/Message';
 import ChatBubble from '@app/components/ChatBubble';
 
@@ -54,7 +53,6 @@ const DeleteChatModal = ({
 };
 
 const ChatPage = () => {
-  const { statusMap } = useStatusMap();
   const [isTyping, setIsTyping] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const socket = useSocket();
@@ -65,7 +63,6 @@ const ChatPage = () => {
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat } = useGetCurrentChat(chatId as string);
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
-  const isOnline = statusMap.get(Number(otherUserId)) === 'online';
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
   const otherUserProfilePhoto = getProfilePhotoUrl(
@@ -79,6 +76,7 @@ const ChatPage = () => {
 
   const otherUserName = otherUser?.data.username;
   const currentUserName = currentUser?.data.username;
+  const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data.status === 'online');
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
@@ -109,6 +107,16 @@ const ChatPage = () => {
     };
   }, [socket, otherUserId]);
 
+  useEffect(() => {
+    if (!socket || !otherUserId) return;
+
+    socket.on('status-update', (data) => {
+      if (Number(data.userId) === Number(otherUserId)) {
+        setIsOnlineState(data.status === 'online');
+      }
+    });
+  }, [socket, otherUserId]);
+
   return (
     <ChatGuard>
       <AppLayout>
@@ -133,7 +141,7 @@ const ChatPage = () => {
         </Button>
         <Card>
           <div className="flex items-center gap-1 border-b mb-4">
-            <span className="text-xs mt-1">{isOnline ? '🟢' : '🔴'}</span>
+            <span className="text-xs mt-1">{isOnlineState ? '🟢' : '🔴'}</span>
             <h1 className="cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
               {otherUserName}
             </h1>
