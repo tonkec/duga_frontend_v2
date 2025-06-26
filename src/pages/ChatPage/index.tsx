@@ -73,10 +73,9 @@ const ChatPage = () => {
   );
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const { user: currentUser } = useGetUserById(currentUserId as string);
-
   const otherUserName = otherUser?.data.username;
   const currentUserName = currentUser?.data.username;
-  const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data.status === 'online');
+  const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');
 
   useEffect(() => {
     socket.on('received', (data: IMessage) => {
@@ -113,9 +112,22 @@ const ChatPage = () => {
     socket.on('status-update', (data) => {
       if (Number(data.userId) === Number(otherUserId)) {
         setIsOnlineState(data.status === 'online');
+        return;
       }
+
+      setIsOnlineState(otherUser?.data.status === 'online');
     });
-  }, [socket, otherUserId]);
+
+    return () => {
+      socket.off('status-update');
+    };
+  }, [socket, otherUserId, otherUser]);
+
+  useEffect(() => {
+    if (otherUser?.data?.status) {
+      setIsOnlineState(otherUser.data.status === 'online');
+    }
+  }, [otherUser?.data?.status]);
 
   return (
     <ChatGuard>
