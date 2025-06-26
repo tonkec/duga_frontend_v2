@@ -65,6 +65,7 @@ function App() {
     }
 
     createOrLoginUser(parsed.data);
+    // This prevents calling createOrLoginUser twice
     hasUserBeenCreated.current = true;
   }, [auth0User, userId, createOrLoginUser]);
 
