@@ -31,7 +31,7 @@ const createUserSchema = z.object({
 const DEFAULT_USERNAME = 'Korisnik';
 
 function App() {
-  const hasUserBeenCreated = useRef(false);
+  const hasBeenCalled = useRef(false);
   const { createOrLoginUser } = useCreateUser();
   const { user: auth0User } = useAuth0();
   const windowSize = useGetWindowSize();
@@ -49,7 +49,7 @@ function App() {
   const { userChats, isUserChatsLoading } = useGetAllUserChats(userId as string);
 
   useEffect(() => {
-    if (!auth0User || hasUserBeenCreated.current) return;
+    if (!auth0User || hasBeenCalled.current) return;
 
     const input = {
       email: auth0User.email,
@@ -66,7 +66,7 @@ function App() {
 
     createOrLoginUser(parsed.data);
     // This prevents calling createOrLoginUser twice
-    hasUserBeenCreated.current = true;
+    hasBeenCalled.current = true;
   }, [auth0User, userId, createOrLoginUser]);
 
   if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
