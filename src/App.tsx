@@ -2,7 +2,7 @@ import './App.css';
 import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetUserById } from './hooks/useGetUserById';
 import Paginated from './components/Paginated';
@@ -19,10 +19,19 @@ import { useCreateUser } from './pages/Login/hooks';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
+import { z } from 'zod';
+
+const createUserSchema = z.object({
+  email: z.string().email(),
+  username: z.string().min(1),
+  isVerified: z.boolean(),
+  auth0Id: z.string().min(1),
+});
 
 const DEFAULT_USERNAME = 'Korisnik';
 
 function App() {
+  const hasUserBeenCreated = useRef(false);
   const { createOrLoginUser } = useCreateUser();
   const { user: auth0User } = useAuth0();
   const windowSize = useGetWindowSize();
@@ -40,21 +49,24 @@ function App() {
   const { userChats, isUserChatsLoading } = useGetAllUserChats(userId as string);
 
   useEffect(() => {
-    const handleAuth0 = () => {
-      if (!auth0User) {
-        navigate('/login');
-        return;
-      }
+    if (!auth0User || hasUserBeenCreated.current) return;
 
-      createOrLoginUser({
-        email: auth0User.email || '',
-        username: DEFAULT_USERNAME.toLowerCase(),
-        isVerified: auth0User.email_verified || false,
-      });
+    const input = {
+      email: auth0User.email,
+      username: DEFAULT_USERNAME.toLowerCase(),
+      isVerified: auth0User.email_verified,
+      auth0Id: auth0User.sub,
     };
 
-    handleAuth0();
-  }, [auth0User, createOrLoginUser, navigate]);
+    const parsed = createUserSchema.safeParse(input);
+    if (!parsed.success) {
+      console.error('❌ Invalid user input', parsed.error.flatten());
+      return;
+    }
+
+    createOrLoginUser(parsed.data);
+    hasUserBeenCreated.current = true;
+  }, [auth0User, userId, createOrLoginUser]);
 
   if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
     return (
