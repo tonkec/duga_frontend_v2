@@ -76,6 +76,10 @@ const UserProfileCard = ({
         setIsOnlineState(data.status === 'online');
       }
     });
+
+    return () => {
+      socket.off('status-update');
+    };
   }, [socket, user.id]);
 
   useEffect(() => {
