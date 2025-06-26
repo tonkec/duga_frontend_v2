@@ -8,7 +8,8 @@ export type ButtonType =
   | 'black'
   | 'blue'
   | 'danger'
-  | 'blue-dark';
+  | 'blue-dark'
+  | 'transparent';
 
 interface IButtonProps {
   children: React.ReactNode;
@@ -38,6 +39,8 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
       return 'py-2 px-4 bg-red text-white';
     case 'blue-dark':
       return 'py-2 px-4 bg-blue-dark text-white';
+    case 'transparent':
+      return 'py-2 px-4 bg-transparent text-black hover:bg-gray-200 underline hover:text-black';
     default:
       return 'bg-blue';
   }
