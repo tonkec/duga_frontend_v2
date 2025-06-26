@@ -83,6 +83,10 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
         setIsOnlineState(data.status === 'online');
       }
     });
+
+    return () => {
+      socket.off('status-update');
+    };
   }, [socket, user.id]);
 
   useEffect(() => {
