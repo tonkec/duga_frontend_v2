@@ -16,6 +16,21 @@ interface PhotoLikeDropdownProps {
   likes: ILike[];
 }
 
+const getLikesTranslation = (likesNumber: number) => {
+  switch (likesNumber) {
+    case 1:
+      return 'lajk';
+    case 2:
+    case 3:
+    case 4:
+      return 'lajka';
+    case 5:
+      return 'lajkova';
+    default:
+      return 'lajkova';
+  }
+};
+
 const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -30,14 +45,15 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
   return (
     <div className="relative" ref={dropdownRef}>
       <span
         className="cursor-pointer text-sm text-blue-600 hover:underline"
         onClick={() => setOpen((prev) => !prev)}
       >
-        {likes?.length > 0 ? `${likes.length} lajkova` : 'Nema lajkova'}
+        {likes?.length > 0
+          ? `${likes.length} ${getLikesTranslation(likes.length)}`
+          : 'Nema lajkova'}
       </span>
 
       {open && (

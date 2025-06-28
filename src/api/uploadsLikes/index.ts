@@ -1,24 +1,17 @@
 import { apiClient } from '..';
 
 interface IAddLikeProps {
-  userId: string;
   uploadId: string;
 }
 
-export const addUploadLike = async ({ userId, uploadId }: IAddLikeProps) => {
+export const addUploadLike = async ({ uploadId }: IAddLikeProps) => {
   const client = apiClient();
-  return client.post(`/likes/upvote`, {
-    userId,
-    uploadId,
-  });
+  return client.post(`/likes/upvote/${uploadId}`);
 };
 
-export const removeUploadLike = async ({ userId, uploadId }: IAddLikeProps) => {
+export const removeUploadLike = async ({ uploadId }: IAddLikeProps) => {
   const client = apiClient();
-  return client.post(`/likes/downvote`, {
-    userId,
-    uploadId,
-  });
+  return client.post(`/likes/downvote/${uploadId}`);
 };
 
 export const getUploadLikes = async (uploadId: string) => {

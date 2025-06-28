@@ -25,11 +25,11 @@ createRoot(document.getElementById('root')!).render(
     <CookiesProvider>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          <SocketProvider>
-            <Auth0ProviderWithNavigate>
+          <Auth0ProviderWithNavigate>
+            <SocketProvider>
               <DugaRoutes />
-            </Auth0ProviderWithNavigate>
-          </SocketProvider>
+            </SocketProvider>
+          </Auth0ProviderWithNavigate>
           <ReactQueryDevtools />
           <ToastContainer />
         </QueryClientProvider>
