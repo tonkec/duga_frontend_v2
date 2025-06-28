@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
-import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 
@@ -307,7 +307,7 @@ const PhotoUploader = () => {
               type="file"
               name="avatars"
               multiple
-              accept=".png,.jpg,.jpeg,.svg"
+              accept={ALLOWED_FILE_TYPES}
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
