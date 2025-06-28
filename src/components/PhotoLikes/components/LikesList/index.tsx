@@ -20,7 +20,6 @@ const getLikesTranslation = (likesNumber: number) => {
   switch (likesNumber) {
     case 1:
       return 'lajk';
-
     case 2:
     case 3:
     case 4:
