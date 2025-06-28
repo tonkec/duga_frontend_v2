@@ -9,6 +9,7 @@ interface ISignupProps {
   email: string;
   username: string;
   isVerified: boolean;
+  auth0Id: string;
 }
 
 export const useCreateUser = () => {
@@ -20,8 +21,8 @@ export const useCreateUser = () => {
     isError: isSignupError,
     isSuccess,
   } = useMutation({
-    mutationFn: ({ email, username, isVerified }: ISignupProps) =>
-      register(email, username, isVerified),
+    mutationFn: ({ auth0Id, email, username, isVerified }: ISignupProps) =>
+      register(auth0Id, email, username, isVerified),
     onSuccess: (data) => {
       setUserId(data?.data?.user?.id);
     },
