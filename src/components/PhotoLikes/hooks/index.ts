@@ -2,11 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { addUploadLike, getUploadLikes, removeUploadLike } from '@app/api/uploadsLikes';
-import { useSocket } from '@app/context/useSocket';
 
 export const useUpvoteUpload = () => {
-  const socket = useSocket();
-
   const {
     mutate: mutateUpvoteUpload,
     isPending: isUpvotingUpload,
@@ -14,8 +11,7 @@ export const useUpvoteUpload = () => {
     isSuccess: isUpvoteUploadSuccess,
   } = useMutation({
     mutationFn: (photoLike: { uploadId: string }) => addUploadLike(photoLike),
-    onSuccess: (data) => {
-      socket.emit('upvote-upload', data.data);
+    onSuccess: () => {
       toast.success('Fotografija je lajkana', toastConfig);
     },
     onError: (e) => {
@@ -33,8 +29,6 @@ export const useUpvoteUpload = () => {
 };
 
 export const useDownvoteUpload = () => {
-  const socket = useSocket();
-
   const {
     mutate: mutateDownvoteUpload,
     isPending: isDownvotingUpload,
@@ -42,8 +36,7 @@ export const useDownvoteUpload = () => {
     isSuccess: isDownvoteUploadSuccess,
   } = useMutation({
     mutationFn: (photoLike: { uploadId: string }) => removeUploadLike(photoLike),
-    onSuccess: (data) => {
-      socket.emit('downvote-upload', data.data);
+    onSuccess: () => {
       toast.success('Fotografija je odlajkana', toastConfig);
     },
     onError: (e) => {

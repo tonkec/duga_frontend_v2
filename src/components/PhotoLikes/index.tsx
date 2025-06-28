@@ -1,7 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSocket } from '@app/context/useSocket';
 import PhotoLikeDropdown from './components/LikesList';
 
@@ -21,38 +21,31 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const { mutateDownvoteUpload } = useDownvoteUpload();
   const { allUploadUpvotes, areUploadUpvotesLoading } = useGetUploadUpvotes(photoId as string);
   const [allLikes, setAllLikes] = useState<ILike[]>([]);
-  const [isSocketInitialized, setIsSocketInitialized] = useState(false);
-  const [hasUserLiked, setHasUserLiked] = useState(
-    allLikes?.filter((like) => Number(like.userId) === Number(currentUser)).length > 0
-  );
+
+  const hasUserLiked = useMemo(() => {
+    return allLikes.some((like) => Number(like.userId) === Number(currentUser));
+  }, [allLikes, currentUser]);
 
   const onUpvote = () => {
     if (!currentUser || !photoId) return;
     mutateUpvoteUpload({ uploadId: photoId });
-    setHasUserLiked(true);
   };
 
   const onDownvote = () => {
     if (!currentUser || !photoId) return;
     mutateDownvoteUpload({ uploadId: photoId });
-    setHasUserLiked(false);
   };
 
   useEffect(() => {
-    if (!areUploadUpvotesLoading && !isSocketInitialized && allUploadUpvotes?.data) {
-      setAllLikes(Array.isArray(allUploadUpvotes.data) ? allUploadUpvotes.data : []);
+    if (!areUploadUpvotesLoading && Array.isArray(allUploadUpvotes?.data)) {
+      setAllLikes(allUploadUpvotes.data);
     }
-  }, [allUploadUpvotes?.data, areUploadUpvotesLoading, isSocketInitialized]);
+  }, [allUploadUpvotes?.data, areUploadUpvotesLoading]);
 
   useEffect(() => {
     const handleUpdate = (data: { uploadId: number; likes: ILike[] }) => {
-      console.log(data, 'socket data');
       if (String(data.uploadId) === String(photoId)) {
         setAllLikes(data.likes);
-        setIsSocketInitialized(true);
-        setHasUserLiked(
-          data.likes?.filter((like) => Number(like.userId) === Number(currentUser)).length > 0
-        );
       }
     };
 
@@ -63,7 +56,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
       socket.off('upvote-upload', handleUpdate);
       socket.off('downvote-upload', handleUpdate);
     };
-  }, [photoId, socket, currentUser, allLikes, hasUserLiked]);
+  }, [photoId, socket]);
 
   if (!photoId) return null;
 
