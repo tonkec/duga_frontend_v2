@@ -21,7 +21,9 @@ import GiphySearch from '@app/components/GiphySearch';
 import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { toast } from 'react-toastify';
-import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { areValidImageTypes } from '@app/utils/areValidImageTypes';
+import { toastConfig } from '@app/configs/toast.config';
 
 type Inputs = {
   content: string;
@@ -173,6 +175,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       formData.append('avatars', file);
     });
 
+    if (!files || files.length === 0) return;
+
     if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
@@ -223,10 +227,17 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           type="file"
           multiple
           className="hidden"
+          accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
           onChange={(e) => {
             socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
             const files = e.target.files as FileList;
+
+            if (!areValidImageTypes(files)) {
+              toast.error('Dozvoljeni formati su jpeg, jpg, png i svg!', toastConfig);
+              return;
+            }
+
             setValue('files', files);
             setCurrentUploadableImage((prev) => {
               if (prev) {
