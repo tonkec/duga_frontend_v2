@@ -21,61 +21,51 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const { mutateDownvoteUpload } = useDownvoteUpload();
   const { allUploadUpvotes, areUploadUpvotesLoading } = useGetUploadUpvotes(photoId as string);
   const [allLikes, setAllLikes] = useState<ILike[]>([]);
-  const hasUserLiked = allLikes?.some((like) => like.userId === currentUser);
+  const [isSocketInitialized, setIsSocketInitialized] = useState(false);
+  const [hasUserLiked, setHasUserLiked] = useState(
+    allLikes?.filter((like) => Number(like.userId) === Number(currentUser)).length > 0
+  );
 
   const onUpvote = () => {
-    if (!currentUser || !photoId) {
-      return;
-    }
-
-    mutateUpvoteUpload({
-      userId: currentUser as string,
-      uploadId: photoId,
-    });
+    if (!currentUser || !photoId) return;
+    mutateUpvoteUpload({ uploadId: photoId });
+    setHasUserLiked(true);
   };
 
   const onDownvote = () => {
-    if (!currentUser || !photoId) {
-      return;
-    }
-
-    mutateDownvoteUpload({
-      userId: currentUser as string,
-      uploadId: photoId,
-    });
+    if (!currentUser || !photoId) return;
+    mutateDownvoteUpload({ uploadId: photoId });
+    setHasUserLiked(false);
   };
 
   useEffect(() => {
-    const handleUpvote = (data: { uploadId: number; likes: ILike[] }) => {
-      if (String(data.uploadId) === String(photoId)) {
-        setAllLikes(data.likes);
-      }
-    };
-
-    const handleDownvote = (data: { uploadId: number; likes: ILike[] }) => {
-      if (String(data.uploadId) === String(photoId)) {
-        setAllLikes(data.likes);
-      }
-    };
-
-    socket.on('upvote-upload', handleUpvote);
-    socket.on('downvote-upload', handleDownvote);
-
-    return () => {
-      socket.off('upvote-upload', handleUpvote);
-      socket.off('downvote-upload', handleDownvote);
-    };
-  }, [photoId, socket]);
+    if (!areUploadUpvotesLoading && !isSocketInitialized && allUploadUpvotes?.data) {
+      setAllLikes(Array.isArray(allUploadUpvotes.data) ? allUploadUpvotes.data : []);
+    }
+  }, [allUploadUpvotes?.data, areUploadUpvotesLoading, isSocketInitialized]);
 
   useEffect(() => {
-    if (!areUploadUpvotesLoading) {
-      setAllLikes(allUploadUpvotes?.data);
-    }
-  }, [allUploadUpvotes, areUploadUpvotesLoading]);
+    const handleUpdate = (data: { uploadId: number; likes: ILike[] }) => {
+      console.log(data, 'socket data');
+      if (String(data.uploadId) === String(photoId)) {
+        setAllLikes(data.likes);
+        setIsSocketInitialized(true);
+        setHasUserLiked(
+          data.likes?.filter((like) => Number(like.userId) === Number(currentUser)).length > 0
+        );
+      }
+    };
 
-  if (!photoId) {
-    return null;
-  }
+    socket.on('upvote-upload', handleUpdate);
+    socket.on('downvote-upload', handleUpdate);
+
+    return () => {
+      socket.off('upvote-upload', handleUpdate);
+      socket.off('downvote-upload', handleUpdate);
+    };
+  }, [photoId, socket, currentUser, allLikes, hasUserLiked]);
+
+  if (!photoId) return null;
 
   return (
     <div className="flex items-center gap-2 mt-2">

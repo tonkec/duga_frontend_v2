@@ -13,7 +13,7 @@ export const useUpvoteUpload = () => {
     isError: isUpvoteUploadError,
     isSuccess: isUpvoteUploadSuccess,
   } = useMutation({
-    mutationFn: (photoLike: { userId: string; uploadId: string }) => addUploadLike(photoLike),
+    mutationFn: (photoLike: { uploadId: string }) => addUploadLike(photoLike),
     onSuccess: (data) => {
       socket.emit('upvote-upload', data.data);
       toast.success('Fotografija je lajkana', toastConfig);
@@ -41,16 +41,11 @@ export const useDownvoteUpload = () => {
     isError: isDownvoteUploadError,
     isSuccess: isDownvoteUploadSuccess,
   } = useMutation({
-    mutationFn: (photoLike: { userId: string; uploadId: string }) => removeUploadLike(photoLike),
-    onSuccess: (_, variables) => {
-      socket.emit('downvote-upload', {
-        userId: variables.userId,
-        uploadId: variables.uploadId,
-      });
-
-      toast.success('Fotografija je dislajkana', toastConfig);
+    mutationFn: (photoLike: { uploadId: string }) => removeUploadLike(photoLike),
+    onSuccess: (data) => {
+      socket.emit('downvote-upload', data.data);
+      toast.success('Fotografija je odlajkana', toastConfig);
     },
-
     onError: (e) => {
       console.log(e);
       toast.error('Došlo je do greške.', toastConfig);

@@ -2,6 +2,8 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
+import { useAuth0 } from '@auth0/auth0-react';
+import AppLayout from '@app/components/AppLayout';
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
@@ -13,37 +15,65 @@ const getBackendUrl = () => {
   }
   return 'http://localhost:8080/';
 };
-const URL = getBackendUrl();
 
-const socket: Socket = io(URL);
+const URL = getBackendUrl();
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [currentUserId] = useLocalStorage('userId');
-  const [, setIsConnected] = useState(socket.connected);
-
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+  const [socket, setSocket] = useState<Socket | null>(null);
   useEffect(() => {
-    const handleConnect = () => {
-      setIsConnected(true);
-      console.log('Connected to server with socket ID:', socket.id);
+    if (!isAuthenticated || !currentUserId) return;
+
+    const connectSocket = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+
+        const newSocket = io(URL, {
+          auth: {
+            token,
+          },
+        });
+
+        setSocket(newSocket);
+
+        newSocket.on('connect', () => {
+          console.log('✅ Connected to server with socket ID:', newSocket.id);
+          if (currentUserId) {
+            newSocket.emit('join', { id: currentUserId });
+          }
+        });
+
+        newSocket.on('disconnect', () => {
+          console.log('🔌 Disconnected from server');
+        });
+
+        return () => {
+          newSocket.disconnect();
+        };
+      } catch (err) {
+        console.error('⚠️ Socket connection error:', err);
+      }
     };
 
-    const handleDisconnect = () => {
-      setIsConnected(false);
-      console.log('Disconnected from server');
-    };
-
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-
-    if (currentUserId) {
-      socket.emit('join', { id: currentUserId });
-    }
+    connectSocket();
 
     return () => {
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
+      socket?.disconnect();
     };
-  }, [currentUserId]);
+  }, [isAuthenticated, getAccessTokenSilently, currentUserId]);
+
+  if (!isAuthenticated) {
+    return <>{children}</>;
+  }
+
+  if (isAuthenticated && !socket) {
+    return (
+      <AppLayout>
+        <p>Učitavanje...</p>
+      </AppLayout>
+    );
+  }
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
 };

@@ -113,7 +113,12 @@ const NotificationDropdown = ({
             <div className="p-4 text-sm text-black">Nema obavijesti</div>
           ) : (
             notifications.map((n) => (
-              <Notification n={n} isMobile={isMobile} setNotifications={setNotifications} />
+              <Notification
+                key={n.id}
+                n={n}
+                isMobile={isMobile}
+                setNotifications={setNotifications}
+              />
             ))
           )}
         </div>
