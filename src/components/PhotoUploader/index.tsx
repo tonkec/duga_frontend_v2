@@ -137,7 +137,7 @@ const PhotoUploader = () => {
     if (!files || files.length === 0) return;
 
     if (!areValidImageTypes(files)) {
-      toast.error('Možeš odabrati samo PNG, JPG, JPEG, i SVG formate');
+      toast.error(`Možeš odabrati samo ${ALLOWED_FILE_TYPES} formate`);
       return;
     }
 
