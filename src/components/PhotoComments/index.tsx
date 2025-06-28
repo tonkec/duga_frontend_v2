@@ -232,7 +232,7 @@ const PhotoComments = () => {
                       }
 
                       if (!areValidImageTypes(e.target.files)) {
-                        toast.error('Dozvoljeni formati su jpeg, jpg, png i svg!', toastConfig);
+                        toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
                         return;
                       }
 
