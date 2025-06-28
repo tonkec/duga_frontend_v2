@@ -1,8 +1,8 @@
 import { apiClient } from '..';
 
-export const getAllNotifications = async (userId: string) => {
+export const getAllNotifications = async () => {
   const client = apiClient();
-  return client.get(`/notifications/${userId}`);
+  return client.get(`/notifications/`);
 };
 
 export const markAsReadNotification = async (notificationId: string) => {
@@ -10,9 +10,7 @@ export const markAsReadNotification = async (notificationId: string) => {
   return client.put(`/notifications/${notificationId}/read`);
 };
 
-export const markAllAsReadNotifications = async (userId: string) => {
+export const markAllAsReadNotifications = async () => {
   const client = apiClient();
-  return client.put(`/notifications/mark-all-read`, {
-    userId,
-  });
+  return client.put(`/notifications/mark-all-read`);
 };
