@@ -16,12 +16,14 @@ import MentionInput from '@app/components/MentionInput';
 import { IUser } from '@app/components/UserCard';
 import { toast } from 'react-toastify';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
-import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { init, SearchIndex } from 'emoji-mart';
 import { IEmoji } from '@app/pages/ChatPage/components/SendMessage';
 import { debounce } from 'lodash';
 import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
+import { areValidImageTypes } from '@app/utils/areValidImageTypes';
+import { toastConfig } from '@app/configs/toast.config';
 
 const schema = z
   .object({
@@ -221,10 +223,21 @@ const PhotoComments = () => {
                 <>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept={ALLOWED_FILE_TYPES}
                     ref={fileInputRef}
                     className="hidden"
-                    onChange={(e) => field.onChange(e.target.files)}
+                    onChange={(e) => {
+                      if (!e.target.files) {
+                        return;
+                      }
+
+                      if (!areValidImageTypes(e.target.files)) {
+                        toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+                        return;
+                      }
+
+                      field.onChange(e.target.files);
+                    }}
                   />
                   <BiPaperclip
                     fontSize={20}

@@ -13,8 +13,9 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
-import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 
 export interface ImageDescription {
   description: string;
@@ -30,11 +31,6 @@ interface IPhotoActionButtonsProps {
   onCheckboxChange?: (e: SyntheticEvent) => void;
   hasCheckbox?: boolean;
 }
-
-const validateFileType = (file: File) => {
-  const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-  return allowedTypes.includes(file.type);
-};
 
 const DeleteButtonModal = ({
   onDelete,
@@ -114,7 +110,6 @@ const PhotoUploader = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
   const { allUserImages } = useGetAllUserImages(userId as string);
-
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
@@ -138,6 +133,13 @@ const PhotoUploader = () => {
     e.preventDefault();
 
     const files = (e.target as HTMLFormElement)?.avatars?.files;
+
+    if (!files || files.length === 0) return;
+
+    if (!areValidImageTypes(files)) {
+      toast.error(`Možeš odabrati samo ${ALLOWED_FILE_TYPES} formate`);
+      return;
+    }
 
     if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
@@ -305,6 +307,7 @@ const PhotoUploader = () => {
               type="file"
               name="avatars"
               multiple
+              accept={ALLOWED_FILE_TYPES}
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
@@ -322,11 +325,11 @@ const PhotoUploader = () => {
                     return;
                   }
 
-                  const invalidFiles = Array.from(files).filter((file) => !validateFileType(file));
-                  if (invalidFiles.length) {
-                    toast.error('Dozvoljeni formati su jpeg, jpg i png!', toastConfig);
+                  if (!areValidImageTypes(files)) {
+                    toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
                     return;
                   }
+
                   const images = Array.from(files).map((file) => {
                     return {
                       url: URL.createObjectURL(file),
