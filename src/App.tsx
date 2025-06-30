@@ -44,7 +44,7 @@ function App() {
     label: 'ime',
   });
 
-  const { userChats, isUserChatsLoading } = useGetAllUserChats(currentUser?.data.id as string);
+  const { userChats, isUserChatsLoading } = useGetAllUserChats();
 
   useEffect(() => {
     if (!auth0User || hasBeenCalled.current) return;

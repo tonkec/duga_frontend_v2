@@ -1,24 +1,15 @@
 import { apiClient } from '..';
 
-export const createChat = async (data: { userId: number; partnerId: number }) => {
+export const createChat = async (data: { partnerId: number }) => {
   const client = apiClient();
   return client.post('/chats/create', {
-    user: {
-      id: data.userId,
-    },
     partnerId: data.partnerId,
   });
 };
 
-export const getAllUserChats = async (userId: string) => {
+export const getAllUserChats = async () => {
   const client = apiClient();
-  return client.get(`/chats`, {
-    params: {
-      user: {
-        id: userId,
-      },
-    },
-  });
+  return client.get(`/chats`);
 };
 
 export const getCurrentChat = async (chatId: string) => {
