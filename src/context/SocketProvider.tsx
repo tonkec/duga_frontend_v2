@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
@@ -19,17 +18,18 @@ const getBackendUrl = () => {
 const URL = getBackendUrl();
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const [currentUserId] = useLocalStorage('userId');
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
   useEffect(() => {
-    if (!isAuthenticated || !currentUserId) return;
+    if (!isAuthenticated) return;
+
+    let newSocket: Socket;
 
     const connectSocket = async () => {
       try {
         const token = await getAccessTokenSilently();
 
-        const newSocket = io(URL, {
+        newSocket = io(URL, {
           auth: {
             token,
           },
@@ -39,18 +39,12 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
         newSocket.on('connect', () => {
           console.log('✅ Connected to server with socket ID:', newSocket.id);
-          if (currentUserId) {
-            newSocket.emit('join', { id: currentUserId });
-          }
+          newSocket.emit('join');
         });
 
         newSocket.on('disconnect', () => {
           console.log('🔌 Disconnected from server');
         });
-
-        return () => {
-          newSocket.disconnect();
-        };
       } catch (err) {
         console.error('⚠️ Socket connection error:', err);
       }
@@ -59,9 +53,9 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     connectSocket();
 
     return () => {
-      socket?.disconnect();
+      newSocket?.disconnect();
     };
-  }, [isAuthenticated, getAccessTokenSilently, currentUserId]);
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   if (!isAuthenticated) {
     return <>{children}</>;
