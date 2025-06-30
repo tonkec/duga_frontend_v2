@@ -28,6 +28,11 @@ export const getAllUsers = async () => {
   return client.get(`/users/get-users/`);
 };
 
+export const getCurrentUser = () => {
+  const client = apiClient();
+  return client.get(`/users/current-user/`);
+};
+
 export const getUserById = async (id: string) => {
   const client = apiClient();
   return client.get(`/users/${id}`);

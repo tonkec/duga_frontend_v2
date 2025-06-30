@@ -6,8 +6,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Input from '@app/components/Input';
 import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
-import { useGetUserById } from '@app/hooks/useGetUserById';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useUpdateUser } from './hooks';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,6 +15,7 @@ import Button from '@app/components/Button';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
 import Label from '@app/components/Label';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -144,8 +143,7 @@ const schema = z.object({
 });
 
 const EditMyProfilePage = () => {
-  const [userId] = useLocalStorage('userId');
-  const { user: currentUser } = useGetUserById(userId as string);
+  const { user: currentUser } = useGetCurrentUser();
   const { updateUserMutation } = useUpdateUser();
   const {
     register,

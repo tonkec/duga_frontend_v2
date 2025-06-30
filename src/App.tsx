@@ -4,7 +4,6 @@ import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useEffect, useRef, useState } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useGetUserById } from './hooks/useGetUserById';
 import Paginated from './components/Paginated';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
@@ -20,6 +19,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
 import { z } from 'zod';
+import { useGetCurrentUser } from './hooks/useGetCurrentUser';
 
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -37,7 +37,7 @@ function App() {
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [userId] = useLocalStorage('userId');
-  const { user: currentUser, isUserLoading } = useGetUserById(String(userId));
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [search, setSearch] = useState('');
 

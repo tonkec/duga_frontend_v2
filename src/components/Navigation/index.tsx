@@ -5,11 +5,11 @@ import ProfilePhoto from '@app/components/ProfilePhoto';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useCookies } from 'react-cookie';
-import { useGetUserById } from '@app/hooks/useGetUserById';
 import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
 import { NavigationItems } from '../NavigationLinks';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,7 +19,7 @@ const Navigation = () => {
   const [, setCookie] = useCookies(['token']);
   const [userId, saveUserId] = useLocalStorage('userId', null);
   const { allImages } = useGetAllImages(String(userId) || '');
-  const { user: currentUser, isUserLoading } = useGetUserById(userId || '');
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
 
   useEffect(() => {
     if (!isMobile) {
