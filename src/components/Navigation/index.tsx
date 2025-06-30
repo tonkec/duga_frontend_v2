@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocalStorage } from '@uidotdev/usehooks';
 import { FiMenu, FiX } from 'react-icons/fi';
 import ProfilePhoto from '@app/components/ProfilePhoto';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
@@ -16,6 +17,7 @@ const Navigation = () => {
   const isMobile = width! < 768;
   const { logout } = useAuth0();
   const [, setCookie] = useCookies(['token']);
+  const [, saveUserId] = useLocalStorage('userId', null);
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const { allImages } = useGetAllImages(String(userId) || '');
@@ -28,6 +30,7 @@ const Navigation = () => {
 
   const onLogout = () => {
     setCookie('token', '');
+    saveUserId(null);
     logout({
       logoutParams: {
         returnTo: window.location.origin,
