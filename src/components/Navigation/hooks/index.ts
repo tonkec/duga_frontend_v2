@@ -25,7 +25,6 @@ export const useGetAllNotifcations = (userId: string) => {
 };
 
 export const useMarkAsReadNotification = () => {
-  const userId = useLocalStorage('userId')[0];
   const queryClient = useQueryClient();
   const {
     mutate: mutateMarkAsRead,
@@ -36,7 +35,7 @@ export const useMarkAsReadNotification = () => {
     mutationFn: (notificationId: string) => markAsReadNotification(notificationId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['notifications', userId],
+        queryKey: ['notifications'],
       });
     },
   });

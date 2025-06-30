@@ -3,7 +3,6 @@ import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
 import { useEffect, useRef, useState } from 'react';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import Paginated from './components/Paginated';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
@@ -36,7 +35,6 @@ function App() {
   const { user: auth0User } = useAuth0();
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
-  const [userId] = useLocalStorage('userId');
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const [search, setSearch] = useState('');
@@ -46,7 +44,7 @@ function App() {
     label: 'ime',
   });
 
-  const { userChats, isUserChatsLoading } = useGetAllUserChats(userId as string);
+  const { userChats, isUserChatsLoading } = useGetAllUserChats(currentUser?.data.id as string);
 
   useEffect(() => {
     if (!auth0User || hasBeenCalled.current) return;
@@ -67,7 +65,7 @@ function App() {
     createOrLoginUser(parsed.data);
     // This prevents calling createOrLoginUser twice
     hasBeenCalled.current = true;
-  }, [auth0User, userId, createOrLoginUser]);
+  }, [auth0User, createOrLoginUser]);
 
   if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
     return (

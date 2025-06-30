@@ -3,7 +3,6 @@ import Button from '@app/components/Button';
 import { useAddUploadComment, useGetUploadComments } from './hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '@app/components/FieldError';
@@ -24,6 +23,7 @@ import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const schema = z
   .object({
@@ -61,7 +61,8 @@ const PhotoComments = () => {
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const { mutateAddUploadComment } = useAddUploadComment();
-  const [userId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const { photoId } = useParams();
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string

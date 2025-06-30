@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import AppLayout from '@app/components/AppLayout';
 import Card from '@app/components/Card';
 import Cta from '@app/components/Cta';
@@ -9,14 +8,15 @@ import { useNavigate } from 'react-router';
 import UserProfileCard from '@app/components/UserProfileCard';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import 'react-tabs/style/react-tabs.css';
-import { useGetUserById } from '@app/hooks/useGetUserById';
 import Loader from '@app/components/Loader';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
-  const [userId] = useLocalStorage('userId');
-  const { allImages, allImagesLoading } = useGetAllImages(userId as string);
-  const { user: currentUser } = useGetUserById(userId as string);
+  const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data?.id;
+  const { allImages, allImagesLoading } = useGetAllImages(currentUserId);
+
   if (allImagesLoading) {
     return (
       <AppLayout>

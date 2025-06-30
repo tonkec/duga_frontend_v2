@@ -6,7 +6,6 @@ export const useUserOnlineStatus = () => {
     queryKey: ['userOnlineStatus'],
     queryFn: () =>
       getUserOnlineStatus().then((res) => {
-        console.log(res);
         return res.data;
       }),
     staleTime: 10 * 1000,
