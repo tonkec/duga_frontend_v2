@@ -103,7 +103,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
-  const { allNotifications } = useGetAllNotifcations(String(currentUserId) || '');
+  const { allNotifications } = useGetAllNotifcations();
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const { allUserImages } = useGetAllUserImages(currentUserId as string);
 
