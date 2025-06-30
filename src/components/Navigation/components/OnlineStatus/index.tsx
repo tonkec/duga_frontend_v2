@@ -3,9 +3,9 @@ import { useUserOnlineStatus } from '@app/context/OnlineStatus/hooks';
 
 import { useSocket } from '@app/context/useSocket';
 
-const StatusDropdown = ({ userId }: { userId: string }) => {
+const StatusDropdown = () => {
   const socket = useSocket();
-  const { data, isLoading } = useUserOnlineStatus(String(userId));
+  const { data, isLoading } = useUserOnlineStatus();
 
   const [status, setStatus] = useState<'online' | 'offline'>('online');
 
@@ -23,7 +23,7 @@ const StatusDropdown = ({ userId }: { userId: string }) => {
     }
 
     setStatus(newStatus);
-    socket.emit('set-status', { userId, status: newStatus });
+    socket.emit('set-status', { status: newStatus });
   };
 
   if (isLoading) return null;

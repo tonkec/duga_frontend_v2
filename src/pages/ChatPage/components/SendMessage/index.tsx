@@ -105,7 +105,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const { allNotifications } = useGetAllNotifcations(String(currentUserId) || '');
   const { mutateMarkAsRead } = useMarkAsReadNotification();
-  const { allUserImages } = useGetAllUserImages(currentUserId as string);
+  const { allUserImages } = useGetAllUserImages();
 
   const sendGif = (gifUrl: string) => {
     const msg = {

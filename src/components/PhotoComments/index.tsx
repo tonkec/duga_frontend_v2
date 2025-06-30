@@ -66,7 +66,7 @@ const PhotoComments = () => {
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string
   );
-  const { allUserImages } = useGetAllUserImages(userId as string);
+  const { allUserImages } = useGetAllUserImages();
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);

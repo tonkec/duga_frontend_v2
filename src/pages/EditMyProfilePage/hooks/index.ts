@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router';
 import { deleteUser, IUserUpdateProps, updateUser } from '@app/api/users';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
-import { useAuth0 } from '@auth0/auth0-react';
 
-export const useUpdateUser = (userId: string) => {
+export const useUpdateUser = () => {
   const navigate = useNavigate();
   const {
     mutate: updateUserMutation,
@@ -36,32 +35,29 @@ export const useUpdateUser = (userId: string) => {
       languages,
       ending,
     }: IUserUpdateProps) =>
-      updateUser(
-        {
-          sexuality,
-          age,
-          location,
-          gender,
-          bio,
-          username,
-          lookingFor,
-          relationshipStatus,
-          cigarettes,
-          alcohol,
-          sport,
-          favoriteDay,
-          spirituality,
-          embarasement,
-          tooOldFor,
-          makesMyDay,
-          favoriteSong,
-          favoriteMovie,
-          interests,
-          languages,
-          ending,
-        },
-        userId
-      ),
+      updateUser({
+        sexuality,
+        age,
+        location,
+        gender,
+        bio,
+        username,
+        lookingFor,
+        relationshipStatus,
+        cigarettes,
+        alcohol,
+        sport,
+        favoriteDay,
+        spirituality,
+        embarasement,
+        tooOldFor,
+        makesMyDay,
+        favoriteSong,
+        favoriteMovie,
+        interests,
+        languages,
+        ending,
+      }),
     onSuccess: () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');
@@ -75,10 +71,8 @@ export const useUpdateUser = (userId: string) => {
   return { isUserPending, updateUserMutation, isUserUpdatingError, isUserUpdatingSuccess };
 };
 
-export const useDeleteUser = (userId: string) => {
+export const useDeleteUser = () => {
   const navigate = useNavigate();
-  const { user } = useAuth0();
-  const auth0UserId = user?.sub;
 
   const {
     mutate: deleteUserMutation,
@@ -86,7 +80,7 @@ export const useDeleteUser = (userId: string) => {
     isError: isUserUpdatingError,
     isSuccess: isUserUpdatingSuccess,
   } = useMutation({
-    mutationFn: () => deleteUser(userId, auth0UserId),
+    mutationFn: () => deleteUser(),
     onSuccess: () => {
       toast.success('Uspješno izbrisan profil!', toastConfig);
       navigate('/login');
