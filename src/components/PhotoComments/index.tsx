@@ -9,7 +9,6 @@ import FieldError from '@app/components/FieldError';
 import { useEffect, useState } from 'react';
 import { BiPaperclip } from 'react-icons/bi';
 import { useRef } from 'react';
-import Paginated from '@app/components/Paginated';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { IUser } from '@app/components/UserCard';
@@ -196,16 +195,10 @@ const PhotoComments = () => {
   return (
     <>
       <div className="flex flex-col gap-2 ">
-        <div>
-          <Paginated<IComment>
-            itemsPerPage={5}
-            gridClassName="grid grid-cols-1 gap-2"
-            data={sortedComments}
-            paginatedSingle={({ singleEntry }: { singleEntry: IComment }) => (
-              <CommentWithUser comment={singleEntry} />
-            )}
-          />
-        </div>
+        {sortedComments.length &&
+          sortedComments.map((comment) => {
+            return <CommentWithUser key={comment.id} comment={comment} />;
+          })}
       </div>
 
       <form className="w-full flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
