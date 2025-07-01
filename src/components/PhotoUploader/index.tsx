@@ -109,7 +109,7 @@ const PhotoActionButtons = ({
 const PhotoUploader = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [userId] = useLocalStorage('userId');
-  const { allUserImages } = useGetAllUserImages(userId as string);
+  const { allUserImages } = useGetAllUserImages();
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);

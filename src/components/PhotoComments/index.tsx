@@ -3,14 +3,12 @@ import Button from '@app/components/Button';
 import { useAddUploadComment, useGetUploadComments } from './hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '@app/components/FieldError';
 import { useEffect, useState } from 'react';
 import { BiPaperclip } from 'react-icons/bi';
 import { useRef } from 'react';
-import Paginated from '@app/components/Paginated';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { IUser } from '@app/components/UserCard';
@@ -24,6 +22,7 @@ import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const schema = z
   .object({
@@ -61,12 +60,13 @@ const PhotoComments = () => {
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const { mutateAddUploadComment } = useAddUploadComment();
-  const [userId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const { photoId } = useParams();
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string
   );
-  const { allUserImages } = useGetAllUserImages(userId as string);
+  const { allUserImages } = useGetAllUserImages();
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
@@ -195,16 +195,10 @@ const PhotoComments = () => {
   return (
     <>
       <div className="flex flex-col gap-2 ">
-        <div>
-          <Paginated<IComment>
-            itemsPerPage={5}
-            gridClassName="grid grid-cols-1 gap-2"
-            data={sortedComments}
-            paginatedSingle={({ singleEntry }: { singleEntry: IComment }) => (
-              <CommentWithUser comment={singleEntry} />
-            )}
-          />
-        </div>
+        {sortedComments.length &&
+          sortedComments.map((comment) => {
+            return <CommentWithUser key={comment.id} comment={comment} />;
+          })}
       </div>
 
       <form className="w-full flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>

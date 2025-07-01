@@ -7,11 +7,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FieldError from '@app/components/FieldError';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import MentionInput from '@app/components/MentionInput';
 import { Link } from 'react-router-dom';
 import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 interface Inputs {
   comment: string;
@@ -24,7 +24,8 @@ const schema = z.object({
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
-  const [currentUser] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data.id;
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
   const { mutateEditUploadComment } = useEditUploadComment();
@@ -116,7 +117,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
             />
           )}
         </div>
-        {currentUser === comment.userId && (
+        {currentUserId === comment.userId && (
           <div className="flex gap-2">
             <Button type="tertiary" onClick={() => setIsEditing(true)}>
               Izmijeni

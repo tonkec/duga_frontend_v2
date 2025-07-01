@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserOnlineStatus } from '../../../api/users';
 
-export const useUserOnlineStatus = (userId: string) => {
+export const useUserOnlineStatus = () => {
   return useQuery({
-    queryKey: ['userOnlineStatus', userId],
-    queryFn: () => getUserOnlineStatus(userId).then((res) => res.data),
-    enabled: !!userId,
+    queryKey: ['userOnlineStatus'],
+    queryFn: () =>
+      getUserOnlineStatus().then((res) => {
+        return res.data;
+      }),
     staleTime: 10 * 1000,
   });
 };

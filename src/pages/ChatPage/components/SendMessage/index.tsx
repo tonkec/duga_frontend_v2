@@ -7,7 +7,6 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
 import { IUser } from '@app/components/UserCard';
-import { useGetUserById } from '@app/hooks/useGetUserById';
 import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
 import { SyntheticEvent, useState, useRef, useEffect } from 'react';
@@ -24,6 +23,7 @@ import { toast } from 'react-toastify';
 import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 type Inputs = {
   content: string;
@@ -97,15 +97,15 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
-  const { userChats } = useGetAllUserChats(currentUserId as string);
-  const { user: currentUser } = useGetUserById(String(currentUserId));
+  const { userChats } = useGetAllUserChats();
+  const { user: currentUser } = useGetCurrentUser();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const { allNotifications } = useGetAllNotifcations();
   const { mutateMarkAsRead } = useMarkAsReadNotification();
-  const { allUserImages } = useGetAllUserImages(currentUserId as string);
+  const { allUserImages } = useGetAllUserImages();
 
   const sendGif = (gifUrl: string) => {
     const msg = {

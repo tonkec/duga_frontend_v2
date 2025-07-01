@@ -30,7 +30,7 @@ const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalPr
 const SettingsPage = () => {
   const [userId] = useLocalStorage('userId');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { deleteUserMutation } = useDeleteUser(userId as string);
+  const { deleteUserMutation } = useDeleteUser();
   const { acceptCookies, rejectCookies } = useCookieConsent();
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
@@ -51,7 +51,7 @@ const SettingsPage = () => {
       <Card>
         <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
 
-        <div>{String(userId) && <OnlineStatus userId={String(userId)} />}</div>
+        <div>{String(userId) && <OnlineStatus />}</div>
 
         <hr className="mb-5" />
 

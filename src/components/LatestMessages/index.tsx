@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import Card from '@app/components/Card';
 import { useNavigate } from 'react-router';
@@ -9,6 +8,7 @@ import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto'
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import { S3_URL } from '@app/utils/consts';
 import { IChat, useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 interface IMessage {
   id: number;
@@ -45,9 +45,11 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
 
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
   const { isMessageReadData } = useGetIsMessageRead(String(message?.id) || '');
+  const { user: currentUser } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
+
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { is_read } = isMessageReadData?.data || {};
-  const [userId] = useLocalStorage('userId');
   const isFromSameUser = message.User.id === Number(userId);
 
   const messageBackgroundColor = () => {
@@ -109,8 +111,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 
 const LatestMessages = () => {
   const navigate = useNavigate();
-  const [userId] = useLocalStorage('userId');
-  const { userChats } = useGetAllUserChats(String(userId), true);
+  const { userChats } = useGetAllUserChats(true);
 
   if (!userChats?.data?.length) return null;
 

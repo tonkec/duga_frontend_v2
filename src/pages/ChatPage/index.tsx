@@ -15,6 +15,7 @@ import { useSocket } from '@app/context/useSocket';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { IMessage } from './components/Message';
 import ChatBubble from '@app/components/ChatBubble';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 interface IChatUser {
   userId: number;
@@ -72,7 +73,7 @@ const ChatPage = () => {
     getProfilePhoto(allCurrentUserImages?.data.images)
   );
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
-  const { user: currentUser } = useGetUserById(currentUserId as string);
+  const { user: currentUser } = useGetCurrentUser();
   const otherUserName = otherUser?.data.username;
   const currentUserName = currentUser?.data.username;
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');

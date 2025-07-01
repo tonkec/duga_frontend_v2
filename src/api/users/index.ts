@@ -28,19 +28,24 @@ export const getAllUsers = async () => {
   return client.get(`/users/get-users/`);
 };
 
+export const getCurrentUser = () => {
+  const client = apiClient();
+  return client.get(`/users/current-user/`);
+};
+
 export const getUserById = async (id: string) => {
   const client = apiClient();
   return client.get(`/users/${id}`);
 };
 
-export const updateUser = async (data: IUserUpdateProps, userId: string) => {
+export const updateUser = async (data: IUserUpdateProps) => {
   const client = apiClient();
-  return client.post(`/users/update-user`, { data: data }, { params: { userId: userId } });
+  return client.post(`/users/update-user`, { data: data });
 };
 
-export const deleteUser = async (userId: string, auth0UserId: string | undefined) => {
+export const deleteUser = async () => {
   const client = apiClient();
-  return client.delete(`/delete-user`, { params: { userId, auth0UserId } });
+  return client.delete(`/delete-user`);
 };
 
 export const getUserByUsername = async (username: string) => {
@@ -48,12 +53,12 @@ export const getUserByUsername = async (username: string) => {
   return client.get(`/users/username/${username}`);
 };
 
-export const getUserOnlineStatus = async (userId: string) => {
+export const getUserOnlineStatus = async () => {
   const client = apiClient();
-  return client.get(`/users/online-status/${userId}`);
+  return client.get(`/users/online-status/`);
 };
 
-export const getAllUserPhotos = async (userId: string) => {
+export const getAllUserPhotos = async () => {
   const client = apiClient();
-  return client.get(`/uploads/user-photos/${userId}`);
+  return client.get(`/uploads/user-photos/`);
 };
