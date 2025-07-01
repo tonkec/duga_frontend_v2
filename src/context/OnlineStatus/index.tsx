@@ -15,7 +15,7 @@ export const StatusProvider = ({
   const socket = useSocket();
   const [statusMap, setStatusMap] = useState<StatusMap>(new Map());
 
-  const { data } = useUserOnlineStatus(String(onlineUserId || ''));
+  const { data } = useUserOnlineStatus();
   useEffect(() => {
     if (data?.status && onlineUserId) {
       setStatusMap((prev) => {

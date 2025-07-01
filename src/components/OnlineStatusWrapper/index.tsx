@@ -1,9 +1,9 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams } from 'react-router';
 import { StatusProvider } from '@app/context/OnlineStatus';
 import { useGetCurrentChat } from '@app/pages/ChatPage/hooks';
 import { getOtherUser } from '@app/pages/ChatPage';
 import { useEffect, useState } from 'react';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const OnlineStatusWrapper = ({
   children,
@@ -13,7 +13,8 @@ const OnlineStatusWrapper = ({
   isCurrentUser?: boolean;
 }) => {
   const [otherUserId, setOtherUserId] = useState<number | null>(null);
-  const [currentUserId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data?.id;
   const { chatId } = useParams();
   const { userId } = useParams();
   const { currentChat } = useGetCurrentChat(chatId as string);
