@@ -4,17 +4,15 @@ import {
   markAllAsReadNotifications,
   markAsReadNotification,
 } from '@app/api/notifications';
-import { useLocalStorage } from '@uidotdev/usehooks';
 
-export const useGetAllNotifcations = (userId: string) => {
+export const useGetAllNotifcations = () => {
   const {
     data: allNotifications,
     error: allNotificationsError,
     isPending: areAllNotificationsLoading,
   } = useQuery({
-    queryKey: ['notifications', userId],
-    queryFn: () => getAllNotifications(userId),
-    enabled: !!userId,
+    queryKey: ['notifications'],
+    queryFn: () => getAllNotifications(),
   });
 
   return {
@@ -49,7 +47,6 @@ export const useMarkAsReadNotification = () => {
 };
 
 export const useMarkAllAsReadNotifications = () => {
-  const [userId] = useLocalStorage('userId');
   const queryClient = useQueryClient();
   const {
     mutate: mutateMarkAllAsRead,
@@ -57,10 +54,10 @@ export const useMarkAllAsReadNotifications = () => {
     isError: isMarkAllAsReadError,
     isSuccess: isMarkAllAsReadSuccess,
   } = useMutation({
-    mutationFn: () => markAllAsReadNotifications(String(userId)),
+    mutationFn: () => markAllAsReadNotifications(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['notifications', userId],
+        queryKey: ['notifications'],
       });
     },
   });
