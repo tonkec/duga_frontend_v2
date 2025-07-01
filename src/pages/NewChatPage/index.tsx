@@ -14,7 +14,7 @@ const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
-  const { userChats, isUserChatsLoading } = useGetAllUserChats(currentUserId as string);
+  const { userChats, isUserChatsLoading } = useGetAllUserChats();
   const [search, setSearch] = useState('');
   const { onCreateChat } = useCreateNewChat();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
@@ -53,7 +53,7 @@ const NewChatPage = () => {
     : [];
 
   const onButtonClick = (partnerId: number) => {
-    onCreateChat({ userId: Number(currentUserId), partnerId });
+    onCreateChat({ partnerId });
   };
 
   return (

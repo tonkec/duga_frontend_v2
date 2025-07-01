@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { IChat, useCreateNewChat } from '@app/pages/NewChatPage/hooks';
 import Button, { ButtonType } from '@app/components/Button';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
@@ -25,16 +24,15 @@ const SendMessageButton = ({
 }: ISendMessageButtonProps) => {
   const [isQueryEnabled, setIsQueryEnabled] = useState(false);
   const navigate = useNavigate();
-  const [userId] = useLocalStorage('userId');
   const { onCreateChat } = useCreateNewChat();
-  const { userChats } = useGetAllUserChats(userId as string, isQueryEnabled);
+  const { userChats } = useGetAllUserChats(isQueryEnabled);
   return (
     <Button
       className={buttonClasses}
       onClick={() => {
         setIsQueryEnabled(true);
         if (!hasAlreadyChatted(userChats?.data, sendMessageToId)) {
-          onCreateChat({ userId: Number(userId), partnerId: Number(sendMessageToId) });
+          onCreateChat({ partnerId: Number(sendMessageToId) });
         }
 
         const chat = getChatWithOtherUser(userChats?.data, Number(sendMessageToId));

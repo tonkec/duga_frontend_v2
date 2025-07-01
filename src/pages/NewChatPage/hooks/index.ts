@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router';
 import { isMessageRead, markMessagesAsRead } from '@app/api/chatMessages';
 
 interface CreateChatInput {
-  userId: number;
   partnerId: number;
 }
 

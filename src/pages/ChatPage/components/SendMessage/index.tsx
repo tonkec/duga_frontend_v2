@@ -97,7 +97,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const [currentUserId] = useLocalStorage('userId');
-  const { userChats } = useGetAllUserChats(currentUserId as string);
+  const { userChats } = useGetAllUserChats();
   const { user: currentUser } = useGetCurrentUser();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);

@@ -76,7 +76,7 @@ const NotificationDropdown = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (!userId) return null;
+  if (!userId || !socket) return null;
 
   return (
     <div className="relative inline-block w-full" ref={dropdownRef}>

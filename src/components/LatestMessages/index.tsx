@@ -111,9 +111,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 
 const LatestMessages = () => {
   const navigate = useNavigate();
-  const { user: currentUser } = useGetCurrentUser();
-  const userId = currentUser?.data?.id;
-  const { userChats } = useGetAllUserChats(String(userId), true);
+  const { userChats } = useGetAllUserChats(true);
 
   if (!userChats?.data?.length) return null;
 
