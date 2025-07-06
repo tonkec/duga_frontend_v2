@@ -23,7 +23,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const [allLikes, setAllLikes] = useState<ILike[]>([]);
 
   const hasUserLiked = useMemo(() => {
-    return allLikes.some((like) => Number(like.userId) === Number(currentUser));
+    return allLikes.some((like) => Number(like.userId) === Number(currentUser?.data?.id));
   }, [allLikes, currentUser]);
 
   const onUpvote = () => {
