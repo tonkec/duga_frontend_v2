@@ -22,7 +22,6 @@ import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
-import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const schema = z
   .object({
@@ -60,8 +59,6 @@ const PhotoComments = () => {
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const { mutateAddUploadComment } = useAddUploadComment();
-  const { user: currentUser } = useGetCurrentUser();
-  const userId = currentUser?.data?.id;
   const { photoId } = useParams();
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string
@@ -90,7 +87,7 @@ const PhotoComments = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (data: Inputs) => {
-    if (!userId || !photoId || !isValid) return;
+    if (!photoId || !isValid) return;
 
     if (data?.image?.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
@@ -98,7 +95,6 @@ const PhotoComments = () => {
     }
 
     const formData = new FormData();
-    formData.append('userId', String(userId));
     formData.append('uploadId', photoId);
     formData.append('comment', data?.comment || '');
     if (taggedUsers.length > 0) {
