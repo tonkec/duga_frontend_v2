@@ -22,6 +22,7 @@ import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
+import Paginated from '../Paginated';
 
 const schema = z
   .object({
@@ -52,6 +53,10 @@ export interface IComment {
   taggedUsers?: { id: number; username: string }[];
   imageUrl?: string;
 }
+
+const PaginatedSingle = ({ singleEntry }: { singleEntry: IComment }) => (
+  <CommentWithUser comment={singleEntry} />
+);
 
 const PhotoComments = () => {
   init({ data });
@@ -191,10 +196,14 @@ const PhotoComments = () => {
   return (
     <>
       <div className="flex flex-col gap-2 ">
-        {sortedComments.length &&
-          sortedComments.map((comment) => {
-            return <CommentWithUser key={comment.id} comment={comment} />;
-          })}
+        <div>
+          <Paginated<IComment>
+            itemsPerPage={5}
+            gridClassName="grid grid-cols-1 gap-2"
+            data={sortedComments}
+            paginatedSingle={PaginatedSingle}
+          />
+        </div>
       </div>
 
       <form className="w-full flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
