@@ -46,6 +46,7 @@ interface Inputs {
 export interface IComment {
   id: number;
   comment: string;
+  userId: string;
   uploadId: string;
   createdAt: string;
   taggedUsers?: { id: number; username: string }[];
