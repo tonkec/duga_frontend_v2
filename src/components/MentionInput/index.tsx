@@ -60,7 +60,7 @@ const MentionInput = ({
 
     const match = val.match(/@(\w*)$/);
     if (match) {
-      const query = match[1].toLowerCase();
+      const query = match[1].toLowerCase().trim();
       setRawQuery(query);
       setShowSuggestions(true);
     } else {
