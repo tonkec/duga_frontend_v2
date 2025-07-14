@@ -62,3 +62,8 @@ export const getAllUserPhotos = async () => {
   const client = apiClient();
   return client.get(`/uploads/user-photos/`);
 };
+
+export const getUsersByUsernames = async (usernames: string[]) => {
+  const client = apiClient();
+  return client.post('/users/by-usernames', { usernames });
+};

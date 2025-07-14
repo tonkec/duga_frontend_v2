@@ -84,6 +84,8 @@ const PhotoComments = () => {
     resolver: zodResolver(schema),
     defaultValues: {
       content: '',
+      comment: '',
+      image: undefined,
     },
   });
 
@@ -201,7 +203,7 @@ const PhotoComments = () => {
             itemsPerPage={5}
             gridClassName="grid grid-cols-1 gap-2"
             data={sortedComments}
-            paginatedSingle={PaginatedSingle}
+            paginatedSingle={({ singleEntry }) => <PaginatedSingle singleEntry={singleEntry} />}
           />
         </div>
       </div>

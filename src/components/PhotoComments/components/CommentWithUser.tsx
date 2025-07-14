@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { IComment } from '..';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
-import { useDeleteUploadComment, useEditUploadComment } from '@app/components/PhotoComments/hooks';
+import {
+  useDeleteUploadComment,
+  useEditUploadComment,
+  useGetUsersByUsernames,
+} from '@app/components/PhotoComments/hooks';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +25,11 @@ const schema = z.object({
   comment: z.string().min(1),
 });
 
+const extractMentionedUsernames = (comment: string): string[] => {
+  const matches = comment.match(/@(\w+)/g) || [];
+  return matches.map((mention) => mention.slice(1));
+};
+
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
@@ -29,7 +38,8 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
   const { mutateEditUploadComment } = useEditUploadComment();
-
+  const usernames = extractMentionedUsernames(comment.comment);
+  const { data: resolvedUsers } = useGetUsersByUsernames(usernames);
   const {
     handleSubmit,
     control,
@@ -87,9 +97,13 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
               render={({ field }) => (
                 <MentionInput
                   value={field.value}
-                  onChange={field.onChange}
-                  onTagUsersChange={setTaggedUsers}
+                  onChange={(val) => field.onChange(val.trimStart())}
+                  onTagUsersChange={(users) => {
+                    setTaggedUsers(users);
+                    field.onChange(field.value);
+                  }}
                   placeholder="Izmijeni komentar"
+                  initialTaggedUsers={resolvedUsers?.data?.users ?? []}
                 />
               )}
             />
@@ -99,7 +113,9 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
             <Button type="tertiary" onClick={() => setIsEditing(false)}>
               Otkaži
             </Button>
-            <Button type="tertiary">Spremi</Button>
+            <Button type="tertiary" onClick={handleSubmit(onSubmit)}>
+              Spremi
+            </Button>
           </div>
         </form>
       );

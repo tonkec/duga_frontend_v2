@@ -8,6 +8,7 @@ import {
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useSocket } from '@app/context/useSocket';
+import { getUsersByUsernames } from '@app/api/users';
 
 export const useEditUploadComment = () => {
   const socket = useSocket();
@@ -100,4 +101,12 @@ export const useGetUploadComments = (uploadId: string) => {
   });
 
   return { allComments, allCommentsError, areCommentsLoading };
+};
+
+export const useGetUsersByUsernames = (usernames: string[]) => {
+  return useQuery({
+    queryKey: ['users', usernames],
+    queryFn: () => getUsersByUsernames(usernames),
+    enabled: usernames.length > 0,
+  });
 };

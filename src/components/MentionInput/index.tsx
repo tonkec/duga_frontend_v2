@@ -9,6 +9,7 @@ interface MentionInputProps {
   onTagUsersChange?: (users: IUser[]) => void;
   placeholder?: string;
   className?: string;
+  initialTaggedUsers?: IUser[];
 }
 
 const MentionInput = ({
@@ -17,6 +18,7 @@ const MentionInput = ({
   onTagUsersChange,
   placeholder = 'Napiši komentar...',
   className = '',
+  initialTaggedUsers = [],
 }: MentionInputProps) => {
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -64,6 +66,7 @@ const MentionInput = ({
       setRawQuery(query);
       setShowSuggestions(true);
     } else {
+      setRawQuery('');
       setShowSuggestions(false);
     }
   };
@@ -76,13 +79,19 @@ const MentionInput = ({
     const newVal = `${before}@${user.username} `;
     onChange(newVal);
 
-    if (!taggedUsers.some((u) => u.id === user.id)) {
+    if (!taggedUsers.some((u) => Number(u.id) === Number(user.id))) {
       const updated = [...taggedUsers, user];
       setTaggedUsers(updated);
       onTagUsersChange?.(updated);
     }
     setShowSuggestions(false);
   };
+
+  useEffect(() => {
+    if (initialTaggedUsers.length > 0) {
+      setTaggedUsers(initialTaggedUsers);
+    }
+  }, [initialTaggedUsers]);
 
   return (
     <div className={`relative w-full ${className}`} ref={containerRef}>
