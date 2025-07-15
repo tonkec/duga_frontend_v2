@@ -1,31 +1,38 @@
 import { useNavigate } from 'react-router';
-import { S3_URL } from '@app/utils/consts';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import { useGetImageBlob } from '../../hooks';
 
 interface IUpload {
   id: string;
   url: string;
   userId: string;
+  secureUrl: string;
 }
 
 const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
   const { allImages } = useGetAllImages(upload.userId);
+  const { data: imageBlob } = useGetImageBlob(upload.secureUrl);
+
   return (
     <div className="flex flex-col gap-1">
-      <img
-        className="border rounded cursor-pointer"
-        src={`${S3_URL}/${upload.url}`}
-        alt={upload.id}
-        onClick={() => {
-          navigate(`/photo/${upload.id}`);
-        }}
-        style={{ maxWidth: '100%' }}
-      />
+      {imageBlob ? (
+        <img
+          className="border rounded cursor-pointer"
+          src={URL.createObjectURL(imageBlob)}
+          alt={upload.id}
+          onClick={() => {
+            navigate(`/photo/${upload.id}`);
+          }}
+          style={{ maxWidth: '100%' }}
+        />
+      ) : (
+        <p>Loading image...</p>
+      )}
 
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
         <Avatar
