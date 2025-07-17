@@ -2,8 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
-import { S3_CHAT_PHOTO_ENVIRONMENT, S3_URL } from '@app/utils/consts';
-import { useEffect, useState } from 'react';
+import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 
 type MessageType = 'text' | 'file' | 'gif';
 
@@ -26,6 +25,7 @@ export interface IMessage {
   };
   id: string;
   messagePhotoUrl: string;
+  securePhotoUrl?: string; // Optional for secure URLs
 }
 
 interface IMessageProps {
@@ -57,41 +57,37 @@ const MessageContent = ({
   createdAt,
   messageType,
 }: IMessageContentProps) => {
-  const [src, setSrc] = useState(messagePhotoUrl);
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (!messagePhotoUrl) return;
-    const shouldRenderS3Image = messageType === 'file' && messagePhotoUrl;
-    const shouldRenderGiphy = messageType === 'gif' && messagePhotoUrl;
+  const isS3File = messageType === 'file' && messagePhotoUrl;
+  const isGiphy = messageType === 'gif' && messagePhotoUrl;
 
-    if (shouldRenderS3Image) {
-      const url = `${S3_URL}/${S3_CHAT_PHOTO_ENVIRONMENT}/${encodeURIComponent(messagePhotoUrl)}`;
-      timeout = setTimeout(() => setSrc(url), 1000);
-    }
-
-    if (shouldRenderGiphy) {
-      setSrc(messagePhotoUrl);
-    }
-
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [messagePhotoUrl, messageType]);
-
+  const { data: imageBlob, error } = useGetImageBlob(messagePhotoUrl || '');
+  console.log(messagePhotoUrl, 'messagePhotoUrl');
   return (
     <div className={messageStyles}>
-      {src ? (
+      {isGiphy && messagePhotoUrl && (
         <img
           className="cursor-pointer"
-          src={src}
+          src={messagePhotoUrl}
           alt="message"
           width={100}
-          onClick={() => window.open(src, '_blank')}
+          onClick={() => window.open(messagePhotoUrl, '_blank')}
           referrerPolicy="no-referrer"
         />
-      ) : (
-        <p>{message}</p>
       )}
+
+      {isS3File && imageBlob && (
+        <img
+          className="cursor-pointer"
+          src={URL.createObjectURL(imageBlob)}
+          alt="message"
+          width={100}
+          referrerPolicy="no-referrer"
+        />
+      )}
+
+      {!isGiphy && !isS3File && <p>{message}</p>}
+
+      {error && !isGiphy && <p className="text-red-500">❌ Error loading image</p>}
       <RecordCreatedAt className="text-right" createdAt={createdAt} />
     </div>
   );

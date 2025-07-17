@@ -18,9 +18,15 @@ export const useGetLatestUploads = () => {
 export const useGetImageBlob = (secureUrl: string) => {
   const { data, error, isLoading } = useQuery({
     queryKey: ['imageBlob', secureUrl],
+    enabled: !!secureUrl,
+    retry: 1,
     queryFn: async () => {
-      console.log('Fetching image blob for URL:', secureUrl);
+      if (!secureUrl) throw new Error('Missing secure URL');
       const token = getCookie('token');
+      if (!token) throw new Error('User is not authenticated');
+
+      console.log('Fetching image blob for URL:', secureUrl);
+
       const res = await fetch(secureUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -28,7 +34,7 @@ export const useGetImageBlob = (secureUrl: string) => {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to fetch image blob');
+        throw new Error(`Failed to fetch image blob: ${res.statusText}`);
       }
 
       return await res.blob();
