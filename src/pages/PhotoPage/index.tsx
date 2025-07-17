@@ -7,10 +7,14 @@ import PhotoComments from '@app/components/PhotoComments';
 import PhotoLikes from '@app/components/PhotoLikes';
 import Loader from '@app/components/Loader';
 import notFound from '@app/assets/not_found.svg';
+import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 
 const PhotoPage = () => {
   const { photoId } = useParams();
   const { singleImage, singleImageLoading } = useGetSingleImage(photoId as string);
+  const { data: imageBlob } = useGetImageBlob(
+    singleImage?.data?.secureUrl || singleImage?.data?.url || ''
+  );
 
   if (singleImageLoading) {
     return (
@@ -38,7 +42,11 @@ const PhotoPage = () => {
       <Card>
         <div className="lg:flex gap-5 items-start">
           <div>
-            <img src={getPhotoUrl(singleImage?.data)} alt="Slika" />
+            {imageBlob ? (
+              <img src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
+            ) : (
+              <img src={getPhotoUrl(singleImage?.data)} alt="Slika" />
+            )}
             <PhotoLikes photoId={photoId} />
           </div>
           <div className="flex-1">

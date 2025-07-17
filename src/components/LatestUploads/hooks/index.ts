@@ -19,6 +19,7 @@ export const useGetImageBlob = (secureUrl: string) => {
   const { data, error, isLoading } = useQuery({
     queryKey: ['imageBlob', secureUrl],
     queryFn: async () => {
+      console.log('Fetching image blob for URL:', secureUrl);
       const token = getCookie('token');
       const res = await fetch(secureUrl, {
         headers: {

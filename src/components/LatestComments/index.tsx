@@ -8,6 +8,7 @@ import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import DOMPurify from 'dompurify';
+import { useGetImageBlob } from '../LatestUploads/hooks';
 
 interface IComment {
   id: number;
@@ -17,12 +18,16 @@ interface IComment {
   userId: number;
   taggedUsers?: { id: number; username: string }[];
   imageUrl: string;
+  secureImageUrl?: string;
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
+  console.log('🧠 Comment imageUrl:', comment.imageUrl);
+  console.log('🔐 Secure URL:', comment.secureImageUrl);
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
   const { allImages } = useGetAllImages(comment.userId.toString());
+  const { data: imageBlob } = useGetImageBlob(comment.secureImageUrl || comment.imageUrl);
 
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
@@ -62,10 +67,10 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
     >
       <div className="flex items-center gap-2 mb-2">
         <p className="text-sm">
-          {comment.imageUrl ? (
+          {imageBlob ? (
             <img
-              src={comment.imageUrl}
-              alt="User Avatar"
+              src={URL.createObjectURL(imageBlob)}
+              alt="Comment image"
               className="w-36 h-36"
               onClick={() => navigate(`/user/${comment.userId}`)}
             />

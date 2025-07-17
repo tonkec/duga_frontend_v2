@@ -52,6 +52,7 @@ export interface IComment {
   createdAt: string;
   taggedUsers?: { id: number; username: string }[];
   imageUrl?: string;
+  secureImageUrl?: string;
 }
 
 const PhotoComments = () => {
