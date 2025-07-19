@@ -22,8 +22,6 @@ interface IComment {
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
-  console.log('🧠 Comment imageUrl:', comment.imageUrl);
-  console.log('🔐 Secure URL:', comment.secureImageUrl);
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
   const { allImages } = useGetAllImages(comment.userId.toString());

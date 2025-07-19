@@ -61,7 +61,6 @@ const MessageContent = ({
   const isGiphy = messageType === 'gif' && messagePhotoUrl;
 
   const { data: imageBlob, error } = useGetImageBlob(messagePhotoUrl || '');
-  console.log(messagePhotoUrl, 'messagePhotoUrl');
   return (
     <div className={messageStyles}>
       {isGiphy && messagePhotoUrl && (
