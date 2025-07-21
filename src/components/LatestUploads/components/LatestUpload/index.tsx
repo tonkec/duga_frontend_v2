@@ -9,14 +9,14 @@ interface IUpload {
   id: string;
   url: string;
   userId: string;
-  secureUrl: string;
+  securePhotoUrl: string;
 }
 
 const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
   const { allImages } = useGetAllImages(upload.userId);
-  const { data: imageBlob } = useGetImageBlob(upload.secureUrl);
+  const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl);
 
   return (
     <div className="flex flex-col gap-1">

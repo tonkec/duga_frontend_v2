@@ -14,7 +14,7 @@ export interface IImage {
   updatedAt: string;
   url: string;
   userId: string;
-  secureUrl: string;
+  securePhotoUrl: string;
 }
 
 interface IPhotosProps {

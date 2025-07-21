@@ -9,7 +9,7 @@ interface IPhotoProps {
 
 const Photo = ({ image }: IPhotoProps) => {
   const navigate = useNavigate();
-  const { data: imageBlob } = useGetImageBlob(image?.secureUrl || '');
+  const { data: imageBlob } = useGetImageBlob(image?.securePhotoUrl || '');
 
   return (
     <img

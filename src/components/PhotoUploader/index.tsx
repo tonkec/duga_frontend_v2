@@ -209,7 +209,7 @@ const PhotoUploader = () => {
               {allExistingImages.data.images.map((image: IImage, index: number) => {
                 return (
                   <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
-                    <BlobImage imageUrl={image.secureUrl} name={image.name} />
+                    <BlobImage imageUrl={image.securePhotoUrl} name={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => {
                         setUpdatedImageDescriptions((prev) => {

@@ -13,7 +13,7 @@ const PhotoPage = () => {
   const { photoId } = useParams();
   const { singleImage, singleImageLoading } = useGetSingleImage(photoId as string);
   const { data: imageBlob } = useGetImageBlob(
-    singleImage?.data?.secureUrl || singleImage?.data?.url || ''
+    singleImage?.data?.securePhotoUrl || singleImage?.data?.url || ''
   );
 
   if (singleImageLoading) {

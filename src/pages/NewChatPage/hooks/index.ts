@@ -36,7 +36,7 @@ interface Message {
     message: string;
     createdAt: string;
   };
-  secureUrl: string;
+  securePhotoUrl: string;
 }
 
 export const useCreateNewChat = () => {
