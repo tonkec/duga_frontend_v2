@@ -28,7 +28,7 @@ const UserAvatar = ({
         size={size}
         round={round}
         onClick={onClick}
-        className="cursor-pointer"
+        className={onClick ? 'cursor-pointer' : ''}
         textSizeRatio={2}
       />
     );
