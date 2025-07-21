@@ -25,6 +25,8 @@ export const useGetImageBlob = (secureUrl: string) => {
       const token = getCookie('token');
       if (!token) throw new Error('User is not authenticated');
 
+      console.log('Fetching image blob for URL:', secureUrl);
+
       const res = await fetch(secureUrl, {
         headers: {
           Authorization: `Bearer ${token}`,

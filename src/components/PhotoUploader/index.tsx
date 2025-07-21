@@ -11,11 +11,11 @@ import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
-import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
+import ExistingImage from './components/ExistingImage';
 
 export interface ImageDescription {
   description: string;
@@ -210,7 +210,7 @@ const PhotoUploader = () => {
               {allExistingImages.data.images.map((image: IImage, index: number) => {
                 return (
                   <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
-                    <img src={getImageUrl(image)} alt={image.name} />
+                    <ExistingImage imageUrl={image.secureUrl} name={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => {
                         setUpdatedImageDescriptions((prev) => {
