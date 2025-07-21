@@ -18,7 +18,6 @@ const NewChatPage = () => {
   const [search, setSearch] = useState('');
   const { onCreateChat } = useCreateNewChat();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
-
   if (isAllUsersLoading || isUserChatsLoading) {
     return (
       <AppLayout>

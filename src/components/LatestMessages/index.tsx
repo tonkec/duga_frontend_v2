@@ -24,7 +24,7 @@ interface IMessage {
   messagePhotoUrl: string;
   fromUserId: number;
   chatId: number;
-  secureUrl: string;
+  securePhotoUrl?: string;
 }
 
 const LatestMessageAvatar = ({ userId }: { userId: string }) => {
@@ -71,9 +71,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     return <LatestMessageAvatar userId={String(message.User.id)} />;
   };
 
-  console.log(message);
-
-  if (message.secureUrl) {
+  if (message.securePhotoUrl) {
     return (
       <div
         onClick={() => {
@@ -86,7 +84,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
       >
         <div className="flex items-center gap-2 mb-2">
           {getLatestPerson()}
-          <BlobImage imageUrl={message.secureUrl} name="komentar" className="w-32 h-32" />
+          <BlobImage imageUrl={message.securePhotoUrl} name="komentar" className="w-32 h-32" />
         </div>
         <RecordCreatedAt createdAt={message.createdAt} />
       </div>

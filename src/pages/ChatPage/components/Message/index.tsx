@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 
-type MessageType = 'text' | 'file' | 'gif';
+export type MessageType = 'text' | 'file' | 'gif';
 
 interface BaseMessageTemplateProps {
   userName: string;
@@ -24,8 +24,9 @@ export interface IMessage {
     id: number;
   };
   id: string;
+  securePhotoUrl: string;
+  fromUserId: number;
   messagePhotoUrl: string;
-  securePhotoUrl?: string; // Optional for secure URLs
 }
 
 interface IMessageProps {

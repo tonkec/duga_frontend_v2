@@ -15,7 +15,7 @@ export interface IUser {
   firstName: string;
   bio: string;
   gender: string;
-  id: string;
+  id: number;
   isVerified: boolean;
   location: string;
   password: string;
@@ -71,7 +71,7 @@ const getUserAge = ({ age }: { age: number }) => {
 };
 
 const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
-  const { allImages } = useGetAllImages(user.id);
+  const { allImages } = useGetAllImages(String(user.id));
   const socket = useSocket();
   const [isOnlineState, setIsOnlineState] = useState(isOnline);
 
