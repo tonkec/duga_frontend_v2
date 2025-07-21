@@ -5,7 +5,7 @@ interface IExsitingImageProps {
   name: string;
 }
 
-const ExistingImage = ({ imageUrl, name }: IExsitingImageProps) => {
+const BlobImage = ({ imageUrl, name }: IExsitingImageProps) => {
   const { data: imageBlob } = useGetImageBlob(imageUrl || '');
 
   if (!imageBlob) {
@@ -14,4 +14,4 @@ const ExistingImage = ({ imageUrl, name }: IExsitingImageProps) => {
   return <img src={URL.createObjectURL(imageBlob)} alt={name} />;
 };
 
-export default ExistingImage;
+export default BlobImage;

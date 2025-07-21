@@ -15,8 +15,7 @@ import ConfirmModal from '@app/components/ConfirmModal';
 import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
-import ExistingImage from './components/ExistingImage';
-
+import BlobImage from './components/BlobImage';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -210,7 +209,7 @@ const PhotoUploader = () => {
               {allExistingImages.data.images.map((image: IImage, index: number) => {
                 return (
                   <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
-                    <ExistingImage imageUrl={image.secureUrl} name={image.name} />
+                    <BlobImage imageUrl={image.secureUrl} name={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => {
                         setUpdatedImageDescriptions((prev) => {
