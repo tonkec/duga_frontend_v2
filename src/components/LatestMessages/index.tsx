@@ -6,9 +6,9 @@ import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import Avatar from 'react-avatar';
 import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetUserById } from '@app/hooks/useGetUserById';
-import { S3_URL } from '@app/utils/consts';
 import { IChat, useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import BlobImage from '../PhotoUploader/components/BlobImage';
 
 interface IMessage {
   id: number;
@@ -24,6 +24,7 @@ interface IMessage {
   messagePhotoUrl: string;
   fromUserId: number;
   chatId: number;
+  secureUrl: string;
 }
 
 const LatestMessageAvatar = ({ userId }: { userId: string }) => {
@@ -70,7 +71,9 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     return <LatestMessageAvatar userId={String(message.User.id)} />;
   };
 
-  if (message.messagePhotoUrl) {
+  console.log(message);
+
+  if (message.secureUrl) {
     return (
       <div
         onClick={() => {
@@ -83,7 +86,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
       >
         <div className="flex items-center gap-2 mb-2">
           {getLatestPerson()}
-          <img src={`${S3_URL}/${message.messagePhotoUrl}`} alt="message" className="h-10 w-10" />
+          <BlobImage imageUrl={message.secureUrl} name="komentar" className="w-32 h-32" />
         </div>
         <RecordCreatedAt createdAt={message.createdAt} />
       </div>
