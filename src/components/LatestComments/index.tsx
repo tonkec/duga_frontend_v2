@@ -4,11 +4,9 @@ import Card from '@app/components/Card';
 import Loader from '@app/components/Loader';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetLatestComments } from './hooks';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import DOMPurify from 'dompurify';
 import { useGetImageBlob } from '../LatestUploads/hooks';
+import UserAvatar from '../UserAvatar';
 
 interface IComment {
   id: number;
@@ -24,7 +22,6 @@ interface IComment {
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
-  const { allImages } = useGetAllImages(comment.userId.toString());
   const { data: imageBlob } = useGetImageBlob(comment.secureImageUrl || comment.imageUrl);
 
   const renderFormattedComment = (text: string) => {
@@ -78,16 +75,10 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
         </p>
       </div>
       <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Avatar
-          color="#2D46B9"
-          name={`${user?.data.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="20"
-          round={true}
-          onClick={() => {
-            navigate(`/user/${comment.userId}`);
-          }}
-          className="cursor-pointer"
+        <UserAvatar
+          color="black"
+          userId={String(comment.userId)}
+          avatarFallbackName={user?.data.username}
         />
         <RecordCreatedAt createdAt={comment.createdAt} />
       </div>

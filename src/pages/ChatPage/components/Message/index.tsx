@@ -1,14 +1,13 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
+import UserAvatar from '@app/components/UserAvatar';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
 interface BaseMessageTemplateProps {
   userName: string;
-  profilePhoto: string;
   message: string;
   createdAt: string;
   messagePhotoUrl: string;
@@ -95,13 +94,14 @@ const MessageContent = ({
 
 const CurrentUserMessageTemplate = ({
   userName,
-  profilePhoto,
   message,
   createdAt,
   messagePhotoUrl,
   showAvatar,
   messageType,
 }: IMessageTemplateProps) => {
+  const [currentUserId] = useLocalStorage('userId');
+
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className="flex">
@@ -114,7 +114,7 @@ const CurrentUserMessageTemplate = ({
       </div>
       {showAvatar && (
         <div className="ml-0.5">
-          <Avatar name={userName} src={profilePhoto} size="24" round />
+          <UserAvatar avatarFallbackName={userName} userId={String(currentUserId)} color="black" />
         </div>
       )}
     </div>
@@ -123,7 +123,6 @@ const CurrentUserMessageTemplate = ({
 
 const OtherUserMessageTemplate = ({
   userName,
-  profilePhoto,
   message,
   otherUserId,
   createdAt,
@@ -136,7 +135,7 @@ const OtherUserMessageTemplate = ({
     <div className="flex">
       {showAvatar && (
         <div className="cursor-pointer mr-0.5" onClick={() => navigate(`/user/${otherUserId}`)}>
-          <Avatar name={userName} src={profilePhoto} size="24" round />
+          <UserAvatar color="black" avatarFallbackName={userName} userId={String(otherUserId)} />
         </div>
       )}
       <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
@@ -153,8 +152,6 @@ const OtherUserMessageTemplate = ({
 
 const Message = ({
   message,
-  otherUserProfilePhoto,
-  currentUserProfilePhoto,
   otherUserName,
   currentUserName,
   otherUserId,
@@ -166,7 +163,6 @@ const Message = ({
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate
       userName={currentUserName}
-      profilePhoto={currentUserProfilePhoto}
       message={message.message}
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
@@ -176,7 +172,6 @@ const Message = ({
   ) : (
     <OtherUserMessageTemplate
       userName={otherUserName}
-      profilePhoto={otherUserProfilePhoto}
       message={message.message}
       otherUserId={otherUserId}
       createdAt={message.createdAt}

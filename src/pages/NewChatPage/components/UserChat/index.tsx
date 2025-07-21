@@ -1,12 +1,10 @@
 import { BiChevronRight } from 'react-icons/bi';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import { getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import Avatar from 'react-avatar';
 import { useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import LastMessage from '../LastMessage';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
 import { IUser } from '@app/components/UserCard';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface IUserChatProps {
   user: IUser;
@@ -15,7 +13,6 @@ interface IUserChatProps {
 }
 
 const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
-  const { allImages } = useGetAllImages(String(user.id));
   const [userId] = useLocalStorage('userId');
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { isMessageReadData } = useGetIsMessageRead(String(lastMessage?.id || ''));
@@ -39,12 +36,10 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
       }}
     >
       <div className="flex items-center">
-        <Avatar
+        <UserAvatar
           color="#2D46B9"
-          name={`${user.username}`}
-          src={getProfilePhotoUrl(allImages?.data.images)}
-          size="40"
-          round={true}
+          avatarFallbackName={`${user.username}`}
+          userId={String(user.id)}
         />
         <div className="ml-4">
           <h1 className="text-lg font-semibold">{user.username}</h1>

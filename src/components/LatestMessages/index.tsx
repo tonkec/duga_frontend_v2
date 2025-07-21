@@ -2,13 +2,11 @@ import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import Card from '@app/components/Card';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import { IChat, useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import BlobImage from '../PhotoUploader/components/BlobImage';
+import UserAvatar from '../UserAvatar';
 
 interface IMessage {
   id: number;
@@ -28,18 +26,10 @@ interface IMessage {
 }
 
 const LatestMessageAvatar = ({ userId }: { userId: string }) => {
-  const { allImages } = useGetAllImages(userId);
   const { user } = useGetUserById(userId);
   return (
     <div className="flex gap-2">
-      <Avatar
-        color="#F037A5"
-        name={`${user?.data?.username}`}
-        src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-        size="40"
-        round={true}
-        className="cursor-pointer"
-      />
+      <UserAvatar color="#F037A5" avatarFallbackName={`${user?.data?.username}`} userId={userId} />
     </div>
   );
 };

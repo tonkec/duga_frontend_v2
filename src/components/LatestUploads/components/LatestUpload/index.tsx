@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router';
 import { useGetUserById } from '@app/hooks/useGetUserById';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetImageBlob } from '../../hooks';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface IUpload {
   id: string;
@@ -15,7 +13,6 @@ interface IUpload {
 const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
-  const { allImages } = useGetAllImages(upload.userId);
   const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl);
 
   return (
@@ -35,16 +32,13 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
       )}
 
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
-        <Avatar
+        <UserAvatar
           color="#2D46B9"
-          name={`${user?.data.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="40"
-          round={true}
+          avatarFallbackName={`${user?.data.username}`}
           onClick={() => {
             navigate(`/user/${upload.userId}`);
           }}
-          className="cursor-pointer"
+          userId={upload.userId}
         />
         <p>{user?.data.username}</p>
       </div>
