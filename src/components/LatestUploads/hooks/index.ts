@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getLatestUploads } from '@app/api/uploads';
-import { getCookie } from '@app/api';
+import { apiClient } from '@app/api';
 
 export const useGetLatestUploads = () => {
   const {
@@ -22,22 +22,14 @@ export const useGetImageBlob = (secureUrl: string) => {
     retry: 1,
     queryFn: async () => {
       if (!secureUrl) throw new Error('Missing secure URL');
-      const token = getCookie('token');
-      if (!token) throw new Error('User is not authenticated');
 
-      console.log('Fetching image blob for URL:', secureUrl);
+      const client = apiClient();
 
-      const res = await fetch(secureUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await client.get(secureUrl, {
+        responseType: 'blob',
       });
 
-      if (!res.ok) {
-        throw new Error(`Failed to fetch image blob: ${res.statusText}`);
-      }
-
-      return await res.blob();
+      return response.data as Blob;
     },
   });
 
