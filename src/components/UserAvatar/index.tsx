@@ -6,9 +6,18 @@ interface IUserAvatarProps {
   color: string;
   onClick?: () => void;
   userId: string;
+  size?: string;
+  round?: boolean;
 }
 
-const UserAvatar = ({ avatarFallbackName, color, onClick, userId }: IUserAvatarProps) => {
+const UserAvatar = ({
+  avatarFallbackName,
+  color,
+  onClick,
+  userId,
+  size = '40',
+  round = true,
+}: IUserAvatarProps) => {
   const { profilePhoto } = useGetProfilePhoto(userId);
   if (profilePhoto) {
     return (
@@ -16,10 +25,11 @@ const UserAvatar = ({ avatarFallbackName, color, onClick, userId }: IUserAvatarP
         color={color}
         name={avatarFallbackName}
         src={profilePhoto.data.securePhotoUrl}
-        size="20"
-        round={true}
+        size={size}
+        round={round}
         onClick={onClick}
         className="cursor-pointer"
+        textSizeRatio={2}
       />
     );
   }

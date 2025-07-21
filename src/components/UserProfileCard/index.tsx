@@ -94,7 +94,13 @@ const UserProfileCard = ({
     <Card>
       <div className="xl:flex gap-6">
         <div>
-          <UserAvatar avatarFallbackName={`${user.username}`} color="#2D46B9" userId={user.id} />
+          <UserAvatar
+            avatarFallbackName={`${user.username}`}
+            color="#2D46B9"
+            userId={user.id}
+            size="200"
+            round={false}
+          />
         </div>
 
         <div className="flex gap-6">

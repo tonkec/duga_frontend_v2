@@ -92,11 +92,12 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
 
   return (
     <Card className="h-full">
-      <div className="w-full text-center">
+      <div className="w-full text-center mb-4">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
           color="#2D46B9"
           userId={String(user.id)}
+          size="100"
         />
       </div>
       <div className="flex flex-col justify-between text-center">

@@ -140,7 +140,7 @@ function App() {
                 buttonText="Pogledaj profil 👀"
                 secondButton={
                   <SendMessageButton
-                    sendMessageToId={singleEntry.id}
+                    sendMessageToId={String(singleEntry.id)}
                     buttonType="blue"
                     disabled={hasChatWithUser}
                   />
