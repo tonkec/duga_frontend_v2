@@ -67,13 +67,7 @@ const MessageContent = ({
       {isGiphy && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {isS3File && imageBlob && (
-        <img
-          className="cursor-pointer"
-          src={URL.createObjectURL(imageBlob)}
-          alt="message"
-          width={100}
-          referrerPolicy="no-referrer"
-        />
+        <img src={URL.createObjectURL(imageBlob)} alt="poruka" width={100} />
       )}
 
       {!isGiphy && !isS3File && <p>{message}</p>}
