@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useNavigate } from 'react-router';
 import { isMessageRead, markMessagesAsRead } from '@app/api/chatMessages';
+import { MessageType } from '@app/pages/ChatPage/components/Message';
 
 interface CreateChatInput {
   partnerId: number;
@@ -32,11 +33,9 @@ interface Message {
   messagePhotoUrl: string;
   fromUserId: number;
   chatId: number;
-  message: {
-    message: string;
-    createdAt: string;
-  };
+  message: string;
   securePhotoUrl: string;
+  type: MessageType;
 }
 
 export const useCreateNewChat = () => {

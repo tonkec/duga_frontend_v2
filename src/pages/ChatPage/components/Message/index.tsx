@@ -23,10 +23,11 @@ export interface IMessage {
   User: {
     id: number;
   };
-  id: string;
+  id: number;
   securePhotoUrl: string;
   fromUserId: number;
   messagePhotoUrl: string;
+  chatId: number;
 }
 
 interface IMessageProps {
