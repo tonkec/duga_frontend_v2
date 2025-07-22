@@ -204,7 +204,7 @@ const PhotoComments = () => {
   return (
     <>
       <div className="flex flex-col gap-2 ">
-        {sortedComments.length &&
+        {!!sortedComments.length &&
           sortedComments.map((comment) => {
             return <CommentWithUser key={comment.id} comment={comment} />;
           })}
