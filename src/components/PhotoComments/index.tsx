@@ -22,8 +22,8 @@ import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
-import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
+import Paginated from '../Paginated';
 
 const schema = z
   .object({
@@ -56,14 +56,16 @@ export interface IComment {
   secureImageUrl?: string;
 }
 
+const PaginatedSingle = ({ singleEntry }: { singleEntry: IComment }) => (
+  <CommentWithUser comment={singleEntry} />
+);
+
 const PhotoComments = () => {
   init({ data });
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
   const { mutateAddUploadComment } = useAddUploadComment();
-  const { user: currentUser } = useGetCurrentUser();
-  const userId = currentUser?.data?.id;
   const { photoId } = useParams();
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string
@@ -92,7 +94,7 @@ const PhotoComments = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (data: Inputs) => {
-    if (!userId || !photoId || !isValid) return;
+    if (!photoId || !isValid) return;
 
     if (data?.image?.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
@@ -100,7 +102,6 @@ const PhotoComments = () => {
     }
 
     const formData = new FormData();
-    formData.append('userId', String(userId));
     formData.append('uploadId', photoId);
     formData.append('comment', data?.comment || '');
     if (taggedUsers.length > 0) {
@@ -204,10 +205,14 @@ const PhotoComments = () => {
   return (
     <>
       <div className="flex flex-col gap-2 ">
-        {!!sortedComments.length &&
-          sortedComments.map((comment) => {
-            return <CommentWithUser key={comment.id} comment={comment} />;
-          })}
+        {!!sortedComments.length && (
+          <Paginated<IComment>
+            itemsPerPage={5}
+            gridClassName="grid grid-cols-1 gap-2"
+            data={sortedComments}
+            paginatedSingle={PaginatedSingle}
+          />
+        )}
       </div>
 
       <form className="w-full flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
