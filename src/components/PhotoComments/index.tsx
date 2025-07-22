@@ -23,6 +23,7 @@ import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 
 const schema = z
   .object({
@@ -106,7 +107,14 @@ const PhotoComments = () => {
       formData.append('taggedUserIds', JSON.stringify(taggedUsers.map((u) => u.id)));
     }
     if (data.image?.[0]) {
-      formData.append('commentImage', data.image[0]);
+      const originalFile = data.image[0];
+      const cleanedName = removeSpacesAndDashes(originalFile.name.trim()).toLowerCase();
+
+      const cleanedFile = new File([originalFile], cleanedName, {
+        type: originalFile.type,
+      });
+
+      formData.append('commentImage', cleanedFile);
     }
 
     mutateAddUploadComment(formData);

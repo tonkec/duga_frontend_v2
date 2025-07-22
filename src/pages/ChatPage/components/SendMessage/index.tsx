@@ -24,6 +24,7 @@ import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts'
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 
 type Inputs = {
   content: string;
@@ -166,21 +167,23 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     e.preventDefault();
 
     const files = (e.target as HTMLFormElement).avatars.files as FileList;
-    const formData = new FormData();
-
-    formData.append('chatId', chatId);
-    formData.append('fromUserId', currentUserId as string);
-    formData.append('timestamp', imageTimestamp);
-    Array.from(files).forEach((file: File) => {
-      formData.append('avatars', file);
-    });
-
     if (!files || files.length === 0) return;
 
-    if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (files.length + (allUserImages?.data?.length || 0) > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
+
+    const formData = new FormData();
+    formData.append('chatId', chatId);
+    formData.append('fromUserId', currentUserId as string);
+    formData.append('timestamp', imageTimestamp);
+
+    Array.from(files).forEach((file: File) => {
+      const cleanedName = removeSpacesAndDashes(file.name.toLowerCase().trim());
+      const cleanedFile = new File([file], cleanedName, { type: file.type });
+      formData.append('avatars', cleanedFile);
+    });
 
     emitImageToSockets();
     uploadMessageImage(formData);

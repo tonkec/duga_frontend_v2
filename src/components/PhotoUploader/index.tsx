@@ -140,26 +140,32 @@ const PhotoUploader = () => {
       return;
     }
 
-    if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (files.length + (allUserImages?.data?.length || 0) > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
 
     const formData = new FormData();
-    if (files) {
-      formData.append('text', JSON.stringify(newImageDescriptions));
-      formData.append('userId', userId as string);
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    formData.append('text', JSON.stringify(newImageDescriptions));
+    formData.append('userId', userId as string);
 
-        formData.append('avatars', file);
-      }
-      onUploadPhotos(formData);
+    for (let i = 0; i < files.length; i++) {
+      const originalFile = files[i];
+      const cleanedName = removeSpacesAndDashes(originalFile.name.toLowerCase().trim());
+
+      const cleanedFile = new File([originalFile], cleanedName, {
+        type: originalFile.type,
+      });
+
+      formData.append('avatars', cleanedFile);
     }
+
+    onUploadPhotos(formData);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+
     setNewImages([]);
   };
 

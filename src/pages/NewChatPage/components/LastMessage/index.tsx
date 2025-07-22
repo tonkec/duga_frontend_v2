@@ -7,7 +7,6 @@ interface ILastMessageProps {
 }
 
 const LastMessage = ({ message }: ILastMessageProps) => {
-  console.log(message);
   if (message.message) {
     return <p className="text-gray-500">{message.message}</p>;
   }
