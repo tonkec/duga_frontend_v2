@@ -189,17 +189,23 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   const onMessageSubmit = (data: Inputs) => {
+    const toUserId = chat.Users?.filter(
+      (user: IUser) => !!user?.id && user.id !== Number(currentUserId)
+    ).map((user: IUser) => user.id);
+
     const msg = {
       type: 'text',
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
-      toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+      toUserId,
       chatId,
       message: data.content,
     };
-    if (isValid) {
+
+    if (isValid && toUserId?.length) {
       socket.emit('message', msg);
     }
+
     reset();
   };
 
