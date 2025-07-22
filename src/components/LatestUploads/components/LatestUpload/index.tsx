@@ -1,43 +1,45 @@
 import { useNavigate } from 'react-router';
-import { S3_URL } from '@app/utils/consts';
 import { useGetUserById } from '@app/hooks/useGetUserById';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import { useGetImageBlob } from '../../hooks';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface IUpload {
   id: string;
   url: string;
   userId: string;
+  securePhotoUrl: string;
 }
 
 const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
-  const { allImages } = useGetAllImages(upload.userId);
+  const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl);
+
   return (
     <div className="flex flex-col gap-1">
-      <img
-        className="border rounded cursor-pointer"
-        src={`${S3_URL}/${upload.url}`}
-        alt={upload.id}
-        onClick={() => {
-          navigate(`/photo/${upload.id}`);
-        }}
-        style={{ maxWidth: '100%' }}
-      />
+      {imageBlob ? (
+        <img
+          className="border rounded cursor-pointer"
+          src={URL.createObjectURL(imageBlob)}
+          alt={upload.id}
+          onClick={() => {
+            navigate(`/photo/${upload.id}`);
+          }}
+          style={{ maxWidth: '100%' }}
+        />
+      ) : (
+        <p>Loading image...</p>
+      )}
 
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
-        <Avatar
+        <UserAvatar
           color="#2D46B9"
-          name={`${user?.data.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="40"
-          round={true}
+          avatarFallbackName={`${user?.data.username}`}
           onClick={() => {
             navigate(`/user/${upload.userId}`);
           }}
-          className="cursor-pointer"
+          userId={upload.userId}
+          className="w-6 h-6"
         />
         <p>{user?.data.username}</p>
       </div>

@@ -1,6 +1,4 @@
 import Card from '@app/components/Card';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import Avatar from 'react-avatar';
 import { BiBody, BiBoltCircle, BiCheckCircle, BiSolidMap, BiStopwatch, BiX } from 'react-icons/bi';
 import {
   getFavoriteDayOfWeekTranslation,
@@ -14,6 +12,7 @@ import { IImage } from '@app/components/Photos';
 import Loader from '@app/components/Loader';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
+import UserAvatar from '../UserAvatar';
 
 const isYouTubeUrl = (url: string) => {
   try {
@@ -59,7 +58,6 @@ export interface IUserProfileCardProps {
 
 const UserProfileCard = ({
   user,
-  allImages,
   allImagesLoading,
 }: {
   user: IUserProfileCardProps;
@@ -96,12 +94,12 @@ const UserProfileCard = ({
     <Card>
       <div className="xl:flex gap-6">
         <div>
-          <Avatar
-            name={`${user.username}`}
-            src={getProfilePhotoUrl(getProfilePhoto(allImages))}
-            size="300"
+          <UserAvatar
+            avatarFallbackName={`${user.username}`}
             color="#2D46B9"
-            className="rounded"
+            userId={user.id}
+            size="200"
+            round={false}
           />
         </div>
 

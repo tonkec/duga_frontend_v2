@@ -11,12 +11,11 @@ import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
-import { getImageUrl } from '@app/utils/getImageUrl';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
-
+import BlobImage from './components/BlobImage';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -141,26 +140,32 @@ const PhotoUploader = () => {
       return;
     }
 
-    if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (files.length + (allUserImages?.data?.length || 0) > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
 
     const formData = new FormData();
-    if (files) {
-      formData.append('text', JSON.stringify(newImageDescriptions));
-      formData.append('userId', userId as string);
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    formData.append('text', JSON.stringify(newImageDescriptions));
+    formData.append('userId', userId as string);
 
-        formData.append('avatars', file);
-      }
-      onUploadPhotos(formData);
+    for (let i = 0; i < files.length; i++) {
+      const originalFile = files[i];
+      const cleanedName = removeSpacesAndDashes(originalFile.name.toLowerCase().trim());
+
+      const cleanedFile = new File([originalFile], cleanedName, {
+        type: originalFile.type,
+      });
+
+      formData.append('avatars', cleanedFile);
     }
+
+    onUploadPhotos(formData);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+
     setNewImages([]);
   };
 
@@ -210,7 +215,7 @@ const PhotoUploader = () => {
               {allExistingImages.data.images.map((image: IImage, index: number) => {
                 return (
                   <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
-                    <img src={getImageUrl(image)} alt={image.name} />
+                    <BlobImage imageUrl={image.securePhotoUrl} name={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => {
                         setUpdatedImageDescriptions((prev) => {

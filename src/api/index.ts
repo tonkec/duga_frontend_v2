@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getErrorMessage } from '@app/utils/getErrorMessage';
 
-const getCookie = (name: string) => {
+export const getCookie = (name: string) => {
   const cookies = document.cookie.split('; ');
   for (let i = 0; i < cookies.length; i++) {
     const [key, value] = cookies[i].split('=');

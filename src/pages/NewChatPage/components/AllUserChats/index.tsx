@@ -1,17 +1,11 @@
 import { useNavigate } from 'react-router';
 import { IUser } from '@app/components/UserCard';
 import UserChat from '@app/pages/NewChatPage/components/UserChat';
+import { IMessage } from '@app/pages/ChatPage/components/Message';
 
 interface IChat {
   id: number;
-  Messages: {
-    message: string;
-    fromUserId: number;
-    chatId: number;
-    createdAt: string;
-    updatedAt: string;
-    id: string;
-  }[];
+  Messages: IMessage[];
   Users: IUser[];
   createdAt: string;
   type: string;

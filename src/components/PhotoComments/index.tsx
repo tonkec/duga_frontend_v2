@@ -22,6 +22,7 @@ import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
+import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 import Paginated from '../Paginated';
 
 const schema = z
@@ -52,6 +53,7 @@ export interface IComment {
   createdAt: string;
   taggedUsers?: { id: number; username: string }[];
   imageUrl?: string;
+  secureImageUrl?: string;
 }
 
 const PaginatedSingle = ({ singleEntry }: { singleEntry: IComment }) => (
@@ -106,7 +108,14 @@ const PhotoComments = () => {
       formData.append('taggedUserIds', JSON.stringify(taggedUsers.map((u) => u.id)));
     }
     if (data.image?.[0]) {
-      formData.append('commentImage', data.image[0]);
+      const originalFile = data.image[0];
+      const cleanedName = removeSpacesAndDashes(originalFile.name.trim()).toLowerCase();
+
+      const cleanedFile = new File([originalFile], cleanedName, {
+        type: originalFile.type,
+      });
+
+      formData.append('commentImage', cleanedFile);
     }
 
     mutateAddUploadComment(formData);
@@ -196,14 +205,14 @@ const PhotoComments = () => {
   return (
     <>
       <div className="flex flex-col gap-2 ">
-        <div>
+        {!!sortedComments.length && (
           <Paginated<IComment>
             itemsPerPage={5}
             gridClassName="grid grid-cols-1 gap-2"
             data={sortedComments}
             paginatedSingle={PaginatedSingle}
           />
-        </div>
+        )}
       </div>
 
       <form className="w-full flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>

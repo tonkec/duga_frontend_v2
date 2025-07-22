@@ -6,6 +6,7 @@ interface IUpload {
   id: string;
   url: string;
   userId: string;
+  securePhotoUrl: string;
 }
 
 const LatestUploads = () => {
