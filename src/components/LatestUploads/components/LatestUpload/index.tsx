@@ -39,6 +39,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
             navigate(`/user/${upload.userId}`);
           }}
           userId={upload.userId}
+          className="w-6 h-6"
         />
         <p>{user?.data.username}</p>
       </div>

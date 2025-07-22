@@ -18,7 +18,12 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
   const { user } = useGetUserById(userId);
   return (
     <div className="flex gap-2">
-      <UserAvatar color="#F037A5" avatarFallbackName={`${user?.data?.username}`} userId={userId} />
+      <UserAvatar
+        className="w-6 h-6"
+        color="#F037A5"
+        avatarFallbackName={`${user?.data?.username}`}
+        userId={userId}
+      />
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import Avatar from 'react-avatar';
 import { useGetProfilePhoto } from './hooks/useGetProfilePhoto';
+import Loader from '../Loader';
+import { useGetImageBlob } from '../LatestUploads/hooks';
 
 interface IUserAvatarProps {
   avatarFallbackName: string;
@@ -8,6 +10,7 @@ interface IUserAvatarProps {
   userId: string;
   size?: string;
   round?: boolean;
+  className?: string;
 }
 
 const UserAvatar = ({
@@ -17,22 +20,31 @@ const UserAvatar = ({
   userId,
   size = '40',
   round = true,
+  className,
 }: IUserAvatarProps) => {
-  const { profilePhoto } = useGetProfilePhoto(userId);
-  if (profilePhoto) {
-    return (
-      <Avatar
-        color={color}
-        name={avatarFallbackName}
-        src={profilePhoto.data.securePhotoUrl}
-        size={size}
-        round={round}
-        onClick={onClick}
-        className={onClick ? 'cursor-pointer' : ''}
-        textSizeRatio={2}
-      />
-    );
+  const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId);
+  const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
+
+  if (isProfilePhotoLoading) {
+    return <Loader />;
   }
+
+  if (imageBlob) {
+    return <img src={URL.createObjectURL(imageBlob)} alt="Comment image" className={className} />;
+  }
+
+  return (
+    <Avatar
+      color={color}
+      name={avatarFallbackName}
+      src={profilePhoto?.data.securePhotoUrl}
+      size={size}
+      round={round}
+      onClick={onClick}
+      className={onClick ? `cursor-pointer ${className}` : `${className}`}
+      textSizeRatio={2}
+    />
+  );
 };
 
 export default UserAvatar;
