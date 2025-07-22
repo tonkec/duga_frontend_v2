@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import UserAvatar from '@app/components/UserAvatar';
+import GiphyMessage from '../GiphyMessage';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -57,22 +58,13 @@ const MessageContent = ({
   createdAt,
   messageType,
 }: IMessageContentProps) => {
-  const isS3File = messageType === 'file' && messagePhotoUrl;
-  const isGiphy = messageType === 'gif' && messagePhotoUrl;
-
+  const isS3File = messageType === 'file';
+  const isGiphy = messageType === 'gif';
   const { data: imageBlob, error } = useGetImageBlob(messagePhotoUrl || '');
+
   return (
     <div className={messageStyles}>
-      {isGiphy && messagePhotoUrl && (
-        <img
-          className="cursor-pointer"
-          src={messagePhotoUrl}
-          alt="message"
-          width={100}
-          onClick={() => window.open(messagePhotoUrl, '_blank')}
-          referrerPolicy="no-referrer"
-        />
-      )}
+      {isGiphy && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {isS3File && imageBlob && (
         <img
