@@ -4,15 +4,40 @@ import Photo from '@app/components/Photos/components/Photo';
 import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import notFound from '@app/assets/not_found.svg';
+import ConfirmModal from '@app/components/ConfirmModal';
+import { useState } from 'react';
+
+interface IDeletePhotoModalProps {
+  setIsDeleteModalVisible: (visible: boolean) => void;
+  onDeletePhoto: () => void;
+  isDeleteModalVisible: boolean;
+}
+
+const DeletePhotoModal = ({
+  isDeleteModalVisible,
+  onDeletePhoto,
+  setIsDeleteModalVisible,
+}: IDeletePhotoModalProps) => {
+  return (
+    <ConfirmModal
+      isOpen={isDeleteModalVisible}
+      onConfirm={onDeletePhoto}
+      onClose={() => setIsDeleteModalVisible(false)}
+    >
+      <h2 className="text-xl text-center"> Jesi li siguran_na da želiš obrisati fotografiju?</h2>
+      <p className="text-center">Brisanje fotografije briše i njezin pripadajući zapis</p>
+    </ConfirmModal>
+  );
+};
 
 const AllUserPhotos = () => {
   const { allUserImages } = useGetAllUserImages();
   const { deletePhoto, isDeleting } = useDeletePhoto();
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState('');
 
-  const handleDelete = (url: string) => {
-    if (confirm('Are you sure you want to delete this photo?')) {
-      deletePhoto({ url });
-    }
+  const handleDelete = () => {
+    deletePhoto({ url: photoUrl });
   };
 
   if (!allUserImages?.data.length) {
@@ -25,16 +50,30 @@ const AllUserPhotos = () => {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4">
-      {allUserImages?.data.map((image: IImage, index: number) => (
-        <div key={index} className="relative max-w-[400px]">
-          <Photo image={image} />
-          <Button onClick={() => handleDelete(image.url)} disabled={isDeleting} type="danger">
-            Delete
-          </Button>
-        </div>
-      ))}
-    </div>
+    <>
+      <DeletePhotoModal
+        isDeleteModalVisible={isDeleteModalVisible}
+        onDeletePhoto={handleDelete}
+        setIsDeleteModalVisible={setIsDeleteModalVisible}
+      />
+      <div className="grid grid-cols-2 gap-4">
+        {allUserImages?.data.map((image: IImage, index: number) => (
+          <div key={index} className="relative max-w-[400px]">
+            <Photo image={image} />
+            <Button
+              onClick={() => {
+                setIsDeleteModalVisible(true);
+                setPhotoUrl(image.url);
+              }}
+              disabled={isDeleting}
+              type="danger"
+            >
+              Delete
+            </Button>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
