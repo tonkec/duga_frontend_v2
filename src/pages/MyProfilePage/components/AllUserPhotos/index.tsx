@@ -25,7 +25,9 @@ const DeletePhotoModal = ({
       onClose={() => setIsDeleteModalVisible(false)}
     >
       <h2 className="text-xl text-center"> Jesi li siguran_na da želiš obrisati fotografiju?</h2>
-      <p className="text-center">Brisanje fotografije briše i njezin pripadajući zapis</p>
+      <p className="text-center">
+        Brisanjem fotografije uklanja se i sve što je s njom povezano (npr. komentar ili poruka).
+      </p>
     </ConfirmModal>
   );
 };
