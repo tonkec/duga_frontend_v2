@@ -30,7 +30,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
   const { mutateEditUploadComment } = useEditUploadComment();
-  const { data: imageBlob } = useGetImageBlob(comment.secureImageUrl || comment.imageUrl || '');
+  const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || '');
 
   const {
     handleSubmit,
