@@ -7,7 +7,7 @@ interface DeletePhotoParams {
   url: string;
 }
 
-export const useDeletePhoto = (queryKey: string[] = ['all-user-photos']) => {
+export const useDeletePhoto = (queryKey: string[] = ['uploads']) => {
   const queryClient = useQueryClient();
   const {
     mutate: deletePhoto,

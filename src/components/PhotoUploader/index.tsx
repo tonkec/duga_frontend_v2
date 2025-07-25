@@ -113,7 +113,7 @@ const PhotoUploader = () => {
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
-  const { onUploadPhotos } = useUploadPhotos(userId as string);
+  const { onUploadPhotos } = useUploadPhotos();
   const [newImages, setNewImages] = useState<IImage[]>();
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []

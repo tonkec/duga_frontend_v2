@@ -70,6 +70,7 @@ const AllUserPhotos = () => {
               }}
               disabled={isDeleting}
               type="danger"
+              className="mt-4"
             >
               Delete
             </Button>
