@@ -40,6 +40,7 @@ const AllUserPhotos = () => {
 
   const handleDelete = () => {
     deletePhoto({ url: photoUrl });
+    setIsDeleteModalVisible(false);
   };
 
   if (!allUserImages?.data.length) {
