@@ -135,7 +135,7 @@ const PhotoComments = () => {
     }
 
     socket.on('receive-comment', (data) => {
-      setAllComments((prev) => [...prev, data.data]);
+      setAllComments((prev) => [data.data, ...prev]);
     });
 
     socket.on('remove-comment', (data) => {
