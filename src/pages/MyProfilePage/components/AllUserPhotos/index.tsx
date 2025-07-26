@@ -6,6 +6,7 @@ import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import notFound from '@app/assets/not_found.svg';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { useState } from 'react';
+import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 
 interface IDeletePhotoModalProps {
   setIsDeleteModalVisible: (visible: boolean) => void;
@@ -59,6 +60,10 @@ const AllUserPhotos = () => {
         onDeletePhoto={handleDelete}
         setIsDeleteModalVisible={setIsDeleteModalVisible}
       />
+      <p className="mb-4">
+        Trenutno imaš {allUserImages.data.length} od maximalno {MAXIMUM_NUMBER_OF_IMAGES}{' '}
+        fotografija.
+      </p>
       <div className="grid grid-cols-2 gap-4">
         {allUserImages?.data.map((image: IImage, index: number) => (
           <div key={index} className="relative max-w-[400px]">
