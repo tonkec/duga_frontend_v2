@@ -1,7 +1,6 @@
 import { useParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { useGetSingleImage } from './hooks';
-import { getPhotoUrl } from '@app/utils/getPhotoUrl';
 import Card from '@app/components/Card';
 import PhotoComments from '@app/components/PhotoComments';
 import PhotoLikes from '@app/components/PhotoLikes';
@@ -45,7 +44,7 @@ const PhotoPage = () => {
             {imageBlob ? (
               <img src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
             ) : (
-              <img src={getPhotoUrl(singleImage?.data)} alt="Slika" />
+              <p> Greška</p>
             )}
             <PhotoLikes photoId={photoId} />
           </div>
