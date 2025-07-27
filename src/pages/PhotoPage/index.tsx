@@ -40,14 +40,14 @@ const PhotoPage = () => {
     <AppLayout>
       <Card>
         <div className="lg:flex gap-5 items-start">
-          <div>
-            {imageBlob ? (
+          {imageBlob ? (
+            <div className="max-w-[50%]">
               <img src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
-            ) : (
-              <p> Greška</p>
-            )}
-            <PhotoLikes photoId={photoId} />
-          </div>
+              <PhotoLikes photoId={photoId} />
+            </div>
+          ) : (
+            <p> Greška </p>
+          )}
           <div className="flex-1">
             {singleImage?.data?.description && (
               <p className="mt-2 mb-2 py-2">{singleImage?.data.description}</p>
