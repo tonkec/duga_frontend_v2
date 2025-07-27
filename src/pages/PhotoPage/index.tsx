@@ -41,7 +41,7 @@ const PhotoPage = () => {
       <Card>
         <div className="lg:flex gap-5 items-start">
           {imageBlob ? (
-            <div className="max-w-[50%]">
+            <div className="lg:max-w-[50%] md:max-w-[70%]">
               <img src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
               <PhotoLikes photoId={photoId} />
             </div>
