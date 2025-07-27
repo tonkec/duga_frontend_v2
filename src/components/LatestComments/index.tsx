@@ -16,13 +16,13 @@ interface IComment {
   userId: number;
   taggedUsers?: { id: number; username: string }[];
   imageUrl: string;
-  secureImageUrl?: string;
+  securePhotoUrl?: string;
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
-  const { data: imageBlob } = useGetImageBlob(comment.secureImageUrl || comment.imageUrl);
+  const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || comment.imageUrl);
 
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();

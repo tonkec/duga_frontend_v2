@@ -101,7 +101,12 @@ const CurrentUserMessageTemplate = ({
       </div>
       {showAvatar && (
         <div className="ml-0.5">
-          <UserAvatar avatarFallbackName={userName} userId={String(currentUserId)} color="black" />
+          <UserAvatar
+            className="w-12 h-12 rounded"
+            avatarFallbackName={userName}
+            userId={String(currentUserId)}
+            color="black"
+          />
         </div>
       )}
     </div>

@@ -14,7 +14,7 @@ const Photo = ({ image }: IPhotoProps) => {
   return (
     <img
       src={imageBlob ? URL.createObjectURL(imageBlob) : getImageUrl(image)}
-      alt="user image"
+      alt="fotografija"
       onClick={() => {
         navigate(`/photo/${image.id}`);
       }}
