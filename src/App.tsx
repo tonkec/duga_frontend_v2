@@ -19,6 +19,7 @@ import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
 import { z } from 'zod';
 import { useGetCurrentUser } from './hooks/useGetCurrentUser';
+import { generate } from 'random-words';
 
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -27,7 +28,9 @@ const createUserSchema = z.object({
   auth0Id: z.string().min(1),
 });
 
-const DEFAULT_USERNAME = 'Korisnik';
+const generateDefaultUsername = () => {
+  return generate({ exactly: 1, formatter: (word) => word.toLowerCase() });
+};
 
 function App() {
   const hasBeenCalled = useRef(false);
@@ -51,7 +54,7 @@ function App() {
 
     const input = {
       email: auth0User.email,
-      username: DEFAULT_USERNAME.toLowerCase(),
+      username: generateDefaultUsername(),
       isVerified: auth0User.email_verified,
       auth0Id: auth0User.sub,
     };
