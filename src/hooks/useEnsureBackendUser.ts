@@ -3,6 +3,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
 
+export const generateUniqueUsername = (): string => {
+  const [word] = generate({ exactly: 1, formatter: (w) => w.toLowerCase() });
+  const randomNumber = Math.floor(1000 + Math.random() * 9000);
+  const username = `${word}-${randomNumber}`;
+  return username;
+};
+
 export const useEnsureBackendUser = () => {
   const { getAccessTokenSilently, user: auth0User } = useAuth0();
 
@@ -16,9 +23,7 @@ export const useEnsureBackendUser = () => {
 
       const input = {
         email: auth0User.email,
-        username: generate({
-          exactly: 1,
-        }),
+        username: generateUniqueUsername(),
         isVerified: auth0User.email_verified,
         auth0Id: auth0User.sub,
       };
