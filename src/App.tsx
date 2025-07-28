@@ -2,7 +2,7 @@ import './App.css';
 import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
 import UserFilters from './components/UserFilters';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Paginated from './components/Paginated';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
@@ -13,59 +13,21 @@ import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
 import LatestMessages from './components/LatestMessages';
 import LatestComments from './components/LatestComments';
-import { useCreateUser } from './pages/Login/hooks';
-import { useAuth0 } from '@auth0/auth0-react';
 import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
-import { z } from 'zod';
-import { useGetCurrentUser } from './hooks/useGetCurrentUser';
-
-const createUserSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(1),
-  isVerified: z.boolean(),
-  auth0Id: z.string().min(1),
-});
-
-const DEFAULT_USERNAME = 'Korisnik';
+import { useEnsureBackendUser } from './hooks/useEnsureBackendUser';
 
 function App() {
-  const hasBeenCalled = useRef(false);
-  const { createOrLoginUser } = useCreateUser();
-  const { user: auth0User } = useAuth0();
+  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
-  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const { userChats, isUserChatsLoading } = useGetAllUserChats();
   const [search, setSearch] = useState('');
-
   const [selectValue, setSelectValue] = useState({
     value: 'username',
     label: 'ime',
   });
-
-  const { userChats, isUserChatsLoading } = useGetAllUserChats();
-
-  useEffect(() => {
-    if (!auth0User || hasBeenCalled.current) return;
-
-    const input = {
-      email: auth0User.email,
-      username: DEFAULT_USERNAME.toLowerCase(),
-      isVerified: auth0User.email_verified,
-      auth0Id: auth0User.sub,
-    };
-
-    const parsed = createUserSchema.safeParse(input);
-    if (!parsed.success) {
-      console.error('❌ Invalid user input', parsed.error.flatten());
-      return;
-    }
-
-    createOrLoginUser(parsed.data);
-    // This prevents calling createOrLoginUser twice
-    hasBeenCalled.current = true;
-  }, [auth0User, createOrLoginUser]);
 
   if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
     return (
@@ -76,28 +38,17 @@ function App() {
   }
 
   const allUsersWithoutCurrentUser = allUsers?.data?.filter(
-    (user: IUser) => user.id !== currentUser?.data.id
+    (user: IUser) => user.id !== currentUser?.id
   );
 
   const allVerifiedUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => user.isVerified);
 
   const filteredUsers = allVerifiedUsers?.filter((user: IUser) => {
-    if (selectValue.value === 'username') {
-      return user?.username?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectValue.value === 'gender') {
-      return user?.gender?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectValue.value === 'sexuality') {
-      return user?.sexuality?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectValue.value === 'location') {
-      return user?.location?.toLowerCase().includes(search.toLowerCase());
-    }
-
+    const value = search.toLowerCase();
+    if (selectValue.value === 'username') return user?.username?.toLowerCase().includes(value);
+    if (selectValue.value === 'gender') return user?.gender?.toLowerCase().includes(value);
+    if (selectValue.value === 'sexuality') return user?.sexuality?.toLowerCase().includes(value);
+    if (selectValue.value === 'location') return user?.location?.toLowerCase().includes(value);
     return false;
   });
 
@@ -134,9 +85,7 @@ function App() {
             return (
               <UserCard
                 user={singleEntry}
-                onButtonClick={() => {
-                  navigate(`/user/${singleEntry.id}`);
-                }}
+                onButtonClick={() => navigate(`/user/${singleEntry.id}`)}
                 buttonText="Pogledaj profil 👀"
                 secondButton={
                   <SendMessageButton
