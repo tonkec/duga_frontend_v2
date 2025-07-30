@@ -3,13 +3,14 @@ import Card from '@app/components/Card';
 import Cta from '@app/components/Cta';
 import Photos from '@app/components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
+import { BiSolidCamera, BiSolidFile, BiGlobe } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
 import UserProfileCard from '@app/components/UserProfileCard';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import 'react-tabs/style/react-tabs.css';
 import Loader from '@app/components/Loader';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import AllUserPhotos from './components/AllUserPhotos';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
@@ -36,7 +37,13 @@ const MyProfilePage = () => {
           </Tab>
           <Tab>
             <div className="flex items-center gap-1">
-              Fotografije <BiSolidCamera fontSize={25} />
+              Profilne Fotografije <BiSolidCamera fontSize={25} />
+            </div>
+          </Tab>
+
+          <Tab>
+            <div className="flex items-center gap-1">
+              Sve fotografije <BiGlobe fontSize={25} />
             </div>
           </Tab>
         </TabList>
@@ -84,6 +91,12 @@ const MyProfilePage = () => {
         <TabPanel>
           <Card>
             <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
+          </Card>
+        </TabPanel>
+
+        <TabPanel>
+          <Card>
+            <AllUserPhotos />
           </Card>
         </TabPanel>
       </Tabs>

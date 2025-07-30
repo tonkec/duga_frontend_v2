@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { uploadPhotos } from '@app/api/uploads';
 
-export const useUploadPhotos = (id: string) => {
+export const useUploadPhotos = () => {
   const queryClient = useQueryClient();
   const {
     mutate: onUploadPhotos,
@@ -15,7 +15,7 @@ export const useUploadPhotos = (id: string) => {
     onSuccess: () => {
       toast.success('Fotografije uspješno spremljene', toastConfig);
       queryClient.invalidateQueries({
-        queryKey: ['uploads', 'avatar', id],
+        queryKey: ['uploads'],
       });
     },
     onError: (error) => {

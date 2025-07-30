@@ -1,16 +1,20 @@
-import Avatar from 'react-avatar';
 import { Link } from 'react-router';
 import { IUser } from '@app/components/UserCard';
+import UserAvatar from '../UserAvatar';
 
 interface IProfilePhotoProps {
-  url: string;
   currentUser: IUser;
 }
 
-const ProfilePhoto = ({ url, currentUser }: IProfilePhotoProps) => {
+const ProfilePhoto = ({ currentUser }: IProfilePhotoProps) => {
   return (
     <Link to={'/profile'}>
-      <Avatar color="#F037A5" src={url} size="40" round={true} name={`${currentUser?.username}`} />
+      <UserAvatar
+        userId={String(currentUser.id)}
+        color="#F037A5"
+        avatarFallbackName={`${currentUser?.username}`}
+        className="rounded w-6 h-6"
+      />
     </Link>
   );
 };

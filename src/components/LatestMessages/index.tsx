@@ -2,42 +2,27 @@ import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import Card from '@app/components/Card';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import { useGetUserById } from '@app/hooks/useGetUserById';
-import { S3_URL } from '@app/utils/consts';
 import { IChat, useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import BlobImage from '../PhotoUploader/components/BlobImage';
+import UserAvatar from '../UserAvatar';
+import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
+import { IMessage } from '@app/pages/ChatPage/components/Message';
 
-interface IMessage {
-  id: number;
-  message: {
-    message: string;
-    createdAt: string;
-  };
-  createdAt: string;
-  User: {
-    id: number;
-    firstName: string;
-  };
-  messagePhotoUrl: string;
-  fromUserId: number;
-  chatId: number;
+interface IMessageWrapper {
+  message: IMessage;
 }
 
 const LatestMessageAvatar = ({ userId }: { userId: string }) => {
-  const { allImages } = useGetAllImages(userId);
   const { user } = useGetUserById(userId);
   return (
     <div className="flex gap-2">
-      <Avatar
+      <UserAvatar
+        className="w-6 h-6"
         color="#F037A5"
-        name={`${user?.data?.username}`}
-        src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-        size="40"
-        round={true}
-        className="cursor-pointer"
+        avatarFallbackName={`${user?.data?.username}`}
+        userId={userId}
       />
     </div>
   );
@@ -52,57 +37,43 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   const { is_read } = isMessageReadData?.data || {};
   const isFromSameUser = message.User.id === Number(userId);
 
-  const messageBackgroundColor = () => {
-    if (isFromSameUser) {
-      return 'bg-white text-black hover:bg-blue hover:text-white';
+  const handleClick = () => {
+    if (!isFromSameUser) {
+      onMarkMessagesAsRead(String(message.id));
     }
+    onClick();
+  };
 
-    return is_read
+  const messageBackgroundColor = isFromSameUser
+    ? 'bg-white text-black hover:bg-blue hover:text-white'
+    : is_read
       ? 'bg-white text-black hover:bg-blue hover:text-white'
       : 'bg-blue text-white hover:bg-pink';
-  };
 
-  const getLatestPerson = () => {
-    if (message.User.id === Number(userId)) {
-      return <LatestMessageAvatar userId={String(userId)} />;
+  const getLatestPerson = () => (
+    <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
+  );
+
+  const renderMessageContent = () => {
+    if (message.type === 'gif') {
+      return <GiphyMessage messagePhotoUrl={message.messagePhotoUrl} />;
     }
 
-    return <LatestMessageAvatar userId={String(message.User.id)} />;
-  };
+    if (message.securePhotoUrl) {
+      return <BlobImage imageUrl={message.securePhotoUrl} name="komentar" className="w-32 h-32" />;
+    }
 
-  if (message.messagePhotoUrl) {
-    return (
-      <div
-        onClick={() => {
-          if (message.User.id !== Number(userId)) {
-            onMarkMessagesAsRead(String(message.id));
-          }
-          onClick();
-        }}
-        className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
-      >
-        <div className="flex items-center gap-2 mb-2">
-          {getLatestPerson()}
-          <img src={`${S3_URL}/${message.messagePhotoUrl}`} alt="message" className="h-10 w-10" />
-        </div>
-        <RecordCreatedAt createdAt={message.createdAt} />
-      </div>
-    );
-  }
+    return <span className="text-black">{message.message}</span>;
+  };
 
   return (
     <div
-      onClick={() => {
-        if (message.User.id !== Number(userId)) {
-          onMarkMessagesAsRead(String(message.id));
-        }
-        onClick();
-      }}
+      onClick={handleClick}
       className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
       <div className="flex items-center gap-2 mb-2">
         {getLatestPerson()}
-        <span className="text-black"> {`${message.message}`} </span> <br />
+        {renderMessageContent()}
       </div>
       <RecordCreatedAt createdAt={message.createdAt} />
     </div>
@@ -123,12 +94,11 @@ const LatestMessages = () => {
   });
 
   const sorted = allMessages
-    .filter((m: IMessage) => m.message?.createdAt)
+    .filter((m: IMessageWrapper) => m.message?.createdAt)
     .sort(
-      (a: IMessage, b: IMessage) =>
+      (a: IMessageWrapper, b: IMessageWrapper) =>
         new Date(b.message.createdAt).getTime() - new Date(a.message.createdAt).getTime()
     );
-
   const top3 = sorted.slice(0, 3);
 
   return (

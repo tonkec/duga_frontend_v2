@@ -1,13 +1,11 @@
 import Button from '@app/components/Button';
-import Avatar from 'react-avatar';
 import Card from '@app/components/Card';
 import { getUserBio } from '@app/components/UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import clsx from 'clsx';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
+import UserAvatar from '../UserAvatar';
 export interface IUser {
   avatar: string;
   email: string;
@@ -15,7 +13,7 @@ export interface IUser {
   firstName: string;
   bio: string;
   gender: string;
-  id: string;
+  id: number;
   isVerified: boolean;
   location: string;
   password: string;
@@ -71,7 +69,6 @@ const getUserAge = ({ age }: { age: number }) => {
 };
 
 const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
-  const { allImages } = useGetAllImages(user.id);
   const socket = useSocket();
   const [isOnlineState, setIsOnlineState] = useState(isOnline);
 
@@ -95,15 +92,12 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
 
   return (
     <Card className="h-full">
-      <div className="w-full text-center">
-        <Avatar
-          name={`${user.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="100"
-          textSizeRatio={3}
+      <div className="w-full text-center mb-4">
+        <UserAvatar
+          avatarFallbackName={`${user.username}`}
           color="#2D46B9"
-          className="w-full mb-4"
-          round
+          userId={String(user.id)}
+          size="100"
         />
       </div>
       <div className="flex flex-col justify-between text-center">

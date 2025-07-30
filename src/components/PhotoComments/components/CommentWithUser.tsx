@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 
 interface Inputs {
   comment: string;
@@ -40,6 +41,8 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const { mutateEditUploadComment } = useEditUploadComment();
   const usernames = extractMentionedUsernames(comment.comment);
   const { data: resolvedUsers } = useGetUsersByUsernames(usernames);
+  const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || '');
+
   const {
     handleSubmit,
     control,
@@ -125,9 +128,9 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       <div className="flex gap-2 justify-between items-start">
         <div>
           {comment.comment && <p className="text-lg">{renderFormattedComment(comment.comment)}</p>}
-          {comment.imageUrl && (
+          {imageBlob && (
             <img
-              src={comment.imageUrl}
+              src={URL.createObjectURL(imageBlob)}
               alt="Comment attachment"
               className="max-h-32 max-w-full object-cover rounded"
             />

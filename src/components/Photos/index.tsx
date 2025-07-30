@@ -1,9 +1,9 @@
 import { SetStateAction } from 'react';
 import notFound from '@app/assets/not_found.svg';
 import { ImageDescription } from '@app/components/PhotoUploader';
-import { useNavigate } from 'react-router';
-import { getImageUrl } from '@app/utils/getImageUrl';
 import PhotoLikes from '@app/components/PhotoLikes';
+
+import Photo from './components/Photo';
 export interface IImage {
   createdAt: string;
   description: string;
@@ -14,6 +14,7 @@ export interface IImage {
   updatedAt: string;
   url: string;
   userId: string;
+  securePhotoUrl: string;
 }
 
 interface IPhotosProps {
@@ -23,8 +24,6 @@ interface IPhotosProps {
 }
 
 const Photos = ({ images, notFoundText }: IPhotosProps) => {
-  const navigate = useNavigate();
-
   if (!images || !images.length) {
     return (
       <>
@@ -41,14 +40,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
         {images.map((image: IImage, index: number) => {
           return (
             <div className="max-w-[400px]" key={index}>
-              <img
-                src={getImageUrl(image)}
-                alt="user image"
-                onClick={() => {
-                  navigate(`/photo/${image.id}`);
-                }}
-                className="cursor-pointer w-full object-cover rounded-md"
-              />
+              <Photo image={image} />
               {image.description && <p className="mt-2">{image.description}</p>}
               <PhotoLikes photoId={String(image.id)} />
             </div>

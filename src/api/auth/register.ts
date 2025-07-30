@@ -6,6 +6,6 @@ export const register = async (
   username: string,
   isVerified: boolean
 ) => {
-  const client = apiClient(true);
+  const client = apiClient();
   return client.post(`/register`, { email, username, isVerified, auth0Id });
 };

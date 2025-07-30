@@ -68,7 +68,7 @@ const PaginatedMessages = ({
             key={message.id}
             message={message}
             otherUserId={otherUserId}
-            messagePhotoUrl={message.messagePhotoUrl}
+            messagePhotoUrl={message.securePhotoUrl || message.messagePhotoUrl}
             showAvatar={showAvatar}
           />
         );

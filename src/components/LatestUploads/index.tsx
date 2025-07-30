@@ -6,16 +6,13 @@ interface IUpload {
   id: string;
   url: string;
   userId: string;
+  securePhotoUrl: string;
 }
 
 const LatestUploads = () => {
   const { latestUploads } = useGetLatestUploads();
 
   if (!latestUploads) {
-    return null;
-  }
-
-  if (latestUploads.data.length < 3) {
     return null;
   }
 

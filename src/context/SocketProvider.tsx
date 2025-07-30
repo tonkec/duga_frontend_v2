@@ -2,7 +2,8 @@ import { useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
-import AppLayout from '@app/components/AppLayout';
+import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
@@ -15,21 +16,22 @@ const getBackendUrl = () => {
   return 'http://localhost:8080/';
 };
 
-const URL = getBackendUrl();
-
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
+  const [, saveUserId] = useLocalStorage('userId');
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
-  useEffect(() => {
-    if (!isAuthenticated) return;
+  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
 
+  useEffect(() => {
+    if (!isAuthenticated || isUserLoading || !currentUser) return;
+    saveUserId(currentUser?.id);
     let newSocket: Socket;
 
     const connectSocket = async () => {
       try {
         const token = await getAccessTokenSilently();
 
-        newSocket = io(URL, {
+        newSocket = io(getBackendUrl(), {
           auth: {
             token,
           },
@@ -38,15 +40,15 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
-          console.log('✅ Connected to server with socket ID:', newSocket.id);
+          console.log('✅ Connected to socket:', newSocket.id);
           newSocket.emit('join');
         });
 
         newSocket.on('disconnect', () => {
-          console.log('🔌 Disconnected from server');
+          console.log('🔌 Socket disconnected');
         });
-      } catch (err) {
-        console.error('⚠️ Socket connection error:', err);
+      } catch (error) {
+        console.error('⚠️ Failed to connect socket:', error);
       }
     };
 
@@ -55,18 +57,14 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       newSocket?.disconnect();
     };
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated, isUserLoading, currentUser, getAccessTokenSilently]);
 
   if (!isAuthenticated) {
     return <>{children}</>;
   }
 
   if (isAuthenticated && !socket) {
-    return (
-      <AppLayout>
-        <p>Učitavanje...</p>
-      </AppLayout>
-    );
+    return <p>Učitavanje...</p>;
   }
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
