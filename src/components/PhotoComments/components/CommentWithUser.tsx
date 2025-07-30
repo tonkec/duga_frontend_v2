@@ -100,7 +100,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
               render={({ field }) => (
                 <MentionInput
                   value={field.value}
-                  onChange={(val) => field.onChange(val.trim())}
+                  onChange={(val) => field.onChange(val)}
                   onTagUsersChange={(users) => {
                     setTaggedUsers(users);
                     field.onChange(field.value);
