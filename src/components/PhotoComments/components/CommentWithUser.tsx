@@ -47,6 +47,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
     handleSubmit,
     control,
     formState: { errors, isValid },
+    watch,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
     defaultValues: { comment: comment.comment },
@@ -116,7 +117,11 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
             <Button type="tertiary" onClick={() => setIsEditing(false)}>
               Otkaži
             </Button>
-            <Button type="tertiary" onClick={handleSubmit(onSubmit)}>
+            <Button
+              type="tertiary"
+              onClick={handleSubmit(onSubmit)}
+              disabled={comment.comment === watch('comment')}
+            >
               Spremi
             </Button>
           </div>
