@@ -55,7 +55,7 @@ const daysOfWeek = [
 ];
 
 const cityOptions = [
-  { label: 'Belgrade', value: 'Belgrade' },
+  { label: 'Beograd', value: 'Belgrade' },
   { label: 'Zagreb', value: 'Zagreb' },
   { label: 'Sarajevo', value: 'Sarajevo' },
   { label: 'Skopje', value: 'Skopje' },
