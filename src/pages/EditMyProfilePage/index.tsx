@@ -64,8 +64,6 @@ const cityOptions = [
   { label: 'Ljubljana', value: 'Ljubljana' },
   { label: 'Tirana', value: 'Tirana' },
   { label: 'Sofia', value: 'Sofia' },
-  { label: 'Thessaloniki', value: 'Thessaloniki' },
-  { label: 'Athens', value: 'Athens' },
   { label: 'Split', value: 'Split' },
   { label: 'Rijeka', value: 'Rijeka' },
   { label: 'Osijek', value: 'Osijek' },
@@ -73,9 +71,6 @@ const cityOptions = [
   { label: 'Niš', value: 'Niš' },
   { label: 'Banja Luka', value: 'Banja Luka' },
   { label: 'Mostar', value: 'Mostar' },
-  { label: 'Bitola', value: 'Bitola' },
-  { label: 'Shkodër', value: 'Shkodër' },
-  { label: 'Kotor', value: 'Kotor' },
 ];
 
 type Inputs = {
