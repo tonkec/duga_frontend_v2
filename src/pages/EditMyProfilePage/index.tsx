@@ -54,6 +54,30 @@ const daysOfWeek = [
   { value: 'sunday', label: 'Nedjelja' },
 ];
 
+const cityOptions = [
+  { label: 'Belgrade', value: 'Belgrade' },
+  { label: 'Zagreb', value: 'Zagreb' },
+  { label: 'Sarajevo', value: 'Sarajevo' },
+  { label: 'Skopje', value: 'Skopje' },
+  { label: 'Podgorica', value: 'Podgorica' },
+  { label: 'Pristina', value: 'Pristina' },
+  { label: 'Ljubljana', value: 'Ljubljana' },
+  { label: 'Tirana', value: 'Tirana' },
+  { label: 'Sofia', value: 'Sofia' },
+  { label: 'Thessaloniki', value: 'Thessaloniki' },
+  { label: 'Athens', value: 'Athens' },
+  { label: 'Split', value: 'Split' },
+  { label: 'Rijeka', value: 'Rijeka' },
+  { label: 'Osijek', value: 'Osijek' },
+  { label: 'Novi Sad', value: 'Novi Sad' },
+  { label: 'Niš', value: 'Niš' },
+  { label: 'Banja Luka', value: 'Banja Luka' },
+  { label: 'Mostar', value: 'Mostar' },
+  { label: 'Bitola', value: 'Bitola' },
+  { label: 'Shkodër', value: 'Shkodër' },
+  { label: 'Kotor', value: 'Kotor' },
+];
+
 type Inputs = {
   bio: string;
   age: string;
@@ -81,7 +105,7 @@ type Inputs = {
 const schema = z.object({
   bio: z.string().optional(),
   age: z.string().optional(),
-  location: z.string().optional(),
+  location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
   username: z.string().optional(),
@@ -162,7 +186,8 @@ const EditMyProfilePage = () => {
         username: currentUser.data.username || '',
         bio: currentUser.data.bio || '',
         age: String(currentUser.data.age ?? '0'),
-        location: currentUser.data.location || '',
+        location:
+          cityOptions.find((option) => option.value === currentUser.data.location)?.value || '',
         sexuality: currentUser.data.sexuality || '',
         gender: currentUser.data.gender || '',
         lookingFor:
@@ -189,6 +214,7 @@ const EditMyProfilePage = () => {
   }, [currentUser, reset]);
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
+    console.log(errors);
     if (isValid) {
       updateUserMutation({
         ...data,
@@ -226,12 +252,33 @@ const EditMyProfilePage = () => {
                     {...register('username')}
                     label="Korisničko ime"
                   />
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Lokacija"
-                    label="Lokacija"
-                    {...register('location')}
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <Label>Lokacija</Label>
+                        <Select
+                          isClearable
+                          {...field}
+                          options={cityOptions}
+                          placeholder="Tvoja lokacija otprilike..."
+                          className="mb-2"
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: '#F037A5',
+                              primary: 'black',
+                            },
+                          })}
+                          value={cityOptions.find((option) => option.value === field.value) || null}
+                          onChange={(selectedOption) =>
+                            field.onChange(selectedOption ? selectedOption.value : null)
+                          }
+                        />
+                      </>
+                    )}
                   />
                   <Input
                     type="text"
