@@ -64,9 +64,9 @@ const AllUserPhotos = () => {
         Trenutno imaš {allUserImages.data.length} od maximalno {MAXIMUM_NUMBER_OF_IMAGES}{' '}
         fotografija.
       </p>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="lg:grid grid-cols-3 gap-4 ">
         {allUserImages?.data.map((image: IImage, index: number) => (
-          <div key={index} className="relative max-w-[400px]">
+          <div key={index} className="relative mb-6 lg:mb-0 max-w-[400px]">
             <Photo image={image} />
             <Button
               onClick={() => {
