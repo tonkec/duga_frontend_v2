@@ -103,7 +103,7 @@ const schema = z.object({
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
-  username: z.string().optional(),
+  username: z.string().nonempty('Korisničko ime je obavezno'),
   lookingFor: z.string().optional(),
   relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
@@ -246,6 +246,7 @@ const EditMyProfilePage = () => {
                     placeholder="Korisničko ime"
                     {...register('username')}
                     label="Korisničko ime"
+                    error={errors?.username?.message}
                   />
                   <Controller
                     name="location"

@@ -11,7 +11,12 @@ const Footer = () => {
       >
         Kodiraš? Pomozi nam unaprijediti aplikaciju!
       </a>
-      <p className="text-gray-400 text-center mt-6">Duga. Sva prava pridržana</p>
+      <a className="text-gray-400 text-center mt-2" href="mailto: admin@duga.app">
+        admin@duga.app
+      </a>
+      <p className="text-gray-400 text-center mt-2">
+        Duga &#169; {new Date().getFullYear()}. Sva prava pridržana
+      </p>
     </footer>
   );
 };
