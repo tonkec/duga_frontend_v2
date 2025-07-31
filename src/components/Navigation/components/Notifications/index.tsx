@@ -101,7 +101,7 @@ const NotificationDropdown = ({
         >
           <Button
             type="transparent"
-            className="w-full text-left"
+            className={`w-full text-left ${isMobile ? 'bg-black text-white' : 'bg-transparent'}`}
             onClick={() => {
               mutateMarkAllAsRead();
               setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
