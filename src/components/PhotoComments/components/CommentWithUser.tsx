@@ -2,22 +2,16 @@ import { useState } from 'react';
 import { IComment } from '..';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
-import {
-  useDeleteUploadComment,
-  useEditUploadComment,
-  useGetUsersByUsernames,
-} from '@app/components/PhotoComments/hooks';
+import { useDeleteUploadComment, useEditUploadComment } from '@app/components/PhotoComments/hooks';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FieldError from '@app/components/FieldError';
 import MentionInput from '@app/components/MentionInput';
 import { Link } from 'react-router-dom';
-import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
-
 interface Inputs {
   comment: string;
 }
@@ -26,21 +20,16 @@ const schema = z.object({
   comment: z.string().min(1),
 });
 
-const extractMentionedUsernames = (comment: string): string[] => {
-  const matches = comment.match(/@(\w+)/g) || [];
-  return matches.map((mention) => mention.slice(1));
-};
-
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
+  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>(
+    comment.taggedUsers ?? []
+  );
   const { user: currentUser } = useGetCurrentUser();
   const currentUserId = currentUser?.data.id;
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
   const { mutateEditUploadComment } = useEditUploadComment();
-  const usernames = extractMentionedUsernames(comment.comment);
-  const { data: resolvedUsers } = useGetUsersByUsernames(usernames);
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || '');
 
   const {
@@ -54,11 +43,12 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   });
 
   const onSubmit = (data: Inputs) => {
+    console.count('EDIT');
     if (!isValid) return;
 
     mutateEditUploadComment({
       id: Number(comment.id),
-      comment: data.comment,
+      comment: data.comment.trim(),
       taggedUserIds: taggedUsers.map((user) => Number(user.id)),
     });
 
@@ -68,12 +58,15 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
     if (!cleanText) return null;
-    const parts = cleanText.split(/(@\w+)/g);
+    const parts = cleanText.split(/(@[\w\d]+)/g);
 
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
         const username = part.slice(1);
-        const matchedUser = comment.taggedUsers?.find(
+
+        console.log({ taggedUsers, comment, username });
+
+        const matchedUser = (taggedUsers.length > 0 ? taggedUsers : comment.taggedUsers)?.find(
           (u) => u.username.toLowerCase() === username.toLowerCase()
         );
 
@@ -104,10 +97,9 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
                   onChange={(val) => field.onChange(val)}
                   onTagUsersChange={(users) => {
                     setTaggedUsers(users);
-                    field.onChange(field.value);
                   }}
                   placeholder="Izmijeni komentar"
-                  initialTaggedUsers={resolvedUsers?.data?.users ?? []}
+                  initialTaggedUsers={taggedUsers}
                 />
               )}
             />

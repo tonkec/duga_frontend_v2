@@ -11,7 +11,6 @@ import { BiPaperclip } from 'react-icons/bi';
 import { useRef } from 'react';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
-import { IUser } from '@app/components/UserCard';
 import { toast } from 'react-toastify';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
@@ -73,7 +72,7 @@ const PhotoComments = () => {
   const { allUserImages } = useGetAllUserImages();
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
-  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
+  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>([]);
   const {
     handleSubmit,
     formState: { isValid, errors },
@@ -105,7 +104,7 @@ const PhotoComments = () => {
 
     const formData = new FormData();
     formData.append('uploadId', photoId);
-    formData.append('comment', data?.comment || '');
+    formData.append('comment', data?.comment.trim() || '');
     if (taggedUsers.length > 0) {
       formData.append('taggedUserIds', JSON.stringify(taggedUsers.map((u) => u.id)));
     }
