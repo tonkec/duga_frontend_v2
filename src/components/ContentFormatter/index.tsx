@@ -20,8 +20,8 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
             return (
               <iframe
                 key={i}
-                width="560"
-                height="315"
+                width="360"
+                height="200"
                 src={`https://www.youtube.com/embed/${match[1]}`}
                 title="YouTube video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -38,8 +38,8 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
               <iframe
                 key={i}
                 src={`https://giphy.com/embed/${match[1]}`}
-                width="480"
-                height="270"
+                width="280"
+                height="170"
                 allowFullScreen
               ></iframe>
             );
@@ -54,7 +54,7 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
                 key={i}
                 src={match[1]}
                 alt="content"
-                style={{ maxWidth: '100%', display: 'inline-block' }}
+                style={{ maxWidth: '200px', display: 'inline-block' }}
               />
             );
           }

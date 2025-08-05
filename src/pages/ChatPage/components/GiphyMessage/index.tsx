@@ -8,7 +8,7 @@ const GiphyMessage = ({ messagePhotoUrl }: IGiphyMessageProps) => {
       className="cursor-pointer"
       src={messagePhotoUrl}
       alt="message"
-      width={100}
+      width={200}
       onClick={() => window.open(messagePhotoUrl, '_blank')}
       referrerPolicy="no-referrer"
     />
