@@ -21,7 +21,6 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
         height="200"
         src={`https://www.youtube.com/embed/${videoId}`}
         title="YouTube video"
-        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       ></iframe>
@@ -36,7 +35,6 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
         src={`https://giphy.com/embed/${giphyId}`}
         width="480"
         height="270"
-        frameBorder="0"
         allowFullScreen
       ></iframe>
     );
