@@ -64,7 +64,13 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
           const match = part.match(urlRegex);
           if (match) {
             return (
-              <a key={i} href={match[1]} target="_blank" rel="noopener noreferrer">
+              <a
+                key={i}
+                href={match[1]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
                 {match[1]}
               </a>
             );
