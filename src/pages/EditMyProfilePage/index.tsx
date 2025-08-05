@@ -103,7 +103,13 @@ const schema = z.object({
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
-  username: z.string().nonempty('Korisničko ime je obavezno'),
+  username: z
+    .string()
+    .nonempty('Korisničko ime je obavezno')
+    .regex(
+      /^[a-zA-Z0-9._]+$/,
+      'Korisničko ime smije sadržavati samo slova, brojeve, točke i donje crte'
+    ),
   lookingFor: z.string().optional(),
   relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
