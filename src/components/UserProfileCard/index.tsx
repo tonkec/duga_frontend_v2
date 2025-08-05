@@ -13,6 +13,7 @@ import Loader from '@app/components/Loader';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
+import ContentFormatter from '../ContentFormatter';
 
 const isYouTubeUrl = (url: string) => {
   try {
@@ -164,7 +165,7 @@ const UserProfileCard = ({
       {shouldRenderField(user.bio) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">O meni</h2>
-          <p>{getUserBio(user.bio)}</p>
+          <ContentFormatter text={getUserBio(user.bio)} />
         </div>
       )}
 
@@ -178,42 +179,42 @@ const UserProfileCard = ({
       {shouldRenderField(user.embarasement) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Najsramotnija stvar koja mi se dogodila</h2>
-          <p>{user.embarasement}</p>
+          <ContentFormatter text={user.embarasement} />
         </div>
       )}
 
       {shouldRenderField(user.tooOldFor) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Imam previše godina za...</h2>
-          <p>{user.tooOldFor}</p>
+          <ContentFormatter text={user.tooOldFor} />
         </div>
       )}
 
       {shouldRenderField(user.makesMyDay) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Dan mi je ljepši ako...</h2>
-          <p>{user.makesMyDay}</p>
+          <ContentFormatter text={user.makesMyDay} />
         </div>
       )}
 
       {shouldRenderField(user.spirituality) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Duhovnost/religioznost</h2>
-          <p>{user.spirituality}</p>
+          <ContentFormatter text={user.spirituality} />
         </div>
       )}
 
       {shouldRenderField(user.interests) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Interesi:</h2>
-          <p>{user.interests}</p>
+          <ContentFormatter text={user.interests} />
         </div>
       )}
 
       {shouldRenderField(user.languages) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Jezici koje govorim: </h2>
-          <p>{user.languages}</p>
+          <ContentFormatter text={user.languages} />
         </div>
       )}
 
@@ -242,7 +243,7 @@ const UserProfileCard = ({
       {shouldRenderField(user.ending) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">Za kraj ću reći još</h2>
-          <p>{user.ending}</p>
+          <ContentFormatter text={user.ending} />
         </div>
       )}
     </Card>
