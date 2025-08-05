@@ -24,7 +24,6 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
                 height="315"
                 src={`https://www.youtube.com/embed/${match[1]}`}
                 title="YouTube video"
-                frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
@@ -41,7 +40,6 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
                 src={`https://giphy.com/embed/${match[1]}`}
                 width="480"
                 height="270"
-                frameBorder="0"
                 allowFullScreen
               ></iframe>
             );
@@ -73,7 +71,7 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
           }
         }
 
-        return <span key={i}>{part}</span>; // regular text or spaces
+        return <span key={i}>{part}</span>;
       })}
     </>
   );
