@@ -3,7 +3,7 @@ interface IContentFormatterProps {
 }
 
 const ContentFormatter = ({ text }: IContentFormatterProps) => {
-  const parts = text.split(/(\s+)/); // keep spaces so formatting stays natural
+  const parts = text.split(/(\s+)/);
 
   const youtubeRegex =
     /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
