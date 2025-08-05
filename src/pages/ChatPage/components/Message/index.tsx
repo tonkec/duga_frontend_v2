@@ -4,6 +4,7 @@ import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import UserAvatar from '@app/components/UserAvatar';
 import GiphyMessage from '../GiphyMessage';
+import ContentFormatter from '@app/components/ContentFormatter';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -68,10 +69,10 @@ const MessageContent = ({
       {isGiphy && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {isS3File && imageBlob && (
-        <img src={URL.createObjectURL(imageBlob)} alt="poruka" width={100} />
+        <img src={URL.createObjectURL(imageBlob)} alt="slika" width={100} />
       )}
 
-      {!isGiphy && !isS3File && <p>{message}</p>}
+      {!isGiphy && !isS3File && <ContentFormatter text={message} />}
 
       {error && !isGiphy && <p className="text-red-500">❌ Error loading image</p>}
       <RecordCreatedAt className="text-right" createdAt={createdAt} />
