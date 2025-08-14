@@ -257,7 +257,7 @@ const LoginPage = () => {
               <li className="mt-12">
                 <Button
                   type="transparent"
-                  className="!px-6 !py-2 !text-lg no-underline bg-pink-dark text-white"
+                  className="!px-6 !py-2 !text-lg no-underline !bg-pink-dark text-white"
                   onClick={() => {
                     loginWithRedirect({
                       authorizationParams: {
