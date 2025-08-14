@@ -2,6 +2,7 @@ import Button from '@app/components/Button';
 import { useAuth0 } from '@auth0/auth0-react';
 import Guy from '@app/assets/guy.svg';
 import Girl from '@app/assets/girl.svg';
+import AI from '@app/assets/ai.svg';
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage } from 'react-icons/bi';
 import { useRef } from 'react';
@@ -111,8 +112,8 @@ const LoginPage = () => {
         </div>
       </section>
 
-      <section className="bg-white py-16 pb-32">
-        <h2 className="text-center text-4xl font-bold mb-8">Zašto baš odabrati nas?</h2>
+      <section className="bg-white py-16 pb-32 px-12">
+        <h2 className="text-center text-4xl font-bold mb-8">Zašto odabrati baš nas?</h2>
         <ul className="max-w-2xl mx-auto">
           <li className="bg-blue-dark py-8 px-6 rounded-lg">
             <div className="flex flex-col sm:flex-row items-center gap-5">
@@ -161,6 +162,26 @@ const LoginPage = () => {
             </div>
           </li>
         </ul>
+      </section>
+
+      <section className="bg-white px-12">
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          <div className="max-w-xl">
+            <h2 className="text-3xl font-bold mb-6">AI koji nadgleda sigurnost sadržaja</h2>
+            <p className="text-lg mb-8">
+              Naša platforma koristi napredne AI alate za prepoznavanje i uklanjanje neprimjerenog
+              sadržaja. Bilo da se radi o uvredama, spam porukama ili bilo kojem obliku
+              zlostavljanja, naš AI sustav će ga prepoznati i ukloniti. Na taj način osiguravamo
+              sigurno i ugodno okruženje za sve naše korisnike i korisnice.
+            </p>
+            <Button type="primary" className="!px-4 !py-2 !text-lg">
+              Saznaj više
+            </Button>
+          </div>
+          <div>
+            <img src={AI} alt="" />
+          </div>
+        </div>
       </section>
 
       <section className="gradient text-center pt-12 overflow-hidden">
