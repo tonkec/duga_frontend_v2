@@ -246,12 +246,12 @@ const LoginPage = () => {
               </li>
               <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                <span className="text-white text-lg">Slanje poruka</span>
+                <span className="text-white text-lg">Neograničene poruke</span>
               </li>
 
               <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                <span className="text-white text-lg">Do 5 fotografija</span>
+                <span className="text-white text-lg">Do ukupno 5 fotografija</span>
               </li>
 
               <li className="mt-12">
@@ -299,7 +299,7 @@ const LoginPage = () => {
 
               <li className="text-md text-black">
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                <span className="text-white text-lg">Do 10 fotografija</span>
+                <span className="text-white text-lg">Do ukupno 10 fotografija</span>
               </li>
 
               <li className="mt-12">
