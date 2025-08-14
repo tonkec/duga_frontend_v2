@@ -2,8 +2,9 @@ import Button from '@app/components/Button';
 import { useAuth0 } from '@auth0/auth0-react';
 import Guy from '@app/assets/guy.svg';
 import Girl from '@app/assets/girl.svg';
+import AI from '@app/assets/ai.svg';
 import CookieBanner from '@app/components/CookieBanner';
-import { BiHeart, BiStopwatch, BiMessage } from 'react-icons/bi';
+import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
 
 const getDomainPath = () => {
@@ -31,7 +32,7 @@ const LoginPage = () => {
     <>
       <header className="gradient">
         <CookieBanner />
-        <nav className="transparent py-2 px-4 flex justify-between items-center fixed top-0 left-0 w-full z-10">
+        <nav className="transparent py-6 px-4 flex justify-between items-center fixed top-0 left-0 w-full z-10">
           <Button
             className=""
             type="primary"
@@ -43,13 +44,12 @@ const LoginPage = () => {
               });
             }}
           >
-            Prijavi se!
+            Prijava
           </Button>
         </nav>
 
         <div className="flex py-52 px-8 items-center justify-center">
           <div className="flex flex-col items-center">
-            <h4 className="text-white">Dobrodošao_la na Dugu!</h4>
             <h1 className="mt-2 text-8xl font-bold text-white">Duga</h1>
             <p className="text-center mt-8 text-white text-4xl max-w-xl">
               Razgovaraj, flertaj ili prozuji s queer osobicama s Balkana.
@@ -81,18 +81,18 @@ const LoginPage = () => {
         </div>
       </header>
 
-      <section className="bg-white py-16" ref={learnMoreRef}>
-        <div className="max-w-7xl mx-auto p-4">
+      <section className="bg-white py-16 px-12" ref={learnMoreRef}>
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
 
           <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
-            <div className="bg-blue text-center rounded px-6 py-8 flex-1">
+            <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
               <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
               <p className="text-white">Pregledaj profile i pronađi nekoga tko ti se sviđa.</p>
             </div>
 
-            <div className="bg-blue-dark text-center rounded px-6 py-8 flex-1">
+            <div className="bg-blue-dark text-center rounded-lg px-6 py-8 flex-1">
               <BiStopwatch className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Uštedi si vrijeme i živčeke</h4>
               <p className="text-white">
@@ -100,7 +100,7 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <div className="bg-blue text-center rounded px-6 py-8 flex-1">
+            <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
               <BiMessage className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Pošalji poruku</h4>
               <p className="text-white">
@@ -111,10 +111,10 @@ const LoginPage = () => {
         </div>
       </section>
 
-      <section className="bg-white py-16 pb-32">
-        <h2 className="text-center text-4xl font-bold mb-8">Zašto baš odabrati nas?</h2>
+      <section className="bg-white py-16 pb-32 px-12">
+        <h2 className="text-center text-4xl font-bold mb-8">Zašto odabrati baš nas?</h2>
         <ul className="max-w-2xl mx-auto">
-          <li className="bg-blue-dark py-8 px-6">
+          <li className="bg-blue-dark py-8 px-6 rounded-lg">
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">01.</span>
@@ -130,7 +130,7 @@ const LoginPage = () => {
               </div>
             </div>
           </li>
-          <li className="gradient py-8 px-6 mt-2">
+          <li className="gradient py-8 px-6 mt-2 rounded-lg">
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">02.</span>
@@ -144,7 +144,7 @@ const LoginPage = () => {
             </div>
           </li>
 
-          <li className="bg-blue-dark py-8 px-6 mt-2">
+          <li className="bg-blue-dark py-8 px-6 rounded-lg mt-2">
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">03.</span>
@@ -163,21 +163,161 @@ const LoginPage = () => {
         </ul>
       </section>
 
-      <section className="gradient text-center pt-12 overflow-hidden">
+      <section className="bg-white px-12">
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          <div className="max-w-xl">
+            <h2 className="text-3xl font-bold mb-6">AI nadgleda sigurnost sadržaja</h2>
+            <p className="text-lg mb-8">
+              Naša platforma koristi napredne AI alate za prepoznavanje i uklanjanje neprimjerenog
+              sadržaja. Bilo da se radi o uvredama, spam porukama ili bilo kojem obliku
+              zlostavljanja, naš AI sustav će ga prepoznati i ukloniti. Na taj način osiguravamo
+              sigurno i ugodno okruženje za sve naše korisnike i korisnice.
+            </p>
+            <Button
+              type="primary"
+              className="!px-4 !py-2 !text-lg"
+              onClick={() => {
+                window.open('https://aws.amazon.com/rekognition/', '_blank');
+              }}
+            >
+              Saznaj više
+            </Button>
+          </div>
+          <div>
+            <img src={AI} alt="" />
+          </div>
+        </div>
+      </section>
+
+      <section className="gradient text-center pt-12 overflow-hidden px-12">
         <div className="flex items-end justify-center">
           <div className="sm:w-1/4 -mb-4 -ml-24 transparent hidden lg:block">
             <img src={Guy} alt="Guy" />
           </div>
-          <div className="flex flex-col text-left px-6 pb-6">
+          <div className="flex flex-col text-left pb-6">
             <h3 className="text-4xl text-white font-bold mb-4">Pridruži nam se danas!</h3>
             <p className="text-white mb-8">
               Iskoristi sve prednosti naše platforme i pronađi svoju srodnu dušu.
               <br />
               Postani član naše zajednice. Zaljubi se u trenu i pronađi ljubav svog života.
             </p>
-            <Button type="primary" className="!px-6 !py-4 !text-xl max-w-md">
+            <Button
+              type="primary"
+              className="!px-6 !py-4 !text-xl max-w-md"
+              onClick={() => {
+                loginWithRedirect({
+                  authorizationParams: {
+                    redirect_uri: URL,
+                  },
+                });
+              }}
+            >
               Prijavi se
             </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-12 pt-12">
+        <h2 className="text-3xl font-bold mb-6">Cijena</h2>
+
+        <p className="text-lg max-w-2xl">
+          Naša platforma nudi različite planove pretplate kako bi zadovoljila potrebe svih
+          korisnika. Od besplatnog osnovnog plana do premium opcija, imamo nešto za svakoga.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12 mt-12">
+          <div className="bg-pink p-6 rounded-lg">
+            <h3 className="text-2xl font-bold mt-2 mb-4 text-white">Besplatni plan</h3>
+            <h3 className="text-lg text-white mb-12">0€ mjesečno</h3>
+
+            <ul>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
+                <span className="text-white text-lg">Osnovne funkcionalnosti</span>
+              </li>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
+                <span className="text-white text-lg">Mogućnost kreiranja profila</span>
+              </li>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
+                <span className="text-white text-lg">Mogućnost pretraživanja profila</span>
+              </li>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
+                <span className="text-white text-lg">Neograničene poruke</span>
+              </li>
+
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
+                <span className="text-white text-lg">Do ukupno 5 fotografija</span>
+              </li>
+
+              <li className="mt-12">
+                <Button
+                  type="transparent"
+                  className="!px-6 !py-2 !text-lg no-underline bg-pink-dark text-white"
+                  onClick={() => {
+                    loginWithRedirect({
+                      authorizationParams: {
+                        redirect_uri: URL,
+                      },
+                    });
+                  }}
+                >
+                  Odaberi plan unutar aplikacije
+                </Button>
+              </li>
+            </ul>
+          </div>
+
+          <div className="gradient p-6 rounded-lg">
+            <h3 className="text-2xl font-bold mt-2 mb-4 text-white">Premium plan</h3>
+            <h3 className="text-lg text-white mb-12">10€ mjesečno</h3>
+
+            <ul>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
+                <span className="text-white text-lg">Sve značajke osnovnog plana</span>
+              </li>
+
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
+                <span className="text-white text-lg">Mogućnost gledanja posjetitelja profila</span>
+              </li>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
+                <span className="text-white text-lg">
+                  Mogućnost gledanja tko ti je pročitao poruku
+                </span>
+              </li>
+              <li className="text-md text-black mb-3">
+                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
+                <span className="text-white text-lg">Grupni razgovori </span>
+              </li>
+
+              <li className="text-md text-black">
+                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
+                <span className="text-white text-lg">Do ukupno 10 fotografija</span>
+              </li>
+
+              <li className="mt-12">
+                <Button
+                  type="blue"
+                  className="!px-6 !py-2 !text-lg"
+                  onClick={() => {
+                    loginWithRedirect({
+                      authorizationParams: {
+                        redirect_uri: URL,
+                      },
+                    });
+                  }}
+                >
+                  Odaberi plan unutar aplikacije
+                </Button>
+              </li>
+            </ul>
           </div>
         </div>
       </section>
