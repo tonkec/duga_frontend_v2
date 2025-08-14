@@ -1,11 +1,10 @@
 import Button from '@app/components/Button';
 import { useAuth0 } from '@auth0/auth0-react';
-import Image1 from '@app/assets/image1.png';
-import Image2 from '@app/assets/image2.png';
-import Image3 from '@app/assets/image3.png';
-import Image4 from '@app/assets/image4.png';
-import Homepage from '@app/assets/homepage.svg';
+import Guy from '@app/assets/guy.svg';
+import Girl from '@app/assets/girl.svg';
 import CookieBanner from '@app/components/CookieBanner';
+import { BiHeart, BiStopwatch, BiMessage } from 'react-icons/bi';
+import { useRef } from 'react';
 
 const getDomainPath = () => {
   const { hostname } = window.location;
@@ -22,13 +21,17 @@ const URL = getDomainPath();
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
+  const learnMoreRef = useRef<HTMLDivElement>(null);
+
+  const scrollToLearnMore = () => {
+    learnMoreRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
       <header className="gradient">
         <CookieBanner />
-        <nav className="gradient py-2 px-4 flex justify-between items-center fixed top-0 left-0 w-full z-10">
-          <h1 className="text-white">Duga 🏳️‍🌈</h1>
+        <nav className="transparent py-2 px-4 flex justify-between items-center fixed top-0 left-0 w-full z-10">
           <Button
             className=""
             type="primary"
@@ -44,137 +47,159 @@ const LoginPage = () => {
           </Button>
         </nav>
 
-        <div className="flex py-36 px-8 mt-14 items-center justify-center">
+        <div className="flex py-52 px-8 items-center justify-center">
           <div className="flex flex-col items-center">
-            <h1 className="text-8xl font-bold mt-4 text-white">Duga</h1>
-            <p className="text-center mt-8 text-white">
-              Aplikacija za upoznavanje LGBT osoba na Balkanu.
+            <h4 className="text-white">Dobrodošao_la na Dugu!</h4>
+            <h1 className="mt-2 text-8xl font-bold text-white">Duga</h1>
+            <p className="text-center mt-8 text-white text-4xl max-w-xl">
+              Razgovaraj, flertaj ili prozuji s queer osobicama s Balkana.
             </p>
-            <Button
-              type="primary"
-              className="mt-4"
-              onClick={() => {
-                loginWithRedirect({
-                  authorizationParams: {
-                    redirect_uri: URL,
-                  },
-                });
-              }}
-            >
-              Prijavi se!
-            </Button>
+            <div className="flex flex-col sm:flex-row items-center mt-8 gap-4">
+              <Button
+                type="primary"
+                className="!px-6 !py-4 !text-xl w-full sm:w-auto"
+                onClick={() => {
+                  loginWithRedirect({
+                    authorizationParams: {
+                      redirect_uri: URL,
+                    },
+                  });
+                }}
+              >
+                Prijavi se!
+              </Button>
+
+              <Button
+                type="blue"
+                className="!px-6 !py-4 !text-xl w-full sm:w-auto"
+                onClick={scrollToLearnMore}
+              >
+                Saznaj više
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <section className="bg-gray-100 py-16">
+      <section className="bg-white py-16" ref={learnMoreRef}>
         <div className="max-w-7xl mx-auto p-4">
           <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
-          <p className="text-center">Jednostavno i učinkovito!</p>
 
-          <section className="bg-gray-100 py-16">
-            <div className="max-w-7xl mx-auto p-4">
-              <div className="lg:flex items-center mx-auto">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mt-4">1. Potrudi se oko svog profila ✍️ </h2>
-                  <p className="mt-2 max-w-md">
-                    Profil je prva stvar koju korisnici vide kada se prijave. Stoga je važno da
-                    profil bude ispunjen sa što više informacija o tebi. Dodajte svoje slike, opis,
-                    interese i sve ostale informacije koje smatrate relevantnima.
-                  </p>
-                </div>
-
-                <div className="flex-1">
-                  <img src={Image2} alt="Potrudi se oko svog profila" className="rounded-sm mt-8" />
-                </div>
-              </div>
+          <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
+            <div className="bg-blue text-center rounded px-6 py-8 flex-1">
+              <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
+              <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
+              <p className="text-white">Pregledaj profile i pronađi nekoga tko ti se sviđa.</p>
             </div>
-          </section>
 
-          <section className="bg-gray-100 py-16">
-            <div className="max-w-7xl mx-auto p-4">
-              <div className="lg:flex items-center mx-auto">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mt-4">2. Pokaži se na fotkama 📸</h2>
-                  <p className="mt-2 max-w-md">
-                    Tvoje fotke su itekako bitne jer korisnici na temelju njih donose odluku hoće li
-                    ti poslati poruku ili ne. Stoga je važno da imaš što više fotki na profilu.
-                    Fotke trebaju biti kvalitetne i jasne, a najbolje je da su fotke na kojima si
-                    nasmijan_a i opušten_a. Fotke nisu obavezne.
-                  </p>
-                </div>
-
-                <div className="flex-1">
-                  <img src={Image3} alt="Pokaži se na fotkama" className="rounded-sm mt-8" />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <div className="lg:flex items-center mx-auto">
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold mt-4">3. Pretraži korisnike 🔍</h2>
-              <p className="mt-2 max-w-md">
-                Svi korisnici su izlistani prijavljenim userima. Kada se prijaviš, možeš vidjeti
-                profile drugih korisnika te ih zapratiti. Ne vjerujemo u brzinsko svajpanje i
-                robotsko spajanje ljudi na temelju plitkih pitanja. Tako da je potrebno zaista pomno
-                proučiti profile korisnika.
+            <div className="bg-blue-dark text-center rounded px-6 py-8 flex-1">
+              <BiStopwatch className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
+              <h4 className="text-white text-xl mb-2">Uštedi si vrijeme i živčeke</h4>
+              <p className="text-white">
+                Iskoristi naše filtere za brzo pronalaženje idealne osobice.
               </p>
             </div>
 
-            <div className="flex-1">
-              <img src={Image1} alt="Pretraži korisnike" className="rounded-sm mt-8" />
+            <div className="bg-blue text-center rounded px-6 py-8 flex-1">
+              <BiMessage className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
+              <h4 className="text-white text-xl mb-2">Pošalji poruku</h4>
+              <p className="text-white">
+                Pošalji poruku osobi koja ti se sviđa i započni razgovor.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-gray-100 py-16">
-        <div className="max-w-7xl mx-auto p-4">
-          <div className="lg:flex items-center mx-auto">
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold mt-4">4. Pošalji poruku ✉️</h2>
-              <p className="mt-2 max-w-md">
-                Nemoj se ustručavati. Ako ti se sviđa nečiji profil, slobodno im pošalji poruku.
-                Nemoj čekati da ti oni prvi pošalju poruku jer možda čekate jedno na drugo. Budi
-                hrabar_ra! Možda se iz toga rodi nešto lijepo.
-              </p>
+      <section className="bg-white py-16 pb-32">
+        <h2 className="text-center text-4xl font-bold mb-8">Zašto baš odabrati nas?</h2>
+        <ul className="max-w-2xl mx-auto">
+          <li className="bg-blue-dark py-8 px-6">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <div>
+                <span className="text-6xl text-white">01.</span>
+              </div>
+              <div>
+                <h4 className="text-xl text-white">
+                  Jednostavno i brzo povezivanje s queer osobama.
+                </h4>
+                <p className="text-white text-md mt-4">
+                  Naša platforma omogućava ti da se lako povežeš s osobama koje dijele slične
+                  interese i vrijednosti.
+                </p>
+              </div>
             </div>
+          </li>
+          <li className="gradient py-8 px-6 mt-2">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <div>
+                <span className="text-6xl text-white">02.</span>
+              </div>
+              <div>
+                <h4 className="text-xl text-white">Sigurnost i privatnost su na prvom mjestu.</h4>
+                <p className="text-white text-md mt-4">
+                  Osiguravamo zaštitu tvojih podataka i potpunu kontrolu nad svojim profilom.
+                </p>
+              </div>
+            </div>
+          </li>
 
-            <div className="flex-1">
-              <img src={Image4} alt="Pošalji poruku" className="rounded-sm mt-8" />
+          <li className="bg-blue-dark py-8 px-6 mt-2">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <div>
+                <span className="text-6xl text-white">03.</span>
+              </div>
+              <div>
+                <h4 className="text-xl text-white">
+                  Raznolike mogućnosti za komunikaciju i upoznavanje.
+                </h4>
+                <p className="text-white text-md mt-4">
+                  Nudimo različite načine za povezivanje s drugim korisnicima, uključujući chat,
+                  video pozive i grupne razgovore.
+                </p>
+              </div>
             </div>
+          </li>
+        </ul>
+      </section>
+
+      <section className="gradient text-center pt-12 overflow-hidden">
+        <div className="flex items-end justify-center">
+          <div className="sm:w-1/4 -mb-4 -ml-24 transparent hidden lg:block">
+            <img src={Guy} alt="Guy" />
           </div>
-        </div>
-      </section>
-
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto p-4">
-          <h2 className="text-3xl font-bold mt-4 text-center">I to je to!</h2>
-          <p className="text-center mt-2 max-w-lg mx-auto">
-            Upoznaš super osobicu pa se zajedno možete glupirati po planinama.
-          </p>
-
-          <img
-            src={Homepage}
-            alt="Upoznaš super osobicu pa se zajedno možete glupirati po planinama."
-            className="mx-auto mt-12"
-          />
-        </div>
-      </section>
-
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto p-4">
-          <div className="flex flex-col items-center mx-auto">
-            <h2 className="text-4xl font-bold text-center"> Tražimo contributore! </h2>
-            <p className="text-center max-w-xl">
-              Duga je open source aplikacija bazirana na <b>React</b> tehnologijama. U potrazi smo
-              za novim članovima tima. Ako si zainteresiran_a za rad na ovom projektu, slobodno se
-              javi našem adminu{' '}
-              <a className="underline" href="mailto:admin@duga.app">
-                admin@duga.app{' '}
-              </a>
+          <div className="flex flex-col text-left px-6 pb-6">
+            <h3 className="text-4xl text-white font-bold mb-4">Pridruži nam se danas!</h3>
+            <p className="text-white mb-8">
+              Iskoristi sve prednosti naše platforme i pronađi svoju srodnu dušu.
+              <br />
+              Postani član naše zajednice. Zaljubi se u trenu i pronađi ljubav svog života.
             </p>
+            <Button type="primary" className="!px-6 !py-4 !text-xl max-w-md">
+              Prijavi se
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-32 bg-blue text-white">
+        <div className="mx-auto p-4">
+          <div className="flex mx-auto max-w-5xl gap-12 items-center">
+            <div className="flex-1">
+              <h2 className="text-5xl mb-6"> Tražimo contributore! </h2>
+              <p className="text-lg">
+                Duga je open source aplikacija bazirana na <b>React</b> tehnologijama. U potrazi smo
+                za novim članovima_cama tima. Ako si zainteresiran_a za rad na ovom projektu,
+                slobodno se javi našem adminu{' '}
+                <a className="underline" href="mailto:admin@duga.app">
+                  admin@duga.app{' '}
+                </a>
+              </p>
+            </div>
+
+            <div className="w-1/2 hidden lg:block">
+              <img src={Girl} alt="Girl" />
+            </div>
           </div>
         </div>
       </section>
