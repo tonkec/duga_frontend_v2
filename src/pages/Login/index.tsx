@@ -167,7 +167,7 @@ const LoginPage = () => {
       <section className="bg-white px-12">
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="max-w-xl">
-            <h2 className="text-3xl font-bold mb-6">AI koji nadgleda sigurnost sadržaja</h2>
+            <h2 className="text-3xl font-bold mb-6">AI nadgleda sigurnost sadržaja</h2>
             <p className="text-lg mb-8">
               Naša platforma koristi napredne AI alate za prepoznavanje i uklanjanje neprimjerenog
               sadržaja. Bilo da se radi o uvredama, spam porukama ili bilo kojem obliku
