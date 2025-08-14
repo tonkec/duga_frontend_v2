@@ -54,10 +54,10 @@ const LoginPage = () => {
             <p className="text-center mt-8 text-white text-4xl max-w-xl">
               Razgovaraj, flertaj ili prozuji s queer osobicama s Balkana.
             </p>
-            <div className="flex items-center mt-8 gap-4">
+            <div className="flex flex-col sm:flex-row items-center mt-8 gap-4">
               <Button
                 type="primary"
-                className="!px-6 !py-4 !text-xl"
+                className="!px-6 !py-4 !text-xl w-full sm:w-auto"
                 onClick={() => {
                   loginWithRedirect({
                     authorizationParams: {
@@ -68,7 +68,12 @@ const LoginPage = () => {
               >
                 Prijavi se!
               </Button>
-              <Button type="blue" className="!px-6 !py-4 !text-xl" onClick={scrollToLearnMore}>
+
+              <Button
+                type="blue"
+                className="!px-6 !py-4 !text-xl w-full sm:w-auto"
+                onClick={scrollToLearnMore}
+              >
                 Saznaj više
               </Button>
             </div>
@@ -80,7 +85,7 @@ const LoginPage = () => {
         <div className="max-w-7xl mx-auto p-4">
           <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
 
-          <div className="flex flex-wrap justify-center gap-8 mt-8">
+          <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
             <div className="bg-blue text-center rounded px-6 py-8 flex-1">
               <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
@@ -110,7 +115,7 @@ const LoginPage = () => {
         <h2 className="text-center text-4xl font-bold mb-8">Zašto baš odabrati nas?</h2>
         <ul className="max-w-2xl mx-auto">
           <li className="bg-blue-dark py-8 px-6">
-            <div className="flex items-center gap-5">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">01.</span>
               </div>
@@ -126,7 +131,7 @@ const LoginPage = () => {
             </div>
           </li>
           <li className="gradient py-8 px-6 mt-2">
-            <div className="flex items-center gap-5">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">02.</span>
               </div>
@@ -140,7 +145,7 @@ const LoginPage = () => {
           </li>
 
           <li className="bg-blue-dark py-8 px-6 mt-2">
-            <div className="flex items-center gap-5">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">03.</span>
               </div>
@@ -160,7 +165,7 @@ const LoginPage = () => {
 
       <section className="gradient text-center pt-12 overflow-hidden">
         <div className="flex items-end justify-center">
-          <div className="w-1/4 -mb-4 -ml-24 transparent">
+          <div className="sm:w-1/4 -mb-4 -ml-24 transparent hidden lg:block">
             <img src={Guy} alt="Guy" />
           </div>
           <div className="flex flex-col text-left px-6 pb-6">
@@ -192,7 +197,7 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <div className="w-1/2">
+            <div className="w-1/2 hidden lg:block">
               <img src={Girl} alt="Girl" />
             </div>
           </div>
