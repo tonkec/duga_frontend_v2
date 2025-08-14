@@ -13,6 +13,7 @@ import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
+import ContentFormatter from '@app/components/ContentFormatter';
 
 interface Inputs {
   comment: string;
@@ -74,7 +75,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
         }
       }
 
-      return <span key={index}>{part}</span>;
+      return <ContentFormatter key={index} text={part} />;
     });
   };
 
@@ -114,7 +115,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
           {imageBlob && (
             <img
               src={URL.createObjectURL(imageBlob)}
-              alt="Comment attachment"
+              alt="Slika"
               className="max-h-32 max-w-full object-cover rounded"
             />
           )}
