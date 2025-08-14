@@ -86,13 +86,13 @@ const LoginPage = () => {
           <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
 
           <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
-            <div className="bg-blue text-center rounded px-6 py-8 flex-1">
+            <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
               <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
               <p className="text-white">Pregledaj profile i pronađi nekoga tko ti se sviđa.</p>
             </div>
 
-            <div className="bg-blue-dark text-center rounded px-6 py-8 flex-1">
+            <div className="bg-blue-dark text-center rounded-lg px-6 py-8 flex-1">
               <BiStopwatch className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Uštedi si vrijeme i živčeke</h4>
               <p className="text-white">
@@ -100,7 +100,7 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <div className="bg-blue text-center rounded px-6 py-8 flex-1">
+            <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
               <BiMessage className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
               <h4 className="text-white text-xl mb-2">Pošalji poruku</h4>
               <p className="text-white">
@@ -114,7 +114,7 @@ const LoginPage = () => {
       <section className="bg-white py-16 pb-32">
         <h2 className="text-center text-4xl font-bold mb-8">Zašto baš odabrati nas?</h2>
         <ul className="max-w-2xl mx-auto">
-          <li className="bg-blue-dark py-8 px-6">
+          <li className="bg-blue-dark py-8 px-6 rounded-lg">
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">01.</span>
@@ -130,7 +130,7 @@ const LoginPage = () => {
               </div>
             </div>
           </li>
-          <li className="gradient py-8 px-6 mt-2">
+          <li className="gradient py-8 px-6 mt-2 rounded-lg">
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">02.</span>
@@ -144,7 +144,7 @@ const LoginPage = () => {
             </div>
           </li>
 
-          <li className="bg-blue-dark py-8 px-6 mt-2">
+          <li className="bg-blue-dark py-8 px-6 rounded-lg mt-2">
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div>
                 <span className="text-6xl text-white">03.</span>
