@@ -44,7 +44,7 @@ const LoginPage = () => {
               });
             }}
           >
-            Prijavi se odmah
+            Prijava
           </Button>
         </nav>
 
