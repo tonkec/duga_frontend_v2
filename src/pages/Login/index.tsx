@@ -284,13 +284,11 @@ const LoginPage = () => {
 
               <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                <span className="text-white text-lg">Mogućnost gledanja posjetitelja profila</span>
+                <span className="text-white text-lg">Saznaj tko ti gleda profil</span>
               </li>
               <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                <span className="text-white text-lg">
-                  Mogućnost gledanja tko ti je pročitao poruku
-                </span>
+                <span className="text-white text-lg">Saznaj jesu li vidjeli poruku</span>
               </li>
               <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
