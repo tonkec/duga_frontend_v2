@@ -50,7 +50,6 @@ const LoginPage = () => {
 
         <div className="flex py-52 px-8 items-center justify-center">
           <div className="flex flex-col items-center">
-            <h4 className="text-white">Dobrodošao_la na Dugu!</h4>
             <h1 className="mt-2 text-8xl font-bold text-white">Duga</h1>
             <p className="text-center mt-8 text-white text-4xl max-w-xl">
               Razgovaraj, flertaj ili prozuji s queer osobicama s Balkana.
@@ -282,10 +281,7 @@ const LoginPage = () => {
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
                 <span className="text-white text-lg">Sve značajke osnovnog plana</span>
               </li>
-              <li className="text-md text-black mb-3">
-                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                <span className="text-white text-lg">Do 10 fotografija</span>
-              </li>
+
               <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
                 <span className="text-white text-lg">Mogućnost gledanja posjetitelja profila</span>
@@ -296,9 +292,14 @@ const LoginPage = () => {
                   Mogućnost gledanja tko ti je pročitao poruku
                 </span>
               </li>
-              <li className="text-md text-black">
+              <li className="text-md text-black mb-3">
                 <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
                 <span className="text-white text-lg">Grupni razgovori </span>
+              </li>
+
+              <li className="text-md text-black">
+                <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
+                <span className="text-white text-lg">Do 10 fotografija</span>
               </li>
 
               <li className="mt-12">
