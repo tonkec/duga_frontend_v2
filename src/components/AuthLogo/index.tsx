@@ -1,7 +1,8 @@
 import svg from '@app/assets/auth.svg';
+import Image from '../Image';
 
 const AuthLogo = () => {
-  return <img src={svg} />;
+  return <Image src={svg} alt="Auth Logo" />;
 };
 
 export default AuthLogo;
