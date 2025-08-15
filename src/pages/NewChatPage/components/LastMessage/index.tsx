@@ -9,11 +9,7 @@ interface ILastMessageProps {
 
 const LastMessage = ({ message }: ILastMessageProps) => {
   if (message.message) {
-    return (
-      <p className="text-gray-500">
-        <ContentFormatter text={message.message} />
-      </p>
-    );
+    return <ContentFormatter text={message.message} />;
   }
 
   if (message.type === 'gif') {
