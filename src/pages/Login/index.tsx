@@ -6,8 +6,7 @@ import AI from '@app/assets/ai.svg';
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
-import useImage from '@app/hooks/useImage';
-import Loader from '@app/components/Loader';
+import Image from '@app/components/Image';
 
 const getDomainPath = () => {
   const { hostname } = window.location;
@@ -23,9 +22,6 @@ const getDomainPath = () => {
 const URL = getDomainPath();
 
 const LoginPage = () => {
-  const loadingGuy = useImage(Guy);
-  const loadingGirl = useImage(Girl);
-  const loadingAI = useImage(AI);
   const { loginWithRedirect } = useAuth0();
   const learnMoreRef = useRef<HTMLDivElement>(null);
 
@@ -188,14 +184,16 @@ const LoginPage = () => {
               Saznaj više
             </Button>
           </div>
-          <div>{loadingAI ? <Loader /> : <img src={AI} alt="AI" />}</div>
+          <div>
+            <Image src={AI} alt="AI" className="w-full h-auto" />
+          </div>
         </div>
       </section>
 
       <section className="gradient text-center pt-12 overflow-hidden px-12">
         <div className="flex items-end justify-center">
           <div className="sm:w-1/4 -mb-4 -ml-24 transparent hidden lg:block">
-            {loadingGuy ? <Loader /> : <img src={Guy} alt="Guy" />}
+            {<Image src={Guy} alt="Guy" className="w-full h-auto" />}
           </div>
           <div className="flex flex-col text-left pb-6">
             <h3 className="text-4xl text-white font-bold mb-4">Pridruži nam se danas!</h3>
@@ -339,7 +337,7 @@ const LoginPage = () => {
             </div>
 
             <div className="w-1/2 hidden lg:block">
-              {loadingGirl ? <Loader color="#ffffff" /> : <img src={Girl} alt="Girl" />}
+              {<Image src={Girl} alt="AI" className="w-full h-auto" />}
             </div>
           </div>
         </div>
