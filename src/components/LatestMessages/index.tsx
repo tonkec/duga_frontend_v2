@@ -9,6 +9,7 @@ import BlobImage from '../PhotoUploader/components/BlobImage';
 import UserAvatar from '../UserAvatar';
 import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
+import ContentFormatter from '../ContentFormatter';
 
 interface IMessageWrapper {
   message: IMessage;
@@ -63,7 +64,11 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
       return <BlobImage imageUrl={message.securePhotoUrl} name="komentar" className="w-32 h-32" />;
     }
 
-    return <span className="text-black">{message.message}</span>;
+    return (
+      <span className="text-black">
+        <ContentFormatter text={message.message} />
+      </span>
+    );
   };
 
   return (
