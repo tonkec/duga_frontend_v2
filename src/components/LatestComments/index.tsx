@@ -8,6 +8,7 @@ import DOMPurify from 'dompurify';
 import { useGetImageBlob } from '../LatestUploads/hooks';
 import UserAvatar from '../UserAvatar';
 import Image from '../Image';
+import ContentFormatter from '../ContentFormatter';
 
 interface IComment {
   id: number;
@@ -52,7 +53,11 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
         }
       }
 
-      return <span key={index}>{part}</span>;
+      return (
+        <span key={index}>
+          <ContentFormatter text={part} />
+        </span>
+      );
     });
   };
 

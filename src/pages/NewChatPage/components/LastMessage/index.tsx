@@ -1,3 +1,4 @@
+import ContentFormatter from '@app/components/ContentFormatter';
 import BlobImage from '@app/components/PhotoUploader/components/BlobImage';
 import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
@@ -8,7 +9,11 @@ interface ILastMessageProps {
 
 const LastMessage = ({ message }: ILastMessageProps) => {
   if (message.message) {
-    return <p className="text-gray-500">{message.message}</p>;
+    return (
+      <p className="text-gray-500">
+        <ContentFormatter text={message.message} />
+      </p>
+    );
   }
 
   if (message.type === 'gif') {
