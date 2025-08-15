@@ -7,6 +7,7 @@ import { useGetLatestComments } from './hooks';
 import DOMPurify from 'dompurify';
 import { useGetImageBlob } from '../LatestUploads/hooks';
 import UserAvatar from '../UserAvatar';
+import Image from '../Image';
 
 interface IComment {
   id: number;
@@ -63,7 +64,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
       <div className="flex items-center gap-2 mb-2">
         <p className="text-sm">
           {imageBlob ? (
-            <img
+            <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Comment image"
               className="w-36 h-36"

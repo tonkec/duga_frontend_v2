@@ -1,4 +1,5 @@
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
+import Image from '@app/components/Image';
 
 interface IExsitingImageProps {
   imageUrl: string;
@@ -13,7 +14,7 @@ const BlobImage = ({ imageUrl, name, className }: IExsitingImageProps) => {
     return null;
   }
 
-  return <img src={URL.createObjectURL(imageBlob)} alt={name} className={className} />;
+  return <Image src={URL.createObjectURL(imageBlob)} alt={name} className={className} />;
 };
 
 export default BlobImage;

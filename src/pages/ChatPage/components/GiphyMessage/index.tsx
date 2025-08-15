@@ -1,16 +1,17 @@
+import Image from '@app/components/Image';
+
 interface IGiphyMessageProps {
   messagePhotoUrl: string;
 }
 
 const GiphyMessage = ({ messagePhotoUrl }: IGiphyMessageProps) => {
   return (
-    <img
-      className="cursor-pointer"
+    <Image
       src={messagePhotoUrl}
       alt="message"
-      width={200}
+      style={{ width: 200 }}
       onClick={() => window.open(messagePhotoUrl, '_blank')}
-      referrerPolicy="no-referrer"
+      className="cursor-pointer"
     />
   );
 };

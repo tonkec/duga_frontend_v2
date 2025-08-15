@@ -1,3 +1,5 @@
+import Image from '@app/components/Image';
+
 interface IContentFormatterProps {
   text: string;
 }
@@ -50,8 +52,7 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
           const match = part.match(imageRegex);
           if (match) {
             return (
-              <img
-                key={i}
+              <Image
                 src={match[1]}
                 alt="content"
                 style={{ maxWidth: '200px', display: 'inline-block' }}

@@ -2,8 +2,9 @@ import { SetStateAction } from 'react';
 import notFound from '@app/assets/not_found.svg';
 import { ImageDescription } from '@app/components/PhotoUploader';
 import PhotoLikes from '@app/components/PhotoLikes';
-
 import Photo from './components/Photo';
+import Image from '../Image';
+
 export interface IImage {
   createdAt: string;
   description: string;
@@ -27,7 +28,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
   if (!images || !images.length) {
     return (
       <>
-        <img src={notFound} className="mx-auto block max-w-[300px]" />
+        <Image src={notFound} className="mx-auto block max-w-[300px]" alt="Not Found" />
         <h2 className="font-bold mt-5 mb-2 text-center">{notFoundText}</h2>
       </>
     );

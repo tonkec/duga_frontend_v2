@@ -2,6 +2,7 @@ import Avatar from 'react-avatar';
 import { useGetProfilePhoto } from './hooks/useGetProfilePhoto';
 import Loader from '../Loader';
 import { useGetImageBlob } from '../LatestUploads/hooks';
+import Image from '../Image';
 
 interface IUserAvatarProps {
   avatarFallbackName: string;
@@ -30,7 +31,7 @@ const UserAvatar = ({
   }
 
   if (imageBlob) {
-    return <img src={URL.createObjectURL(imageBlob)} alt="Comment image" className={className} />;
+    return <Image src={URL.createObjectURL(imageBlob)} alt="Comment image" className={className} />;
   }
 
   return (

@@ -24,6 +24,7 @@ import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 import Paginated from '../Paginated';
+import Image from '../Image';
 
 const schema = z
   .object({
@@ -307,7 +308,7 @@ const PhotoComments = () => {
 
         {previewUrl && (
           <div className="relative w-fit">
-            <img
+            <Image
               src={previewUrl}
               alt="Preview"
               className="max-w-[150px] rounded-md border border-gray-300"

@@ -5,6 +5,7 @@ import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import UserAvatar from '@app/components/UserAvatar';
 import GiphyMessage from '../GiphyMessage';
 import ContentFormatter from '@app/components/ContentFormatter';
+import Image from '@app/components/Image';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -69,7 +70,7 @@ const MessageContent = ({
       {isGiphy && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {isS3File && imageBlob && (
-        <img src={URL.createObjectURL(imageBlob)} alt="slika" width={200} />
+        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ width: 200 }} />
       )}
 
       {!isGiphy && !isS3File && <ContentFormatter text={message} />}

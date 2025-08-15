@@ -7,6 +7,7 @@ import PhotoLikes from '@app/components/PhotoLikes';
 import Loader from '@app/components/Loader';
 import notFound from '@app/assets/not_found.svg';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
+import Image from '@app/components/Image';
 
 const PhotoPage = () => {
   const { photoId } = useParams();
@@ -28,7 +29,7 @@ const PhotoPage = () => {
       <AppLayout>
         <Card>
           <div className="flex flex-col justify-center items-center max-w-lg mx-auto">
-            <img src={notFound} alt="Not found" />
+            <Image src={notFound} alt="Not found" />
             <p className="text-center">Slika nije pronađena ili je obrisana.</p>
           </div>
         </Card>
@@ -42,7 +43,7 @@ const PhotoPage = () => {
         <div className="lg:flex gap-5 items-start">
           {imageBlob ? (
             <div className="lg:max-w-[50%] md:max-w-[70%]">
-              <img src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
+              <Image src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
               <PhotoLikes photoId={photoId} />
             </div>
           ) : (
