@@ -14,6 +14,7 @@ import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import ContentFormatter from '@app/components/ContentFormatter';
+import Image from '@app/components/Image';
 
 interface Inputs {
   comment: string;
@@ -113,7 +114,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
         <div>
           {comment.comment && <p className="text-lg">{renderFormattedComment(comment.comment)}</p>}
           {imageBlob && (
-            <img
+            <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Slika"
               className="max-h-32 max-w-full object-cover rounded"

@@ -25,6 +25,7 @@ import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
+import Image from '@app/components/Image';
 
 type Inputs = {
   content: string;
@@ -357,12 +358,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           {currentUploadableImage.map((image: File) => {
             return (
               <div key={image.name}>
-                <img
-                  key={image.name}
+                <Image
                   src={URL.createObjectURL(image)}
                   alt={image.name}
-                  width={150}
-                  height={150}
+                  style={{ width: 150, height: 150 }}
                   className="border mt-2"
                 />
                 <Button

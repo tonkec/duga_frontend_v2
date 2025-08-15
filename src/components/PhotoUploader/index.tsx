@@ -16,6 +16,7 @@ import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts'
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import BlobImage from './components/BlobImage';
+import Image from '../Image';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -290,7 +291,7 @@ const PhotoUploader = () => {
                 return (
                   <div key={image.name} className="mb-4 max-w-[400px]">
                     <div className="relative w-full aspect-[1/1] overflow-hidden rounded-md">
-                      <img
+                      <Image
                         src={image.url}
                         alt={image.name}
                         className="absolute top-0 left-0 w-full h-full object-cover"

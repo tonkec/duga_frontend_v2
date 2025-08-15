@@ -1,11 +1,12 @@
 import AppLayout from '@app/components/AppLayout';
 import NotFoundPageSvg from '@app/assets/not_found_page.svg';
+import Image from '@app/components/Image';
 
 const NotFoundPage = () => {
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-center h-full">
-        <img src={NotFoundPageSvg} alt="Not Found Page" className="w-1/2 h-1/2" />
+        <Image src={NotFoundPageSvg} alt="Not Found Page" className="w-1/2 h-1/2" />
         <h1 className="text-2xl font-bold mt-4">Stranica ne postoji.</h1>
       </div>
     </AppLayout>
