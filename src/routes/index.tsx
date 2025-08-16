@@ -15,6 +15,7 @@ import ChatPage from '@app/pages/ChatPage';
 import CookiePolicyPage from '@app/pages/CookiePolicyPage';
 import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
 import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
+import TermsOfUsePage from '@app/pages/RulesPage';
 
 const DugaRoutes = () => {
   return (
@@ -153,6 +154,15 @@ const DugaRoutes = () => {
         element={
           <PageTitle title="Politika privatnosti">
             <PrivacyPolicyPage />
+          </PageTitle>
+        }
+      />
+
+      <Route
+        path="terms-of-use"
+        element={
+          <PageTitle title="Uvjeti korištenja">
+            <TermsOfUsePage />
           </PageTitle>
         }
       />

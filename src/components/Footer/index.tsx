@@ -17,6 +17,12 @@ const Footer = () => {
             Politika privatnosti
           </Link>
         </div>
+
+        <div>
+          <Link to="/terms-of-use" className="text-gray-400 underline">
+            Uvjeti korištenja
+          </Link>
+        </div>
       </div>
 
       <p className="text-gray-400 text-center mt-8">

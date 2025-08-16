@@ -357,6 +357,11 @@ const LoginPage = () => {
                 Politika privatnosti
               </Link>
             </div>
+            <div>
+              <Link to="/terms-of-use" className="text-white underline">
+                Uvjeti korištenja
+              </Link>
+            </div>
           </div>
           <div className="max-w-7xl mx-auto p-4 flex justify-center gap-2">
             <p className="text-center">Duga © {new Date().getFullYear()}</p>
