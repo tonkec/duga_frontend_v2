@@ -25,7 +25,7 @@ const CookieBanner = () => {
         <h2 className="text-xl font-bold mb-4">Kolačići</h2>
         <p className="mb-6">
           Koristimo{' '}
-          <Link to="/cookie-policy" className="text-blue-500 underline">
+          <Link to="/cookie-policy" className="text-blue underline">
             kolačiće
           </Link>{' '}
           za poboljšanje korisničkog iskustva.
