@@ -38,11 +38,6 @@ export default function PrivacyPolicyPage() {
             </a>
           </li>
           <li>
-            <a href="#prijenosi" className="px-3 py-1 border rounded-full hover:bg-gray-100">
-              Prijenosi
-            </a>
-          </li>
-          <li>
             <a href="#pohrana" className="px-3 py-1 border rounded-full hover:bg-gray-100">
               Pohrana
             </a>
