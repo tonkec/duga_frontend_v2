@@ -9,7 +9,6 @@ export default function CookiePolicyPage() {
         </p>
       </header>
 
-      {/* Navigation */}
       <nav className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-10">
         <ul className="flex flex-wrap gap-2 text-sm">
           <li>
@@ -63,7 +62,6 @@ export default function CookiePolicyPage() {
         </ul>
       </nav>
 
-      {/* Što su kolačići */}
       <section id="sto-su-kolacici" className="mb-10 text-black">
         <h2 className="text-2xl font-semibold mb-3">Što su kolačići?</h2>
         <p>
@@ -73,11 +71,9 @@ export default function CookiePolicyPage() {
         </p>
       </section>
 
-      {/* Vrste kolačića */}
       <section id="vrste-kolacica" className="mb-10">
         <h2 className="text-2xl font-semibold mb-3">Koje vrste kolačića koristimo?</h2>
 
-        {/* Nužni */}
         <details open className="mb-4 bg-gray-50  border border-gray-200 rounded-xl p-4">
           <summary className="cursor-pointer font-medium">
             1) Nužni (obvezni) kolačići{' '}
@@ -122,7 +118,6 @@ export default function CookiePolicyPage() {
           </div>
         </details>
 
-        {/* Preferencijski */}
         <details className="mb-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
           <summary className="cursor-pointer font-medium">2) Preferencijski kolačići</summary>
           <p className="mt-3">
@@ -130,7 +125,6 @@ export default function CookiePolicyPage() {
           </p>
         </details>
 
-        {/* Analitički */}
         <details className="mb-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
           <summary className="cursor-pointer font-medium">3) Analitički kolačići</summary>
           <p className="mt-3">
@@ -139,7 +133,6 @@ export default function CookiePolicyPage() {
           </p>
         </details>
 
-        {/* Marketinški */}
         <details className="bg-gray-50 border border-gray-200 rounded-xl p-4">
           <summary className="cursor-pointer font-medium">4) Marketinški/oglasni kolačići</summary>
           <p className="mt-3">
@@ -149,7 +142,6 @@ export default function CookiePolicyPage() {
         </details>
       </section>
 
-      {/* Treće strane */}
       <section id="trece-strane" className="mb-10 text-black">
         <h2 className="text-2xl font-semibold mb-3 text-black">Kolačići trećih strana</h2>
         <ul className="list-disc list-inside space-y-1">
@@ -162,7 +154,6 @@ export default function CookiePolicyPage() {
         </ul>
       </section>
 
-      {/* Promjene */}
       <section id="promjene" className="mb-10 text-black">
         <h2 className="text-2xl font-semibold mb-3">Promjene ove politike</h2>
         <p>
@@ -171,7 +162,6 @@ export default function CookiePolicyPage() {
         </p>
       </section>
 
-      {/* Kontakt */}
       <section id="kontakt" className="mb-10 text-black">
         <h2 className="text-2xl font-semibold mb-3">Kontakt</h2>
         <p>
