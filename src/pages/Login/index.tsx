@@ -338,7 +338,7 @@ const LoginPage = () => {
             </div>
 
             <div className="w-1/2 hidden lg:block">
-              {<Image src={Girl} alt="AI" className="w-full h-auto" />}
+              <Image src={Girl} alt="AI" className="w-full h-auto" />
             </div>
           </div>
         </div>
