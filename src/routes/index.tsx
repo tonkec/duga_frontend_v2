@@ -12,6 +12,7 @@ import VerifyEmailPage from '@app/pages/VerifyEmailPage';
 import SettingsPage from '@app/pages/SettingsPage';
 import { PageTitle } from '@app/components/PageTitle';
 import ChatPage from '@app/pages/ChatPage';
+import CookiePolicyPage from '@app/pages/CookiePolicyPage';
 import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
 
 const DugaRoutes = () => {
@@ -133,6 +134,15 @@ const DugaRoutes = () => {
         element={
           <PageTitle title="Login">
             <LoginPage />
+          </PageTitle>
+        }
+      />
+
+      <Route
+        path="cookie-policy"
+        element={
+          <PageTitle title="Cookie Policy">
+            <CookiePolicyPage />
           </PageTitle>
         }
       />
