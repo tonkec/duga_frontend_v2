@@ -14,6 +14,7 @@ import { PageTitle } from '@app/components/PageTitle';
 import ChatPage from '@app/pages/ChatPage';
 import CookiePolicyPage from '@app/pages/CookiePolicyPage';
 import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
+import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
 
 const DugaRoutes = () => {
   return (
@@ -141,8 +142,17 @@ const DugaRoutes = () => {
       <Route
         path="cookie-policy"
         element={
-          <PageTitle title="Cookie Policy">
+          <PageTitle title="Politika kolačića">
             <CookiePolicyPage />
+          </PageTitle>
+        }
+      />
+
+      <Route
+        path="privacy-policy"
+        element={
+          <PageTitle title="Politika privatnosti">
+            <PrivacyPolicyPage />
           </PageTitle>
         }
       />
