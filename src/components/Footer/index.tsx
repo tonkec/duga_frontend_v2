@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="py-12 flex flex-col justify-end">
       <Divider className="mt-4 mb-4" height={2} />
 
-      <div className="flex justify-center items-center gap-2 mt-4">
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-2 mt-4">
         <div className="text-center">
           <Link to="/cookie-policy" className="text-gray-400 underline">
             Politika kolačića
