@@ -7,6 +7,7 @@ import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
 import Image from '@app/components/Image';
+import { Link } from 'react-router';
 
 const getDomainPath = () => {
   const { hostname } = window.location;
@@ -345,6 +346,11 @@ const LoginPage = () => {
 
       <footer>
         <div className="bg-gray-800 text-white py-4">
+          <div className="max-w-7xl mx-auto p-4 text-center">
+            <Link to="/cookie-policy" className="text-white underline">
+              Politika kolačića
+            </Link>
+          </div>
           <div className="max-w-7xl mx-auto p-4">
             <p className="text-center">Duga © {new Date().getFullYear()}</p>
             <p className="text-center">Sva prava pridržana.</p>
