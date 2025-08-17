@@ -23,8 +23,8 @@ export const useUpdateUser = () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');
     },
-    onError: (err: Error) => {
-      console.log(err);
+    onError: (data: { response: { data: { errors: string[] } } }) => {
+      toast.error(`Greška: ${data?.response.data.errors[0]}`, toastConfig);
     },
   });
 

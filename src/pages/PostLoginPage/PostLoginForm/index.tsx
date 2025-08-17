@@ -41,13 +41,8 @@ export default function PostLoginForm() {
     },
   });
 
-  const onSubmitForm = (data: FormValues) => {
-    updatePostLoginMutation(data);
-  };
-
   const onSubmit = (data: FormValues) => {
-    onSubmitForm?.(data);
-    console.log('FORM DATA →', data);
+    updatePostLoginMutation(data);
   };
 
   return (
@@ -89,11 +84,11 @@ export default function PostLoginForm() {
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4 rounded border-gray-300"
             {...register('acceptPrivacy')}
           />
-          <span className="text-sm">
-            Prihvaćam{' '}
+          <span className="text-sm flex items-center gap-1">
+            <span> Prihvaćam </span>
             <a href="/privacy-policy" className="text-blue-600 underline">
               Politiku privatnosti
             </a>
@@ -105,11 +100,11 @@ export default function PostLoginForm() {
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4 rounded border-gray-300"
             {...register('acceptTerms')}
           />
-          <span className="text-sm">
-            Prihvaćam{' '}
+          <span className="text-sm flex items-center gap-1">
+            <span>Prihvaćam </span>
             <a href="/terms-of-use" className="text-blue-600 underline">
               Pravila upotrebe
             </a>
