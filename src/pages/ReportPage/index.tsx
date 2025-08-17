@@ -87,6 +87,14 @@ export default function ReportPage() {
                     onBlur={field.onBlur}
                     isClearable
                     classNamePrefix="react-select"
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: '#F037A5',
+                        primary: 'black',
+                      },
+                    })}
                   />
                   {errors.problem_type && (
                     <p className="mt-1 text-sm text-red">{errors.problem_type.message}</p>
