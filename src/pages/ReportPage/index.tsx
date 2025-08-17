@@ -9,9 +9,9 @@ import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
 import { useLocalStorage } from '@uidotdev/usehooks';
 
-const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string;
+const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string;
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string;
 
 type Option = { value: string; label: string };
 
@@ -25,43 +25,45 @@ const problemOptions: Option[] = [
 ];
 
 const FormSchema = z.object({
-  problem_type: z.string().min(2, 'Odaberi vrstu problema.'),
+  problem_type: z.enum(['bug', 'abuse', 'inappropriate', 'account', 'billing', 'other'], {
+    required_error: 'Odaberi vrstu problema.',
+    invalid_type_error: 'Odaberi vrstu problema.',
+  }),
   message: z.string().min(10, 'Poruka mora imati barem 10 znakova.'),
+  userId: z.number().optional(),
 });
 
-type FormValues = {
-  problem_type: { value: string; label: string } | null;
-  message: string;
-  userId: string;
-};
+type FormValues = z.infer<typeof FormSchema>;
 
 async function sendReport(data: FormValues) {
+  const label =
+    problemOptions.find((o) => o.value === data.problem_type)?.label ?? data.problem_type;
   return emailjs.send(
     SERVICE_ID,
     TEMPLATE_ID,
-    { problem_type: data.problem_type, message: data.message, userId: data.userId },
+    { problem_type: label, message: data.message, user_id: data.userId ?? '' },
     { publicKey: PUBLIC_KEY }
   );
 }
 
 export default function ReportPage() {
-  const [userId] = useLocalStorage<string>('userId', '');
+  const [userId] = useLocalStorage<number>('userId', 0);
+
   const {
     register,
     handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
     control,
-  } = useForm<FormValues>({ resolver: zodResolver(FormSchema) });
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+  });
 
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationKey: ['report-problem'],
     mutationFn: sendReport,
-    onSuccess: () => reset(),
   });
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
     mutate({ ...data, userId });
   };
 
@@ -70,30 +72,32 @@ export default function ReportPage() {
       <h2 className="text-xl font-semibold text-center mb-6">Prijavi problem</h2>
 
       <Card className="max-w-lg w-full mx-auto">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6" noValidate>
           <div>
-            <label htmlFor="problem_type" className="block text-sm font-medium text-gray-700">
-              Vrsta problema
-            </label>
-
+            <label className="block text-sm font-medium text-gray-700 mb-1">Vrsta problema</label>
             <Controller
               name="problem_type"
               control={control}
               render={({ field }) => (
-                <Select
-                  options={problemOptions}
-                  value={field.value}
-                  onChange={(opt) => field.onChange(opt as Option | null)}
-                />
+                <>
+                  <Select
+                    options={problemOptions}
+                    value={problemOptions.find((opt) => opt.value === field.value) ?? null}
+                    onChange={(opt) => field.onChange((opt as Option | null)?.value ?? '')}
+                    onBlur={field.onBlur}
+                    isClearable
+                    classNamePrefix="react-select"
+                  />
+                  {errors.problem_type && (
+                    <p className="mt-1 text-sm text-red">{errors.problem_type.message}</p>
+                  )}
+                </>
               )}
             />
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-              Poruka
-            </label>
-
+            <label className="block text-sm font-medium text-gray-700 mb-1">Poruka</label>
             <TextArea
               placeholder="Opiši problem što detaljnije…"
               className="mt-1 block w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -105,6 +109,7 @@ export default function ReportPage() {
           <button type="submit" disabled={isPending || isSubmitting}>
             {isPending ? 'Slanje…' : 'Pošalji'}
           </button>
+
           <div role="status" aria-live="polite" className="text-sm">
             {isSuccess && <p className="text-green">Hvala! Tvoja prijava je poslana.</p>}
             {isError && <p className="text-red">Nešto nije u redu. Pokušaj ponovno.</p>}
