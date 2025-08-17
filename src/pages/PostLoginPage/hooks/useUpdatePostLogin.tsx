@@ -1,0 +1,32 @@
+import { IPostLoginProps, updatePostLoginData } from '@app/api/users';
+import { toastConfig } from '@app/configs/toast.config';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
+
+export const useUpdateUser = () => {
+  const navigate = useNavigate();
+  const {
+    mutate: updatePostLoginMutation,
+    isPending: isUpdateUserPending,
+    isError: isUpdateUserError,
+    isSuccess: isUpdateUserSuccess,
+  } = useMutation({
+    mutationFn: ({ age, acceptPrivacy, acceptTerms, username }: IPostLoginProps) =>
+      updatePostLoginData({
+        age,
+        acceptPrivacy,
+        acceptTerms,
+        username,
+      }),
+    onSuccess: () => {
+      toast.success('Uspješno spremljeni podaci!', toastConfig);
+      navigate('/profile');
+    },
+    onError: (err: Error) => {
+      console.log(err);
+    },
+  });
+
+  return { isUpdateUserPending, isUpdateUserError, isUpdateUserSuccess, updatePostLoginMutation };
+};

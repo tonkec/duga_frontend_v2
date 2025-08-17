@@ -17,6 +17,7 @@ import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
 import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
 import TermsOfUsePage from '@app/pages/RulesPage';
 import ReportPage from '@app/pages/ReportPage';
+import PostLoginPage from '@app/pages/PostLoginPage';
 
 const DugaRoutes = () => {
   return (
@@ -148,6 +149,15 @@ const DugaRoutes = () => {
         element={
           <PageTitle title="Login">
             <LoginPage />
+          </PageTitle>
+        }
+      />
+
+      <Route
+        path="post-login"
+        element={
+          <PageTitle title="Post Login">
+            <PostLoginPage />
           </PageTitle>
         }
       />
