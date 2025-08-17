@@ -85,7 +85,7 @@ export default function PostLoginForm() {
             className="h-4 w-4 rounded border-gray-300"
             {...register('acceptPrivacy')}
           />
-          <span className="text-sm flex items-center gap-1">
+          <span className="text-sm flex flex-col sm:flex-row sm:items-center gap-1">
             <span> Prihvaćam </span>
             <a href="/privacy-policy" className="text-blue-600 underline">
               Politiku privatnosti
@@ -101,7 +101,7 @@ export default function PostLoginForm() {
             className="h-4 w-4 rounded border-gray-300"
             {...register('acceptTerms')}
           />
-          <span className="text-sm flex items-center gap-1">
+          <span className="text-sm flex flex-col sm:flex-row sm:items-center gap-1">
             <span>Prihvaćam </span>
             <a href="/terms-of-use" className="text-blue-600 underline">
               Pravila upotrebe
