@@ -50,8 +50,6 @@ export default function PostLoginForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="max-w-lg mx-auto space-y-5 bg-white border border-gray-200 rounded-2xl p-6"
     >
-      <h2 className="text-xl font-semibold">Osnovne informacije</h2>
-
       <div>
         <label htmlFor="username" className="block text-sm font-medium text-gray-700">
           Korisničko ime
@@ -60,7 +58,7 @@ export default function PostLoginForm() {
         <Input
           type="text"
           className="mt-1 block w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="npr. duga_user"
+          placeholder="npr. jazavac123"
           {...register('username')}
         />
         {errors.username && <p className="mt-1 text-sm text-red">{errors.username.message}</p>}

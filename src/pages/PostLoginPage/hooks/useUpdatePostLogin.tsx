@@ -21,7 +21,7 @@ export const useUpdateUser = () => {
       }),
     onSuccess: () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
-      navigate('/profile');
+      navigate('/');
     },
     onError: (data: { response: { data: { errors: string[] } } }) => {
       toast.error(`Greška: ${data?.response.data.errors[0]}`, toastConfig);
