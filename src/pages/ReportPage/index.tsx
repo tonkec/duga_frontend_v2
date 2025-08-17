@@ -106,7 +106,11 @@ export default function ReportPage() {
             {errors.message && <p className="mt-1 text-sm text-red">{errors.message.message}</p>}
           </div>
 
-          <button type="submit" disabled={isPending || isSubmitting}>
+          <button
+            type="submit"
+            disabled={isPending || isSubmitting}
+            className="bg-pink text-white px-4 py-2 rounded hover:bg-pink-dark"
+          >
             {isPending ? 'Slanje…' : 'Pošalji'}
           </button>
 
