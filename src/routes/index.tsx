@@ -16,6 +16,7 @@ import CookiePolicyPage from '@app/pages/CookiePolicyPage';
 import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
 import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
 import TermsOfUsePage from '@app/pages/RulesPage';
+import ReportPage from '@app/pages/ReportPage';
 
 const DugaRoutes = () => {
   return (
@@ -118,6 +119,17 @@ const DugaRoutes = () => {
           <AuthGuard>
             <PageTitle title="Postavke">
               <SettingsPage />
+            </PageTitle>
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/report"
+        element={
+          <AuthGuard>
+            <PageTitle title="Prijavi problem">
+              <ReportPage />
             </PageTitle>
           </AuthGuard>
         }

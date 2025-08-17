@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
@@ -12,6 +12,7 @@ import Loader from '@app/components/Loader';
 import SendMessageButton from '@app/components/SendMessageButton';
 
 const OtherUserPage = () => {
+  const navigate = useNavigate();
   const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
@@ -75,10 +76,10 @@ const OtherUserPage = () => {
               </Cta>
               <Cta
                 className="mt-4"
-                buttonText="Zaprati"
-                subtitle="Zaprati ovu zanimljivu osobicu."
-                title="Zaprati me!"
-                onClick={() => {}}
+                buttonText="Prijavi problem"
+                subtitle="Ako primijetiš bilo kakav problem s ovim profilom, slobodno ga prijavi putem forme."
+                title="Postoji li problem?"
+                onClick={() => navigate(`/report/`)}
               />
             </div>
           </div>

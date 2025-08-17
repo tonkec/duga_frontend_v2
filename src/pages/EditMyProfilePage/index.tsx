@@ -215,7 +215,6 @@ const EditMyProfilePage = () => {
   }, [currentUser, reset]);
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
-    console.log(errors);
     if (isValid) {
       updateUserMutation({
         ...data,
