@@ -346,7 +346,7 @@ const LoginPage = () => {
 
       <footer>
         <div className="bg-gray-800 text-white py-8">
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-2">
             <div>
               <Link to="/cookie-policy" className="text-white underline">
                 Politika kolačića
