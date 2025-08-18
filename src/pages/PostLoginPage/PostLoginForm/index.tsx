@@ -90,7 +90,6 @@ export default function PostLoginForm() {
             <a href="/privacy-policy" className="text-blue-600 underline">
               Politiku privatnosti
             </a>
-            .
           </span>
         </label>
         {errors.acceptPrivacy && <p className="text-sm text-red">{errors.acceptPrivacy.message}</p>}
@@ -106,7 +105,6 @@ export default function PostLoginForm() {
             <a href="/terms-of-use" className="text-blue-600 underline">
               Pravila upotrebe
             </a>
-            .
           </span>
         </label>
         {errors.acceptTerms && <p className="text-sm text-red">{errors.acceptTerms.message}</p>}
