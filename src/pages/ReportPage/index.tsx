@@ -20,7 +20,7 @@ const problemOptions: Option[] = [
   { value: 'abuse', label: 'Zlouporaba / uznemiravanje' },
   { value: 'inappropriate', label: 'Neprimjeren sadržaj' },
   { value: 'account', label: 'Račun / pristup' },
-  { value: 'billing', label: 'Plaćanje / naplata' },
+  // { value: 'billing', label: 'Plaćanje / naplata' },
   { value: 'other', label: 'Ostalo' },
 ];
 
