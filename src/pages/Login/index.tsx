@@ -12,11 +12,11 @@ import { Link } from 'react-router';
 const getDomainPath = () => {
   const { hostname } = window.location;
   if (hostname.includes('duga.app')) {
-    return 'https://duga.app/post-login';
+    return 'https://duga.app/';
   } else if (hostname.includes('staging--dugaprod.netlify.app')) {
-    return 'https://staging--dugaprod.netlify.app/post-login';
+    return 'https://staging--dugaprod.netlify.app';
   } else {
-    return 'http://localhost:5173/post-login';
+    return 'http://localhost:5173';
   }
 };
 
