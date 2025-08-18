@@ -1,9 +1,10 @@
+// src/routes/DugaRoutes.tsx
 import { Routes, Route } from 'react-router';
+import { publicRoutes, privateRoutes, onboardedRoutes } from './config';
+import { PageTitle } from '@app/components/PageTitle';
+import NotFoundPage from '@app/pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
 import PostLoginGuard from './guards/PostLoginGuard';
-import { publicRoutes, privateRoutes, onboardedRoutes } from './config';
-import NotFoundPage from '@app/pages/NotFoundPage';
-import { PageTitle } from '@app/components/PageTitle';
 
 const DugaRoutes = () => {
   return (
@@ -13,7 +14,7 @@ const DugaRoutes = () => {
       ))}
 
       {privateRoutes.map((r) => (
-        <Route key={r.path} path={r.path} element={<AuthGuard>{r.element}</AuthGuard>} />
+        <Route key={r.path} path={r.path} element={r.element} />
       ))}
 
       <Route

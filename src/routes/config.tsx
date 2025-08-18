@@ -1,4 +1,4 @@
-// routes/config.tsx
+// src/routes/config.tsx
 import App from '@app/App';
 import LoginPage from '@app/pages/Login';
 import MyProfilePage from '@app/pages/MyProfilePage';
@@ -17,8 +17,9 @@ import TermsOfUsePage from '@app/pages/RulesPage';
 import ReportPage from '@app/pages/ReportPage';
 import PostLoginPage from '@app/pages/PostLoginPage';
 import { PageTitle } from '@app/components/PageTitle';
+import { AuthGuard } from './guards/AuthGuard';
+import PostLoginFormGuard from './guards/PostLoginFormGuard';
 
-// 🟢 Public routes
 export const publicRoutes = [
   {
     path: 'verify-email',
@@ -62,19 +63,22 @@ export const publicRoutes = [
   },
 ];
 
-// 🔵 Logged-in but NOT necessarily onboarded
+// Logged-in but NOT necessarily onboarded — and block onboarded users
 export const privateRoutes = [
   {
     path: 'post-login',
     element: (
-      <PageTitle title="Post Login">
-        <PostLoginPage />
-      </PageTitle>
+      <AuthGuard>
+        <PostLoginFormGuard />
+        <PageTitle title="Post Login">
+          <PostLoginPage />
+        </PageTitle>
+      </AuthGuard>
     ),
   },
 ];
 
-// 🟣 Logged-in AND onboarded
+// Logged-in AND onboarded only
 export const onboardedRoutes = [
   {
     path: '/',
