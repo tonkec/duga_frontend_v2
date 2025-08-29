@@ -69,10 +69,11 @@ export const privateRoutes = [
     path: 'post-login',
     element: (
       <AuthGuard>
-        <PostLoginFormGuard />
-        <PageTitle title="Post Login">
-          <PostLoginPage />
-        </PageTitle>
+        <PostLoginFormGuard>
+          <PageTitle title="Post Login">
+            <PostLoginPage />
+          </PageTitle>
+        </PostLoginFormGuard>
       </AuthGuard>
     ),
   },

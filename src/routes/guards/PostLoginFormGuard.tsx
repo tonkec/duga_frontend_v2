@@ -1,8 +1,8 @@
-import { Navigate, Outlet } from 'react-router';
+import { Navigate } from 'react-router';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Loader from '@app/components/Loader';
 
-const PostLoginFormGuard = () => {
+const PostLoginFormGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, isUserLoading } = useGetCurrentUser();
 
   if (isUserLoading) {
@@ -13,7 +13,7 @@ const PostLoginFormGuard = () => {
     return <Navigate to="/" />;
   }
 
-  return <Outlet />;
+  return <>{children}</>;
 };
 
 export default PostLoginFormGuard;
