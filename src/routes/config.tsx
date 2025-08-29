@@ -1,4 +1,3 @@
-// src/routes/config.tsx
 import App from '@app/App';
 import LoginPage from '@app/pages/Login';
 import MyProfilePage from '@app/pages/MyProfilePage';
