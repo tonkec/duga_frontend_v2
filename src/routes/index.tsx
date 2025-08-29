@@ -1,180 +1,39 @@
-import { Route, Routes } from 'react-router';
-import App from '@app/App';
-import LoginPage from '@app/pages/Login';
-import MyProfilePage from '@app/pages/MyProfilePage';
-import EditMyProfilePage from '@app/pages/EditMyProfilePage';
-import OtherUserPage from '@app/pages/OtherUserPage';
-import PhotoPage from '@app/pages/PhotoPage';
-import NewChatPage from '@app/pages/NewChatPage';
+// src/routes/DugaRoutes.tsx
+import { Routes, Route } from 'react-router';
+import { publicRoutes, privateRoutes, onboardedRoutes } from './config';
+import { PageTitle } from '@app/components/PageTitle';
 import NotFoundPage from '@app/pages/NotFoundPage';
 import { AuthGuard } from './guards/AuthGuard';
-import VerifyEmailPage from '@app/pages/VerifyEmailPage';
-import SettingsPage from '@app/pages/SettingsPage';
-import { PageTitle } from '@app/components/PageTitle';
-import ChatPage from '@app/pages/ChatPage';
-import CookiePolicyPage from '@app/pages/CookiePolicyPage';
-import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
-import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
-import TermsOfUsePage from '@app/pages/RulesPage';
-import ReportPage from '@app/pages/ReportPage';
+import PostLoginGuard from './guards/PostLoginGuard';
 
 const DugaRoutes = () => {
   return (
     <Routes>
+      {publicRoutes.map((r) => (
+        <Route key={r.path} path={r.path} element={r.element} />
+      ))}
+
+      {privateRoutes.map((r) => (
+        <Route key={r.path} path={r.path} element={r.element} />
+      ))}
+
+      <Route
+        element={
+          <AuthGuard>
+            <PostLoginGuard />
+          </AuthGuard>
+        }
+      >
+        {onboardedRoutes.map((r) => (
+          <Route key={r.path} path={r.path} element={r.element} />
+        ))}
+      </Route>
+
       <Route
         path="*"
         element={
-          <AuthGuard>
-            <PageTitle title="Stranica nije pronađena">
-              <NotFoundPage />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/"
-        element={
-          <AuthGuard>
-            <PageTitle title="Početna">
-              <App />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <AuthGuard>
-            <PageTitle title="Moj profil">
-              <OnlineStatusWrapper isCurrentUser>
-                <MyProfilePage />
-              </OnlineStatusWrapper>
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/edit"
-        element={
-          <AuthGuard>
-            <PageTitle title="Uredi profil">
-              <EditMyProfilePage />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/user/:userId"
-        element={
-          <AuthGuard>
-            <PageTitle title="Profil korisnika">
-              <OnlineStatusWrapper>
-                <OtherUserPage />
-              </OnlineStatusWrapper>
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/photo/:photoId"
-        element={
-          <AuthGuard>
-            <PageTitle title="Fotografija">
-              <PhotoPage />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/new-chat"
-        element={
-          <AuthGuard>
-            <PageTitle title="Novi chat">
-              <NewChatPage />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/chat/:chatId"
-        element={
-          <AuthGuard>
-            <PageTitle title="Chat">
-              <OnlineStatusWrapper>
-                <ChatPage />
-              </OnlineStatusWrapper>
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/settings"
-        element={
-          <AuthGuard>
-            <PageTitle title="Postavke">
-              <SettingsPage />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="/report"
-        element={
-          <AuthGuard>
-            <PageTitle title="Prijavi problem">
-              <ReportPage />
-            </PageTitle>
-          </AuthGuard>
-        }
-      />
-
-      <Route
-        path="verify-email"
-        element={
-          <PageTitle title="Verifikacija emaila">
-            <VerifyEmailPage />
-          </PageTitle>
-        }
-      />
-      <Route
-        path="login"
-        element={
-          <PageTitle title="Login">
-            <LoginPage />
-          </PageTitle>
-        }
-      />
-
-      <Route
-        path="cookie-policy"
-        element={
-          <PageTitle title="Politika kolačića">
-            <CookiePolicyPage />
-          </PageTitle>
-        }
-      />
-
-      <Route
-        path="privacy-policy"
-        element={
-          <PageTitle title="Politika privatnosti">
-            <PrivacyPolicyPage />
-          </PageTitle>
-        }
-      />
-
-      <Route
-        path="terms-of-use"
-        element={
-          <PageTitle title="Uvjeti korištenja">
-            <TermsOfUsePage />
+          <PageTitle title="Stranica nije pronađena">
+            <NotFoundPage />
           </PageTitle>
         }
       />

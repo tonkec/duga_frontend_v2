@@ -23,6 +23,14 @@ export interface IUserUpdateProps {
   languages: string;
   ending: string;
 }
+
+export interface IPostLoginProps {
+  username: string;
+  age: number;
+  acceptPrivacy: boolean;
+  acceptTerms: boolean;
+}
+
 export const getAllUsers = async () => {
   const client = apiClient();
   return client.get(`/users/get-users/`);
@@ -61,4 +69,9 @@ export const getUserOnlineStatus = async () => {
 export const getAllUserPhotos = async () => {
   const client = apiClient();
   return client.get(`/uploads/user-photos/`);
+};
+
+export const updatePostLoginData = async (data: IPostLoginProps) => {
+  const client = apiClient();
+  return client.post(`/users/post-login`, { data: data });
 };
