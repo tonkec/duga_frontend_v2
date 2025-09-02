@@ -177,7 +177,6 @@ const EditMyProfilePage = () => {
   useEffect(() => {
     if (currentUser) {
       reset({
-        username: currentUser.data.username || '',
         bio: currentUser.data.bio || '',
         age: String(currentUser.data.age ?? '0'),
         location:
@@ -211,7 +210,6 @@ const EditMyProfilePage = () => {
     if (isValid) {
       updateUserMutation({
         ...data,
-        username: data?.username?.toLowerCase() || '',
       });
     }
   };
@@ -242,7 +240,7 @@ const EditMyProfilePage = () => {
                     type="text"
                     className="mb-2 !bg-gray-200"
                     placeholder="Korisničko ime"
-                    {...register('username')}
+                    value={currentUser?.data.username}
                     label="Korisničko ime"
                     disabled
                   />
