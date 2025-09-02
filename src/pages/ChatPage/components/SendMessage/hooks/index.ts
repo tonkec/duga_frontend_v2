@@ -8,13 +8,16 @@ type BackendError = {
   errors: { reason: string }[];
 };
 
-export const useUploadMessageImage = () => {
+export const useUploadMessageImage = (emitImageToSockets: () => void) => {
   const {
     mutate: uploadMessageImage,
     isError,
     isSuccess,
   } = useMutation({
     mutationFn: (data: FormData) => uploadMessagePhotos(data),
+    onSuccess: () => {
+      emitImageToSockets();
+    },
     onError: (error: AxiosError<BackendError>) => {
       const errors = error?.response?.data?.errors;
       toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);

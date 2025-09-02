@@ -160,9 +160,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         });
       });
     }
+
+    setCurrentUploadableImage(null);
+    reset({ content: '', files: null });
   };
 
-  const { uploadMessageImage } = useUploadMessageImage();
+  const { uploadMessageImage } = useUploadMessageImage(emitImageToSockets);
 
   const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -186,10 +189,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       formData.append('avatars', cleanedFile);
     });
 
-    emitImageToSockets();
     uploadMessageImage(formData);
-    setCurrentUploadableImage(null);
-    reset();
   };
 
   const onMessageSubmit = (data: Inputs) => {
