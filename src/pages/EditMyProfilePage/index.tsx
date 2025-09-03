@@ -103,13 +103,6 @@ const schema = z.object({
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
-  username: z
-    .string()
-    .nonempty('Korisničko ime je obavezno')
-    .regex(
-      /^[a-zA-Z0-9._]+$/,
-      'Korisničko ime smije sadržavati samo slova, brojeve, točke i donje crte'
-    ),
   lookingFor: z.string().optional(),
   relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
@@ -184,7 +177,6 @@ const EditMyProfilePage = () => {
   useEffect(() => {
     if (currentUser) {
       reset({
-        username: currentUser.data.username || '',
         bio: currentUser.data.bio || '',
         age: String(currentUser.data.age ?? '0'),
         location:
@@ -218,7 +210,6 @@ const EditMyProfilePage = () => {
     if (isValid) {
       updateUserMutation({
         ...data,
-        username: data?.username?.toLowerCase() || '',
       });
     }
   };
@@ -247,11 +238,11 @@ const EditMyProfilePage = () => {
                 <div className="col-span-2">
                   <Input
                     type="text"
-                    className="mb-2"
+                    className="mb-2 !bg-gray-200"
                     placeholder="Korisničko ime"
-                    {...register('username')}
+                    value={currentUser?.data.username}
                     label="Korisničko ime"
-                    error={errors?.username?.message}
+                    disabled
                   />
                   <Controller
                     name="location"

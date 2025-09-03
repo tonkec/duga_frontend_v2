@@ -6,7 +6,6 @@ export interface IUserUpdateProps {
   gender: string;
   location: string;
   age: string;
-  username: string;
   lookingFor: string;
   relationshipStatus: string;
   cigarettes: boolean;
