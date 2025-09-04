@@ -8,6 +8,8 @@ import {
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useSocket } from '@app/context/useSocket';
+import { AxiosError } from 'axios';
+import { BackendError } from '@app/pages/ChatPage/components/SendMessage/hooks';
 
 export const useEditUploadComment = () => {
   const socket = useSocket();
@@ -49,8 +51,9 @@ export const useAddUploadComment = () => {
       toast.success('Komentar uspješno dodan.', toastConfig);
       socket.emit('send-comment', data.data);
     },
-    onError: () => {
-      toast.error('Došlo je do greške.', toastConfig);
+    onError: (error: AxiosError<BackendError>) => {
+      const errors = error?.response?.data?.errors;
+      toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);
     },
   });
 
