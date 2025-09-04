@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { AxiosError } from 'axios';
 
-type BackendError = {
+export type BackendError = {
   errors: { reason: string }[];
 };
 
