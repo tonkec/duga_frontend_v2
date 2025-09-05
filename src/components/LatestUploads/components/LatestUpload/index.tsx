@@ -19,8 +19,9 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
     <div className="flex flex-col gap-1">
       {imageBlob && (
         <div
-          className="h-[300px] bg-center bg-cover bg-no-repeat"
+          className="h-[300px] bg-center bg-cover bg-no-repeat cursor-pointer"
           style={{ backgroundImage: `url(${URL.createObjectURL(imageBlob)})` }}
+          onClick={() => navigate(`/photo/${upload.id}`)}
         ></div>
       )}
 
