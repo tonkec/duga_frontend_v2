@@ -53,6 +53,12 @@ export const apiClient = (token?: string): AxiosInstance => {
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
+      if (error.response?.status >= 500) {
+        console.error('🔥 Backend error:', error.response);
+      }
+      if (error.code === 'ERR_NETWORK') {
+        console.error('🚨 Network error: backend down?');
+      }
       const errorMessage = getErrorMessage(error);
       if (errorMessage) {
         console.error('API Error:', errorMessage);
