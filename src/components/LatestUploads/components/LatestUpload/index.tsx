@@ -17,18 +17,11 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
 
   return (
     <div className="flex flex-col gap-1">
-      {imageBlob ? (
-        <img
-          className="border rounded cursor-pointer"
-          src={URL.createObjectURL(imageBlob)}
-          alt={upload.id}
-          onClick={() => {
-            navigate(`/photo/${upload.id}`);
-          }}
-          style={{ maxWidth: '100%' }}
-        />
-      ) : (
-        <p>Loading image...</p>
+      {imageBlob && (
+        <div
+          className="h-[300px] bg-center bg-cover bg-no-repeat"
+          style={{ backgroundImage: `url(${URL.createObjectURL(imageBlob)})` }}
+        ></div>
       )}
 
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">

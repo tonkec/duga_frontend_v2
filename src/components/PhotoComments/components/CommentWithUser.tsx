@@ -12,6 +12,9 @@ import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
+import ContentFormatter from '@app/components/ContentFormatter';
+import Image from '@app/components/Image';
+
 interface Inputs {
   comment: string;
 }
@@ -79,7 +82,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
         }
       }
 
-      return <span key={index}>{part}</span>;
+      return <ContentFormatter key={index} text={part} />;
     });
   };
 
@@ -123,13 +126,13 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
 
     return (
       <div className="flex gap-2 justify-between items-start">
-        <div>
+        <div className="flex-1">
           {comment.comment && <p className="text-lg">{renderFormattedComment(comment.comment)}</p>}
           {imageBlob && (
-            <img
+            <Image
               src={URL.createObjectURL(imageBlob)}
-              alt="Comment attachment"
-              className="max-h-32 max-w-full object-cover rounded"
+              alt="Slika"
+              className="max-h-64 w-full object-cover rounded"
             />
           )}
         </div>
@@ -153,7 +156,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
       ) : (
-        <p>od: {user?.data.username || `User ${comment.userId}`}</p>
+        <p className="mt-3">od: {user?.data.username || `User ${comment.userId}`}</p>
       )}
     </div>
   );

@@ -21,7 +21,7 @@ const LatestUploads = () => {
       <h2 className="mb-2">📸 Nedavno dodane fotke</h2>
 
       <Card>
-        <div className="md:grid md:grid-cols-3 gap-6">
+        <div className="lg:grid lg:grid-cols-3 gap-6">
           {latestUploads?.data.map((upload: IUpload) => (
             <LatestUpload key={upload.id} upload={upload} />
           ))}

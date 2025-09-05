@@ -7,6 +7,8 @@ import { useGetLatestComments } from './hooks';
 import DOMPurify from 'dompurify';
 import { useGetImageBlob } from '../LatestUploads/hooks';
 import UserAvatar from '../UserAvatar';
+import Image from '../Image';
+import ContentFormatter from '../ContentFormatter';
 
 interface IComment {
   id: number;
@@ -51,37 +53,42 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
         }
       }
 
-      return <span key={index}>{part}</span>;
+      return (
+        <span key={index}>
+          <ContentFormatter text={part} />
+        </span>
+      );
     });
   };
 
   return (
     <div
-      className="flex flex-col gap-1 border-b p-4 hover:bg-gray-100 transition cursor-pointer"
+      className="flex gap-6 border-b p-4 hover:bg-gray-100 transition cursor-pointer justify-between"
       onClick={onClick}
     >
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-col  gap-2 mb-2">
         <p className="text-sm">
           {imageBlob ? (
-            <img
+            <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Comment image"
-              className="w-36 h-36"
+              className="w-xl rounded"
               onClick={() => navigate(`/user/${comment.userId}`)}
             />
           ) : (
             <span className="text-gray-500">{renderFormattedComment(comment.comment)}</span>
           )}
         </p>
-      </div>
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <UserAvatar
-          color="black"
-          userId={String(comment.userId)}
-          avatarFallbackName={user?.data.username}
-          className="w-6 h-6"
-        />
-        <RecordCreatedAt createdAt={comment.createdAt} />
+
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <UserAvatar
+            color="black"
+            userId={String(comment.userId)}
+            avatarFallbackName={user?.data.username}
+            className="w-6 h-6"
+          />
+          <RecordCreatedAt createdAt={comment.createdAt} />
+        </div>
       </div>
     </div>
   );
@@ -103,7 +110,7 @@ const LatestComments = () => {
   return (
     <div className="col-span-2">
       <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
-      <Card className="!p-0 overflow-hidden">
+      <Card className="!p-0 overflow-hidden max-w-lg">
         {comments.map((comment: IComment) => (
           <LatestComment
             key={comment.id}

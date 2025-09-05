@@ -1,5 +1,3 @@
-import { truncateString } from '@app/utils/truncateString';
-
 export const getLookingForTranslation = (lookingFor: string) => {
   switch (lookingFor) {
     case 'friendship':
@@ -80,5 +78,5 @@ export const getUserBio = (bio: string) => {
     return 'Biografija još nije postavljena.';
   }
 
-  return truncateString(bio, 100);
+  return bio;
 };

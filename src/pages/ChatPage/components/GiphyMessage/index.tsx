@@ -3,16 +3,7 @@ interface IGiphyMessageProps {
 }
 
 const GiphyMessage = ({ messagePhotoUrl }: IGiphyMessageProps) => {
-  return (
-    <img
-      className="cursor-pointer"
-      src={messagePhotoUrl}
-      alt="message"
-      width={100}
-      onClick={() => window.open(messagePhotoUrl, '_blank')}
-      referrerPolicy="no-referrer"
-    />
-  );
+  return <img src={messagePhotoUrl} alt="gif" style={{ maxWidth: '100px' }} />;
 };
 
 export default GiphyMessage;

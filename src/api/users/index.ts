@@ -6,7 +6,6 @@ export interface IUserUpdateProps {
   gender: string;
   location: string;
   age: string;
-  username: string;
   lookingFor: string;
   relationshipStatus: string;
   cigarettes: boolean;
@@ -23,6 +22,14 @@ export interface IUserUpdateProps {
   languages: string;
   ending: string;
 }
+
+export interface IPostLoginProps {
+  username: string;
+  age: number;
+  acceptPrivacy: boolean;
+  acceptTerms: boolean;
+}
+
 export const getAllUsers = async () => {
   const client = apiClient();
   return client.get(`/users/get-users/`);
@@ -66,4 +73,9 @@ export const getAllUserPhotos = async () => {
 export const getUsersByUsernames = async (usernames: string[]) => {
   const client = apiClient();
   return client.post('/users/by-usernames', { usernames });
+};
+
+export const updatePostLoginData = async (data: IPostLoginProps) => {
+  const client = apiClient();
+  return client.post(`/users/post-login`, { data: data });
 };

@@ -4,6 +4,8 @@ import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import UserAvatar from '@app/components/UserAvatar';
 import GiphyMessage from '../GiphyMessage';
+import ContentFormatter from '@app/components/ContentFormatter';
+import Image from '@app/components/Image';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -51,7 +53,13 @@ interface IMessageContentProps {
   messageType: string;
 }
 
-const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
+const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2 max-w-[50vw]';
+
+const unwrapUploadsProxy = (url?: string) => {
+  if (!url) return '';
+  const prefix = '/uploads/files/';
+  return url.startsWith(prefix) ? decodeURIComponent(url.slice(prefix.length)) : url;
+};
 
 const MessageContent = ({
   messagePhotoUrl,
@@ -61,17 +69,23 @@ const MessageContent = ({
 }: IMessageContentProps) => {
   const isS3File = messageType === 'file';
   const isGiphy = messageType === 'gif';
-  const { data: imageBlob, error } = useGetImageBlob(messagePhotoUrl || '');
+
+  // For GIFs, use the unwrapped external URL directly
+  const externalGifUrl = isGiphy ? unwrapUploadsProxy(messagePhotoUrl || '') : '';
+
+  // Only fetch blobs for S3 files through your API
+  const proxiedUrl = !isGiphy && isS3File ? messagePhotoUrl || '' : '';
+  const { data: imageBlob, error } = useGetImageBlob(proxiedUrl);
 
   return (
     <div className={messageStyles}>
-      {isGiphy && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
+      {isGiphy && externalGifUrl && <GiphyMessage messagePhotoUrl={externalGifUrl} />}
 
-      {isS3File && imageBlob && (
-        <img src={URL.createObjectURL(imageBlob)} alt="poruka" width={100} />
+      {!isGiphy && isS3File && imageBlob && (
+        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '50vw' }} />
       )}
 
-      {!isGiphy && !isS3File && <p>{message}</p>}
+      {!isGiphy && !isS3File && <ContentFormatter text={message} />}
 
       {error && !isGiphy && <p className="text-red-500">❌ Error loading image</p>}
       <RecordCreatedAt className="text-right" createdAt={createdAt} />

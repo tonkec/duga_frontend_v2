@@ -7,6 +7,7 @@ import notFound from '@app/assets/not_found.svg';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { useState } from 'react';
 import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import Image from '@app/components/Image';
 
 interface IDeletePhotoModalProps {
   setIsDeleteModalVisible: (visible: boolean) => void;
@@ -47,7 +48,7 @@ const AllUserPhotos = () => {
   if (!allUserImages?.data.length) {
     return (
       <>
-        <img src={notFound} className="mx-auto block max-w-[300px]" />
+        <Image src={notFound} alt="Nema fotografija" className="mx-auto block max-w-[300px]" />
         <h2 className="font-bold mt-5 mb-2 text-center">Nema fotografija</h2>
       </>
     );

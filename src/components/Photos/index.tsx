@@ -2,8 +2,10 @@ import { SetStateAction } from 'react';
 import notFound from '@app/assets/not_found.svg';
 import { ImageDescription } from '@app/components/PhotoUploader';
 import PhotoLikes from '@app/components/PhotoLikes';
-
 import Photo from './components/Photo';
+import Image from '../Image';
+import { useNavigate } from 'react-router';
+
 export interface IImage {
   createdAt: string;
   description: string;
@@ -24,10 +26,11 @@ interface IPhotosProps {
 }
 
 const Photos = ({ images, notFoundText }: IPhotosProps) => {
+  const navigate = useNavigate();
   if (!images || !images.length) {
     return (
       <>
-        <img src={notFound} className="mx-auto block max-w-[300px]" />
+        <Image src={notFound} className="mx-auto block max-w-[300px]" alt="Not Found" />
         <h2 className="font-bold mt-5 mb-2 text-center">{notFoundText}</h2>
       </>
     );
@@ -40,7 +43,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
         {images.map((image: IImage, index: number) => {
           return (
             <div className="max-w-[400px]" key={index}>
-              <Photo image={image} />
+              <Photo image={image} onClick={() => navigate(`/photo/${image.id}`)} />
               {image.description && <p className="mt-2">{image.description}</p>}
               <PhotoLikes photoId={String(image.id)} />
             </div>
