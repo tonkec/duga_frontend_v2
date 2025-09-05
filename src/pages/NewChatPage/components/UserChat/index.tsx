@@ -35,23 +35,27 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
         onClick();
       }}
     >
-      <div className="flex items-center">
-        <UserAvatar
-          color="#2D46B9"
-          avatarFallbackName={`${user.username}`}
-          userId={String(user.id)}
-        />
-        <div className="ml-4">
-          <h1 className="text-lg font-semibold">{user.username}</h1>
-        </div>
-
+      <div className="flex flex-col items-center">
         {lastMessage && (
           <div className="ml-4">
             <LastMessage message={lastMessage} />
           </div>
         )}
+        <div className="flex mt-4 items-center">
+          <UserAvatar
+            color="#2D46B9"
+            avatarFallbackName={`${user.username}`}
+            userId={String(user.id)}
+          />
+          <div className="ml-4">
+            <h1 className="text-lg font-semibold">{user.username}</h1>
+          </div>
+        </div>
       </div>
-      <BiChevronRight className="w-6 h-6 text-gray-500" color={is_read ? '#000' : '#fff'} />
+      <BiChevronRight
+        className="w-6 h-6 text-gray-500"
+        color={isMarkedAsRead() ? '#000' : '#fff'}
+      />
     </div>
   );
 };
