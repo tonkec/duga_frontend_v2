@@ -61,7 +61,13 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     }
 
     if (message.securePhotoUrl) {
-      return <BlobImage imageUrl={message.securePhotoUrl} name="komentar" className="w-xl" />;
+      return (
+        <BlobImage
+          imageUrl={message.securePhotoUrl}
+          name="komentar"
+          className="w-xl rounded max-h-[400px]"
+        />
+      );
     }
 
     return (

@@ -16,7 +16,7 @@ const LastMessage = ({ message }: ILastMessageProps) => {
     return <GiphyMessage messagePhotoUrl={message.messagePhotoUrl} />;
   }
 
-  return <BlobImage imageUrl={message.securePhotoUrl} name="poruka" className="h-16 w-16" />;
+  return <BlobImage imageUrl={message.securePhotoUrl} name="poruka" className="h-64 w-64" />;
 };
 
 export default LastMessage;
