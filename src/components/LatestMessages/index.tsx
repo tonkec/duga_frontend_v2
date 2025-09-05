@@ -61,7 +61,13 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     }
 
     if (message.securePhotoUrl) {
-      return <BlobImage imageUrl={message.securePhotoUrl} name="komentar" className="w-32 h-32" />;
+      return (
+        <BlobImage
+          imageUrl={message.securePhotoUrl}
+          name="komentar"
+          className="w-xl rounded max-h-[400px]"
+        />
+      );
     }
 
     return (
@@ -76,11 +82,13 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
       onClick={handleClick}
       className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
-      <div className="flex items-center gap-2 mb-2">
-        {getLatestPerson()}
+      <div className="mb-2">
         {renderMessageContent()}
+        <div className="mt-4 flex items-center gap-2">
+          {getLatestPerson()}
+          <RecordCreatedAt createdAt={message.createdAt} />
+        </div>
       </div>
-      <RecordCreatedAt createdAt={message.createdAt} />
     </div>
   );
 };
@@ -109,7 +117,7 @@ const LatestMessages = () => {
   return (
     <div className="col-span-2">
       <h2 className="mb-2">📬 Tvoje nedavne poruke</h2>
-      <Card className="!p-0 overflow-hidden">
+      <Card className="!p-0 overflow-hidden max-w-xl">
         {top3.map(({ message }: { message: IMessage }, index: number) => (
           <LatestMessage
             key={index}

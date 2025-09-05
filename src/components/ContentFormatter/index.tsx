@@ -51,13 +51,7 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
         if (imageRegex.test(part)) {
           const match = part.match(imageRegex);
           if (match) {
-            return (
-              <Image
-                src={match[1]}
-                alt="content"
-                style={{ maxWidth: '200px', display: 'inline-block' }}
-              />
-            );
+            return <Image src={match[1]} alt="content" style={{ display: 'inline-block' }} />;
           }
         }
 
