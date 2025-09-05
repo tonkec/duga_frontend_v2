@@ -6,7 +6,7 @@ const Fallback = () => {
         <p className="text-white text-md mt-2">Kontaktiraj nas putem maila 👇</p>
         <a
           href="mailto:admin@duga.app"
-          className="inline-block bg-blue max-w-lg px-2 py-2 text-white mt-4"
+          className="inline-block bg-blue max-w-lg px-2 py-2 text-white mt-4 rounded"
         >
           admin@duga.app
         </a>
