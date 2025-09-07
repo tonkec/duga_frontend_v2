@@ -12,7 +12,7 @@ interface IUpload {
 const LatestUploads = () => {
   const { latestUploads } = useGetLatestUploads();
 
-  if (!latestUploads) {
+  if (!latestUploads?.data.length) {
     return null;
   }
 
