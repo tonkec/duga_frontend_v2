@@ -165,10 +165,19 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     reset({ content: '', files: null });
   };
 
-  const { uploadMessageImage } = useUploadMessageImage(emitImageToSockets);
+  const clearSelectedFiles = () => {
+    setCurrentUploadableImage(null);
+    setValue('files', null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setImageTimestamp(String(Date.now()));
+  };
+
+  const { uploadMessageImage } = useUploadMessageImage(emitImageToSockets, clearSelectedFiles);
 
   const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+
+    if (!currentUploadableImage?.length) return;
 
     const files = (e.target as HTMLFormElement).avatars.files as FileList;
     if (!files || files.length === 0) return;
