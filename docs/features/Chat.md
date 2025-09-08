@@ -113,3 +113,7 @@
 - As a **keyboard user**, I should be able to **focus** the input and **send** a message (e.g., Enter key).
 
 > Note: Full WCAG compliance and screen reader semantics are intentionally **out of scope** for now.
+
+## AWS Rekognition
+
+- See file `Chat_Uploads_Rekognition.md`
