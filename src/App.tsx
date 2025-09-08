@@ -52,7 +52,7 @@ function App() {
     return false;
   });
 
-  const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
+  const renderedUsers = search ? filteredUsers : allVerifiedUsers;
   const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
 
   return (
