@@ -15,6 +15,7 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
+import RecordCreatedAt from '@app/components/RecordCreatedAt';
 
 interface Inputs {
   comment: string;
@@ -141,15 +142,21 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {renderContent()}
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
+      ) : currentUserId === comment.userId ? (
+        <p className="mt-3 text-sm">
+          <span>Tvoj komentar</span>
+          <RecordCreatedAt createdAt={comment.createdAt} />
+        </p>
       ) : (
-        <p>
-          od:{' '}
+        <p className="text-sm mt-3 ">
+          Kaže{' '}
           <span
-            className="mt-3 text-blue underline cursor-pointer"
+            className="text-blue underline cursor-pointer"
             onClick={() => navigate(`/user/${comment.userId}`)}
           >
             {user?.data.username}
           </span>
+          <RecordCreatedAt createdAt={comment.createdAt} />
         </p>
       )}
     </div>
