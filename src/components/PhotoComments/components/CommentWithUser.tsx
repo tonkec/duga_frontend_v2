@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FieldError from '@app/components/FieldError';
 import MentionInput from '@app/components/MentionInput';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
@@ -25,6 +25,7 @@ const schema = z.object({
 });
 
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
   const { user: currentUser } = useGetCurrentUser();
@@ -140,8 +141,18 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {renderContent()}
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
+      ) : currentUserId === comment.userId ? (
+        <p className="mt-3">Komentar od tebe</p>
       ) : (
-        <p className="mt-3">od: {user?.data.username || `User ${comment.userId}`}</p>
+        <p>
+          Komentar od:{' '}
+          <span
+            className="mt-3 text-blue underline cursor-pointer"
+            onClick={() => navigate(`/user/${comment.userId}`)}
+          >
+            {user?.data.username}
+          </span>
+        </p>
       )}
     </div>
   );
