@@ -24,41 +24,152 @@ html {
   }
 }
 
+@property --p1x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 85%;
+}
+@property --p1y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 1%;
+}
+@property --p2x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 14%;
+}
+@property --p2y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 15%;
+}
+@property --p3x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 60%;
+}
+@property --p3y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 90%;
+}
+@property --p4x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 79%;
+}
+@property --p4y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 7%;
+}
+@property --p5x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 55%;
+}
+@property --p5y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 65%;
+}
+
 .gradient {
+  --p1x: 85%;
+  --p1y: 1%;
+  --p2x: 14%;
+  --p2y: 15%;
+  --p3x: 60%;
+  --p3y: 90%;
+  --p4x: 79%;
+  --p4y: 7%;
+  --p5x: 55%;
+  --p5y: 65%;
+
   background-image: radial-gradient(
-      circle at 85% 1%,
+      circle at var(--p1x) var(--p1y),
       hsla(190, 0%, 93%, 0.05) 0%,
       hsla(190, 0%, 93%, 0.05) 96%,
       transparent 96%,
       transparent 100%
     ),
     radial-gradient(
-      circle at 14% 15%,
+      circle at var(--p2x) var(--p2y),
       hsla(190, 0%, 93%, 0.05) 0%,
       hsla(190, 0%, 93%, 0.05) 1%,
       transparent 1%,
       transparent 100%
     ),
     radial-gradient(
-      circle at 60% 90%,
+      circle at var(--p3x) var(--p3y),
       hsla(190, 0%, 93%, 0.05) 0%,
       hsla(190, 0%, 93%, 0.05) 20%,
       transparent 20%,
       transparent 100%
     ),
     radial-gradient(
-      circle at 79% 7%,
+      circle at var(--p4x) var(--p4y),
       hsla(190, 0%, 93%, 0.05) 0%,
       hsla(190, 0%, 93%, 0.05) 78%,
       transparent 78%,
       transparent 100%
     ),
     radial-gradient(
-      circle at 55% 65%,
+      circle at var(--p5x) var(--p5y),
       hsla(190, 0%, 93%, 0.05) 0%,
       hsla(190, 0%, 93%, 0.05) 52%,
       transparent 52%,
       transparent 100%
     ),
     linear-gradient(135deg, rgb(37, 56, 222), rgb(96, 189, 244));
+
+  background-repeat: no-repeat;
+
+  animation: gradient-drift 10s linear infinite;
+}
+
+@keyframes gradient-drift {
+  0% {
+    --p1x: 85%;
+    --p1y: 1%;
+    --p2x: 14%;
+    --p2y: 15%;
+    --p3x: 60%;
+    --p3y: 90%;
+    --p4x: 79%;
+    --p4y: 7%;
+    --p5x: 55%;
+    --p5y: 65%;
+  }
+  50% {
+    --p1x: 90%;
+    --p1y: 8%;
+    --p2x: 10%;
+    --p2y: 20%;
+    --p3x: 65%;
+    --p3y: 80%;
+    --p4x: 72%;
+    --p4y: 12%;
+    --p5x: 50%;
+    --p5y: 70%;
+  }
+  100% {
+    --p1x: 85%;
+    --p1y: 1%;
+    --p2x: 14%;
+    --p2y: 15%;
+    --p3x: 60%;
+    --p3y: 90%;
+    --p4x: 79%;
+    --p4y: 7%;
+    --p5x: 55%;
+    --p5y: 65%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient {
+    animation: none;
+  }
 }
