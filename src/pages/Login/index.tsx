@@ -85,7 +85,7 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[12rem] right-8">
+            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[13rem] right-8">
               <Image src={Love1} alt="Love" className="w-full" />
             </div>
           </div>
@@ -93,7 +93,7 @@ const LoginPage = () => {
       </header>
 
       <FadeInSection>
-        <div className="bg-white pt-64 pb-12 px-12" ref={learnMoreRef}>
+        <div className="bg-white pt-24 lg:pt-64 pb-12 px-12" ref={learnMoreRef}>
           <div className="container mx-auto">
             <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
 
