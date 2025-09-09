@@ -148,7 +148,6 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
             className="mt-3 text-blue underline cursor-pointer"
             onClick={() => navigate(`/user/${comment.userId}`)}
           >
-            {' '}
             {user?.data.username}
           </span>
         </p>
