@@ -14,6 +14,7 @@ import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
 import ContentFormatter from '../ContentFormatter';
+import { cityOptions } from '@app/consts/cityOptions';
 
 const isYouTubeUrl = (url: string) => {
   try {
@@ -111,7 +112,8 @@ const UserProfileCard = ({
               <span className="text-xs mt-1">{isOnlineState ? '🟢' : '🔴'}</span>
             </div>
             <p className="flex items-center text-lg gap-2">
-              <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}
+              <BiSolidMap /> <b>Lokacija: </b>{' '}
+              {cityOptions.find((cityOption) => cityOption.value === user.location)?.label || 'N/A'}
             </p>
             <p className="flex items-center text-lg gap-2">
               <BiBody /> <b>Rod: </b> {user.gender || 'N/A'}
