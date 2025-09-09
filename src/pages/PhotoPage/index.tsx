@@ -11,14 +11,10 @@ import Image from '@app/components/Image';
 
 const PhotoPage = () => {
   const { photoId } = useParams();
-  const { singleImage, singleImageLoading, singleImageError } = useGetSingleImage(
-    photoId as string
-  );
+  const { singleImage, singleImageLoading } = useGetSingleImage(photoId as string);
   const { data: imageBlob } = useGetImageBlob(
     singleImage?.data?.securePhotoUrl || singleImage?.data?.url || ''
   );
-
-  console.log(singleImageError);
 
   if (singleImageLoading) {
     return (
@@ -28,7 +24,7 @@ const PhotoPage = () => {
     );
   }
 
-  if (!singleImage?.data.length || singleImageError) {
+  if (!singleImage) {
     return (
       <AppLayout>
         <Card>
