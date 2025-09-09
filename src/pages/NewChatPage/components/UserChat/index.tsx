@@ -29,6 +29,10 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
     <div
       className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
       onClick={() => {
+        if (!lastMessage) {
+          onClick();
+          return;
+        }
         if (lastMessage?.fromUserId !== Number(userId)) {
           onMarkMessagesAsRead(String(lastMessage?.id) || '');
         }
