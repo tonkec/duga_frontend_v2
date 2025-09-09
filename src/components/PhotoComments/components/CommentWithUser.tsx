@@ -142,7 +142,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
       ) : currentUserId === comment.userId ? (
-        <p className="mt-3">Komentar od tebe</p>
+        <p className="mt-3">Tvoj komentar</p>
       ) : (
         <p>
           Komentar od:{' '}
