@@ -99,7 +99,6 @@ type Inputs = {
 
 const schema = z.object({
   bio: z.string().optional(),
-  age: z.string().optional(),
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
@@ -178,7 +177,6 @@ const EditMyProfilePage = () => {
     if (currentUser) {
       reset({
         bio: currentUser.data.bio || '',
-        age: String(currentUser.data.age ?? '0'),
         location:
           cityOptions.find((option) => option.value === currentUser.data.location)?.value || '',
         sexuality: currentUser.data.sexuality || '',
@@ -244,6 +242,15 @@ const EditMyProfilePage = () => {
                     label="Korisničko ime"
                     disabled
                   />
+                  <Input
+                    type="text"
+                    className="mb-2 !bg-gray-200"
+                    placeholder="Godine"
+                    value={currentUser?.data?.age}
+                    label="Dob"
+                    disabled
+                  />
+
                   <Controller
                     name="location"
                     control={control}
@@ -286,13 +293,7 @@ const EditMyProfilePage = () => {
                     placeholder="Seksualnost"
                     {...register('sexuality')}
                   />
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Godine"
-                    {...register('age')}
-                    label="Dob"
-                  />
+
                   <Label>Biografija</Label>
                   <TextArea placeholder="Nešto ukratko o tebi" {...register('bio')} />
                 </div>
