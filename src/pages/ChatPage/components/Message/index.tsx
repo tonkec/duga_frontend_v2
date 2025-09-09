@@ -53,7 +53,7 @@ interface IMessageContentProps {
   messageType: string;
 }
 
-const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2 max-w-[50vw]';
+const messageStyles = 'p-2 rounded mb-2 text-white flex flex-col gap-2 max-w-[50vw]';
 
 const unwrapUploadsProxy = (url?: string) => {
   if (!url) return '';
@@ -78,7 +78,7 @@ const MessageContent = ({
   const { data: imageBlob, error } = useGetImageBlob(proxiedUrl);
 
   return (
-    <div className={messageStyles}>
+    <div>
       {isGiphy && externalGifUrl && <GiphyMessage messagePhotoUrl={externalGifUrl} />}
 
       {!isGiphy && isS3File && imageBlob && (
@@ -105,7 +105,7 @@ const CurrentUserMessageTemplate = ({
 
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
-      <div className="flex">
+      <div className={`${messageStyles} flex bg-blue`}>
         <MessageContent
           messageType={messageType}
           messagePhotoUrl={messagePhotoUrl}
@@ -144,7 +144,7 @@ const OtherUserMessageTemplate = ({
           <UserAvatar color="black" avatarFallbackName={userName} userId={String(otherUserId)} />
         </div>
       )}
-      <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
+      <div className={`${messageStyles} bg-black ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
         <MessageContent
           messageType={messageType}
           messagePhotoUrl={messagePhotoUrl}
