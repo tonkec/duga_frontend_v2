@@ -18,6 +18,7 @@ import PostLoginPage from '@app/pages/PostLoginPage';
 import { PageTitle } from '@app/components/PageTitle';
 import { AuthGuard } from './guards/AuthGuard';
 import PostLoginFormGuard from './guards/PostLoginFormGuard';
+import RecordNotFound from '@app/pages/RecordNotFound';
 
 export const publicRoutes = [
   {
@@ -155,6 +156,14 @@ export const onboardedRoutes = [
     element: (
       <PageTitle title="Prijavi problem">
         <ReportPage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/record-not-found',
+    element: (
+      <PageTitle title="Obrisano">
+        <RecordNotFound />
       </PageTitle>
     ),
   },

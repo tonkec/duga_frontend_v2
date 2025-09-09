@@ -23,6 +23,7 @@ export const apiClient = (token?: string): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
+    validateStatus: (s) => s >= 200 && s < 300,
   });
 
   instance.interceptors.request.use(
@@ -56,9 +57,16 @@ export const apiClient = (token?: string): AxiosInstance => {
       if (error.response?.status >= 500) {
         console.error('🔥 Backend error:', error.response);
       }
+
+      if (error.response.status === 404) {
+        window.location.href = '/record-not-found';
+        return;
+      }
+
       if (error.code === 'ERR_NETWORK') {
         console.error('🚨 Network error: backend down?');
       }
+
       const errorMessage = getErrorMessage(error);
       if (errorMessage) {
         console.error('API Error:', errorMessage);
