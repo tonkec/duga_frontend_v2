@@ -19,6 +19,8 @@ import { PageTitle } from '@app/components/PageTitle';
 import { AuthGuard } from './guards/AuthGuard';
 import PostLoginFormGuard from './guards/PostLoginFormGuard';
 import RecordNotFound from '@app/pages/RecordNotFound';
+import BrokenPage from '@app/pages/BrokenPage';
+import NetworkErrorPage from '@app/pages/NetworkErrorPage';
 
 export const publicRoutes = [
   {
@@ -58,6 +60,14 @@ export const publicRoutes = [
     element: (
       <PageTitle title="Uvjeti korištenja">
         <TermsOfUsePage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/network-error',
+    element: (
+      <PageTitle title="Nešto se strgalo">
+        <NetworkErrorPage />
       </PageTitle>
     ),
   },
@@ -162,8 +172,16 @@ export const onboardedRoutes = [
   {
     path: '/record-not-found',
     element: (
-      <PageTitle title="Obrisano">
+      <PageTitle title="Ne postoji">
         <RecordNotFound />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/broken',
+    element: (
+      <PageTitle title="Nešto se strgalo">
+        <BrokenPage />
       </PageTitle>
     ),
   },
