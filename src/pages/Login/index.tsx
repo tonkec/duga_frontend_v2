@@ -54,7 +54,7 @@ const LoginPage = () => {
 
         <div className="container relative mx-auto">
           <div className="lg:flex pt-52 items-center">
-            <div className="flex flex-col bg-blue pt-6 pb-8 rounded px-8">
+            <div className="flex flex-col md:bg-blue pt-6 pb-8 rounded px-8">
               <h1 className="mt-2 mb-12 text-8xl font-bold text-white">Duga</h1>
               <p className="mt-8 text-white text-4xl max-w-xl">
                 Razgovaraj, flertaj ili prozuji s <b className="font-bold">queer</b> osobicama s
@@ -85,7 +85,7 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[12rem] right-8">
+            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[13rem] right-8">
               <Image src={Love1} alt="Love" className="w-full" />
             </div>
           </div>
@@ -93,7 +93,7 @@ const LoginPage = () => {
       </header>
 
       <FadeInSection>
-        <div className="bg-white pt-64 pb-12 px-12" ref={learnMoreRef}>
+        <div className="bg-white pt-24 lg:pt-64 pb-12 px-12" ref={learnMoreRef}>
           <div className="container mx-auto">
             <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
 
