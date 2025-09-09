@@ -1,0 +1,18 @@
+export const cityOptions = [
+  { label: 'Beograd', value: 'Belgrade' },
+  { label: 'Zagreb', value: 'Zagreb' },
+  { label: 'Sarajevo', value: 'Sarajevo' },
+  { label: 'Skopje', value: 'Skopje' },
+  { label: 'Podgorica', value: 'Podgorica' },
+  { label: 'Pristina', value: 'Pristina' },
+  { label: 'Ljubljana', value: 'Ljubljana' },
+  { label: 'Tirana', value: 'Tirana' },
+  { label: 'Sofia', value: 'Sofia' },
+  { label: 'Split', value: 'Split' },
+  { label: 'Rijeka', value: 'Rijeka' },
+  { label: 'Osijek', value: 'Osijek' },
+  { label: 'Novi Sad', value: 'Novi Sad' },
+  { label: 'Niš', value: 'Niš' },
+  { label: 'Banja Luka', value: 'Banja Luka' },
+  { label: 'Mostar', value: 'Mostar' },
+];
