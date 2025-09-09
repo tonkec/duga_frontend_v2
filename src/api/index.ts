@@ -1,5 +1,15 @@
-import axios, { AxiosInstance } from 'axios';
-import { getErrorMessage } from '@app/utils/getErrorMessage';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+const clearAllAuthData = () => {
+  localStorage.clear();
+
+  sessionStorage.clear();
+
+  document.cookie.split(';').forEach((c) => {
+    document.cookie = c
+      .replace(/^ +/, '')
+      .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
+  });
+};
 
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
@@ -23,6 +33,7 @@ export const apiClient = (token?: string): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
+    validateStatus: (s) => s >= 200 && s < 300,
   });
 
   instance.interceptors.request.use(
@@ -49,20 +60,39 @@ export const apiClient = (token?: string): AxiosInstance => {
     },
     (error) => Promise.reject(error)
   );
+  type Cfg = AxiosRequestConfig & { skipGlobalErrorHandler?: boolean };
+
+  const ERROR_ROUTES = ['/broken', '/record-not-found', '/network-error'];
 
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status >= 500) {
-        console.error('🔥 Backend error:', error.response);
+      const cfg = (error.config || {}) as Cfg;
+
+      // let certain calls opt out
+      if (cfg.skipGlobalErrorHandler) {
+        return Promise.reject(error);
       }
-      if (error.code === 'ERR_NETWORK') {
-        console.error('🚨 Network error: backend down?');
+
+      const here = window.location.pathname;
+      const alreadyOnErrorRoute = ERROR_ROUTES.includes(here);
+
+      if (!alreadyOnErrorRoute) {
+        if (error?.response?.status >= 500) {
+          window.location.replace('/broken');
+          return Promise.reject(error);
+        }
+        if (error?.response?.status === 404) {
+          window.location.replace('/record-not-found');
+          return Promise.reject(error);
+        }
+        if (error.code === 'ERR_NETWORK') {
+          clearAllAuthData();
+          window.location.replace('/network-error');
+          return Promise.reject(error);
+        }
       }
-      const errorMessage = getErrorMessage(error);
-      if (errorMessage) {
-        console.error('API Error:', errorMessage);
-      }
+
       return Promise.reject(error);
     }
   );
