@@ -54,7 +54,7 @@ const LoginPage = () => {
 
         <div className="container relative mx-auto">
           <div className="lg:flex pt-52 items-center">
-            <div className="flex flex-col bg-blue pt-6 pb-8 rounded px-8">
+            <div className="flex flex-col md:bg-blue pt-6 pb-8 rounded px-8">
               <h1 className="mt-2 mb-12 text-8xl font-bold text-white">Duga</h1>
               <p className="mt-8 text-white text-4xl max-w-xl">
                 Razgovaraj, flertaj ili prozuji s <b className="font-bold">queer</b> osobicama s
