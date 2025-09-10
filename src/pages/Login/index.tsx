@@ -4,12 +4,14 @@ import Guy from '@app/assets/guy.svg';
 import Girl from '@app/assets/girl.svg';
 import AI from '@app/assets/ai.svg';
 import Love1 from '@app/assets/love1.svg';
+import { BiGroup, BiSolidCamera, BiSolidEnvelope } from 'react-icons/bi';
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
 import Image from '@app/components/Image';
 import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
+import Accordion from './components/Accordion';
 
 const getDomainPath = () => {
   const { hostname } = window.location;
@@ -24,6 +26,51 @@ const getDomainPath = () => {
 
 const URL = getDomainPath();
 
+const faqItems = [
+  {
+    question: 'Mogu li izbrisati svoj profil kad god poželim?',
+    answer: 'Da, profil možeš izbrisati u bilo kojem trenutku putem postavki računa.',
+  },
+  {
+    question: 'Kako funkcionira registracija na Dugu?',
+    answer:
+      'Registracija je brza i jednostavna, potrebno je samo unijeti osnovne podatke i potvrditi adresu e-pošte.',
+  },
+  {
+    question: 'Moram li imati profilnu sliku da bih koristio aplikaciju?',
+    answer:
+      'Ne, ali preporučujemo dodavanje profilne slike jer povećava povjerenje i šanse za povezivanje s drugim korisnicima.',
+  },
+  {
+    question: 'Kako mogu nadograditi na premium plan?',
+    answer: 'Jednostavno iz postavki računa odaberi premium plan i slijedi upute za plaćanje.',
+  },
+  {
+    question: 'Mogu li otkazati pretplatu u bilo kojem trenutku?',
+    answer:
+      'Da, pretplatu možeš otkazati kad god želiš u postavkama računa, bez dodatnih troškova.',
+  },
+  {
+    question: 'Na kojim jezicima je dostupna Duga?',
+    answer:
+      'Trenutno podržavamo hrvatski jezik, a planiramo dodati i druge balkanske jezike u budućnosti.',
+  },
+  {
+    question: 'Kako mogu postati contributor ili pomoći u razvoju?',
+    answer:
+      'Možeš se uključiti putem našeg GitHub repozitorija ili nam se javiti direktno putem e-pošte.',
+  },
+  {
+    question: 'Mogu li prijaviti bug ili dati prijedlog za nove funkcionalnosti?',
+    answer:
+      'Naravno! Svaka povratna informacija nam je dragocjena. Možeš nam pisati putem obrasca za kontakt ili GitHuba.',
+  },
+  {
+    question: 'Postoji li minimalna dob za registraciju?',
+    answer: 'Da, minimalna dob za registraciju je 18 godina, radi sigurnosti i zaštite korisnika.',
+  },
+];
+
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
   const learnMoreRef = useRef<HTMLDivElement>(null);
@@ -33,7 +80,7 @@ const LoginPage = () => {
   };
 
   return (
-    <>
+    <div className="bg-white">
       <header className="gradient  pb-32">
         <CookieBanner />
         <nav className="transparent py-6 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
@@ -85,51 +132,57 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[13rem] right-8">
+            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[13rem] right-8 ob">
               <Image src={Love1} alt="Love" className="w-full" />
             </div>
           </div>
         </div>
       </header>
 
-      <FadeInSection>
-        <div className="bg-white pt-24 lg:pt-64 pb-12 px-12" ref={learnMoreRef}>
-          <div className="container mx-auto">
-            <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
+      <div className="pt-24">
+        <FadeInSection>
+          <div className="bg-white pt-24 lg:pt-24 pb-12 px-12" ref={learnMoreRef}>
+            <div className="container mx-auto">
+              <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
 
-            <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
-              <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
-                <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
-                <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
-                <p className="text-white">Pregledaj profile i pronađi nekoga tko ti se sviđa.</p>
-              </div>
+              <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
+                <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
+                  <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
+                  <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
+                  <p className="text-white">Pregledaj profile i pronađi nekoga tko ti se sviđa.</p>
+                </div>
 
-              <div className="bg-blue-dark text-center rounded-lg px-6 py-8 flex-1">
-                <BiStopwatch
-                  className="text-white inline-block mb-6"
-                  fontSize={40}
-                  color="#F037A5"
-                />
-                <h4 className="text-white text-xl mb-2">Uštedi si vrijeme i živčeke</h4>
-                <p className="text-white">
-                  Iskoristi naše filtere za brzo pronalaženje idealne osobice.
-                </p>
-              </div>
+                <div className="bg-blue-dark text-center rounded-lg px-6 py-8 flex-1">
+                  <BiStopwatch
+                    className="text-white inline-block mb-6"
+                    fontSize={40}
+                    color="#F037A5"
+                  />
+                  <h4 className="text-white text-xl mb-2">Uštedi si vrijeme i živčeke</h4>
+                  <p className="text-white">
+                    Iskoristi naše filtere za brzo pronalaženje idealne osobice.
+                  </p>
+                </div>
 
-              <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
-                <BiMessage className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
-                <h4 className="text-white text-xl mb-2">Pošalji poruku</h4>
-                <p className="text-white">
-                  Pošalji poruku osobi koja ti se sviđa i započni razgovor.
-                </p>
+                <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
+                  <BiMessage
+                    className="text-white inline-block mb-6"
+                    fontSize={40}
+                    color="#F037A5"
+                  />
+                  <h4 className="text-white text-xl mb-2">Pošalji poruku</h4>
+                  <p className="text-white">
+                    Pošalji poruku osobi koja ti se sviđa i započni razgovor.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </FadeInSection>
+        </FadeInSection>
+      </div>
 
       <FadeInSection>
-        <div className="bg-white py-16 pb-32 px-12">
+        <div className="bg-white py-16 pb-12 px-12">
           <h2 className="text-center text-4xl font-bold mb-8">Zašto odabrati baš nas?</h2>
           <ul className="max-w-2xl mx-auto">
             <li className="bg-blue-dark py-8 px-6 rounded-lg">
@@ -179,6 +232,58 @@ const LoginPage = () => {
               </div>
             </li>
           </ul>
+        </div>
+      </FadeInSection>
+
+      <FadeInSection>
+        <div className="text-center py-24 mb-32 mt-32 overflow-hidden px-12 bg-rose container mx-auto rounded">
+          <h2 className="text-center text-4xl font-bold mb-24">Duga u brojkama i iskustvu</h2>
+
+          <div className="lg:grid lg:grid-cols-3 gap-6 xl:gap-12">
+            <div className="space-y-2 mb-12 lg:mb-0">
+              <div className="flex items-center gap-2">
+                <BiGroup className="text-[#2D46B9]" fontSize="2rem" />
+                <h2 className="text-4xl">Mnogo korisnika</h2>
+              </div>
+              <p className="text-left text-gray-700">
+                Na Dugi već 500+ korisnika iz cijele regije upoznaje nove prijatelje, partnere ili
+                jednostavno pronalazi podršku. Svakog tjedna nam se pridružuju novi korisnici iz
+                cijele regije – studenti, mladi profesionalci, kreativci i svi oni koji žele
+                autentične razgovore. Duga je sigurno mjesto gdje možeš biti svoj i povezati se s
+                ljudima koji razumiju tvoju priču. Bez pritiska, bez predrasuda – samo iskrena
+                povezanost.
+              </p>
+            </div>
+
+            <div className="space-y-2 mb-12 lg:mb-0">
+              <div className="flex items-center gap-2 ">
+                <BiSolidEnvelope className="text-[#2D46B9]" fontSize="2rem" />
+                <h2 className="text-4xl">Gro poruka</h2>
+              </div>
+              <p className="text-left text-gray-700">
+                Već je razmijenjeno 10.000+ poruka. Naša chat platforma omogućuje ti da brzo i
+                jednostavno razmjenjuješ poruke. Bilo da tražiš lagani razgovor, flert ili ozbiljnu
+                vezu – komunikacija je brza, sigurna i uvijek pod tvojom kontrolom. Uz AI nadzor i
+                alate za prijavu, možeš biti siguran da je razgovor ugodan i zaštićen od neželjenog
+                sadržaja. Razmjenjuj misli, planiraj susrete ili jednostavno dijeli svakodnevne
+                trenutke – sve na jednom mjestu.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <BiSolidCamera className="text-[#2D46B9]" fontSize="2rem" />
+                <h2 className="text-4xl">Hrpetina fotki</h2>
+              </div>
+              <p className="text-left text-gray-700">
+                Podijeli svoje najbolje trenutke s drugima – od profilnih fotki do albuma. Na Dugi
+                je već podijeljeno više od 1000 fotografija – pokaži i ti svoju jedinstvenost!
+                Dodavanjem fotografija stvaraš bolji dojam, povećavaš šanse za povezivanje i daješ
+                drugima priliku da te upoznaju. Tvoje fotografije su uvijek pod tvojom kontrolom –
+                odlučuješ što i kada želiš podijeliti.
+              </p>
+            </div>
+          </div>
         </div>
       </FadeInSection>
 
@@ -348,6 +453,14 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
+        <div className="container mx-auto pt-24 pb-24 px-8">
+          <h2 className="text-3xl font-bold mb-6">FAQ</h2>
+
+          <Accordion items={faqItems} />
+        </div>
+      </FadeInSection>
+
+      <FadeInSection>
         <div className="py-32 bg-blue text-white">
           <div className="mx-auto container p-4">
             <div className="flex flex-col md:flex-row mx-auto gap-12 items-center">
@@ -396,7 +509,7 @@ const LoginPage = () => {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 };
 
