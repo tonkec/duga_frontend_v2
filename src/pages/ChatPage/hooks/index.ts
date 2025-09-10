@@ -53,8 +53,7 @@ export const useGetCurrentChat = (chatId: string) => {
 
 export const useDeleteCurrentChat = (
   socket: Socket<DefaultEventsMap, DefaultEventsMap>,
-  chatId: string | undefined,
-  partnerId: number | undefined
+  chatId: string | undefined
 ) => {
   const {
     mutate: deleteChat,
@@ -65,7 +64,7 @@ export const useDeleteCurrentChat = (
     mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
     onSuccess: () => {
       toast.success('Chat izbrisan!', toastConfig);
-      socket.emit('deleteChat', { chatId, partnerId });
+      socket.emit('deleteChat', { chatId });
     },
     onError: () => {
       toast.error('Greška! Probaj opet.', toastConfig);

@@ -65,7 +65,7 @@ const ChatPage = () => {
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat } = useGetCurrentChat(chatId as string);
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
-  const { deleteChat } = useDeleteCurrentChat(socket, chatId, otherUserId);
+  const { deleteChat } = useDeleteCurrentChat(socket, chatId);
 
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
