@@ -3,7 +3,8 @@ import { getChatMessages } from '@app/api/chatMessages';
 import { deleteCurrentChat, getCurrentChat } from '@app/api/chats';
 import { toastConfig } from '@app/configs/toast.config';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router';
+import { Socket } from 'socket.io-client';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
 
 export const useGetAllMessages = (chatId: string) => {
   const {
@@ -50,8 +51,11 @@ export const useGetCurrentChat = (chatId: string) => {
   return { currentChat, currentChatError, isCurrentChatLoading, isCurrentChatSuccess };
 };
 
-export const useDeleteCurrentChat = () => {
-  const navigate = useNavigate();
+export const useDeleteCurrentChat = (
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  chatId: string | undefined,
+  partnerId: number | undefined
+) => {
   const {
     mutate: deleteChat,
     isPending: isDeletingChat,
@@ -61,7 +65,7 @@ export const useDeleteCurrentChat = () => {
     mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
     onSuccess: () => {
       toast.success('Chat izbrisan!', toastConfig);
-      navigate('/new-chat');
+      socket.emit('deleteChat', { chatId, partnerId });
     },
     onError: () => {
       toast.error('Greška! Probaj opet.', toastConfig);

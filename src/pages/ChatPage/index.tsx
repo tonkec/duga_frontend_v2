@@ -16,6 +16,8 @@ import ConfirmModal from '@app/components/ConfirmModal';
 import { IMessage } from './components/Message';
 import ChatBubble from '@app/components/ChatBubble';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { toast } from 'react-toastify';
+import { toastConfig } from '@app/configs/toast.config';
 
 interface IChatUser {
   userId: number;
@@ -60,10 +62,11 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const [currentUserId] = useLocalStorage('userId');
   const { chatId } = useParams();
-  const { deleteChat } = useDeleteCurrentChat();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat } = useGetCurrentChat(chatId as string);
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
+  const { deleteChat } = useDeleteCurrentChat(socket, chatId, otherUserId);
+
   const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
   const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
   const otherUserProfilePhoto = getProfilePhotoUrl(
@@ -130,6 +133,19 @@ const ChatPage = () => {
     }
   }, [otherUser?.data?.status]);
 
+  useEffect(() => {
+    socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
+      if (deletedChatId === chatId) {
+        toast.error('Chat je upravo obrisan', toastConfig);
+        navigate('/new-chat');
+      }
+    });
+
+    return () => {
+      socket.off('chatDeleted');
+    };
+  }, [chatId, navigate, socket]);
+
   return (
     <ChatGuard>
       <AppLayout>
@@ -139,7 +155,7 @@ const ChatPage = () => {
           onDeleteChat={() => {
             if (!chatId) return;
             deleteChat({ chatId });
-            navigate('/chats');
+            setIsDeleteModalVisible(false);
           }}
         />
         <Button
