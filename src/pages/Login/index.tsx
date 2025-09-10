@@ -4,6 +4,7 @@ import Guy from '@app/assets/guy.svg';
 import Girl from '@app/assets/girl.svg';
 import AI from '@app/assets/ai.svg';
 import Love1 from '@app/assets/love1.svg';
+import { BiGroup, BiSolidCamera, BiSolidEnvelope } from 'react-icons/bi';
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
@@ -181,7 +182,7 @@ const LoginPage = () => {
       </div>
 
       <FadeInSection>
-        <div className="bg-white py-16 pb-32 px-12">
+        <div className="bg-white py-16 pb-12 px-12">
           <h2 className="text-center text-4xl font-bold mb-8">Zašto odabrati baš nas?</h2>
           <ul className="max-w-2xl mx-auto">
             <li className="bg-blue-dark py-8 px-6 rounded-lg">
@@ -231,6 +232,58 @@ const LoginPage = () => {
               </div>
             </li>
           </ul>
+        </div>
+      </FadeInSection>
+
+      <FadeInSection>
+        <div className="text-center py-24 mb-32 mt-32 overflow-hidden px-12 bg-rose container mx-auto rounded">
+          <h2 className="text-center text-4xl font-bold mb-24">Duga u brojkama i iskustvu</h2>
+
+          <div className="lg:grid lg:grid-cols-3 gap-12">
+            <div className="space-y-2 mb-12 lg:mb-0">
+              <div className="flex items-center gap-2">
+                <BiGroup className="text-[#2D46B9]" fontSize="2rem" />
+                <h2 className="text-4xl">Mnogo korisnika</h2>
+              </div>
+              <p className="text-left text-gray-700">
+                Na Dugi već 500+ korisnika iz cijele regije upoznaje nove prijatelje, partnere ili
+                jednostavno pronalazi podršku. Svakog tjedna nam se pridružuju novi korisnici iz
+                cijele regije – studenti, mladi profesionalci, kreativci i svi oni koji žele
+                autentične razgovore. Duga je sigurno mjesto gdje možeš biti svoj i povezati se s
+                ljudima koji razumiju tvoju priču. Bez pritiska, bez predrasuda – samo iskrena
+                povezanost.
+              </p>
+            </div>
+
+            <div className="space-y-2 mb-12 lg:mb-0">
+              <div className="flex items-center gap-2 ">
+                <BiSolidEnvelope className="text-[#2D46B9]" fontSize="2rem" />
+                <h2 className="text-4xl">Gro poruka</h2>
+              </div>
+              <p className="text-left text-gray-700">
+                Već je razmijenjeno 10.000+ poruka. Naša chat platforma omogućuje ti da brzo i
+                jednostavno razmjenjuješ poruke. Bilo da tražiš lagani razgovor, flert ili ozbiljnu
+                vezu – komunikacija je brza, sigurna i uvijek pod tvojom kontrolom. Uz AI nadzor i
+                alate za prijavu, možeš biti siguran da je razgovor ugodan i zaštićen od neželjenog
+                sadržaja. Razmjenjuj misli, planiraj susrete ili jednostavno dijeli svakodnevne
+                trenutke – sve na jednom mjestu.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <BiSolidCamera className="text-[#2D46B9]" fontSize="2rem" />
+                <h2 className="text-4xl">Hrpetina fotki</h2>
+              </div>
+              <p className="text-left text-gray-700">
+                Podijeli svoje najbolje trenutke s drugima – od profilnih fotki do albuma. Na Dugi
+                je već podijeljeno više od 1000 fotografija – pokaži i ti svoju jedinstvenost!
+                Dodavanjem fotografija stvaraš bolji dojam, povećavaš šanse za povezivanje i daješ
+                drugima priliku da te upoznaju. Tvoje fotografije su uvijek pod tvojom kontrolom –
+                odlučuješ što i kada želiš podijeliti.
+              </p>
+            </div>
+          </div>
         </div>
       </FadeInSection>
 
@@ -400,7 +453,7 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <div className="container mx-auto pt-24 pb-24">
+        <div className="container mx-auto pt-24 pb-24 px-8">
           <h2 className="text-3xl font-bold mb-6">FAQ</h2>
 
           <Accordion items={faqItems} />

@@ -54,7 +54,7 @@ export default function Accordion({ items }: AccordionProps) {
               <motion.div
                 key="content"
                 initial={{ maxHeight: 0, opacity: 0 }}
-                animate={{ maxHeight: 500, opacity: 1 }} // pick a safe max height
+                animate={{ maxHeight: 500, opacity: 1 }}
                 exit={{ maxHeight: 0, opacity: 0 }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 className="overflow-hidden"
