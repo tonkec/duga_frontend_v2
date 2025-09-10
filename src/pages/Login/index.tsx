@@ -239,7 +239,7 @@ const LoginPage = () => {
         <div className="text-center py-24 mb-32 mt-32 overflow-hidden px-12 bg-rose container mx-auto rounded">
           <h2 className="text-center text-4xl font-bold mb-24">Duga u brojkama i iskustvu</h2>
 
-          <div className="lg:grid lg:grid-cols-3 gap-12">
+          <div className="lg:grid lg:grid-cols-3 gap-6 xl:gap-12">
             <div className="space-y-2 mb-12 lg:mb-0">
               <div className="flex items-center gap-2">
                 <BiGroup className="text-[#2D46B9]" fontSize="2rem" />
