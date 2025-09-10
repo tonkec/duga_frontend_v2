@@ -63,7 +63,6 @@ export const useDeleteCurrentChat = (
   } = useMutation({
     mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
     onSuccess: () => {
-      toast.success('Chat izbrisan!', toastConfig);
       socket.emit('deleteChat', { chatId });
     },
     onError: () => {
