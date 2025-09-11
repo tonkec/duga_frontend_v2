@@ -78,5 +78,5 @@ export const getUserBio = (bio: string) => {
     return 'Biografija još nije postavljena.';
   }
 
-  return bio;
+  return bio.replace(/https?:\/\/\S+|www\.\S+/gi, '').trim();
 };
