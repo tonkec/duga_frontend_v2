@@ -114,6 +114,10 @@ const LatestMessages = () => {
     );
   const top3 = sorted.slice(0, 3);
 
+  if (!top3.length) {
+    return null;
+  }
+
   return (
     <div className="col-span-2">
       <h2 className="mb-2">📬 Tvoje nedavne poruke</h2>

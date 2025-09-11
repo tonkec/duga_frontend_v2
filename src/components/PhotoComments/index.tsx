@@ -208,7 +208,7 @@ const PhotoComments = () => {
       <div className="flex flex-col gap-2 ">
         {!!sortedComments.length && (
           <Paginated<IComment>
-            itemsPerPage={5}
+            itemsPerPage={3}
             gridClassName="grid grid-cols-1 gap-2"
             data={sortedComments}
             paginatedSingle={PaginatedSingle}
