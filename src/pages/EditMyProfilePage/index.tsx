@@ -80,12 +80,7 @@ type Inputs = {
 };
 
 const schema = z.object({
-  bio: z
-    .string()
-    .optional()
-    .refine((value) => !value || !/(https?:\/\/|www\.)/i.test(value), {
-      message: 'Bio ne smije imat linkove.',
-    }),
+  bio: z.string().optional(),
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().optional(),
