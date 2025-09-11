@@ -116,7 +116,7 @@ const CurrentUserMessageTemplate = ({
       {showAvatar && (
         <div className="ml-0.5">
           <UserAvatar
-            className="w-12 h-12 rounded"
+            className="w-12 h-12 rounded-full"
             avatarFallbackName={userName}
             userId={String(currentUserId)}
             color="black"
@@ -145,7 +145,7 @@ const OtherUserMessageTemplate = ({
             color="black"
             avatarFallbackName={userName}
             userId={String(otherUserId)}
-            className="w-[40px] h-[40px]"
+            className="w-[40px] h-[40px] rounded-full"
           />
         </div>
       )}
