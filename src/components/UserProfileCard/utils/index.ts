@@ -74,7 +74,7 @@ export const shouldRenderField = (field: string) => {
 };
 
 export const getUserBio = (bio: string) => {
-  const bioWithoutLinks = bio.replace(/https?:\/\/\S+|www\.\S+/gi, '').trim();
+  const bioWithoutLinks = bio?.replace(/https?:\/\/\S+|www\.\S+/gi, '').trim();
   if (!bioWithoutLinks) {
     return 'Biografija još nije postavljena.';
   }
