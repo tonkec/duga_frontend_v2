@@ -39,9 +39,9 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
         onClick();
       }}
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col">
         {lastMessage && (
-          <div className="ml-4">
+          <div>
             <LastMessage message={lastMessage} />
           </div>
         )}
@@ -50,6 +50,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
             color="#2D46B9"
             avatarFallbackName={`${user.username}`}
             userId={String(user.id)}
+            className="w-[40px] h-[40px] rounded-full"
           />
           <div className="ml-4">
             <h1 className="text-lg font-semibold">{user.username}</h1>

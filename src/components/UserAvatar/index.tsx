@@ -31,7 +31,7 @@ const UserAvatar = ({
   }
 
   if (imageBlob) {
-    return <Image src={URL.createObjectURL(imageBlob)} alt="Comment image" className={className} />;
+    return <Image src={URL.createObjectURL(imageBlob)} alt="Avatar" className={className} />;
   }
 
   return (

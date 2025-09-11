@@ -64,7 +64,7 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
             likes.map((like) => (
               <div
                 key={like.id}
-                className="text-sm py-1 px-2 hover:bg-gray-100 rounded"
+                className="text-sm py-1 px-2 hover:bg-gray-100 rounded cursor-pointer"
                 onClick={() => {
                   navigate(`/user/${like.userId}`);
                 }}
