@@ -17,6 +17,7 @@ import { Tooltip } from 'react-tooltip';
 import Label from '@app/components/Label';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { cityOptions } from '@app/consts/cityOptions';
+import FieldError from '@app/components/FieldError';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -79,26 +80,58 @@ type Inputs = {
   ending: string;
 };
 
+const linksRegex = /(https?:\/\/|www\.)/i;
+
 const schema = z.object({
   bio: z
     .string()
     .optional()
-    .refine((value) => !value || !/(https?:\/\/|www\.)/i.test(value), {
+    .refine((value) => !value || !linksRegex.test(value), {
       message: 'Bio ne smije imat linkove.',
     }),
   location: z.string().nullable().optional(),
-  sexuality: z.string().optional(),
-  gender: z.string().optional(),
+  sexuality: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Seksualnost ne smije imat linkove.',
+    }),
+  gender: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Rod ne smije imat linkove.',
+    }),
   lookingFor: z.string().optional(),
   relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
   alcohol: z.boolean().optional(),
   sport: z.boolean().optional(),
   favoriteDay: z.string().min(1).optional(),
-  spirituality: z.string().optional(),
-  embarasement: z.string().optional(),
-  tooOldFor: z.string().optional(),
-  makesMyDay: z.string().optional(),
+  spirituality: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Duhovnost ne smije imat linkove.',
+    }),
+  embarasement: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Ne smije imat linkove.',
+    }),
+  tooOldFor: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Ne smije imat linkove.',
+    }),
+  makesMyDay: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Ne smije imat linkove.',
+    }),
   favoriteSong: z
     .string()
     .refine(
@@ -141,9 +174,24 @@ const schema = z.object({
       }
     )
     .optional(),
-  interests: z.string().optional(),
-  languages: z.string().optional(),
-  ending: z.string().optional(),
+  interests: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Interesi ne smiju imat linkove.',
+    }),
+  languages: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Jezici ne smiju imat linkove.',
+    }),
+  ending: z
+    .string()
+    .optional()
+    .refine((value) => !value || !linksRegex.test(value), {
+      message: 'Za kraj ne smije imat linkove.',
+    }),
 });
 
 const EditMyProfilePage = () => {
@@ -283,6 +331,7 @@ const EditMyProfilePage = () => {
 
                   <Label>Biografija</Label>
                   <TextArea placeholder="Nešto ukratko o tebi" {...register('bio')} />
+                  {errors?.bio?.message && <FieldError message={errors.bio.message} />}
                 </div>
               </div>
 
@@ -448,18 +497,28 @@ const EditMyProfilePage = () => {
                     placeholder="Najsramotnija stvar koja mi se dogodila..."
                     {...register('embarasement')}
                   />
+                  {errors?.embarasement?.message && (
+                    <FieldError message={errors.embarasement.message} />
+                  )}
+
                   <Label>Imam previše godina za...</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Imam previše godina za...."
                     {...register('tooOldFor')}
                   />
+                  {errors?.tooOldFor?.message && <FieldError message={errors.tooOldFor.message} />}
+
                   <Label>Stvari koje mi uljepšavaju dan</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Dan mi je ljepši ako..."
                     {...register('makesMyDay')}
                   />
+                  {errors?.makesMyDay?.message && (
+                    <FieldError message={errors.makesMyDay.message} />
+                  )}
+
                   <Input
                     label={
                       <div className="flex items-center gap-1">
@@ -519,6 +578,9 @@ const EditMyProfilePage = () => {
                     placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
                     {...register('spirituality')}
                   />
+                  {errors?.spirituality?.message && (
+                    <FieldError message={errors.spirituality.message} />
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
@@ -530,6 +592,8 @@ const EditMyProfilePage = () => {
                     {...register('interests')}
                     label="Interesi"
                   />
+                  {errors?.interests?.message && <FieldError message={errors.interests.message} />}
+
                   <Input
                     type="text"
                     className="mb-2"
@@ -537,8 +601,11 @@ const EditMyProfilePage = () => {
                     {...register('languages')}
                     label="Jezici"
                   />
+                  {errors?.languages?.message && <FieldError message={errors.languages.message} />}
+
                   <Label>Za kraj, još nešto o meni</Label>
                   <TextArea placeholder="Za kraj još nešto o meni" {...register('ending')} />
+                  {errors?.ending?.message && <FieldError message={errors.ending.message} />}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3 mt-3">
