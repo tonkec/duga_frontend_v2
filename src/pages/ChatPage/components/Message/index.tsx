@@ -141,7 +141,12 @@ const OtherUserMessageTemplate = ({
     <div className="flex">
       {showAvatar && (
         <div className="cursor-pointer mr-0.5" onClick={() => navigate(`/user/${otherUserId}`)}>
-          <UserAvatar color="black" avatarFallbackName={userName} userId={String(otherUserId)} />
+          <UserAvatar
+            color="black"
+            avatarFallbackName={userName}
+            userId={String(otherUserId)}
+            className="w-[40px] h-[40px]"
+          />
         </div>
       )}
       <div className={`${messageStyles} bg-black ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
