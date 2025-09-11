@@ -68,7 +68,7 @@ const NewChatPage = () => {
       <h1>Pretraži prema imenu ili prezimenu</h1>
       <Input
         type="text"
-        placeholder="Upiši ime ili prezime"
+        placeholder="Upiši username"
         className="mt-4"
         onChange={(e) => setSearch(e.target.value)}
       />
