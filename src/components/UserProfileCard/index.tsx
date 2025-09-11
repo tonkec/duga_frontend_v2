@@ -102,6 +102,7 @@ const UserProfileCard = ({
             userId={user.id}
             size="200"
             round={false}
+            className="w-[200px] rounded"
           />
         </div>
 
