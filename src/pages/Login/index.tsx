@@ -4,7 +4,8 @@ import Guy from '@app/assets/guy.svg';
 import Girl from '@app/assets/girl.svg';
 import AI from '@app/assets/ai.svg';
 import Love1 from '@app/assets/love1.svg';
-import { BiGroup, BiSolidCamera, BiSolidEnvelope } from 'react-icons/bi';
+import { FaEnvelopesBulk, FaPeopleGroup, FaPhotoFilm } from 'react-icons/fa6';
+
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
@@ -242,7 +243,7 @@ const LoginPage = () => {
           <div className="lg:grid lg:grid-cols-3 gap-6 xl:gap-12">
             <div className="space-y-2 mb-12 lg:mb-0">
               <div className="flex items-center gap-2">
-                <BiGroup className="text-[#2D46B9]" fontSize="2rem" />
+                <FaPeopleGroup className="text-[#2D46B9]" fontSize="2rem" />
                 <h2 className="text-4xl">Mnogo korisnika</h2>
               </div>
               <p className="text-left text-gray-700">
@@ -257,7 +258,7 @@ const LoginPage = () => {
 
             <div className="space-y-2 mb-12 lg:mb-0">
               <div className="flex items-center gap-2 ">
-                <BiSolidEnvelope className="text-[#2D46B9]" fontSize="2rem" />
+                <FaEnvelopesBulk className="text-[#2D46B9]" fontSize="2rem" />
                 <h2 className="text-4xl">Gro poruka</h2>
               </div>
               <p className="text-left text-gray-700">
@@ -272,7 +273,7 @@ const LoginPage = () => {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <BiSolidCamera className="text-[#2D46B9]" fontSize="2rem" />
+                <FaPhotoFilm className="text-[#2D46B9]" fontSize="2rem" />
                 <h2 className="text-4xl">Hrpetina fotki</h2>
               </div>
               <p className="text-left text-gray-700">
