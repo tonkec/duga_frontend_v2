@@ -52,7 +52,6 @@ const DeleteButtonModal = ({
 
 const normalizeDescription = (raw: string) =>
   raw
-    .slice(0, 100)
     // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001F\u007F]/gu, '')
     .trim()
