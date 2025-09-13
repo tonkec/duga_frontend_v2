@@ -19,7 +19,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
     <div className="flex flex-col gap-1">
       {imageBlob && (
         <div
-          className="h-[300px] bg-center bg-cover bg-no-repeat cursor-pointer"
+          className="h-[400px] bg-center bg-cover bg-no-repeat cursor-pointer"
           style={{ backgroundImage: `url(${URL.createObjectURL(imageBlob)})` }}
           onClick={() => navigate(`/photo/${upload.id}`)}
         ></div>
@@ -33,7 +33,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
             navigate(`/user/${upload.userId}`);
           }}
           userId={upload.userId}
-          className="w-6 h-6"
+          className="w-[40px] h-[40px] rounded-full"
         />
         <p>{user?.data.username}</p>
       </div>

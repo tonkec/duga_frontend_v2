@@ -4,7 +4,6 @@ import {
   getFavoriteDayOfWeekTranslation,
   getLookingForTranslation,
   getRelationshipStatusTranslation,
-  getUserBio,
   shouldRenderField,
 } from './utils';
 import Iframe from 'react-iframe';
@@ -102,6 +101,7 @@ const UserProfileCard = ({
             userId={user.id}
             size="200"
             round={false}
+            className="w-[200px] rounded"
           />
         </div>
 
@@ -167,7 +167,7 @@ const UserProfileCard = ({
       {shouldRenderField(user.bio) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">O meni</h2>
-          <ContentFormatter text={getUserBio(user.bio)} />
+          <ContentFormatter text={user.bio} />
         </div>
       )}
 

@@ -20,7 +20,7 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
   return (
     <div className="flex gap-2">
       <UserAvatar
-        className="w-6 h-6"
+        className="w-6 h-6 rounded-full"
         color="#F037A5"
         avatarFallbackName={`${user?.data?.username}`}
         userId={userId}
@@ -113,6 +113,10 @@ const LatestMessages = () => {
         new Date(b.message.createdAt).getTime() - new Date(a.message.createdAt).getTime()
     );
   const top3 = sorted.slice(0, 3);
+
+  if (!top3.length) {
+    return null;
+  }
 
   return (
     <div className="col-span-2">

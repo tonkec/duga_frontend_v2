@@ -85,7 +85,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
             color="black"
             userId={String(comment.userId)}
             avatarFallbackName={user?.data.username}
-            className="w-6 h-6"
+            className="w-[40px] h-[40px] rounded-full"
           />
           <RecordCreatedAt createdAt={comment.createdAt} />
         </div>
