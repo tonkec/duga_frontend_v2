@@ -50,6 +50,14 @@ const DeleteButtonModal = ({
   );
 };
 
+const normalizeDescription = (raw: string) =>
+  // eslint-disable-next-line no-control-regex
+  raw
+    .slice(0, 100)
+    .replace(/[\u0000-\u001F\u007F]/gu, '')
+    .trim()
+    .replace(/\s+/g, ' ');
+
 const PhotoActionButtons = ({
   onInputChange,
   onDelete,
@@ -112,6 +120,7 @@ const PhotoUploader = () => {
   const { allUserImages } = useGetAllUserImages();
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
+  const [newImageDescriptionError, setNewImageDescriptionError] = useState<string>('');
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
   const { onUploadPhotos } = useUploadPhotos();
@@ -173,7 +182,15 @@ const PhotoUploader = () => {
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
     setNewImageDescriptions((prevState) => {
       const target = e.target as HTMLInputElement;
-      const description = target.value;
+      const description = normalizeDescription(target.value);
+      if (description.length > 100) {
+        setNewImageDescriptionError('Opis fotografije ne može biti duži od 100 znakova!');
+        toast.error('Opis fotografije ne može biti duži od 100 znakova!', toastConfig);
+        return prevState;
+      }
+
+      setNewImageDescriptionError('');
+
       const imageId = removeSpacesAndDashes(file.name);
       const image = { description, imageId };
       const newState = prevState.filter(
@@ -221,8 +238,18 @@ const PhotoUploader = () => {
                       onInputChange={(e: SyntheticEvent) => {
                         setUpdatedImageDescriptions((prev) => {
                           const target = e.target as HTMLInputElement;
-                          const description = target.value;
-
+                          const description = normalizeDescription(target.value);
+                          if (description.length > 100) {
+                            setNewImageDescriptionError(
+                              'Opis fotografije ne može biti duži od 100 znakova!'
+                            );
+                            toast.error(
+                              'Opis fotografije ne može biti duži od 100 znakova!',
+                              toastConfig
+                            );
+                            return prev;
+                          }
+                          setNewImageDescriptionError('');
                           const imageId = removeSpacesAndDashes(image.name);
                           const newImage = { description, imageId };
                           const newState = prev.filter(
@@ -276,7 +303,7 @@ const PhotoUploader = () => {
               })}
             </div>
 
-            <Button type="primary">
+            <Button type="primary" disabled={newImageDescriptionError.length > 0}>
               <span>Spremi</span>
             </Button>
           </form>
@@ -353,7 +380,7 @@ const PhotoUploader = () => {
             />
           </div>
           {newImages && newImages.length > 0 && (
-            <Button type="primary">
+            <Button type="primary" disabled={newImageDescriptionError.length > 0}>
               <span>Spremi</span>
             </Button>
           )}
