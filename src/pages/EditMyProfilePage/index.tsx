@@ -81,7 +81,7 @@ type Inputs = {
 };
 
 const schema = z.object({
-  bio: z.string().max(300, { message: 'Polje ne smije biti dulje od 300 znakova.' }).optional(),
+  bio: z.string().max(100, { message: 'Polje ne smije biti dulje od 100 znakova.' }).optional(),
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
   gender: z.string().max(100, { message: 'Polje ne smije biti dulje od 100 znakova.' }).optional(),
@@ -296,8 +296,13 @@ const EditMyProfilePage = () => {
                     {...register('sexuality')}
                   />
                   {errors.sexuality?.message && <FieldError message={errors.sexuality.message} />}
-                  <Label>Biografija</Label>
-                  <TextArea placeholder="Nešto ukratko o tebi" {...register('bio')} />
+
+                  <Label>Jedna rečenica o meni</Label>
+                  <Input
+                    type="text"
+                    placeholder="Reci nešto o sebi jednom rečenicom"
+                    {...register('bio')}
+                  />
                   {errors.bio?.message && <FieldError message={errors.bio.message} />}
                 </div>
               </div>
