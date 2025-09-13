@@ -53,7 +53,13 @@ interface IMessageContentProps {
   messageType: string;
 }
 
-const messageStyles = 'p-2 rounded mb-2 text-white bg-blue flex flex-col gap-2';
+const messageStyles = 'p-2 rounded mb-2 text-white flex flex-col gap-2 max-w-[50vw]';
+
+const unwrapUploadsProxy = (url?: string) => {
+  if (!url) return '';
+  const prefix = '/uploads/files/';
+  return url.startsWith(prefix) ? decodeURIComponent(url.slice(prefix.length)) : url;
+};
 
 const MessageContent = ({
   messagePhotoUrl,
@@ -63,14 +69,20 @@ const MessageContent = ({
 }: IMessageContentProps) => {
   const isS3File = messageType === 'file';
   const isGiphy = messageType === 'gif';
-  const { data: imageBlob, error } = useGetImageBlob(messagePhotoUrl || '');
+
+  // For GIFs, use the unwrapped external URL directly
+  const externalGifUrl = isGiphy ? unwrapUploadsProxy(messagePhotoUrl || '') : '';
+
+  // Only fetch blobs for S3 files through your API
+  const proxiedUrl = !isGiphy && isS3File ? messagePhotoUrl || '' : '';
+  const { data: imageBlob, error } = useGetImageBlob(proxiedUrl);
 
   return (
-    <div className={messageStyles}>
-      {isGiphy && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
+    <div>
+      {isGiphy && externalGifUrl && <GiphyMessage messagePhotoUrl={externalGifUrl} />}
 
-      {isS3File && imageBlob && (
-        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ width: 200 }} />
+      {!isGiphy && isS3File && imageBlob && (
+        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '50vw' }} />
       )}
 
       {!isGiphy && !isS3File && <ContentFormatter text={message} />}
@@ -93,7 +105,7 @@ const CurrentUserMessageTemplate = ({
 
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
-      <div className="flex">
+      <div className={`${messageStyles} flex bg-blue`}>
         <MessageContent
           messageType={messageType}
           messagePhotoUrl={messagePhotoUrl}
@@ -104,7 +116,7 @@ const CurrentUserMessageTemplate = ({
       {showAvatar && (
         <div className="ml-0.5">
           <UserAvatar
-            className="w-12 h-12 rounded"
+            className="w-12 h-12 rounded-full"
             avatarFallbackName={userName}
             userId={String(currentUserId)}
             color="black"
@@ -129,10 +141,15 @@ const OtherUserMessageTemplate = ({
     <div className="flex">
       {showAvatar && (
         <div className="cursor-pointer mr-0.5" onClick={() => navigate(`/user/${otherUserId}`)}>
-          <UserAvatar color="black" avatarFallbackName={userName} userId={String(otherUserId)} />
+          <UserAvatar
+            color="black"
+            avatarFallbackName={userName}
+            userId={String(otherUserId)}
+            className="w-[40px] h-[40px] rounded-full"
+          />
         </div>
       )}
-      <div className={`${messageStyles} ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
+      <div className={`${messageStyles} bg-black ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
         <MessageContent
           messageType={messageType}
           messagePhotoUrl={messagePhotoUrl}

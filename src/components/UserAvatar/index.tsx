@@ -31,7 +31,14 @@ const UserAvatar = ({
   }
 
   if (imageBlob) {
-    return <Image src={URL.createObjectURL(imageBlob)} alt="Comment image" className={className} />;
+    return (
+      <Image
+        onClick={onClick}
+        src={URL.createObjectURL(imageBlob)}
+        alt="Avatar"
+        className={`${className} ${onClick ? 'cursor-pointer' : ''}`}
+      />
+    );
   }
 
   return (

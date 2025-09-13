@@ -29,29 +29,38 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
     <div
       className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
       onClick={() => {
+        if (!lastMessage) {
+          onClick();
+          return;
+        }
         if (lastMessage?.fromUserId !== Number(userId)) {
           onMarkMessagesAsRead(String(lastMessage?.id) || '');
         }
         onClick();
       }}
     >
-      <div className="flex items-center">
-        <UserAvatar
-          color="#2D46B9"
-          avatarFallbackName={`${user.username}`}
-          userId={String(user.id)}
-        />
-        <div className="ml-4">
-          <h1 className="text-lg font-semibold">{user.username}</h1>
-        </div>
-
+      <div className="flex flex-col">
         {lastMessage && (
-          <div className="ml-4">
+          <div>
             <LastMessage message={lastMessage} />
           </div>
         )}
+        <div className="flex mt-4 items-center">
+          <UserAvatar
+            color="#2D46B9"
+            avatarFallbackName={`${user.username}`}
+            userId={String(user.id)}
+            className="w-[40px] h-[40px] rounded-full"
+          />
+          <div className="ml-4">
+            <h1 className="text-lg font-semibold">{user.username}</h1>
+          </div>
+        </div>
       </div>
-      <BiChevronRight className="w-6 h-6 text-gray-500" color={is_read ? '#000' : '#fff'} />
+      <BiChevronRight
+        className="w-6 h-6 text-gray-500"
+        color={isMarkedAsRead() ? '#000' : '#fff'}
+      />
     </div>
   );
 };

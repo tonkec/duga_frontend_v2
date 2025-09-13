@@ -40,7 +40,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
   return (
     <div className="lg:flex gap-2 justify-between mb-4">
       <h2 className="justify-start mb-2 lg:mb-0">
-        <span>👇 Neke zanimljive osobice </span>
+        <span>🦄 Neke zanimljive osobice </span>
       </h2>
       <div className="lg:flex gap-2">
         <div className="mb-2 lg:mb-0">

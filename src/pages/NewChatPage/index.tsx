@@ -3,12 +3,14 @@ import AppLayout from '@app/components/AppLayout';
 import Input from '@app/components/Input';
 import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
 import UserCard, { IUser } from '@app/components/UserCard';
-import { useCreateNewChat } from './hooks';
+import { IChat, useCreateNewChat } from './hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '@app/components/Loader';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
+import { toast } from 'react-toastify';
+import { toastConfig } from '@app/configs/toast.config';
 
 const NewChatPage = () => {
   const [currentUserId] = useLocalStorage('userId');
@@ -55,12 +57,18 @@ const NewChatPage = () => {
     onCreateChat({ partnerId });
   };
 
+  const hasChatWithUser = (partnerId: number) => {
+    return userChats?.data?.some((chat: IChat) =>
+      chat.Users?.some((user) => user.id === Number(partnerId))
+    );
+  };
+
   return (
     <AppLayout>
       <h1>Pretraži prema imenu ili prezimenu</h1>
       <Input
         type="text"
-        placeholder="Upiši ime ili prezime"
+        placeholder="Upiši username"
         className="mt-4"
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -71,7 +79,11 @@ const NewChatPage = () => {
             <UserCard
               key={user.id}
               user={user}
-              onButtonClick={() => onButtonClick(Number(user.id))}
+              onButtonClick={() =>
+                hasChatWithUser(Number(user.id))
+                  ? toast.error('Taj chat već postoji!', toastConfig)
+                  : onButtonClick(Number(user.id))
+              }
               buttonText="Pošalji poruku"
             />
           );

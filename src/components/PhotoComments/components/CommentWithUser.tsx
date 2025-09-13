@@ -8,13 +8,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FieldError from '@app/components/FieldError';
 import MentionInput from '@app/components/MentionInput';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
+import RecordCreatedAt from '@app/components/RecordCreatedAt';
 
 interface Inputs {
   comment: string;
@@ -25,6 +26,7 @@ const schema = z.object({
 });
 
 const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
   const { user: currentUser } = useGetCurrentUser();
@@ -111,13 +113,13 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
 
     return (
       <div className="flex gap-2 justify-between items-start">
-        <div>
+        <div className="flex-1">
           {comment.comment && <p className="text-lg">{renderFormattedComment(comment.comment)}</p>}
           {imageBlob && (
             <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Slika"
-              className="max-h-32 max-w-full object-cover rounded"
+              className="max-h-64 w-full object-cover rounded"
             />
           )}
         </div>
@@ -140,8 +142,22 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {renderContent()}
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
+      ) : currentUserId === comment.userId ? (
+        <p className="mt-3 text-sm">
+          <span>Tvoj komentar</span>
+          <RecordCreatedAt createdAt={comment.createdAt} />
+        </p>
       ) : (
-        <p>od: {user?.data.username || `User ${comment.userId}`}</p>
+        <p className="text-sm mt-3 ">
+          Kaže{' '}
+          <span
+            className="text-blue underline cursor-pointer"
+            onClick={() => navigate(`/user/${comment.userId}`)}
+          >
+            {user?.data.username}
+          </span>
+          <RecordCreatedAt createdAt={comment.createdAt} />
+        </p>
       )}
     </div>
   );

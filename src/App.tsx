@@ -52,7 +52,7 @@ function App() {
     return false;
   });
 
-  const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
+  const renderedUsers = search ? filteredUsers : allVerifiedUsers;
   const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
 
   return (
@@ -101,7 +101,7 @@ function App() {
         />
       </div>
 
-      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
+      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12">
         <LatestComments />
         <LatestMessages />
       </div>

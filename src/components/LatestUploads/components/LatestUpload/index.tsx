@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import { useGetImageBlob } from '../../hooks';
 import UserAvatar from '@app/components/UserAvatar';
-import Image from '@app/components/Image';
 
 interface IUpload {
   id: string;
@@ -19,12 +18,11 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
   return (
     <div className="flex flex-col gap-1">
       {imageBlob && (
-        <Image
-          src={URL.createObjectURL(imageBlob)}
-          alt={upload.id}
-          className="border rounded cursor-pointer"
+        <div
+          className="h-[400px] bg-center bg-cover bg-no-repeat cursor-pointer"
+          style={{ backgroundImage: `url(${URL.createObjectURL(imageBlob)})` }}
           onClick={() => navigate(`/photo/${upload.id}`)}
-        />
+        ></div>
       )}
 
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
@@ -35,7 +33,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
             navigate(`/user/${upload.userId}`);
           }}
           userId={upload.userId}
-          className="w-6 h-6"
+          className="w-[40px] h-[40px] rounded-full"
         />
         <p>{user?.data.username}</p>
       </div>

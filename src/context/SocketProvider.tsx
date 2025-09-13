@@ -64,7 +64,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   }
 
   if (isAuthenticated && !socket) {
-    return <p>Učitavanje...</p>;
+    return null;
   }
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;

@@ -16,6 +16,8 @@ import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
 import Label from '@app/components/Label';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { cityOptions } from '@app/consts/cityOptions';
+import FieldError from '@app/components/FieldError';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -54,25 +56,6 @@ const daysOfWeek = [
   { value: 'sunday', label: 'Nedjelja' },
 ];
 
-const cityOptions = [
-  { label: 'Beograd', value: 'Belgrade' },
-  { label: 'Zagreb', value: 'Zagreb' },
-  { label: 'Sarajevo', value: 'Sarajevo' },
-  { label: 'Skopje', value: 'Skopje' },
-  { label: 'Podgorica', value: 'Podgorica' },
-  { label: 'Pristina', value: 'Pristina' },
-  { label: 'Ljubljana', value: 'Ljubljana' },
-  { label: 'Tirana', value: 'Tirana' },
-  { label: 'Sofia', value: 'Sofia' },
-  { label: 'Split', value: 'Split' },
-  { label: 'Rijeka', value: 'Rijeka' },
-  { label: 'Osijek', value: 'Osijek' },
-  { label: 'Novi Sad', value: 'Novi Sad' },
-  { label: 'Niš', value: 'Niš' },
-  { label: 'Banja Luka', value: 'Banja Luka' },
-  { label: 'Mostar', value: 'Mostar' },
-];
-
 type Inputs = {
   bio: string;
   age: string;
@@ -98,21 +81,32 @@ type Inputs = {
 };
 
 const schema = z.object({
-  bio: z.string().optional(),
-  age: z.string().optional(),
+  bio: z.string().max(100, { message: 'Polje ne smije biti dulje od 100 znakova.' }).optional(),
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
-  gender: z.string().optional(),
+  gender: z.string().max(100, { message: 'Polje ne smije biti dulje od 100 znakova.' }).optional(),
   lookingFor: z.string().optional(),
   relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
   alcohol: z.boolean().optional(),
   sport: z.boolean().optional(),
   favoriteDay: z.string().min(1).optional(),
-  spirituality: z.string().optional(),
-  embarasement: z.string().optional(),
-  tooOldFor: z.string().optional(),
-  makesMyDay: z.string().optional(),
+  spirituality: z
+    .string()
+    .max(300, { message: 'Polje ne smije biti dulje od 300 znakova.' })
+    .optional(),
+  embarasement: z
+    .string()
+    .max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' })
+    .optional(),
+  tooOldFor: z
+    .string()
+    .max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' })
+    .optional(),
+  makesMyDay: z
+    .string()
+    .max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' })
+    .optional(),
   favoriteSong: z
     .string()
     .refine(
@@ -155,9 +149,15 @@ const schema = z.object({
       }
     )
     .optional(),
-  interests: z.string().optional(),
-  languages: z.string().optional(),
-  ending: z.string().optional(),
+  interests: z
+    .string()
+    .max(200, { message: 'Polje ne smije biti dulje od 200 znakova.' })
+    .optional(),
+  languages: z
+    .string()
+    .max(200, { message: 'Polje ne smije biti dulje od 200 znakova.' })
+    .optional(),
+  ending: z.string().max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' }).optional(),
 });
 
 const EditMyProfilePage = () => {
@@ -178,7 +178,6 @@ const EditMyProfilePage = () => {
     if (currentUser) {
       reset({
         bio: currentUser.data.bio || '',
-        age: String(currentUser.data.age ?? '0'),
         location:
           cityOptions.find((option) => option.value === currentUser.data.location)?.value || '',
         sexuality: currentUser.data.sexuality || '',
@@ -244,6 +243,15 @@ const EditMyProfilePage = () => {
                     label="Korisničko ime"
                     disabled
                   />
+                  <Input
+                    type="text"
+                    className="mb-2 !bg-gray-200"
+                    placeholder="Godine"
+                    value={currentUser?.data?.age}
+                    label="Dob"
+                    disabled
+                  />
+
                   <Controller
                     name="location"
                     control={control}
@@ -279,6 +287,7 @@ const EditMyProfilePage = () => {
                     {...register('gender')}
                     label="Rod"
                   />
+                  {errors.gender?.message && <FieldError message={errors.gender.message} />}
                   <Input
                     label="Seksualnost"
                     type="text"
@@ -286,15 +295,15 @@ const EditMyProfilePage = () => {
                     placeholder="Seksualnost"
                     {...register('sexuality')}
                   />
+                  {errors.sexuality?.message && <FieldError message={errors.sexuality.message} />}
+
+                  <Label>Jedna rečenica o meni</Label>
                   <Input
                     type="text"
-                    className="mb-2"
-                    placeholder="Godine"
-                    {...register('age')}
-                    label="Dob"
+                    placeholder="Reci nešto o sebi jednom rečenicom"
+                    {...register('bio')}
                   />
-                  <Label>Biografija</Label>
-                  <TextArea placeholder="Nešto ukratko o tebi" {...register('bio')} />
+                  {errors.bio?.message && <FieldError message={errors.bio.message} />}
                 </div>
               </div>
 
@@ -460,18 +469,26 @@ const EditMyProfilePage = () => {
                     placeholder="Najsramotnija stvar koja mi se dogodila..."
                     {...register('embarasement')}
                   />
+                  {errors.embarasement?.message && (
+                    <FieldError message={errors.embarasement.message} />
+                  )}
+
                   <Label>Imam previše godina za...</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Imam previše godina za...."
                     {...register('tooOldFor')}
                   />
+                  {errors.tooOldFor?.message && <FieldError message={errors.tooOldFor.message} />}
+
                   <Label>Stvari koje mi uljepšavaju dan</Label>
                   <TextArea
                     className="mb-4"
                     placeholder="Dan mi je ljepši ako..."
                     {...register('makesMyDay')}
                   />
+                  {errors.makesMyDay?.message && <FieldError message={errors.makesMyDay.message} />}
+
                   <Input
                     label={
                       <div className="flex items-center gap-1">
@@ -531,6 +548,9 @@ const EditMyProfilePage = () => {
                     placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
                     {...register('spirituality')}
                   />
+                  {errors.spirituality?.message && (
+                    <FieldError message={errors.spirituality.message} />
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
@@ -542,6 +562,8 @@ const EditMyProfilePage = () => {
                     {...register('interests')}
                     label="Interesi"
                   />
+                  {errors.interests?.message && <FieldError message={errors.interests.message} />}
+
                   <Input
                     type="text"
                     className="mb-2"
@@ -549,8 +571,11 @@ const EditMyProfilePage = () => {
                     {...register('languages')}
                     label="Jezici"
                   />
+                  {errors.languages?.message && <FieldError message={errors.languages.message} />}
+
                   <Label>Za kraj, još nešto o meni</Label>
                   <TextArea placeholder="Za kraj još nešto o meni" {...register('ending')} />
+                  {errors.ending?.message && <FieldError message={errors.ending.message} />}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3 mt-3">

@@ -4,7 +4,6 @@ import {
   getFavoriteDayOfWeekTranslation,
   getLookingForTranslation,
   getRelationshipStatusTranslation,
-  getUserBio,
   shouldRenderField,
 } from './utils';
 import Iframe from 'react-iframe';
@@ -14,6 +13,7 @@ import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
 import ContentFormatter from '../ContentFormatter';
+import { cityOptions } from '@app/consts/cityOptions';
 
 const isYouTubeUrl = (url: string) => {
   try {
@@ -101,6 +101,7 @@ const UserProfileCard = ({
             userId={user.id}
             size="200"
             round={false}
+            className="w-[200px] rounded"
           />
         </div>
 
@@ -111,7 +112,8 @@ const UserProfileCard = ({
               <span className="text-xs mt-1">{isOnlineState ? '🟢' : '🔴'}</span>
             </div>
             <p className="flex items-center text-lg gap-2">
-              <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}
+              <BiSolidMap /> <b>Lokacija: </b>{' '}
+              {cityOptions.find((cityOption) => cityOption.value === user.location)?.label || 'N/A'}
             </p>
             <p className="flex items-center text-lg gap-2">
               <BiBody /> <b>Rod: </b> {user.gender || 'N/A'}
@@ -165,7 +167,7 @@ const UserProfileCard = ({
       {shouldRenderField(user.bio) && (
         <div className="mb-10">
           <h2 className="font-bold mt-5">O meni</h2>
-          <ContentFormatter text={getUserBio(user.bio)} />
+          <ContentFormatter text={user.bio} />
         </div>
       )}
 
