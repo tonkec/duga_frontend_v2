@@ -4,7 +4,7 @@ import Guy from '@app/assets/guy.svg';
 import Girl from '@app/assets/girl.svg';
 import AI from '@app/assets/ai.svg';
 import Love1 from '@app/assets/love1.svg';
-import { BiGroup, BiSolidCamera, BiSolidEnvelope } from 'react-icons/bi';
+import { FaEnvelopesBulk, FaPeopleGroup, FaPhotoFilm } from 'react-icons/fa6';
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
@@ -40,10 +40,6 @@ const faqItems = [
     question: 'Moram li imati profilnu sliku da bih koristio aplikaciju?',
     answer:
       'Ne, ali preporučujemo dodavanje profilne slike jer povećava povjerenje i šanse za povezivanje s drugim korisnicima.',
-  },
-  {
-    question: 'Kako mogu nadograditi na premium plan?',
-    answer: 'Jednostavno iz postavki računa odaberi premium plan i slijedi upute za plaćanje.',
   },
   {
     question: 'Mogu li otkazati pretplatu u bilo kojem trenutku?',
@@ -83,7 +79,7 @@ const LoginPage = () => {
     <div className="bg-white">
       <header className="gradient  pb-32">
         <CookieBanner />
-        <nav className="transparent py-6 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
+        <nav className="transparent py-2 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
           <Button
             className=""
             type="primary"
@@ -242,7 +238,7 @@ const LoginPage = () => {
           <div className="lg:grid lg:grid-cols-3 gap-6 xl:gap-12">
             <div className="space-y-2 mb-12 lg:mb-0">
               <div className="flex items-center gap-2">
-                <BiGroup className="text-[#2D46B9]" fontSize="2rem" />
+                <FaPeopleGroup className="text-[#2D46B9]" fontSize="2rem" />
                 <h2 className="text-4xl">Mnogo korisnika</h2>
               </div>
               <p className="text-left text-gray-700">
@@ -257,7 +253,7 @@ const LoginPage = () => {
 
             <div className="space-y-2 mb-12 lg:mb-0">
               <div className="flex items-center gap-2 ">
-                <BiSolidEnvelope className="text-[#2D46B9]" fontSize="2rem" />
+                <FaEnvelopesBulk className="text-[#2D46B9]" fontSize="2rem" />
                 <h2 className="text-4xl">Gro poruka</h2>
               </div>
               <p className="text-left text-gray-700">
@@ -272,7 +268,7 @@ const LoginPage = () => {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <BiSolidCamera className="text-[#2D46B9]" fontSize="2rem" />
+                <FaPhotoFilm className="text-[#2D46B9]" fontSize="2rem" />
                 <h2 className="text-4xl">Hrpetina fotki</h2>
               </div>
               <p className="text-left text-gray-700">
@@ -353,7 +349,7 @@ const LoginPage = () => {
 
             <p className="text-lg max-w-2xl">
               Naša platforma nudi različite planove pretplate kako bi zadovoljila potrebe svih
-              korisnika. Od besplatnog osnovnog plana do premium opcija, imamo nešto za svakoga.
+              korisnika. Premium opcija je u izgradnji.
             </p>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12 mt-12">
@@ -388,52 +384,6 @@ const LoginPage = () => {
                     <Button
                       type="transparent"
                       className="!px-6 !py-2 !text-lg no-underline !bg-pink-dark text-white"
-                      onClick={() => {
-                        loginWithRedirect({
-                          authorizationParams: {
-                            redirect_uri: URL,
-                          },
-                        });
-                      }}
-                    >
-                      Odaberi plan unutar aplikacije
-                    </Button>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="gradient p-6 rounded-lg">
-                <h3 className="text-2xl font-bold mt-2 mb-4 text-white">Premium plan</h3>
-                <h3 className="text-lg text-white mb-12">10€ mjesečno</h3>
-
-                <ul>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                    <span className="text-white text-lg">Sve značajke osnovnog plana</span>
-                  </li>
-
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                    <span className="text-white text-lg">Saznaj tko ti gleda profil</span>
-                  </li>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                    <span className="text-white text-lg">Saznaj jesu li vidjeli poruku</span>
-                  </li>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                    <span className="text-white text-lg">Grupni razgovori </span>
-                  </li>
-
-                  <li className="text-md text-black">
-                    <BiSolidCircle className="inline-block mr-2 text-pink" fontSize={10} />
-                    <span className="text-white text-lg">Do ukupno 10 fotografija</span>
-                  </li>
-
-                  <li className="mt-12">
-                    <Button
-                      type="blue"
-                      className="!px-6 !py-2 !text-lg"
                       onClick={() => {
                         loginWithRedirect({
                           authorizationParams: {
