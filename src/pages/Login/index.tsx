@@ -79,7 +79,7 @@ const LoginPage = () => {
     <div className="bg-white">
       <header className="gradient  pb-32">
         <CookieBanner />
-        <nav className="transparent py-6 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
+        <nav className="transparent py-2 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
           <Button
             className=""
             type="primary"
