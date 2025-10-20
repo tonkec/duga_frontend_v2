@@ -8,6 +8,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
 import { NavigationItems } from '../NavigationLinks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { useSocket } from '@app/context/useSocket';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,6 +20,8 @@ const Navigation = () => {
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
 
+  const socket = useSocket();
+
   useEffect(() => {
     if (!isMobile) {
       setIsMobileMenuOpen(false);
@@ -26,6 +29,9 @@ const Navigation = () => {
   }, [isMobile]);
 
   const onLogout = () => {
+    if (socket) {
+      socket.emit('set-status', { status: 'offline' });
+    }
     setCookie('token', '');
     saveUserId(null);
     logout({
