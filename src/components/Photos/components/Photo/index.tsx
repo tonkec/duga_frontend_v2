@@ -16,7 +16,7 @@ const Photo = ({ image, onClick }: IPhotoProps) => {
       src={imageBlob ? URL.createObjectURL(imageBlob) : getImageUrl(image)}
       alt="fotografija"
       onClick={onClick}
-      className="cursor-pointer w-full object-cover rounded-md"
+      className="rounded-md"
     />
   );
 };

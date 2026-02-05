@@ -38,7 +38,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
 
   return (
     <>
-      <h2 className="font-bold mt-5 mb-2">Fotografije ({images.length})</h2>
+      <h2 className="font-bold mt-5 mb-2">Profilne Fotografije ({images.length})</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {images.map((image: IImage, index: number) => {
           return (

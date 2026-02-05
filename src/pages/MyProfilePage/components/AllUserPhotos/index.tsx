@@ -66,8 +66,8 @@ const AllUserPhotos = () => {
         fotografija.
       </p>
       <div className="lg:grid grid-cols-3 gap-4 ">
-        {allUserImages?.data.map((image: IImage, index: number) => (
-          <div key={index} className="relative mb-6 lg:mb-0 max-w-[400px]">
+        {allUserImages?.data.map((image: IImage) => (
+          <div key={image.url} className="relative mb-6 lg:mb-0 max-w-[400px]">
             <Photo image={image} />
             <Button
               onClick={() => {
