@@ -82,7 +82,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
 
         <div className="flex flex-col items-end gap-2 text-sm text-gray-500">
           <UserAvatar
-            color="black"
+            color="#F037A5"
             userId={String(comment.userId)}
             avatarFallbackName={user?.data.username}
             className="w-[40px] h-[40px] rounded-full"
