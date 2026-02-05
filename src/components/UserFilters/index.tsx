@@ -32,7 +32,7 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
     case 'location':
       return 'Pretraži prema lokaciji...';
     default:
-      return 'Odaberite kriterij';
+      return 'Odaberite kriterij pretrage...';
   }
 };
 
