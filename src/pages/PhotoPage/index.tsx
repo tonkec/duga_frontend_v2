@@ -45,7 +45,7 @@ const PhotoPage = () => {
   return (
     <AppLayout>
       <Card>
-        <div className="lg:flex gap-2 items-start">
+        <div className="lg:flex gap-4 items-start">
           <div className="flex-1">
             {imageBlob ? (
               <>

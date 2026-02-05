@@ -36,7 +36,7 @@ const Paginated = <T,>({
   if (!data) return null;
 
   return (
-    <div className="h-full mt-4">
+    <div className="h-full">
       <ul className={gridClassName}>
         {currentPageData.map((item, index) => (
           <li className="h-full xl:mb-4" key={index}>
