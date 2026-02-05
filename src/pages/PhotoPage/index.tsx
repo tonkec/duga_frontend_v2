@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { useGetSingleImage } from './hooks';
 import Card from '@app/components/Card';
@@ -11,8 +11,10 @@ import Image from '@app/components/Image';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import UserAvatar from '@app/components/UserAvatar';
 import Divider from '@app/components/Divider';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const PhotoPage = () => {
+  const navigate = useNavigate();
   const { photoId } = useParams();
   const { singleImage, singleImageLoading } = useGetSingleImage(photoId as string);
   const { data: imageBlob } = useGetImageBlob(
@@ -20,6 +22,7 @@ const PhotoPage = () => {
   );
 
   const { user: userData } = useGetUserById(singleImage?.data?.userId || '');
+  const { user: currentUser } = useGetCurrentUser();
 
   if (singleImageLoading) {
     return (
@@ -34,13 +37,44 @@ const PhotoPage = () => {
       <AppLayout>
         <Card>
           <div className="flex flex-col justify-center items-center max-w-lg mx-auto">
-            <Image src={notFound} alt="Not found" />
+            <Image src={notFound} alt="Nije pronađena" />
             <p className="text-center">Slika nije pronađena ili je obrisana.</p>
           </div>
         </Card>
       </AppLayout>
     );
   }
+
+  const showAvatar = () => {
+    if (currentUser?.data?.id === userData?.data?.id) {
+      return (
+        <div className="flex items-center gap-2">
+          <UserAvatar
+            className="w-8 h-8 rounded-full"
+            color="#F037A5"
+            avatarFallbackName={`${userData?.data?.username}`}
+            userId={String(userData?.data?.id)}
+          />
+          <span>{userData?.data?.username}</span>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        onClick={() => navigate(`/profile/${userData?.data?.id}`)}
+        className="flex items-center gap-2 hover:underline"
+      >
+        <UserAvatar
+          className="w-8 h-8 rounded-full"
+          color="#F037A5"
+          avatarFallbackName={`${userData?.data?.username}`}
+          userId={String(userData?.data?.id)}
+        />
+        <span>{userData?.data?.username}</span>
+      </button>
+    );
+  };
 
   return (
     <AppLayout>
@@ -52,12 +86,7 @@ const PhotoPage = () => {
                 <div>
                   <Image src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
                   <div className="flex justify-between mt-4">
-                    <UserAvatar
-                      className="w-10 h-10 rounded-full"
-                      color="#F037A5"
-                      avatarFallbackName={`${userData?.data?.username}`}
-                      userId={userData?.data?.id}
-                    />
+                    {showAvatar()}
                     {singleImage?.data?.description && (
                       <p className="py-2">{singleImage?.data.description}</p>
                     )}
