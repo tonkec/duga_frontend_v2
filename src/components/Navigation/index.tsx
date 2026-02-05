@@ -40,8 +40,8 @@ const Navigation = () => {
   return (
     <>
       {!isMobile && (
-        <nav className="flex justify-between items-center gradient p-4 shadow-sm text-white">
-          <div className="flex gap-4 items-center space-between w-full">
+        <nav className="flex justify-between items-center gradient px-6 py-4 shadow-sm text-white">
+          <div className="flex gap-6 items-center space-between w-full">
             <ProfilePhoto currentUser={currentUser?.data} />
             <NavigationItems userId={userId} onLogout={onLogout} />
           </div>
