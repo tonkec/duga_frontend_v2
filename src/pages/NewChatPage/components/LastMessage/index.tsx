@@ -17,7 +17,7 @@ const LastMessage = ({ message }: ILastMessageProps) => {
   }
 
   return (
-    <BlobImage imageUrl={message.securePhotoUrl} name="poruka" className="h-32 w-32 rounded" />
+    <BlobImage imageUrl={message.securePhotoUrl} name="poruka" className="rounded max-h-[50px]" />
   );
 };
 

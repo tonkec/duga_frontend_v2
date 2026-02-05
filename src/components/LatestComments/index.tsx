@@ -63,24 +63,24 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
 
   return (
     <div
-      className="flex gap-6 border-b p-4 hover:bg-gray-100 transition cursor-pointer justify-between"
+      className="border-b p-4 hover:bg-gray-100 transition cursor-pointer justify-between"
       onClick={onClick}
     >
-      <div className="flex flex-col  gap-2 mb-2">
-        <p className="text-sm">
+      <div className="flex items-end justify-between gap-2 mb-2">
+        <div>
           {imageBlob ? (
             <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Comment image"
-              className="w-xl rounded"
+              className="w-xl rounded max-h-[100px]"
               onClick={() => navigate(`/user/${comment.userId}`)}
             />
           ) : (
-            <span className="text-gray-500">{renderFormattedComment(comment.comment)}</span>
+            <span className="text-gray-500 text-sm">{renderFormattedComment(comment.comment)}</span>
           )}
-        </p>
+        </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex flex-col items-end gap-2 text-sm text-gray-500">
           <UserAvatar
             color="black"
             userId={String(comment.userId)}
@@ -108,9 +108,9 @@ const LatestComments = () => {
 
   const comments = allComments?.data.slice(0, numberOfComments) || [];
   return (
-    <div className="col-span-2">
+    <div className="flex-1">
       <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
-      <Card className="!p-0 overflow-hidden max-w-lg">
+      <Card className="!p-0 overflow-hidden">
         {comments.map((comment: IComment) => (
           <LatestComment
             key={comment.id}

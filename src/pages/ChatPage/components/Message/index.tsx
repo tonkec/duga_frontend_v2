@@ -82,7 +82,7 @@ const MessageContent = ({
       {isGiphy && externalGifUrl && <GiphyMessage messagePhotoUrl={externalGifUrl} />}
 
       {!isGiphy && isS3File && imageBlob && (
-        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '50vw' }} />
+        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '30vw' }} />
       )}
 
       {!isGiphy && !isS3File && <ContentFormatter text={message} />}

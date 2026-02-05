@@ -101,7 +101,7 @@ function App() {
         />
       </div>
 
-      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12">
+      <div className="flex gap-4 mt-12 max-w-5xl flex-col lg:flex-row">
         <LatestComments />
         <LatestMessages />
       </div>
