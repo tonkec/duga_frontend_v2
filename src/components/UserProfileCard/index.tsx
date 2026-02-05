@@ -97,7 +97,7 @@ const UserProfileCard = ({
         <div>
           <UserAvatar
             avatarFallbackName={`${user.username}`}
-            color="#F037A5"
+            color="#2D46B9"
             userId={user.id}
             size="200"
             round={false}
