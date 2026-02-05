@@ -25,7 +25,6 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || comment.imageUrl);
-  console.log('Comment data:', comment);
 
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();

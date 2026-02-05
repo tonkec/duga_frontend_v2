@@ -26,7 +26,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   return (
     <div
-      className={`flex-1 rounded items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
+      className={`flex-1 flex rounded items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
       onClick={() => {
         if (!lastMessage) {
           onClick();
@@ -39,9 +39,9 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
       }}
     >
       <div className="flex justify-between items-center w-full">
-        <div className="flex items-center justify-end">
+        <div className="flex items-center">
           <UserAvatar
-            color="#2D46B9"
+            color="#F037A5"
             avatarFallbackName={`${user.username}`}
             userId={String(user.id)}
             className="w-[40px] h-[40px] rounded-full"

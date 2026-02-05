@@ -1,5 +1,4 @@
 import AppLayout from '@app/components/AppLayout';
-import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
 import Loader from '@app/components/Loader';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
@@ -10,8 +9,7 @@ const NewChatPage = () => {
   const hasRejectedCookies = cookies.cookieRejectedAt;
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
 
-  const { isAllUsersLoading } = useGetAllUsers();
-  if (isAllUsersLoading || isUserChatsLoading) {
+  if (isUserChatsLoading) {
     return (
       <AppLayout>
         <Loader />

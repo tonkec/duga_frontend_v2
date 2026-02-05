@@ -95,7 +95,7 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
       <div className="w-full text-center mb-4">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
-          color="#2D46B9"
+          color="#F037A5"
           userId={String(user.id)}
           size="100"
           className="w-[100px] h-[100px] rounded-full mx-auto"
