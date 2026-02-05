@@ -13,7 +13,7 @@ const ProfilePhoto = ({ currentUser }: IProfilePhotoProps) => {
         userId={String(currentUser.id)}
         color="#F037A5"
         avatarFallbackName={`${currentUser?.username}`}
-        className="rounded-sm w-12 h-12 object-cover"
+        className="rounded-sm w-12 h-12"
       />
     </Link>
   );

@@ -46,32 +46,38 @@ const PhotoPage = () => {
   }
 
   const showAvatar = () => {
-    if (currentUser?.data?.id === userData?.data?.id) {
+    const userId = userData?.data?.id;
+    const username = userData?.data?.username;
+    if (!userId || !username) {
+      return null;
+    }
+
+    if (currentUser?.data?.id === userId) {
       return (
         <div className="flex items-center gap-2">
           <UserAvatar
             className="w-8 h-8 rounded-full"
             color="#F037A5"
-            avatarFallbackName={`${userData?.data?.username}`}
-            userId={String(userData?.data?.id)}
+            avatarFallbackName={`${username}`}
+            userId={String(userId)}
           />
-          <span>{userData?.data?.username}</span>
+          <span>{username}</span>
         </div>
       );
     }
 
     return (
       <button
-        onClick={() => navigate(`/user/${userData?.data?.id}`)}
+        onClick={() => navigate(`/user/${userId}`)}
         className="flex items-center gap-2 hover:underline"
       >
         <UserAvatar
           className="w-8 h-8 rounded-full"
           color="#F037A5"
-          avatarFallbackName={`${userData?.data?.username}`}
-          userId={String(userData?.data?.id)}
+          avatarFallbackName={`${username}`}
+          userId={String(userId)}
         />
-        <span>{userData?.data?.username}</span>
+        <span>{username}</span>
       </button>
     );
   };

@@ -38,7 +38,7 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
       <h2 className="mb-2">Svi razgovori</h2>
       {userChats?.map((chat) => {
         return (
-          <div key={chat.id} className="flex items-center justify-center">
+          <div key={chat.id} className="flex items-center">
             <UserChat
               user={chat.Users[0]}
               onClick={() => {

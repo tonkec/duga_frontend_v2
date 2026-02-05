@@ -46,10 +46,10 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   };
 
   const messageBackgroundColor = isFromSameUser
-    ? 'bg-white text-black hover:bg-gray-100 hover:text-white'
+    ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
     : is_read
-      ? 'bg-white text-black hover:bg-gray-100 hover:text-white'
-      : 'bg-gray text-white hover:bg-pink';
+      ? 'bg-black text-black hover:bg-gray-100 hover:text-black'
+      : 'bg-gray-100 text-white hover:bg-pink';
 
   const getLatestPerson = () => (
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
