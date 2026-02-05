@@ -38,32 +38,31 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="lg:flex gap-2 justify-between">
-      <div className="lg:flex gap-2">
-        <div className="lg:mb-0 flex-1">
-          <Input
-            type="text"
-            placeholder={getPlaceholder(selectValue)}
-            icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
-            value={search}
-            onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-            className="w-full md:min-w-[600px] lg:min-w-[800px] py-[6px]"
-            disabled={!selectValue.value}
-          />
-        </div>
-        <div className="min-w-[200px] flex-1">
-          <Select
-            options={selectOptions}
-            isClearable
-            placeholder="Odaberite kriterij"
-            onChange={(e) => {
-              setSelectValue({
-                value: e?.value || '',
-                label: e?.label || '',
-              });
-            }}
-          />
-        </div>
+    <div className="sm:flex gap-2 justify-between">
+      <div className="w-full">
+        <Input
+          type="text"
+          placeholder={getPlaceholder(selectValue)}
+          icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
+          value={search}
+          onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
+          className="w-full py-[6px] xl:min-w-[900px]"
+          disabled={!selectValue.value}
+        />
+      </div>
+      <div className="w-full max-w-[200px]">
+        <Select
+          options={selectOptions}
+          isClearable
+          placeholder="Odaberite kriterij"
+          value={selectValue.value ? selectValue : null}
+          onChange={(e) => {
+            setSelectValue({
+              value: e?.value || '',
+              label: e?.label || '',
+            });
+          }}
+        />
       </div>
     </div>
   );
