@@ -62,7 +62,7 @@ const PhotoPage = () => {
 
     return (
       <button
-        onClick={() => navigate(`/profile/${userData?.data?.id}`)}
+        onClick={() => navigate(`/user/${userData?.data?.id}`)}
         className="flex items-center gap-2 hover:underline"
       >
         <UserAvatar
