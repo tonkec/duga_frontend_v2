@@ -25,8 +25,8 @@ function App() {
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
   const [search, setSearch] = useState('');
   const [selectValue, setSelectValue] = useState({
-    value: 'username',
-    label: 'ime',
+    value: '',
+    label: '',
   });
 
   if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
@@ -64,7 +64,7 @@ function App() {
         setSearch={setSearch}
       />
 
-      <div className="mt-12">
+      <div className="mt-4">
         {!renderedUsers?.length && (
           <div className="text-center text-lg max-w-md mx-auto mt-12">
             <h2 className="mb-4">Nema korisnika 😢</h2>

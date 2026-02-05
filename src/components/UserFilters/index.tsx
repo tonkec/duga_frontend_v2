@@ -5,10 +5,10 @@ import { IUser } from '@app/components/UserCard';
 import { SyntheticEvent } from 'react';
 
 const selectOptions: { value: keyof IUser; label: string }[] = [
-  { value: 'gender', label: 'rod' },
-  { value: 'sexuality', label: 'seksualnost' },
-  { value: 'location', label: 'lokacija' },
-  { value: 'username', label: 'ime' },
+  { value: 'gender', label: 'Rod' },
+  { value: 'sexuality', label: 'Seksualnost' },
+  { value: 'location', label: 'Lokacija' },
+  { value: 'username', label: 'Ime' },
 ];
 
 interface IUserFiltersProps {
@@ -32,39 +32,35 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
     case 'location':
       return 'Pretraži prema lokaciji...';
     default:
-      return 'Pretraži prema...';
+      return 'Odaberite kriterij';
   }
 };
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="lg:flex gap-2 justify-between mb-4">
-      <h2 className="justify-start mb-2 lg:mb-0">
-        <span>🦄 Neke zanimljive osobice </span>
-      </h2>
+    <div className="lg:flex gap-2 justify-between">
       <div className="lg:flex gap-2">
-        <div className="mb-2 lg:mb-0">
+        <div className="lg:mb-0 flex-1">
           <Input
             type="text"
             placeholder={getPlaceholder(selectValue)}
-            icon={<BiSearch color="grey" fontSize="20px" className="mt-1" />}
+            icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
             value={search}
             onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-            className="md:min-w-[600px] py-[6px]"
+            className="min-w-[1000px] py-[6px]"
+            disabled={!selectValue.value}
           />
         </div>
-        <div className="min-w-[200px]">
+        <div className="min-w-[200px] flex-1">
           <Select
-            isClearable={false}
             options={selectOptions}
-            placeholder="Pretraži prema..."
+            placeholder="Odaberite kriterij"
             onChange={(e) => {
               setSelectValue({
                 value: e?.value || '',
                 label: e?.label || '',
               });
             }}
-            defaultValue={selectOptions.find((option) => option.value === selectValue.value)}
           />
         </div>
       </div>
