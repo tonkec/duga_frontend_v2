@@ -69,11 +69,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
         />
       );
     }
-    return (
-      <span className="text-black">
-        <ContentFormatter text={message.message} />
-      </span>
-    );
+    return <ContentFormatter text={message.message} />;
   };
 
   return (
