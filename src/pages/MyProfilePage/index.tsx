@@ -37,7 +37,7 @@ const MyProfilePage = () => {
           </Tab>
           <Tab>
             <div className="flex items-center gap-1">
-              Profilne Fotografije <BiSolidCamera fontSize={25} />
+              Fotografije <BiSolidCamera fontSize={25} />
             </div>
           </Tab>
 
