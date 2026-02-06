@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { FiMenu, FiX } from 'react-icons/fi';
-import ProfilePhoto from '@app/components/ProfilePhoto';
 import { useCookies } from 'react-cookie';
 import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -46,9 +45,8 @@ const Navigation = () => {
   return (
     <>
       {!isMobile && (
-        <nav className="flex justify-between items-center gradient p-4 shadow-sm text-white">
-          <div className="flex gap-4 items-center space-between w-full">
-            <ProfilePhoto currentUser={currentUser?.data} />
+        <nav className="flex justify-between items-center gradient px-6 py-4 shadow-sm text-white">
+          <div className="flex gap-6 items-center space-between w-full">
             <NavigationItems userId={userId} onLogout={onLogout} />
           </div>
         </nav>
@@ -56,7 +54,6 @@ const Navigation = () => {
 
       {isMobile && (
         <div className="flex justify-between items-center gradient p-4 shadow-sm text-white">
-          <ProfilePhoto currentUser={currentUser?.data} />
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-white">
             <FiMenu size={24} />
           </button>

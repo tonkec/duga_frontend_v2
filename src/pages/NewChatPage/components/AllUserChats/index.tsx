@@ -35,9 +35,10 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
   const navigate = useNavigate();
   return (
     <div>
+      <h2 className="mb-2">Svi razgovori</h2>
       {userChats?.map((chat) => {
         return (
-          <div key={chat.id}>
+          <div key={chat.id} className="flex items-center">
             <UserChat
               user={chat.Users[0]}
               onClick={() => {

@@ -1,30 +1,28 @@
-import { useState } from 'react';
 import AppLayout from '@app/components/AppLayout';
-import Input from '@app/components/Input';
-import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
-import UserCard, { IUser } from '@app/components/UserCard';
-import { IChat, useCreateNewChat } from './hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import Loader from '@app/components/Loader';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
-import { toast } from 'react-toastify';
-import { toastConfig } from '@app/configs/toast.config';
 
 const NewChatPage = () => {
-  const [currentUserId] = useLocalStorage('userId');
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
-  const [search, setSearch] = useState('');
-  const { onCreateChat } = useCreateNewChat();
-  const { allUsers, isAllUsersLoading } = useGetAllUsers();
-  if (isAllUsersLoading || isUserChatsLoading) {
+
+  if (isUserChatsLoading) {
     return (
       <AppLayout>
         <Loader />
       </AppLayout>
+    );
+  }
+
+  if (userChats?.data.length === 0 || !userChats?.data) {
+    return (
+      <div className="mt-10 text-center text-gray-600">
+        Trenutno nemaš aktivnih razgovora. Započni novu konverzaciju kako bi se ovdje prikazale
+        tvoje poruke.
+      </div>
     );
   }
 
@@ -39,56 +37,8 @@ const NewChatPage = () => {
     );
   }
 
-  const verifiedUsers = allUsers?.data.filter((user: IUser) => user.isVerified);
-
-  const filteredUsers = search
-    ? verifiedUsers
-        .filter((user: IUser) => {
-          return (
-            user?.username?.toLowerCase().includes(search.toLowerCase()) ||
-            user?.firstName?.toLowerCase().includes(search.toLowerCase()) ||
-            user?.lastName?.toLowerCase().includes(search.toLowerCase())
-          );
-        })
-        .filter((user: IUser) => user.id !== currentUserId)
-    : [];
-
-  const onButtonClick = (partnerId: number) => {
-    onCreateChat({ partnerId });
-  };
-
-  const hasChatWithUser = (partnerId: number) => {
-    return userChats?.data?.some((chat: IChat) =>
-      chat.Users?.some((user) => user.id === Number(partnerId))
-    );
-  };
-
   return (
     <AppLayout>
-      <h1>Pretraži prema imenu ili prezimenu</h1>
-      <Input
-        type="text"
-        placeholder="Upiši username"
-        className="mt-4"
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-        {filteredUsers?.map((user: IUser) => {
-          return (
-            <UserCard
-              key={user.id}
-              user={user}
-              onButtonClick={() =>
-                hasChatWithUser(Number(user.id))
-                  ? toast.error('Taj chat već postoji!', toastConfig)
-                  : onButtonClick(Number(user.id))
-              }
-              buttonText="Pošalji poruku"
-            />
-          );
-        })}
-      </div>
       {userChats?.data.length > 0 && <AllUserChats userChats={userChats?.data} />}
     </AppLayout>
   );

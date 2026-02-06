@@ -5,11 +5,11 @@ import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import { IChat, useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
-import BlobImage from '../PhotoUploader/components/BlobImage';
 import UserAvatar from '../UserAvatar';
-import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
 import ContentFormatter from '../ContentFormatter';
+import BlobImage from '../PhotoUploader/components/BlobImage';
+import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
 
 interface IMessageWrapper {
   message: IMessage;
@@ -46,10 +46,10 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   };
 
   const messageBackgroundColor = isFromSameUser
-    ? 'bg-white text-black hover:bg-blue hover:text-white'
+    ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
     : is_read
-      ? 'bg-white text-black hover:bg-blue hover:text-white'
-      : 'bg-blue text-white hover:bg-pink';
+      ? 'bg-gray-100 text-black hover:bg-gray-200 hover:text-black'
+      : 'bg-blue text-white hover:bg-blue hover:text-black';
 
   const getLatestPerson = () => (
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
@@ -65,16 +65,11 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
         <BlobImage
           imageUrl={message.securePhotoUrl}
           name="komentar"
-          className="w-xl rounded max-h-[400px]"
+          className="rounded max-h-[100px]"
         />
       );
     }
-
-    return (
-      <span className="text-black">
-        <ContentFormatter text={message.message} />
-      </span>
-    );
+    return <ContentFormatter text={message.message} />;
   };
 
   return (
@@ -83,10 +78,14 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
       className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
       <div className="mb-2">
-        {renderMessageContent()}
-        <div className="mt-4 flex items-center gap-2">
-          {getLatestPerson()}
-          <RecordCreatedAt createdAt={message.createdAt} />
+        <div className="mt-4 flex items-end gap-2 justify-between">
+          {renderMessageContent()}
+          <div className="flex flex-col items-end">
+            {getLatestPerson()}
+            <div className="mt-4">
+              <RecordCreatedAt createdAt={message.createdAt} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -119,9 +118,9 @@ const LatestMessages = () => {
   }
 
   return (
-    <div className="col-span-2">
+    <div className="flex-1">
       <h2 className="mb-2">📬 Tvoje nedavne poruke</h2>
-      <Card className="!p-0 overflow-hidden max-w-xl">
+      <Card className="!p-0 overflow-hidden">
         {top3.map(({ message }: { message: IMessage }, index: number) => (
           <LatestMessage
             key={index}

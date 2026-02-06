@@ -25,8 +25,8 @@ function App() {
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
   const [search, setSearch] = useState('');
   const [selectValue, setSelectValue] = useState({
-    value: 'username',
-    label: 'ime',
+    value: '',
+    label: '',
   });
 
   if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
@@ -64,7 +64,7 @@ function App() {
         setSearch={setSearch}
       />
 
-      <div className="mt-12">
+      <div className="mt-4">
         {!renderedUsers?.length && (
           <div className="text-center text-lg max-w-md mx-auto mt-12">
             <h2 className="mb-4">Nema korisnika 😢</h2>
@@ -101,7 +101,7 @@ function App() {
         />
       </div>
 
-      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12">
+      <div className="mt-12 flex flex-col gap-4 lg:flex-row [&>*:only-child]:w-full [&>*:only-child]:flex-none">
         <LatestComments />
         <LatestMessages />
       </div>

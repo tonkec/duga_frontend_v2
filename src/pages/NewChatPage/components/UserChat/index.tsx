@@ -1,4 +1,3 @@
-import { BiChevronRight } from 'react-icons/bi';
 import { useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import LastMessage from '../LastMessage';
@@ -27,7 +26,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   return (
     <div
-      className={`flex rounded items-center justify-between p-4 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
+      className={`flex-1 flex rounded items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
       onClick={() => {
         if (!lastMessage) {
           onClick();
@@ -39,15 +38,10 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
         onClick();
       }}
     >
-      <div className="flex flex-col">
-        {lastMessage && (
-          <div>
-            <LastMessage message={lastMessage} />
-          </div>
-        )}
-        <div className="flex mt-4 items-center">
+      <div className="flex justify-between items-center w-full">
+        <div className="flex items-center">
           <UserAvatar
-            color="#2D46B9"
+            color="#F037A5"
             avatarFallbackName={`${user.username}`}
             userId={String(user.id)}
             className="w-[40px] h-[40px] rounded-full"
@@ -56,11 +50,12 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
             <h1 className="text-lg font-semibold">{user.username}</h1>
           </div>
         </div>
+        {lastMessage && (
+          <div>
+            <LastMessage message={lastMessage} />
+          </div>
+        )}
       </div>
-      <BiChevronRight
-        className="w-6 h-6 text-gray-500"
-        color={isMarkedAsRead() ? '#000' : '#fff'}
-      />
     </div>
   );
 };
