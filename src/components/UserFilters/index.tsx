@@ -57,9 +57,17 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           placeholder="Odaberite kriterij"
           value={selectValue.value ? selectValue : null}
           onChange={(e) => {
+            if (!e) {
+              setSelectValue({
+                value: '',
+                label: '',
+              });
+              setSearch('');
+              return;
+            }
             setSelectValue({
-              value: e?.value || '',
-              label: e?.label || '',
+              value: e.value,
+              label: e.label,
             });
           }}
         />
