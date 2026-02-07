@@ -36,23 +36,23 @@ const SettingsPage = () => {
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
 
-  if (!currentUser?.data) {
-    return (
-      <AppLayout>
-        <Card>
-          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
-          <p>Ne možemo učitati tvoje podatke. Molimo pokušaj ponovo kasnije.</p>
-        </Card>
-      </AppLayout>
-    );
-  }
-
   if (isUserLoading) {
     return (
       <AppLayout>
         <Card>
           <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
           <p>Učitavanje...</p>
+        </Card>
+      </AppLayout>
+    );
+  }
+
+  if (!currentUser?.data) {
+    return (
+      <AppLayout>
+        <Card>
+          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+          <p>Ne možemo učitati tvoje podatke. Molimo pokušaj ponovo kasnije.</p>
         </Card>
       </AppLayout>
     );

@@ -12,7 +12,7 @@ interface IUserChatProps {
 }
 
 const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
-  const { user: currentUser } = useGetCurrentUser();
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { isMessageReadData } = useGetIsMessageRead(String(lastMessage?.id || ''));
@@ -20,10 +20,14 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   const isMarkedAsRead = () => {
     if (!lastMessage) return true;
+    if (userId == null) return true;
     if (lastMessage?.fromUserId === Number(userId)) return true;
-
     return is_read;
   };
+
+  if (isUserLoading) {
+    return null;
+  }
 
   return (
     <div
@@ -33,7 +37,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
           onClick();
           return;
         }
-        if (lastMessage?.fromUserId !== Number(userId)) {
+        if (userId != null && lastMessage?.fromUserId !== Number(userId)) {
           onMarkMessagesAsRead(String(lastMessage?.id) || '');
         }
         onClick();
