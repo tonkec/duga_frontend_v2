@@ -59,7 +59,7 @@ const ChatPage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const socket = useSocket();
   const navigate = useNavigate();
-  const { user: currentUser } = useGetCurrentUser();
+  const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
   const { chatId } = useParams();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
@@ -78,6 +78,7 @@ const ChatPage = () => {
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const otherUserName = otherUser?.data.username;
   const currentUserName = currentUser?.data.username;
+
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');
 
   useEffect(() => {
@@ -182,6 +183,8 @@ const ChatPage = () => {
               otherUserProfilePhoto={otherUserProfilePhoto}
               otherUserId={otherUserId as number}
               receivedMessages={receivedMessages}
+              currentUserId={currentUserId as number}
+              isCurrentUserLoading={isCurrentUserLoading}
             />
           </div>
           {isTyping && <ChatBubble />}

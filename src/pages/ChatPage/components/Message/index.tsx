@@ -5,7 +5,6 @@ import UserAvatar from '@app/components/UserAvatar';
 import GiphyMessage from '../GiphyMessage';
 import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
-import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -41,9 +40,17 @@ interface IMessageProps {
   otherUserId?: number;
   messagePhotoUrl: string;
   showAvatar: boolean;
+  currentUserId: number;
+  isCurrentUserLoading: boolean;
 }
-interface IMessageTemplateProps extends BaseMessageTemplateProps {
+
+interface OtherUserMessageTemplateProps extends BaseMessageTemplateProps {
   otherUserId?: number;
+}
+
+interface CurrentUserMessageTemplateProps extends BaseMessageTemplateProps {
+  currentUserId: number;
+  isCurrentUserLoading: boolean;
 }
 
 interface IMessageContentProps {
@@ -100,10 +107,8 @@ const CurrentUserMessageTemplate = ({
   messagePhotoUrl,
   showAvatar,
   messageType,
-}: IMessageTemplateProps) => {
-  const { user: currentUser } = useGetCurrentUser();
-  const currentUserId = currentUser?.data?.id;
-
+  currentUserId,
+}: CurrentUserMessageTemplateProps) => {
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className={`${messageStyles} flex bg-blue`}>
@@ -136,8 +141,9 @@ const OtherUserMessageTemplate = ({
   messagePhotoUrl,
   showAvatar,
   messageType,
-}: IMessageTemplateProps) => {
+}: OtherUserMessageTemplateProps) => {
   const navigate = useNavigate();
+
   return (
     <div className="flex">
       {showAvatar && (
@@ -169,12 +175,10 @@ const Message = ({
   otherUserId,
   messagePhotoUrl,
   showAvatar,
+  currentUserId,
+  isCurrentUserLoading,
 }: IMessageProps) => {
-  const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
-  const currentUserId = currentUser?.data?.id;
-  const isFromCurrentUser = message.User.id === Number(currentUserId);
-
-  if (!currentUserId) return null;
+  const isFromCurrentUser = message.User.id === currentUserId;
 
   if (isCurrentUserLoading) {
     return (
@@ -197,6 +201,8 @@ const Message = ({
     );
   }
 
+  if (!currentUserId) return null;
+
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate
       userName={currentUserName}
@@ -205,6 +211,8 @@ const Message = ({
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}
       messageType={message.type}
+      currentUserId={currentUserId}
+      isCurrentUserLoading={isCurrentUserLoading}
     />
   ) : (
     <OtherUserMessageTemplate
