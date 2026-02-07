@@ -31,12 +31,19 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
 
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
   const { isMessageReadData } = useGetIsMessageRead(String(message?.id) || '');
-  const { user: currentUser } = useGetCurrentUser();
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
 
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { is_read } = isMessageReadData?.data || {};
   const isFromSameUser = message.User.id === Number(userId);
+
+  const isMarkedAsRead = () => {
+    if (isUserLoading) return true;
+    if (userId == null) return true;
+    if (isFromSameUser) return true;
+    return is_read;
+  };
 
   const handleClick = () => {
     if (!isFromSameUser) {
@@ -45,7 +52,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     onClick();
   };
 
-  const baseReadClasses = is_read
+  const baseReadClasses = isMarkedAsRead()
     ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
     : 'bg-blue text-white';
 
