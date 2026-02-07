@@ -115,7 +115,7 @@ const PhotoActionButtons = ({
 
 const PhotoUploader = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { user: currentUser } = useGetCurrentUser();
+  const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const { allUserImages } = useGetAllUserImages();
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
@@ -223,6 +223,22 @@ const PhotoUploader = () => {
   };
 
   const shouldShowEditable = allExistingImages && allExistingImages.data.images.length > 0;
+
+  if (isCurrentUserLoading) {
+    return (
+      <Card>
+        <h2 className="text-xl">Učitavanje...</h2>
+      </Card>
+    );
+  }
+
+  if (!currentUser?.data) {
+    return (
+      <Card>
+        <h2 className="text-xl">Ne možemo učitati tvoje podatke. Molimo pokušaj ponovo kasnije.</h2>
+      </Card>
+    );
+  }
 
   return (
     <div>

@@ -28,7 +28,7 @@ const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalPr
   );
 };
 const SettingsPage = () => {
-  const { user: currentUser } = useGetCurrentUser();
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { deleteUserMutation } = useDeleteUser();
@@ -36,7 +36,18 @@ const SettingsPage = () => {
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
 
-  if (!userId) {
+  if (!currentUser?.data) {
+    return (
+      <AppLayout>
+        <Card>
+          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+          <p>Ne možemo učitati tvoje podatke. Molimo pokušaj ponovo kasnije.</p>
+        </Card>
+      </AppLayout>
+    );
+  }
+
+  if (isUserLoading) {
     return (
       <AppLayout>
         <Card>

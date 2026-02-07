@@ -170,10 +170,33 @@ const Message = ({
   messagePhotoUrl,
   showAvatar,
 }: IMessageProps) => {
-  const { user: currentUser } = useGetCurrentUser();
+  const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
   const isFromCurrentUser = message.User.id === Number(currentUserId);
-  if (!message || !message.createdAt || !message.type || !currentUserId) return null;
+
+  if (!currentUserId) return null;
+
+  if (isCurrentUserLoading) {
+    return (
+      <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
+        <div className={`${messageStyles} flex bg-blue animate-pulse`}>
+          <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+        </div>
+        {showAvatar && (
+          <div className="ml-0.5">
+            <UserAvatar
+              className="w-12 h-12 rounded-full"
+              avatarFallbackName={currentUserName}
+              userId={String(currentUserId)}
+              color="black"
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate
       userName={currentUserName}

@@ -305,6 +305,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
             return (
               <Input
+                className="py-[5px]"
                 type="text"
                 placeholder="Pošalji poruku. Iskoristi : za emojije!"
                 {...field}
