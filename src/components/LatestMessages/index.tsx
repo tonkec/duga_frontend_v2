@@ -46,6 +46,8 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   };
 
   const handleClick = () => {
+    if (isUserLoading) return;
+    if (userId == null) return;
     if (!isFromSameUser) {
       onMarkMessagesAsRead(String(message.id));
     }
