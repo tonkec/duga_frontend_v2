@@ -3,7 +3,6 @@ import AppLayout from '@app/components/AppLayout';
 import Card from '@app/components/Card';
 import SendMessage from './components/SendMessage';
 import { useEffect, useState } from 'react';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
 import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
@@ -60,7 +59,8 @@ const ChatPage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const socket = useSocket();
   const navigate = useNavigate();
-  const [currentUserId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data?.id;
   const { chatId } = useParams();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat } = useGetCurrentChat(chatId as string);
@@ -76,7 +76,6 @@ const ChatPage = () => {
     getProfilePhoto(allCurrentUserImages?.data.images)
   );
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
-  const { user: currentUser } = useGetCurrentUser();
   const otherUserName = otherUser?.data.username;
   const currentUserName = currentUser?.data.username;
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');

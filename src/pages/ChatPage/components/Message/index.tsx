@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
@@ -6,6 +5,7 @@ import UserAvatar from '@app/components/UserAvatar';
 import GiphyMessage from '../GiphyMessage';
 import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -101,7 +101,8 @@ const CurrentUserMessageTemplate = ({
   showAvatar,
   messageType,
 }: IMessageTemplateProps) => {
-  const [currentUserId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data?.id;
 
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
@@ -169,7 +170,8 @@ const Message = ({
   messagePhotoUrl,
   showAvatar,
 }: IMessageProps) => {
-  const [currentUserId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data?.id;
   const isFromCurrentUser = message.User.id === Number(currentUserId);
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate

@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { IImage } from '@app/components/Photos';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
@@ -17,6 +16,7 @@ import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import BlobImage from './components/BlobImage';
 import Image from '../Image';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 export interface ImageDescription {
   description: string;
   imageId: string;
@@ -115,7 +115,8 @@ const PhotoActionButtons = ({
 
 const PhotoUploader = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [userId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const { allUserImages } = useGetAllUserImages();
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);

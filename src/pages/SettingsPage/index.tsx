@@ -3,11 +3,11 @@ import Button from '@app/components/Button';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { useState } from 'react';
 import { useDeleteUser } from '../EditMyProfilePage/hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import Card from '@app/components/Card';
 import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
 import { useCookies } from 'react-cookie';
 import { useCookieConsent } from '@app/hooks/useCookieConsent';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -28,7 +28,8 @@ const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalPr
   );
 };
 const SettingsPage = () => {
-  const [userId] = useLocalStorage('userId');
+  const { user: currentUser } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { deleteUserMutation } = useDeleteUser();
   const { acceptCookies, rejectCookies } = useCookieConsent();

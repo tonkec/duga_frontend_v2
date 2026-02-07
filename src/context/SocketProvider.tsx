@@ -3,7 +3,6 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { useLocalStorage } from '@uidotdev/usehooks';
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
@@ -17,14 +16,12 @@ const getBackendUrl = () => {
 };
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const [, saveUserId] = useLocalStorage('userId');
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
   const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
 
   useEffect(() => {
     if (!isAuthenticated || isUserLoading || !currentUser) return;
-    saveUserId(currentUser?.id);
     let newSocket: Socket;
 
     const connectSocket = async () => {
