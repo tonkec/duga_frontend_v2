@@ -173,6 +173,7 @@ const Message = ({
   const { user: currentUser } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
   const isFromCurrentUser = message.User.id === Number(currentUserId);
+  if (!message || !message.createdAt || !message.type || !currentUserId) return null;
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate
       userName={currentUserName}

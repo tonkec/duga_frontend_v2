@@ -237,6 +237,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     setImageTimestamp(String(timestamp));
   }, []);
 
+  if (!currentUserId || !chat) {
+    return null;
+  }
+
   return (
     <div>
       <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
