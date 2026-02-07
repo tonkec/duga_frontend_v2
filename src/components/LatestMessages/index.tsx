@@ -45,11 +45,9 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     onClick();
   };
 
-  const messageBackgroundColor = isFromSameUser
+  const baseReadClasses = is_read
     ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
-    : is_read
-      ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
-      : 'bg-blue text-white';
+    : 'bg-blue text-white';
 
   const getLatestPerson = () => (
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
@@ -75,7 +73,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   return (
     <div
       onClick={handleClick}
-      className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
+      className={`${baseReadClasses} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
       <div className="mb-2">
         <div className="mt-4 flex items-end gap-2 justify-between">
