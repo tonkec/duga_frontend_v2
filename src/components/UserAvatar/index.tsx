@@ -8,7 +8,7 @@ interface IUserAvatarProps {
   avatarFallbackName: string;
   color: string;
   onClick?: () => void;
-  userId: string;
+  userId: string | undefined;
   size?: string;
   round?: boolean;
   className?: string;
@@ -23,7 +23,7 @@ const UserAvatar = ({
   round = true,
   className,
 }: IUserAvatarProps) => {
-  const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId);
+  const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
   const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
 
   if (isProfilePhotoLoading) {

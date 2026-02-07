@@ -187,12 +187,12 @@ const Message = ({
           <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
           <div className="h-4 bg-gray-300 rounded w-1/2"></div>
         </div>
-        {showAvatar && (
+        {showAvatar && currentUserId !== undefined && (
           <div className="ml-0.5">
             <UserAvatar
               className="w-12 h-12 rounded-full"
               avatarFallbackName={currentUserName}
-              userId={String(currentUserId)}
+              userId={currentUserId !== undefined ? String(currentUserId) : undefined}
               color="black"
             />
           </div>
