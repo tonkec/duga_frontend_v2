@@ -3,7 +3,6 @@ import Button from '@app/components/Button';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FieldError from '@app/components/FieldError';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
 import { IUser } from '@app/components/UserCard';
@@ -98,9 +97,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
-  const [currentUserId] = useLocalStorage('userId');
-  const { userChats } = useGetAllUserChats();
   const { user: currentUser } = useGetCurrentUser();
+  const currentUserId = currentUser?.data?.id;
+  const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
@@ -238,6 +237,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     setImageTimestamp(String(timestamp));
   }, []);
 
+  if (!currentUserId || !chat) {
+    return null;
+  }
+
   return (
     <div>
       <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
@@ -302,6 +305,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
             return (
               <Input
+                className="py-[5px]"
                 type="text"
                 placeholder="Pošalji poruku. Iskoristi : za emojije!"
                 {...field}

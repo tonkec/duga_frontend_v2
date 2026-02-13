@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { useCookies } from 'react-cookie';
 import Loader from '@app/components/Loader';
@@ -15,7 +14,6 @@ const Navigation = () => {
   const isMobile = width! < 768;
   const { logout } = useAuth0();
   const [, setCookie] = useCookies(['token']);
-  const [, saveUserId] = useLocalStorage('userId', null);
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
 
@@ -32,7 +30,6 @@ const Navigation = () => {
       socket.emit('set-status', { status: 'offline' });
     }
     setCookie('token', '');
-    saveUserId(null);
     logout({
       logoutParams: {
         returnTo: window.location.origin,

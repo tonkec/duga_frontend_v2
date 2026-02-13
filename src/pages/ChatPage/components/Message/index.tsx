@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNavigate } from 'react-router';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
@@ -41,9 +40,17 @@ interface IMessageProps {
   otherUserId?: number;
   messagePhotoUrl: string;
   showAvatar: boolean;
+  currentUserId: number;
+  isCurrentUserLoading: boolean;
 }
-interface IMessageTemplateProps extends BaseMessageTemplateProps {
+
+interface OtherUserMessageTemplateProps extends BaseMessageTemplateProps {
   otherUserId?: number;
+}
+
+interface CurrentUserMessageTemplateProps extends BaseMessageTemplateProps {
+  currentUserId: number;
+  isCurrentUserLoading: boolean;
 }
 
 interface IMessageContentProps {
@@ -100,9 +107,8 @@ const CurrentUserMessageTemplate = ({
   messagePhotoUrl,
   showAvatar,
   messageType,
-}: IMessageTemplateProps) => {
-  const [currentUserId] = useLocalStorage('userId');
-
+  currentUserId,
+}: CurrentUserMessageTemplateProps) => {
   return (
     <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
       <div className={`${messageStyles} flex bg-blue`}>
@@ -135,8 +141,9 @@ const OtherUserMessageTemplate = ({
   messagePhotoUrl,
   showAvatar,
   messageType,
-}: IMessageTemplateProps) => {
+}: OtherUserMessageTemplateProps) => {
   const navigate = useNavigate();
+
   return (
     <div className="flex">
       {showAvatar && (
@@ -168,9 +175,34 @@ const Message = ({
   otherUserId,
   messagePhotoUrl,
   showAvatar,
+  currentUserId,
+  isCurrentUserLoading,
 }: IMessageProps) => {
-  const [currentUserId] = useLocalStorage('userId');
-  const isFromCurrentUser = message.User.id === Number(currentUserId);
+  const isFromCurrentUser = message.User.id === currentUserId;
+
+  if (isCurrentUserLoading) {
+    return (
+      <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
+        <div className={`${messageStyles} flex bg-blue animate-pulse`}>
+          <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+        </div>
+        {showAvatar && currentUserId !== undefined && (
+          <div className="ml-0.5">
+            <UserAvatar
+              className="w-12 h-12 rounded-full"
+              avatarFallbackName={currentUserName}
+              userId={currentUserId !== undefined ? String(currentUserId) : undefined}
+              color="black"
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (currentUserId == null) return null;
+
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate
       userName={currentUserName}
@@ -179,6 +211,8 @@ const Message = ({
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}
       messageType={message.type}
+      currentUserId={currentUserId}
+      isCurrentUserLoading={isCurrentUserLoading}
     />
   ) : (
     <OtherUserMessageTemplate

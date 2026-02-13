@@ -11,6 +11,8 @@ const PaginatedMessages = ({
   currentUserName,
   otherUserId,
   receivedMessages,
+  currentUserId,
+  isCurrentUserLoading,
 }: {
   otherUserProfilePhoto: string;
   currentUserProfilePhoto: string;
@@ -18,6 +20,8 @@ const PaginatedMessages = ({
   currentUserName: string;
   otherUserId: number | undefined;
   receivedMessages: IMessage[];
+  currentUserId: number;
+  isCurrentUserLoading: boolean;
 }) => {
   const { chatId } = useParams();
   const { messages, fetchNextPage } = useGetAllMessages(chatId!);
@@ -47,6 +51,26 @@ const PaginatedMessages = ({
     }
   }, [messages.length, receivedMessages.length]);
 
+  if (!messages.length && !receivedMessages.length) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-435px)]">
+        <p className="text-gray-500">Nema poruka u ovom razgovoru</p>
+      </div>
+    );
+  }
+
+  if (!chatId) {
+    return null;
+  }
+
+  if (currentUserId == null) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-435px)]">
+        <p className="text-gray-500">Učitavanje poruka...</p>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -64,12 +88,14 @@ const PaginatedMessages = ({
             otherUserName={otherUserName}
             currentUserName={currentUserName}
             currentUserProfilePhoto={currentUserProfilePhoto}
+            currentUserId={currentUserId}
             otherUserProfilePhoto={otherUserProfilePhoto}
             key={message.id}
             message={message}
             otherUserId={otherUserId}
             messagePhotoUrl={message.securePhotoUrl || message.messagePhotoUrl}
             showAvatar={showAvatar}
+            isCurrentUserLoading={isCurrentUserLoading}
           />
         );
       })}

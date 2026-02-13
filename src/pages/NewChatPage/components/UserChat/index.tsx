@@ -1,9 +1,9 @@
 import { useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/NewChatPage/hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import LastMessage from '../LastMessage';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
 import { IUser } from '@app/components/UserCard';
 import UserAvatar from '@app/components/UserAvatar';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 interface IUserChatProps {
   user: IUser;
@@ -12,17 +12,22 @@ interface IUserChatProps {
 }
 
 const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
-  const [userId] = useLocalStorage('userId');
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { isMessageReadData } = useGetIsMessageRead(String(lastMessage?.id || ''));
   const { is_read } = isMessageReadData?.data || {};
 
   const isMarkedAsRead = () => {
     if (!lastMessage) return true;
+    if (userId == null) return true;
     if (lastMessage?.fromUserId === Number(userId)) return true;
-
     return is_read;
   };
+
+  if (isUserLoading) {
+    return null;
+  }
 
   return (
     <div
@@ -32,7 +37,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
           onClick();
           return;
         }
-        if (lastMessage?.fromUserId !== Number(userId)) {
+        if (userId != null && lastMessage?.fromUserId !== Number(userId)) {
           onMarkMessagesAsRead(String(lastMessage?.id) || '');
         }
         onClick();

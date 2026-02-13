@@ -45,7 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           {...props}
           ref={ref}
-          className={`${inputStyles} ${className} pl-10 ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
+          className={`${inputStyles} ${className} ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -65,7 +65,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           {...props}
           ref={ref}
-          className={`${inputStyles} ${className} pl-10 ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
+          className={`${inputStyles} ${className} ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}

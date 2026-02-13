@@ -3,11 +3,11 @@ import Button from '@app/components/Button';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { useState } from 'react';
 import { useDeleteUser } from '../EditMyProfilePage/hooks';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import Card from '@app/components/Card';
 import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
 import { useCookies } from 'react-cookie';
 import { useCookieConsent } from '@app/hooks/useCookieConsent';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -28,12 +28,35 @@ const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalPr
   );
 };
 const SettingsPage = () => {
-  const [userId] = useLocalStorage('userId');
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { deleteUserMutation } = useDeleteUser();
   const { acceptCookies, rejectCookies } = useCookieConsent();
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
+
+  if (isUserLoading) {
+    return (
+      <AppLayout>
+        <Card>
+          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+          <p>Učitavanje...</p>
+        </Card>
+      </AppLayout>
+    );
+  }
+
+  if (!currentUser?.data) {
+    return (
+      <AppLayout>
+        <Card>
+          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+          <p>Ne možemo učitati tvoje podatke. Molimo pokušaj ponovo kasnije.</p>
+        </Card>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>

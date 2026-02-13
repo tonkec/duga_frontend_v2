@@ -7,7 +7,7 @@ import AppLayout from '@app/components/AppLayout';
 import Card from '@app/components/Card';
 import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
-import { useLocalStorage } from '@uidotdev/usehooks';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string;
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string;
@@ -47,8 +47,8 @@ async function sendReport(data: FormValues) {
 }
 
 export default function ReportPage() {
-  const [userId] = useLocalStorage<number>('userId', 0);
-
+  const { user: currentUser } = useGetCurrentUser();
+  const userId = currentUser?.data?.id;
   const {
     register,
     handleSubmit,

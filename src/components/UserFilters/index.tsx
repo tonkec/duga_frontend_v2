@@ -46,7 +46,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
           value={search}
           onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-          className="w-full py-[6px] xl:min-w-[900px]"
+          className="w-full py-[6px] xl:min-w-[900px] pl-[40px]"
           disabled={!selectValue.value}
         />
       </div>
