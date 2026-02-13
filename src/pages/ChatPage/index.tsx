@@ -137,7 +137,7 @@ const ChatPage = () => {
     socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
       if (deletedChatId === chatId) {
         toast.error('Chat obrisan. Preusmjeravam...', toastConfig);
-        navigate('/record-not-found');
+        navigate('/');
       }
     });
 
