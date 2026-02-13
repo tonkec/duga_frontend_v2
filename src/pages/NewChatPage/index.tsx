@@ -19,10 +19,12 @@ const NewChatPage = () => {
 
   if (userChats?.data.length === 0 || !userChats?.data) {
     return (
-      <div className="mt-10 text-center text-gray-600">
-        Trenutno nemaš aktivnih razgovora. Započni novu konverzaciju kako bi se ovdje prikazale
-        tvoje poruke.
-      </div>
+      <AppLayout>
+        <div className="text-center mt-10 text-gray-500">
+          Još nisi započeo_la nijedan razgovor. Počni tako da posjetiš nečiji profil i pošalješ
+          poruku! 😊
+        </div>
+      </AppLayout>
     );
   }
 
