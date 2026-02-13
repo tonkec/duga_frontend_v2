@@ -68,14 +68,7 @@ const MyProfilePage = () => {
                   navigate('/edit');
                 }}
               />
-              <Cta
-                buttonText="Pošalji poruku"
-                subtitle="Možda te baš čeka zanimljiva osoba."
-                title="Pošalji nekome poruku!"
-                onClick={() => {
-                  navigate('/new-chat');
-                }}
-              />
+
               <Cta
                 buttonText="Pretraži ekipu"
                 className="mt-4"

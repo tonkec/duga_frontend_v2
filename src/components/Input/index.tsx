@@ -17,7 +17,7 @@ interface InputProps {
   disabled?: boolean;
 }
 
-const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded px-4 block w-full appearance-none leading-normal focus:border-blue`;
+const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded px-4 py-2 block w-full appearance-none leading-normal focus:border-blue`;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
