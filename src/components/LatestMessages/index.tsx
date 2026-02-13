@@ -30,7 +30,9 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
 };
 
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
-  const { isMessageReadData } = useGetIsMessageRead(String(message?.id) || '');
+  const { isMessageReadData, isMessageReadLoading } = useGetIsMessageRead(
+    String(message?.id) || ''
+  );
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
 
@@ -39,14 +41,14 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   const isFromSameUser = message.User.id === Number(userId);
 
   const isMarkedAsRead = () => {
-    if (isUserLoading) return true;
+    if (isUserLoading || isMessageReadLoading) return true;
     if (userId == null) return true;
     if (isFromSameUser) return true;
     return is_read;
   };
 
   const handleClick = () => {
-    if (!isUserLoading && userId != null && !isFromSameUser) {
+    if (!isUserLoading && !isMessageReadLoading && userId != null && !isFromSameUser) {
       onMarkMessagesAsRead(String(message.id));
     }
     onClick();
@@ -54,7 +56,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 
   const baseReadClasses = isMarkedAsRead()
     ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
-    : 'bg-blue text-white';
+    : 'bg-blue text-white hover:bg-blue-dark hover:text-white';
 
   const getLatestPerson = () => (
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
