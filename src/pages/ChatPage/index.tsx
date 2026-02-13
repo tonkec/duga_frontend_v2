@@ -146,6 +146,16 @@ const ChatPage = () => {
     };
   }, [chatId, navigate, socket]);
 
+  if (!currentChat?.data) {
+    return (
+      <AppLayout>
+        <Card>
+          <h1 className="text-center text-xl">Chat nije pronađen</h1>
+        </Card>
+      </AppLayout>
+    );
+  }
+
   return (
     <ChatGuard>
       <AppLayout>

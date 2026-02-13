@@ -201,7 +201,7 @@ const Message = ({
     );
   }
 
-  if (!currentUserId) return null;
+  if (currentUserId == null) return null;
 
   return isFromCurrentUser ? (
     <CurrentUserMessageTemplate
