@@ -33,21 +33,22 @@ const CookieBanner = () => {
         <div className="flex justify-center gap-4">
           <button
             onClick={() => {
-              rejectCookies();
-              setShowBanner(false);
-            }}
-            className="bg-slate-900 text-white px-4 py-2 rounded"
-          >
-            Odbij
-          </button>
-          <button
-            onClick={() => {
               acceptCookies();
               setShowBanner(false);
             }}
             className="bg-pink text-white px-4 py-2 rounded"
           >
             Prihvati
+          </button>
+
+          <button
+            onClick={() => {
+              rejectCookies();
+              setShowBanner(false);
+            }}
+            className="bg-slate-900 text-white px-4 py-2 rounded"
+          >
+            Odbij
           </button>
         </div>
       </div>
