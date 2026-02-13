@@ -3,11 +3,38 @@ import Loader from '@app/components/Loader';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
+import { useSocket } from '@app/context/useSocket';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { toastConfig } from '@app/configs/toast.config';
 
 const NewChatPage = () => {
+  const socket = useSocket();
+
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
-  const { userChats, isUserChatsLoading } = useGetAllUserChats();
+  const { userChats, isUserChatsLoading, refetchUserChats } = useGetAllUserChats();
+
+  useEffect(() => {
+    socket.on('chatCreated', () => {
+      refetchUserChats();
+    });
+
+    return () => {
+      socket.off('chatCreated');
+    };
+  }, [socket, refetchUserChats]);
+
+  useEffect(() => {
+    socket.on('chatDeleted', () => {
+      toast.info('Razgovor je obrisan', toastConfig);
+      refetchUserChats();
+    });
+
+    return () => {
+      socket.off('chatDeleted');
+    };
+  }, [socket, refetchUserChats]);
 
   if (isUserChatsLoading) {
     return (

@@ -5,6 +5,7 @@ import { toastConfig } from '@app/configs/toast.config';
 import { useNavigate } from 'react-router';
 import { isMessageRead, markMessagesAsRead } from '@app/api/chatMessages';
 import { MessageType } from '@app/pages/ChatPage/components/Message';
+import { useSocket } from '@app/context/useSocket';
 
 interface CreateChatInput {
   partnerId: number;
@@ -40,6 +41,7 @@ interface Message {
 
 export const useCreateNewChat = () => {
   const navigate = useNavigate();
+  const socket = useSocket();
 
   const {
     mutate: onCreateChat,
@@ -53,6 +55,8 @@ export const useCreateNewChat = () => {
     },
     onSuccess: (data) => {
       toast.success('Razgovor uspješno kreiran', toastConfig);
+      console.log('Emitting createChat event for chat:', data);
+      socket.emit('createChat');
       navigate(`/chat/${data[0].id}`);
     },
     onError: (error: unknown) => {

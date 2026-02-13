@@ -6,11 +6,12 @@ export const useGetAllUserChats = (isQueryEnabled?: boolean) => {
     data: userChats,
     error: userChatsError,
     isPending: isUserChatsLoading,
+    refetch: refetchUserChats,
   } = useQuery({
     queryKey: ['userChats'],
     queryFn: () => getAllUserChats(),
     enabled: isQueryEnabled,
   });
 
-  return { userChats, userChatsError, isUserChatsLoading };
+  return { userChats, userChatsError, isUserChatsLoading, refetchUserChats };
 };

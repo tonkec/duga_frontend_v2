@@ -136,7 +136,7 @@ const ChatPage = () => {
   useEffect(() => {
     socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
       if (deletedChatId === chatId) {
-        toast.warning('Chat obrisan. Preusmjeravam...', toastConfig);
+        toast.info('Chat obrisan. Preusmjeravam...', toastConfig);
         navigate('/');
       }
     });
