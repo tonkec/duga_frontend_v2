@@ -30,26 +30,33 @@ const LatestMessageAvatar = ({ userId }: { userId: string }) => {
 };
 
 const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () => void }) => {
-  const { isMessageReadData } = useGetIsMessageRead(String(message?.id) || '');
-  const { user: currentUser } = useGetCurrentUser();
+  const { isMessageReadData, isMessageReadLoading } = useGetIsMessageRead(
+    String(message?.id) || ''
+  );
+  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
 
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
   const { is_read } = isMessageReadData?.data || {};
   const isFromSameUser = message.User.id === Number(userId);
 
+  const isMarkedAsRead = () => {
+    if (isUserLoading || isMessageReadLoading) return true;
+    if (userId == null) return true;
+    if (isFromSameUser) return true;
+    return is_read;
+  };
+
   const handleClick = () => {
-    if (!isFromSameUser) {
+    if (!isUserLoading && !isMessageReadLoading && userId != null && !isFromSameUser) {
       onMarkMessagesAsRead(String(message.id));
     }
     onClick();
   };
 
-  const messageBackgroundColor = isFromSameUser
+  const baseReadClasses = isMarkedAsRead()
     ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
-    : is_read
-      ? 'bg-gray-100 text-black hover:bg-gray-200 hover:text-black'
-      : 'bg-blue text-white hover:bg-blue hover:text-black';
+    : 'bg-blue text-white hover:bg-blue-dark hover:text-white';
 
   const getLatestPerson = () => (
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
@@ -75,7 +82,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
   return (
     <div
       onClick={handleClick}
-      className={`${messageBackgroundColor} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
+      className={`${baseReadClasses} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
       <div className="mb-2">
         <div className="mt-4 flex items-end gap-2 justify-between">
