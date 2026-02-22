@@ -41,15 +41,23 @@ const NewChatPage = () => {
   }, [socket, refetchUserChats]);
 
   useEffect(() => {
-    socket.on('chatDeleted', () => {
-      toast.info('Razgovor je obrisan');
-      refetchUserChats();
+    socket.on('chatDeleted', ({ chatId }) => {
+      if (
+        userChats?.data?.some((chat: IChat) => {
+          console.log(chat, 'chat');
+          console.log(chatId, 'chatId');
+          return chat.id === Number(chatId);
+        })
+      ) {
+        toast.info('Netko je obrisao razgovor.');
+        refetchUserChats();
+      }
     });
 
     return () => {
       socket.off('chatDeleted');
     };
-  }, [socket, refetchUserChats]);
+  }, [socket, refetchUserChats, userChats]);
 
   useEffect(() => {
     socket.on('received', () => {

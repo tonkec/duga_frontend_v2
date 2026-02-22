@@ -144,7 +144,7 @@ const ChatPage = () => {
     return () => {
       socket.off('chatDeleted');
     };
-  }, [chatId, navigate, socket, currentChat, currentUserId]);
+  }, [chatId, navigate, socket]);
 
   if (!currentChat?.data) {
     return (
