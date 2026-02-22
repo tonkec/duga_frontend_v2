@@ -44,8 +44,6 @@ const NewChatPage = () => {
     socket.on('chatDeleted', ({ chatId }) => {
       if (
         userChats?.data?.some((chat: IChat) => {
-          console.log(chat, 'chat');
-          console.log(chatId, 'chatId');
           return chat.id === Number(chatId);
         })
       ) {
