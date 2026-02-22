@@ -4,7 +4,7 @@ import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import AllUserChats from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
 import { useSocket } from '@app/context/useSocket';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { IChat } from './hooks';
 import { toast } from 'react-toastify';
@@ -16,21 +16,26 @@ const NewChatPage = () => {
   const hasRejectedCookies = cookies.cookieRejectedAt;
   const { userChats, isUserChatsLoading, refetchUserChats } = useGetAllUserChats();
   const { user: currentUser } = useGetCurrentUser();
-  const filteredChats =
-    userChats?.data?.filter((chat: IChat) => {
-      if (chat.Messages && chat.Messages.length > 0) return true;
-      // If chat user id matches current user id and messages are empty, show it
-      if (
-        currentUser &&
-        chat.Users.some((user) => user.id === currentUser.data.id) &&
-        (!chat.Messages || chat.Messages.length === 0)
-      )
-        return true;
-      // Otherwise, do not show
-      return false;
-    }) || [];
+
+  const filteredChats = useMemo(() => {
+    return (
+      userChats?.data?.filter((chat: IChat) => {
+        if (chat.Messages && chat.Messages.length > 0) return true;
+        // If chat user id matches current user id and messages are empty, show it
+        if (
+          currentUser &&
+          chat.Users.some((user) => user.id === currentUser.data.id) &&
+          (!chat.Messages || chat.Messages.length === 0)
+        )
+          return true;
+        // Otherwise, do not show
+        return false;
+      }) || []
+    );
+  }, [userChats, currentUser]);
 
   useEffect(() => {
+    if (!socket) return;
     socket.on('chatCreated', () => {
       refetchUserChats();
     });
@@ -41,6 +46,7 @@ const NewChatPage = () => {
   }, [socket, refetchUserChats]);
 
   useEffect(() => {
+    if (!socket) return;
     socket.on('chatDeleted', ({ chatId }) => {
       if (
         userChats?.data?.some((chat: IChat) => {
@@ -58,6 +64,7 @@ const NewChatPage = () => {
   }, [socket, refetchUserChats, userChats]);
 
   useEffect(() => {
+    if (!socket) return;
     socket.on('received', () => {
       refetchUserChats();
     });
