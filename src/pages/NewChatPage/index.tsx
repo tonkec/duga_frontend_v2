@@ -7,6 +7,7 @@ import { useSocket } from '@app/context/useSocket';
 import { useEffect } from 'react';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { IChat } from './hooks';
+import { toast } from 'react-toastify';
 
 const NewChatPage = () => {
   const socket = useSocket();
@@ -41,6 +42,7 @@ const NewChatPage = () => {
 
   useEffect(() => {
     socket.on('chatDeleted', () => {
+      toast.info('Razgovor je obrisan');
       refetchUserChats();
     });
 
