@@ -55,7 +55,6 @@ export const useCreateNewChat = () => {
     },
     onSuccess: (data) => {
       toast.success('Razgovor uspješno kreiran', toastConfig);
-      console.log('Emitting createChat event for chat:', data);
       socket.emit('createChat');
       navigate(`/chat/${data[0].id}`);
     },

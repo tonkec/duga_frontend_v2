@@ -5,8 +5,6 @@ import AllUserChats from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { IChat } from './hooks';
 
@@ -43,12 +41,21 @@ const NewChatPage = () => {
 
   useEffect(() => {
     socket.on('chatDeleted', () => {
-      toast.info('Razgovor je obrisan', toastConfig);
       refetchUserChats();
     });
 
     return () => {
       socket.off('chatDeleted');
+    };
+  }, [socket, refetchUserChats]);
+
+  useEffect(() => {
+    socket.on('received', () => {
+      refetchUserChats();
+    });
+
+    return () => {
+      socket.off('received');
     };
   }, [socket, refetchUserChats]);
 

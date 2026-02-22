@@ -136,15 +136,15 @@ const ChatPage = () => {
   useEffect(() => {
     socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
       if (deletedChatId === chatId) {
-        toast.info('Chat obrisan. Preusmjeravam...', toastConfig);
-        navigate('/');
+        toast.info('Razgovor je obrisan', toastConfig);
+        navigate('/new-chat');
       }
     });
 
     return () => {
       socket.off('chatDeleted');
     };
-  }, [chatId, navigate, socket]);
+  }, [chatId, navigate, socket, currentChat, currentUserId]);
 
   if (!currentChat?.data) {
     return (
