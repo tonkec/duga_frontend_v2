@@ -31,7 +31,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   return (
     <div
-      className={`flex-1 flex rounded items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
+      className={`flex-1 flex rounded items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer mb-4 mt-2 bg-white hover:bg-gray-200 }`}
       onClick={() => {
         if (!lastMessage) {
           onClick();
@@ -54,12 +54,13 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
           <div className="ml-4">
             <h1 className="text-lg font-semibold">{user.username}</h1>
           </div>
+          {lastMessage && (
+            <div className="ml-2">
+              <LastMessage message={lastMessage} />
+            </div>
+          )}
         </div>
-        {lastMessage && (
-          <div>
-            <LastMessage message={lastMessage} />
-          </div>
-        )}
+        {!isMarkedAsRead() && <div className="w-3 h-3 rounded-full bg-blue ml-2" />}
       </div>
     </div>
   );

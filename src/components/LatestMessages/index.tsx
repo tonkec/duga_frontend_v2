@@ -54,9 +54,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     onClick();
   };
 
-  const baseReadClasses = isMarkedAsRead()
-    ? 'bg-white text-black hover:bg-gray-100 hover:text-black'
-    : 'bg-blue text-white hover:bg-blue-dark hover:text-white';
+  const baseReadClasses = 'bg-white text-black hover:bg-gray-100 hover:text-black';
 
   const getLatestPerson = () => (
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
@@ -85,15 +83,17 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
       className={`${baseReadClasses} cursor-pointer p-2 transition-colors duration-200 border-b border-gray-200`}
     >
       <div className="mb-2">
-        <div className="mt-4 flex items-end gap-2 justify-between">
-          {renderMessageContent()}
-          <div className="flex flex-col items-end">
+        <div className="flex items-end gap-2 justify-between">
+          <div className="flex ml-2 items-center gap-2">
             {getLatestPerson()}
-            <div className="mt-4">
-              <RecordCreatedAt createdAt={message.createdAt} />
-            </div>
+            {renderMessageContent()}
           </div>
+          {!isMarkedAsRead() && <div className="w-3 h-3 rounded-full bg-blue mr-4" />}
         </div>
+        <RecordCreatedAt
+          createdAt={message.createdAt}
+          className="text-xs text-gray-500 mt-4 ml-2"
+        />
       </div>
     </div>
   );
