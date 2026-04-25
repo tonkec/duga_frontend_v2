@@ -34,7 +34,7 @@ const getLastMessage = (userChat: IChat) => {
 const AllUserChats = ({ userChats }: IAllUserChats) => {
   const navigate = useNavigate();
   return (
-    <div>
+    <div className="bg-white p-6">
       <h2 className="mb-2">Svi razgovori</h2>
       {userChats?.map((chat) => {
         return (

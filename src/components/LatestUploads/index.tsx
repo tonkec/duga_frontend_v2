@@ -20,7 +20,7 @@ const LatestUploads = () => {
     <div className="mt-8">
       <h2 className="mb-2">📸 Nedavno dodane fotke</h2>
 
-      <Card>
+      <Card className="py-6 px-6">
         <div className="lg:grid lg:grid-cols-3 gap-6">
           {latestUploads?.data.map((upload: IUpload) => (
             <LatestUpload key={upload.id} upload={upload} />

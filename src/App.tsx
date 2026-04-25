@@ -8,13 +8,8 @@ import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
 import { useGetWindowSize } from './hooks/useGetWindowSize';
-import SendMessageButton from './components/SendMessageButton';
 import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
-import LatestMessages from './components/LatestMessages';
-import LatestComments from './components/LatestComments';
-import { useGetAllUserChats } from './hooks/useGetAllUserChats';
-import { IChat } from '@app/pages/NewChatPage/hooks';
 import { useEnsureBackendUser } from './hooks/useEnsureBackendUser';
 
 function App() {
@@ -22,14 +17,13 @@ function App() {
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
-  const { userChats, isUserChatsLoading } = useGetAllUserChats();
   const [search, setSearch] = useState('');
   const [selectValue, setSelectValue] = useState({
     value: '',
     label: '',
   });
 
-  if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
+  if (isAllUsersLoading || isUserLoading) {
     return (
       <AppLayout>
         <Loader />
@@ -53,7 +47,7 @@ function App() {
   });
 
   const renderedUsers = search ? filteredUsers : allVerifiedUsers;
-  const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
+  const itemsPerPage = windowSize.width < 1024 ? 4 : 8;
 
   return (
     <AppLayout>
@@ -76,34 +70,15 @@ function App() {
           data={renderedUsers}
           itemsPerPage={itemsPerPage}
           paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => {
-            const hasChatWithUser = userChats?.data?.some(
-              (chat: IChat) =>
-                chat.Users?.some((user) => user.id === Number(singleEntry.id)) &&
-                chat.Messages?.length > 0
-            );
-
             return (
               <UserCard
                 user={singleEntry}
                 onButtonClick={() => navigate(`/user/${singleEntry.id}`)}
-                buttonText="Pogledaj profil 👀"
-                secondButton={
-                  <SendMessageButton
-                    sendMessageToId={String(singleEntry.id)}
-                    buttonType="blue"
-                    disabled={hasChatWithUser}
-                  />
-                }
                 isOnline={singleEntry.status === 'online'}
               />
             );
           }}
         />
-      </div>
-
-      <div className="mt-12 flex flex-col gap-4 lg:flex-row [&>*:only-child]:w-full [&>*:only-child]:flex-none">
-        <LatestComments />
-        <LatestMessages />
       </div>
 
       <LatestUploads />

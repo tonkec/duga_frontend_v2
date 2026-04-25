@@ -1,11 +1,10 @@
-import Button from '@app/components/Button';
 import Card from '@app/components/Card';
-import { getUserBio } from '@app/components/UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import clsx from 'clsx';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
+import Button from '../Button';
 export interface IUser {
   avatar: string;
   email: string;
@@ -27,15 +26,13 @@ export interface IUser {
 interface IUserCardProps {
   user: IUser;
   onButtonClick: () => void;
-  buttonText: string;
-  secondButton?: React.ReactNode;
   isOnline?: boolean;
 }
 
 const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return (
-      <p className="text-gray-600 gap-1 flex items-center justify-center mb-2">
+      <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
         {' '}
         <BiSolidMap /> Lokacija: n/a
       </p>
@@ -43,7 +40,7 @@ const getUserLocation = ({ location }: { location: string }) => {
   }
 
   return (
-    <p className="text-gray-600 gap-1 flex items-center justify-center mb-2">
+    <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
       {' '}
       <BiSolidMap /> Lokacija: {location}
     </p>
@@ -53,7 +50,7 @@ const getUserLocation = ({ location }: { location: string }) => {
 const getUserAge = ({ age }: { age: number }) => {
   if (!age) {
     return (
-      <p className="text-gray-600 gap-1 flex items-center justify-center">
+      <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
         {' '}
         <BiStopwatch />
         Godine: n/a
@@ -62,13 +59,13 @@ const getUserAge = ({ age }: { age: number }) => {
   }
 
   return (
-    <p className="text-gray-600 gap-1 flex items-center justify-center">
+    <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
       <BiStopwatch /> Godine: {age}
     </p>
   );
 };
 
-const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
+const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
   const socket = useSocket();
   const [isOnlineState, setIsOnlineState] = useState(isOnline);
 
@@ -91,17 +88,19 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
   }, [isOnline]);
 
   return (
-    <Card className="h-full">
-      <div className="w-full text-center mb-4">
+    <Card
+      className="h-full flex flex-col justify-between pb-8 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      onClick={onButtonClick}
+    >
+      <div className="w-full mb-4 overflow-hidden">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
-          color="#2D46B9"
+          color="#f7f9ff"
           userId={String(user.id)}
-          size="100"
-          className="w-[100px] h-[100px] rounded-full mx-auto"
+          className="aspect-square w-full"
         />
       </div>
-      <div className="flex flex-col justify-between text-center">
+      <div className="flex flex-col justify-between text-center mt-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
             {user.username}
@@ -114,16 +113,10 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
           </h3>
           {getUserLocation(user)}
           {getUserAge(user)}
-          <p className="text-gray-600 mt-2 flex items-center justify-center gap-1">
-            {' '}
-            <span> {getUserBio(user.bio)}</span>
-          </p>
-        </div>
-        <div className="flex gap-2 justify-center items-center mt-4 flex-col">
-          <Button onClick={onButtonClick} type="primary">
-            {buttonText}
+
+          <Button className="mt-4" onClick={onButtonClick} type="blue">
+            Pogledaj profil
           </Button>
-          {secondButton}
         </div>
       </div>
     </Card>

@@ -27,7 +27,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
 
       <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
         <UserAvatar
-          color="#F037A5"
+          color="#2D46B9"
           avatarFallbackName={`${user?.data.username}`}
           onClick={() => {
             navigate(`/user/${upload.userId}`);

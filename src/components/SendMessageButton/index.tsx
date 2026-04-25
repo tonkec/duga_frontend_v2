@@ -13,14 +13,14 @@ interface ISendMessageButtonProps {
   sendMessageToId: string;
   buttonType: ButtonType;
   buttonClasses?: string;
-  disabled?: boolean;
+  hasChatWithUser?: boolean;
 }
 
 const SendMessageButton = ({
   sendMessageToId,
   buttonType,
   buttonClasses,
-  disabled = false,
+  hasChatWithUser = false,
 }: ISendMessageButtonProps) => {
   const [isQueryEnabled, setIsQueryEnabled] = useState(false);
   const navigate = useNavigate();
@@ -42,9 +42,8 @@ const SendMessageButton = ({
         }
       }}
       type={buttonType}
-      disabled={disabled}
     >
-      Pošalji poruku ✉️
+      {hasChatWithUser ? 'Nastavi razgovor' : 'Započni razgovor'}
     </Button>
   );
 };

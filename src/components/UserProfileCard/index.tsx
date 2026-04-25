@@ -92,7 +92,7 @@ const UserProfileCard = ({
   }
 
   return (
-    <Card>
+    <Card className="p-8">
       <div className="xl:flex gap-6">
         <div>
           <UserAvatar

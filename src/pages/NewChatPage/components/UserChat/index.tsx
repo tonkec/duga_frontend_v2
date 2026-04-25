@@ -31,7 +31,7 @@ const UserChat = ({ user, onClick, lastMessage }: IUserChatProps) => {
 
   return (
     <div
-      className={`flex-1 flex rounded items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer mb-4 mt-2 ${isMarkedAsRead() ? 'bg-white text-black' : 'bg-blue text-white'}`}
+      className={`flex-1 flex rounded items-center justify-between px-4 py-2 cursor-pointer mb-4 mt-2 border bg-[#f7f9ff] border-[#dce4ff] ${isMarkedAsRead() ? 'text-black hover:bg-[#e0e7ff]' : 'bg-blue text-white'}`}
       onClick={() => {
         if (!lastMessage) {
           onClick();
