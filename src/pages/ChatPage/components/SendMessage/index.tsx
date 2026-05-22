@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import Button from '@app/components/Button';
 import { z } from 'zod';
@@ -8,7 +9,7 @@ import { IChat } from '@app/pages/NewChatPage/hooks';
 import { IUser } from '@app/components/UserCard';
 import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState, useRef, useEffect } from 'react';
+import { SyntheticEvent, useState, useRef, useEffect, useCallback } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '@app/components/EmojiPicker';
 import { debounce } from 'lodash';
@@ -97,7 +98,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
+  const queryClient = useQueryClient();
   const { user: currentUser } = useGetCurrentUser();
+
+  const refreshUserChatsList = () => {
+    queryClient.invalidateQueries({ queryKey: ['userChats'] });
+  };
   const currentUserId = currentUser?.data?.id;
   const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
@@ -107,6 +113,30 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { allNotifications } = useGetAllNotifcations();
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const { allUserImages } = useGetAllUserImages();
+
+  const emitStopTyping = useCallback(() => {
+    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    socket.emit('stop-typing', {
+      chatId,
+      userId: currentUserId,
+      toUserId: [otherUserId],
+    });
+  }, [socket, currentUserId, otherUserId, chatId]);
+
+  const emitTyping = useCallback(() => {
+    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    socket.emit('typing', {
+      chatId,
+      userId: currentUserId,
+      toUserId: [otherUserId],
+    });
+  }, [socket, currentUserId, otherUserId, chatId]);
+
+  useEffect(() => {
+    return () => {
+      emitStopTyping();
+    };
+  }, [emitStopTyping]);
 
   const sendGif = (gifUrl: string) => {
     const msg = {
@@ -118,6 +148,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       messagePhotoUrl: gifUrl,
     };
     socket?.emit('message', msg);
+    refreshUserChatsList();
     setShowGiphySearch(false);
   };
 
@@ -158,6 +189,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           message: null,
         });
       });
+      refreshUserChatsList();
     }
 
     setCurrentUploadableImage(null);
@@ -216,6 +248,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
     if (isValid && toUserId?.length) {
       socket?.emit('message', msg);
+      refreshUserChatsList();
     }
 
     reset();
@@ -252,7 +285,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
           onChange={(e) => {
-            socket?.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+            emitTyping();
             const files = e.target.files as FileList;
 
             if (!areValidImageTypes(files)) {
@@ -315,11 +348,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   field.onChange(e);
                 }}
                 onFocus={() => {
-                  socket?.emit('typing', {
-                    chatId,
-                    userId: currentUserId,
-                    toUserId: [otherUserId],
-                  });
+                  emitTyping();
                   socket?.emit('markAsRead', {
                     userId: currentUserId,
                     chatId: Number(chatId),
@@ -337,13 +366,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                     });
                   }
                 }}
-                onBlur={() => {
-                  socket?.emit('stop-typing', {
-                    chatId,
-                    userId: currentUserId,
-                    toUserId: [otherUserId],
-                  });
-                }}
+                onBlur={emitStopTyping}
               />
             );
           }}

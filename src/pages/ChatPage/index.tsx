@@ -96,7 +96,8 @@ const ChatPage = () => {
 
     return () => {
       socket.off('typing');
-      socket.off('stopTyping');
+      socket.off('stop-typing');
+      setIsTyping(false);
     };
   }, [socket, otherUserId]);
 

@@ -3,6 +3,7 @@ import AppContainer from '@app/components/AppContainer';
 import Footer from '@app/components/Footer';
 import Navigation from '@app/components/Navigation';
 import CookieBanner from '../CookieBanner';
+import UserChatsSocketSync from '@app/components/UserChatsSocketSync';
 import { useAuth0 } from '@auth0/auth0-react';
 
 interface IAppLayoutProps {
@@ -19,6 +20,7 @@ const AppLayout = ({ children, onScroll }: IAppLayoutProps) => {
 
   return (
     <>
+      <UserChatsSocketSync />
       <Navigation />
       <AppContainer onScroll={(e) => onScroll?.(e)}>
         <main className="mt-10">{children}</main>
