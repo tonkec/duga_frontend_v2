@@ -32,17 +32,15 @@ interface IUserCardProps {
 const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return (
-      <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
-        {' '}
-        <BiSolidMap /> Lokacija: n/a
+      <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+        <BiSolidMap className="text-blue" /> Lokacija nije unesena
       </p>
     );
   }
 
   return (
-    <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
-      {' '}
-      <BiSolidMap /> Lokacija: {location}
+    <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+      <BiSolidMap className="text-blue" /> {location}
     </p>
   );
 };
@@ -50,17 +48,16 @@ const getUserLocation = ({ location }: { location: string }) => {
 const getUserAge = ({ age }: { age: number }) => {
   if (!age) {
     return (
-      <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
-        {' '}
-        <BiStopwatch />
-        Godine: n/a
+      <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+        <BiStopwatch className="text-blue" />
+        Godine nisu unesene
       </p>
     );
   }
 
   return (
-    <p className="text-gray-600 gap-1 flex items-center justify-center mb-1">
-      <BiStopwatch /> Godine: {age}
+    <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+      <BiStopwatch className="text-blue" /> {age} godina
     </p>
   );
 };
@@ -89,32 +86,35 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
 
   return (
     <Card
-      className="h-full flex flex-col justify-between pb-8 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="group h-full rounded-2xl p-3 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer"
       onClick={onButtonClick}
     >
-      <div className="w-full mb-4 overflow-hidden">
+      <div className="relative w-full overflow-hidden rounded-xl bg-[#f7f9ff]">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
           color="#f7f9ff"
           userId={String(user.id)}
-          className="aspect-square w-full"
+          className="aspect-[4/3] w-full transition-transform duration-300 group-hover:scale-105"
+          fgColor="#1f2937"
         />
+        <span
+          className={clsx(
+            'absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-semibold shadow-sm backdrop-blur',
+            isOnlineState ? 'bg-green text-white' : 'bg-white/90 text-gray-600'
+          )}
+        >
+          {isOnlineState ? 'Online' : 'Offline'}
+        </span>
       </div>
-      <div className="flex flex-col justify-between text-center mt-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
-            {user.username}
-            <span
-              className={clsx(
-                'inline-block w-2 h-2 rounded-full',
-                isOnlineState ? 'bg-green' : 'bg-gray-400'
-              )}
-            />
-          </h3>
-          {getUserLocation(user)}
-          {getUserAge(user)}
+      <div className="flex flex-col justify-between text-center px-2 py-4">
+        <div className="min-h-[116px]">
+          <h3 className="text-xl font-bold text-gray-900">{user.username}</h3>
+          <div className="mt-3 space-y-1.5 text-sm">
+            {getUserLocation(user)}
+            {getUserAge(user)}
+          </div>
 
-          <Button className="mt-4" onClick={onButtonClick} type="blue">
+          <Button className="mt-5 w-full" onClick={onButtonClick} type="blue">
             Pogledaj profil
           </Button>
         </div>

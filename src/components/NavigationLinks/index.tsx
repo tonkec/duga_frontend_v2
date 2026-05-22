@@ -38,6 +38,14 @@ export const NavigationItems = ({
             {!isMobile && String.fromCodePoint(parseInt('1F4EB', 16))}
           </Link>
           <Link
+            to="/users"
+            onClick={onItemClick}
+            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
+          >
+            <span>Korisnici</span>
+            {!isMobile && String.fromCodePoint(parseInt('1F465', 16))}
+          </Link>
+          <Link
             to="/profile"
             onClick={onItemClick}
             className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}

@@ -38,19 +38,19 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="sm:flex gap-2 justify-between">
-      <div className="w-full">
+    <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm sm:flex gap-3 justify-between">
+      <div className="w-full mb-3 sm:mb-0">
         <Input
           type="text"
           placeholder={getPlaceholder(selectValue)}
           icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
           value={search}
           onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-          className="w-full py-[6px] xl:min-w-[900px] pl-[40px]"
+          className="w-full py-[6px] pl-[40px]"
           disabled={!selectValue.value}
         />
       </div>
-      <div className="w-full max-w-[200px]">
+      <div className="w-full sm:max-w-[220px]">
         <Select
           options={selectOptions}
           isClearable

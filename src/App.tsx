@@ -1,27 +1,19 @@
 import './App.css';
 import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
-import UserFilters from './components/UserFilters';
-import { useState } from 'react';
-import Paginated from './components/Paginated';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
-import { useGetWindowSize } from './hooks/useGetWindowSize';
 import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
 import { useEnsureBackendUser } from './hooks/useEnsureBackendUser';
+import Button from './components/Button';
+import { getLastOnlineUsers, getVisibleVerifiedUsers } from './utils/userDirectory';
 
 function App() {
   const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
-  const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
-  const [search, setSearch] = useState('');
-  const [selectValue, setSelectValue] = useState({
-    value: '',
-    label: '',
-  });
 
   if (isAllUsersLoading || isUserLoading) {
     return (
@@ -31,55 +23,42 @@ function App() {
     );
   }
 
-  const allUsersWithoutCurrentUser = allUsers?.data?.filter(
-    (user: IUser) => user.id !== currentUser?.id
-  );
-
-  const allVerifiedUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => user.isVerified);
-
-  const filteredUsers = allVerifiedUsers?.filter((user: IUser) => {
-    const value = search.toLowerCase();
-    if (selectValue.value === 'username') return user?.username?.toLowerCase().includes(value);
-    if (selectValue.value === 'gender') return user?.gender?.toLowerCase().includes(value);
-    if (selectValue.value === 'sexuality') return user?.sexuality?.toLowerCase().includes(value);
-    if (selectValue.value === 'location') return user?.location?.toLowerCase().includes(value);
-    return false;
-  });
-
-  const renderedUsers = search ? filteredUsers : allVerifiedUsers;
-  const itemsPerPage = windowSize.width < 1024 ? 4 : 8;
+  const visibleUsers = getVisibleVerifiedUsers(allUsers?.data, currentUser?.id);
+  const lastOnlineUsers = getLastOnlineUsers(visibleUsers, 4);
 
   return (
     <AppLayout>
-      <UserFilters
-        selectValue={selectValue}
-        setSelectValue={setSelectValue}
-        search={search}
-        setSearch={setSearch}
-      />
+      <section>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">
+              Zadnja aktivnost
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-gray-900">Zadnji online korisnici</h2>
+          </div>
+          <Button type="transparent" onClick={() => navigate('/users')}>
+            Pogledaj sve korisnike
+          </Button>
+        </div>
 
-      <div className="mt-4">
-        {!renderedUsers?.length && (
+        {!lastOnlineUsers.length && (
           <div className="text-center text-lg max-w-md mx-auto mt-12">
             <h2 className="mb-4">Nema korisnika 😢</h2>
           </div>
         )}
 
-        <Paginated<IUser>
-          gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-          data={renderedUsers}
-          itemsPerPage={itemsPerPage}
-          paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => {
-            return (
+        <ul className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {lastOnlineUsers.map((user: IUser) => (
+            <li className="h-full" key={user.id}>
               <UserCard
-                user={singleEntry}
-                onButtonClick={() => navigate(`/user/${singleEntry.id}`)}
-                isOnline={singleEntry.status === 'online'}
+                user={user}
+                onButtonClick={() => navigate(`/user/${user.id}`)}
+                isOnline={user.status === 'online'}
               />
-            );
-          }}
-        />
-      </div>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <LatestUploads />
 

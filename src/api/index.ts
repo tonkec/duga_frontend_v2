@@ -1,5 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { resolveAccessToken } from './authToken';
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipGlobalErrorHandler?: boolean;
+  }
+}
 
 /** Clears only the app API token cookie — never Auth0 session storage. */
 const clearAllAuthData = () => {
@@ -49,14 +55,12 @@ export const apiClient = (token?: string): AxiosInstance => {
     },
     (error) => Promise.reject(error)
   );
-  type Cfg = AxiosRequestConfig & { skipGlobalErrorHandler?: boolean };
-
   const ERROR_ROUTES = ['/broken', '/record-not-found', '/network-error'];
 
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      const cfg = (error.config || {}) as Cfg;
+      const cfg = error.config || {};
 
       // let certain calls opt out
       if (cfg.skipGlobalErrorHandler) {

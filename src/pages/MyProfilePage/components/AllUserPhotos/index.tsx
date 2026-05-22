@@ -8,6 +8,7 @@ import ConfirmModal from '@app/components/ConfirmModal';
 import { useState } from 'react';
 import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import Image from '@app/components/Image';
+import Loader from '@app/components/Loader';
 
 interface IDeletePhotoModalProps {
   setIsDeleteModalVisible: (visible: boolean) => void;
@@ -35,17 +36,28 @@ const DeletePhotoModal = ({
 };
 
 const AllUserPhotos = () => {
-  const { allUserImages } = useGetAllUserImages();
-  const { deletePhoto, isDeleting } = useDeletePhoto();
+  const { allUserImages, allUserImagesError, allUserImagesLoading } = useGetAllUserImages();
+  const { deletePhoto, isDeleting } = useDeletePhoto(['uploads', 'user-photos']);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [photoUrl, setPhotoUrl] = useState('');
+  const photos: IImage[] = Array.isArray(allUserImages?.data)
+    ? allUserImages.data
+    : allUserImages?.data?.images || [];
 
   const handleDelete = () => {
     deletePhoto({ url: photoUrl });
     setIsDeleteModalVisible(false);
   };
 
-  if (!allUserImages?.data.length) {
+  if (allUserImagesLoading) {
+    return <Loader />;
+  }
+
+  if (allUserImagesError) {
+    return <h2 className="font-bold mt-5 mb-2 text-center">Fotografije se nisu učitale.</h2>;
+  }
+
+  if (!photos.length) {
     return (
       <>
         <Image src={notFound} alt="Nema fotografija" className="mx-auto block max-w-[300px]" />
@@ -62,11 +74,10 @@ const AllUserPhotos = () => {
         setIsDeleteModalVisible={setIsDeleteModalVisible}
       />
       <p className="mb-4">
-        Trenutno imaš {allUserImages.data.length} od maximalno {MAXIMUM_NUMBER_OF_IMAGES}{' '}
-        fotografija.
+        Trenutno imaš {photos.length} od maximalno {MAXIMUM_NUMBER_OF_IMAGES} fotografija.
       </p>
       <div className="lg:grid grid-cols-3 gap-4 ">
-        {allUserImages?.data.map((image: IImage) => (
+        {photos.map((image: IImage) => (
           <div key={image.id} className="relative mb-6 lg:mb-0 max-w-[400px]">
             <Photo image={image} />
             <Button
