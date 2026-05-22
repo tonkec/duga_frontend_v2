@@ -276,7 +276,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   return (
     <div>
-      <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
+      <form onSubmit={onSubmit} className="flex items-center gap-2">
         <input
           name="avatars"
           type="file"
@@ -302,20 +302,23 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
             });
           }}
         />
-        <BiPaperclip
-          fontSize={20}
-          style={{
-            transform: 'rotate(90deg)',
-          }}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue"
           onClick={handleIconClick}
-        />
+          aria-label="Priloži datoteku"
+        >
+          <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+        </button>
 
-        <BiSolidFileGif
-          fontSize={20}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue"
           onClick={() => setShowGiphySearch(!showGiphySearch)}
-        />
+          aria-label="Odaberi GIF"
+        >
+          <BiSolidFileGif fontSize={20} />
+        </button>
 
         <Controller
           name="content"
@@ -338,9 +341,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
             return (
               <Input
-                className="py-[5px]"
+                className="!rounded-full !border-[#dce4ff] py-2.5"
                 type="text"
-                placeholder="Pošalji poruku. Iskoristi : za emojije!"
+                placeholder="Napiši poruku… ( : za emoji )"
                 {...field}
                 onChange={(e: SyntheticEvent) => {
                   const value = (e.target as HTMLInputElement).value;
@@ -372,7 +375,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           }}
         />
 
-        <Button type="primary">
+        <Button type="blue" className="!rounded-full !p-2.5 shrink-0" htmlType="submit">
           <BiSend fontSize={20} />
         </Button>
       </form>

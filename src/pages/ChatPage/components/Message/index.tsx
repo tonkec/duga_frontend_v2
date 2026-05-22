@@ -56,15 +56,20 @@ interface IMessageContentProps {
   message: string;
   createdAt: string;
   messageType: string;
+  isOwnMessage?: boolean;
 }
 
-const messageStyles = 'p-2 rounded mb-2 text-white flex flex-col gap-2 max-w-[50vw]';
+const getMessageSenderId = (msg: IMessage) => Number(msg.fromUserId ?? msg.User?.id);
+
+const bubbleBase =
+  'flex flex-col gap-1 px-4 py-2.5 shadow-sm max-w-[min(85%,20rem)] break-words text-sm leading-relaxed';
 
 const MessageContent = ({
   messagePhotoUrl,
   message,
   createdAt,
   messageType,
+  isOwnMessage = false,
 }: IMessageContentProps) => {
   const isS3File = messageType === 'file';
   const isGiphy = messageType === 'gif';
@@ -84,7 +89,10 @@ const MessageContent = ({
       {!isGiphy && !isS3File && <ContentFormatter text={message} />}
 
       {error && !isGiphy && <p className="text-red-500">❌ Error loading image</p>}
-      <RecordCreatedAt className="text-right" createdAt={createdAt} />
+      <RecordCreatedAt
+        className={`text-right ${isOwnMessage ? '!text-blue-100' : ''}`}
+        createdAt={createdAt}
+      />
     </div>
   );
 };
@@ -99,24 +107,23 @@ const CurrentUserMessageTemplate = ({
   currentUserId,
 }: CurrentUserMessageTemplateProps) => {
   return (
-    <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
-      <div className={`${messageStyles} flex bg-blue`}>
+    <div className={`flex w-full items-end justify-end gap-2 ${showAvatar ? '' : 'pr-11'}`}>
+      <div className={`${bubbleBase} rounded-2xl rounded-br-sm bg-blue text-white`}>
         <MessageContent
           messageType={messageType}
           messagePhotoUrl={messagePhotoUrl}
           message={message}
           createdAt={createdAt}
+          isOwnMessage
         />
       </div>
       {showAvatar && (
-        <div className="ml-0.5">
-          <UserAvatar
-            className="w-12 h-12 rounded-full"
-            avatarFallbackName={userName}
-            userId={String(currentUserId)}
-            color="black"
-          />
-        </div>
+        <UserAvatar
+          className="h-9 w-9 shrink-0 rounded-full"
+          avatarFallbackName={userName}
+          userId={String(currentUserId)}
+          color="#2D46B9"
+        />
       )}
     </div>
   );
@@ -134,18 +141,24 @@ const OtherUserMessageTemplate = ({
   const navigate = useNavigate();
 
   return (
-    <div className="flex">
+    <div className={`flex w-full items-end justify-start gap-2 ${!showAvatar ? 'pl-11' : ''}`}>
       {showAvatar && (
-        <div className="cursor-pointer mr-0.5" onClick={() => navigate(`/user/${otherUserId}`)}>
+        <button
+          type="button"
+          className="shrink-0 cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue"
+          onClick={() => navigate(`/user/${otherUserId}`)}
+        >
           <UserAvatar
-            color="black"
+            color="#F037A5"
             avatarFallbackName={userName}
             userId={String(otherUserId)}
-            className="w-[40px] h-[40px] rounded-full"
+            className="h-9 w-9 rounded-full"
           />
-        </div>
+        </button>
       )}
-      <div className={`${messageStyles} bg-black ${!showAvatar ? 'ml-[26px]' : 'ml-0'}`}>
+      <div
+        className={`${bubbleBase} rounded-2xl rounded-bl-sm border border-[#e8eeff] bg-white text-gray-900`}
+      >
         <MessageContent
           messageType={messageType}
           messagePhotoUrl={messagePhotoUrl}
@@ -167,24 +180,22 @@ const Message = ({
   currentUserId,
   isCurrentUserLoading,
 }: IMessageProps) => {
-  const isFromCurrentUser = message.User.id === currentUserId;
+  const isFromCurrentUser = getMessageSenderId(message) === Number(currentUserId);
 
   if (isCurrentUserLoading) {
     return (
-      <div className={`flex flex-end ml-auto max-w-fit ${showAvatar ? 'mr-0' : 'mr-[26px]'}`}>
-        <div className={`${messageStyles} flex bg-blue animate-pulse`}>
-          <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+      <div className={`flex w-full items-end justify-end gap-2 ${showAvatar ? '' : 'pr-11'}`}>
+        <div className={`${bubbleBase} animate-pulse rounded-2xl rounded-br-sm bg-blue/40`}>
+          <div className="mb-2 h-4 w-3/4 rounded bg-white/30" />
+          <div className="h-3 w-1/2 rounded bg-white/30" />
         </div>
         {showAvatar && currentUserId !== undefined && (
-          <div className="ml-0.5">
-            <UserAvatar
-              className="w-12 h-12 rounded-full"
-              avatarFallbackName={currentUserName}
-              userId={currentUserId !== undefined ? String(currentUserId) : undefined}
-              color="black"
-            />
-          </div>
+          <UserAvatar
+            className="h-9 w-9 shrink-0 rounded-full"
+            avatarFallbackName={currentUserName}
+            userId={String(currentUserId)}
+            color="#2D46B9"
+          />
         )}
       </div>
     );

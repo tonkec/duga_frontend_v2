@@ -10,6 +10,7 @@ import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
 import { getOtherUser } from './utils/getOtherUser';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
+import UserAvatar from '@app/components/UserAvatar';
 import { useSocket } from '@app/context/useSocket';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { IMessage } from './components/Message';
@@ -168,24 +169,37 @@ const ChatPage = () => {
             setIsDeleteModalVisible(false);
           }}
         />
-        <Button
-          className="mb-2"
-          type="danger"
-          onClick={(e) => {
-            e?.preventDefault();
-            setIsDeleteModalVisible(true);
-          }}
-        >
-          Izbriši razgovor
-        </Button>
-        <Card>
-          <div className="flex items-center gap-1 border-b mb-4">
-            <span className="text-xs mt-1">{isOnlineState ? '🟢' : '🔴'}</span>
-            <h1 className="cursor-pointer" onClick={() => navigate(`/user/${otherUserId}`)}>
-              {otherUserName}
-            </h1>
-          </div>
-          <div className="mt-4 mb-2">
+        <Card className="!overflow-hidden !rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
+          <header className="flex items-center justify-between gap-3 border-b border-[#e8eeff] px-4 py-3">
+            <button
+              type="button"
+              className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-80"
+              onClick={() => navigate(`/user/${otherUserId}`)}
+            >
+              <UserAvatar
+                color="#F037A5"
+                avatarFallbackName={otherUserName ?? ''}
+                userId={String(otherUserId ?? '')}
+                className="h-11 w-11 shrink-0 rounded-full"
+              />
+              <div className="min-w-0">
+                <h1 className="truncate text-lg font-semibold text-gray-900">{otherUserName}</h1>
+                <p className="text-xs text-gray-500">{isOnlineState ? 'Na mreži' : 'Offline'}</p>
+              </div>
+            </button>
+            <Button
+              type="danger"
+              className="shrink-0 !py-1.5 !px-3 !text-xs"
+              onClick={(e) => {
+                e?.preventDefault();
+                setIsDeleteModalVisible(true);
+              }}
+            >
+              Izbriši
+            </Button>
+          </header>
+
+          <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}
@@ -194,9 +208,18 @@ const ChatPage = () => {
               currentUserId={currentUserId as number}
               isCurrentUserLoading={isCurrentUserLoading}
             />
+            {isTyping && (
+              <div className="px-4 pb-2">
+                <ChatBubble />
+              </div>
+            )}
           </div>
-          {isTyping && <ChatBubble />}
-          {chatId && <SendMessage otherUserId={otherUserId} chatId={chatId} />}
+
+          {chatId && (
+            <div className="border-t border-[#e8eeff] bg-white px-4 py-3">
+              <SendMessage otherUserId={otherUserId} chatId={chatId} />
+            </div>
+          )}
         </Card>
       </AppLayout>
     </ChatGuard>
