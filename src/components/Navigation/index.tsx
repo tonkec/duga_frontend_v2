@@ -7,6 +7,7 @@ import { useWindowSize } from '@uidotdev/usehooks';
 import { NavigationItems } from '../NavigationLinks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useSocket } from '@app/context/useSocket';
+import { setOfflineStatus } from '@app/utils/setOfflineStatus';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,10 +26,8 @@ const Navigation = () => {
     }
   }, [isMobile]);
 
-  const onLogout = () => {
-    if (socket) {
-      socket.emit('set-status', { status: 'offline' });
-    }
+  const onLogout = async () => {
+    await setOfflineStatus(socket);
     setCookie('token', '');
     logout({
       logoutParams: {

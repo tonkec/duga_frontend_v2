@@ -52,6 +52,9 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     connectSocket();
 
     return () => {
+      if (newSocket?.connected) {
+        newSocket.emit('set-status', { status: 'offline' });
+      }
       newSocket?.disconnect();
     };
   }, [isAuthenticated, isUserLoading, currentUser, getAccessTokenSilently]);
