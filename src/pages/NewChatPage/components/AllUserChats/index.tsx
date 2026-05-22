@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { IUser } from '@app/components/UserCard';
 import UserChat from '@app/pages/NewChatPage/components/UserChat';
+import NewMessageModal from '@app/pages/NewChatPage/components/NewMessageModal';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
 import Card from '@app/components/Card';
 import Button from '@app/components/Button';
@@ -41,6 +42,7 @@ const getChatSortTime = (chat: IChat) => {
 
 const AllUserChats = ({ userChats }: IAllUserChats) => {
   const navigate = useNavigate();
+  const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
 
   const sortedChats = useMemo(
     () => [...userChats].sort((a, b) => getChatSortTime(b) - getChatSortTime(a)),
@@ -61,11 +63,16 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
                   : `${sortedChats.length} aktivnih razgovora`}
             </p>
           </div>
-          <Button type="blue" className="shrink-0" onClick={() => navigate('/')}>
+          <Button type="blue" className="shrink-0" onClick={() => setIsNewMessageModalOpen(true)}>
             Nova poruka
           </Button>
         </div>
       </header>
+
+      <NewMessageModal
+        isOpen={isNewMessageModalOpen}
+        onClose={() => setIsNewMessageModalOpen(false)}
+      />
 
       <Card className="!rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
         <ul className="divide-y divide-[#e8eeff]" role="list">

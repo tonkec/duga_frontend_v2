@@ -1,9 +1,11 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import Loader from '@app/components/Loader';
 import Button from '@app/components/Button';
 import { PageTitle } from '@app/components/PageTitle';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
+import { filterChatsWithMessages } from '@app/utils/filterChatsWithMessages';
 import AllUserChats from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
 
@@ -30,6 +32,7 @@ const NewChatPage = () => {
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
+  const visibleChats = useMemo(() => filterChatsWithMessages(userChats?.data), [userChats?.data]);
 
   if (isUserChatsLoading) {
     return (
@@ -41,7 +44,7 @@ const NewChatPage = () => {
     );
   }
 
-  if (userChats?.data.length === 0 || !userChats?.data) {
+  if (visibleChats.length === 0) {
     return (
       <PageTitle title="Poruke">
         <AppLayout>
@@ -66,9 +69,7 @@ const NewChatPage = () => {
 
   return (
     <PageTitle title="Poruke">
-      <AppLayout>
-        {userChats.data.length > 0 && <AllUserChats userChats={userChats.data} />}
-      </AppLayout>
+      <AppLayout>{visibleChats.length > 0 && <AllUserChats userChats={visibleChats} />}</AppLayout>
     </PageTitle>
   );
 };
