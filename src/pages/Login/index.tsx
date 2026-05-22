@@ -12,6 +12,8 @@ import Image from '@app/components/Image';
 import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
+import { clearAppSessionRevoked } from '@app/api/appSession';
+import { useAppSessionStatus } from '@app/context/AppSessionContext';
 
 const getDomainPath = () => {
   const { hostname } = window.location;
@@ -69,7 +71,17 @@ const faqItems = [
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
+  const appSessionStatus = useAppSessionStatus();
   const learnMoreRef = useRef<HTMLDivElement>(null);
+
+  const onLogin = () => {
+    clearAppSessionRevoked();
+    loginWithRedirect({
+      authorizationParams: {
+        redirect_uri: URL,
+      },
+    });
+  };
 
   const scrollToLearnMore = () => {
     learnMoreRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,17 +92,7 @@ const LoginPage = () => {
       <header className="gradient  pb-32">
         <CookieBanner />
         <nav className="transparent py-2 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
-          <Button
-            className=""
-            type="primary"
-            onClick={() => {
-              loginWithRedirect({
-                authorizationParams: {
-                  redirect_uri: URL,
-                },
-              });
-            }}
-          >
+          <Button className="" type="primary" onClick={onLogin}>
             Prijava
           </Button>
         </nav>
@@ -99,6 +101,11 @@ const LoginPage = () => {
           <div className="lg:flex pt-52 items-center">
             <div className="flex flex-col md:bg-blue pt-6 pb-8 rounded px-8">
               <h1 className="mt-2 mb-12 text-8xl font-bold text-white">Duga</h1>
+              {appSessionStatus === 'revoked' && (
+                <p className="mb-6 rounded bg-white/90 p-3 text-blue">
+                  Odjavljeni ste jer je račun otvoren u drugoj sesiji.
+                </p>
+              )}
               <p className="mt-8 text-white text-4xl max-w-xl">
                 Razgovaraj, flertaj ili prozuji s <b className="font-bold">queer</b> osobicama s
                 Balkana.
@@ -107,13 +114,7 @@ const LoginPage = () => {
                 <Button
                   type="primary"
                   className="!px-6 !py-4 !text-xl w-full sm:w-auto"
-                  onClick={() => {
-                    loginWithRedirect({
-                      authorizationParams: {
-                        redirect_uri: URL,
-                      },
-                    });
-                  }}
+                  onClick={onLogin}
                 >
                   Prijavi se! 👉
                 </Button>
@@ -324,17 +325,7 @@ const LoginPage = () => {
                 <br />
                 Postani član naše zajednice. Zaljubi se u trenu i pronađi ljubav svog života.
               </p>
-              <Button
-                type="primary"
-                className="!px-6 !py-4 !text-xl max-w-md"
-                onClick={() => {
-                  loginWithRedirect({
-                    authorizationParams: {
-                      redirect_uri: URL,
-                    },
-                  });
-                }}
-              >
+              <Button type="primary" className="!px-6 !py-4 !text-xl max-w-md" onClick={onLogin}>
                 Prijavi se
               </Button>
             </div>
@@ -384,13 +375,7 @@ const LoginPage = () => {
                     <Button
                       type="transparent"
                       className="!px-6 !py-2 !text-lg no-underline !bg-pink-dark text-white"
-                      onClick={() => {
-                        loginWithRedirect({
-                          authorizationParams: {
-                            redirect_uri: URL,
-                          },
-                        });
-                      }}
+                      onClick={onLogin}
                     >
                       Odaberi plan unutar aplikacije
                     </Button>

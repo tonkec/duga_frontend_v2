@@ -4,6 +4,7 @@ import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { resolveAccessToken } from '@app/api/authToken';
+import { getAppSessionId, markSessionRevoked } from '@app/api/appSession';
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
@@ -33,6 +34,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         newSocket = io(getBackendUrl(), {
           auth: {
             token,
+            sessionId: getAppSessionId(),
           },
         });
 
@@ -45,6 +47,11 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
         newSocket.on('disconnect', () => {
           console.log('🔌 Socket disconnected');
+        });
+
+        newSocket.on('session-revoked', () => {
+          markSessionRevoked();
+          newSocket.disconnect();
         });
       } catch (error) {
         console.error('⚠️ Failed to connect socket:', error);

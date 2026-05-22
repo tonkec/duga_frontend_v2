@@ -10,6 +10,7 @@ import { SocketProvider } from './context/SocketProvider.tsx';
 import { Auth0ProviderWithNavigate } from './Auth0ProviderWithNavigate.tsx';
 import AuthTokenBridge from './components/AuthTokenBridge/index.tsx';
 import { CookiesProvider } from 'react-cookie';
+import AppSessionProvider from './components/AppSessionProvider/index.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,9 +31,11 @@ createRoot(document.getElementById('root')!).render(
         <QueryClientProvider client={queryClient}>
           <Auth0ProviderWithNavigate>
             <AuthTokenBridge>
-              <SocketProvider>
-                <DugaRoutes />
-              </SocketProvider>
+              <AppSessionProvider>
+                <SocketProvider>
+                  <DugaRoutes />
+                </SocketProvider>
+              </AppSessionProvider>
             </AuthTokenBridge>
           </Auth0ProviderWithNavigate>
           <ReactQueryDevtools />

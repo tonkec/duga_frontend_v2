@@ -8,6 +8,7 @@ import { NavigationItems } from '../NavigationLinks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useSocket } from '@app/context/useSocket';
 import { setOfflineStatus } from '@app/utils/setOfflineStatus';
+import { clearAppSessionId, clearAppSessionRevoked } from '@app/api/appSession';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -30,6 +31,8 @@ const Navigation = () => {
     if (socket) {
       await setOfflineStatus(socket);
     }
+    clearAppSessionId();
+    clearAppSessionRevoked();
     setCookie('token', '');
     logout({
       logoutParams: {
