@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useQueryClient } from '@tanstack/react-query';
 import Loader from '@app/components/Loader';
 import { register } from '@app/api/auth/register';
 import { startSession } from '@app/api/sessions';
@@ -13,16 +14,20 @@ import { generateUniqueUsername } from '@app/hooks/useEnsureBackendUser';
 
 const AppSessionProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading, user } = useAuth0();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<AppSessionStatus>(() =>
     isAppSessionRevoked() ? 'revoked' : 'loading'
   );
 
   useEffect(() => {
-    const onRevoked = () => setStatus('revoked');
+    const onRevoked = () => {
+      queryClient.clear();
+      setStatus('revoked');
+    };
 
     window.addEventListener(SESSION_REVOKED_EVENT, onRevoked);
     return () => window.removeEventListener(SESSION_REVOKED_EVENT, onRevoked);
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     if (isLoading) return;

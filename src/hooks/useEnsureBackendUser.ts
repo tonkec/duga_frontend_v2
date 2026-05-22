@@ -2,6 +2,7 @@ import { apiClient } from '@app/api';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
+import { isAppSessionRevoked } from '@app/api/appSession';
 
 export const generateUniqueUsername = (): string => {
   const [word] = generate({ exactly: 1, formatter: (w) => w.toLowerCase() });
@@ -10,7 +11,7 @@ export const generateUniqueUsername = (): string => {
   return username;
 };
 
-export const useEnsureBackendUser = () => {
+export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } = {}) => {
   const { user: auth0User, isAuthenticated, isLoading: isAuthLoading } = useAuth0();
 
   return useQuery({
@@ -31,7 +32,7 @@ export const useEnsureBackendUser = () => {
       const res = await client.get('/users/current-user');
       return res.data;
     },
-    enabled: isAuthenticated && !isAuthLoading && !!auth0User,
+    enabled: enabled && !isAppSessionRevoked() && isAuthenticated && !isAuthLoading && !!auth0User,
     throwOnError: false,
   });
 };
