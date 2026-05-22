@@ -1,14 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { resolveAccessToken } from './authToken';
+
+/** Clears only the app API token cookie — never Auth0 session storage. */
 const clearAllAuthData = () => {
-  localStorage.clear();
-
-  sessionStorage.clear();
-
-  document.cookie.split(';').forEach((c) => {
-    document.cookie = c
-      .replace(/^ +/, '')
-      .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
-  });
+  document.cookie = `token=;expires=${new Date(0).toUTCString()};path=/`;
 };
 
 export const getCookie = (name: string): string | null => {
@@ -37,16 +32,10 @@ export const apiClient = (token?: string): AxiosInstance => {
   });
 
   instance.interceptors.request.use(
-    (config) => {
-      // If token is explicitly passed, use it
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        return config;
-      }
+    async (config) => {
+      const authToken = await resolveAccessToken(token);
 
-      // Otherwise, try cookie-based fallback
-      const cookieToken = getCookie('token');
-      if (!cookieToken) {
+      if (!authToken) {
         return Promise.reject({
           response: {
             status: 401,
@@ -55,7 +44,7 @@ export const apiClient = (token?: string): AxiosInstance => {
         });
       }
 
-      config.headers.Authorization = `Bearer ${cookieToken}`;
+      config.headers.Authorization = `Bearer ${authToken}`;
       return config;
     },
     (error) => Promise.reject(error)

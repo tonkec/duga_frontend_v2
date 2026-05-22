@@ -72,6 +72,8 @@ const ChatPage = () => {
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('received', (data: IMessage) => {
       setReceivedMessages((prev) => [...prev, data]);
     });
@@ -82,6 +84,8 @@ const ChatPage = () => {
   }, [socket]);
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('typing', (data: ITypingData) => {
       if (data.userId === Number(otherUserId)) {
         setIsTyping(true);
@@ -124,6 +128,8 @@ const ChatPage = () => {
   }, [otherUser?.data?.status]);
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
       if (deletedChatId === chatId) {
         toast.error('Chat obrisan. Preusmjeravam...', toastConfig);

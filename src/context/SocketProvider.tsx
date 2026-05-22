@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { resolveAccessToken } from '@app/api/authToken';
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
@@ -16,7 +17,7 @@ const getBackendUrl = () => {
 };
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
   const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
 
@@ -26,7 +27,8 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
     const connectSocket = async () => {
       try {
-        const token = await getAccessTokenSilently();
+        const token = await resolveAccessToken();
+        if (!token) return;
 
         newSocket = io(getBackendUrl(), {
           auth: {
@@ -52,20 +54,9 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     connectSocket();
 
     return () => {
-      if (newSocket?.connected) {
-        newSocket.emit('set-status', { status: 'offline' });
-      }
       newSocket?.disconnect();
     };
-  }, [isAuthenticated, isUserLoading, currentUser, getAccessTokenSilently]);
-
-  if (!isAuthenticated) {
-    return <>{children}</>;
-  }
-
-  if (isAuthenticated && !socket) {
-    return null;
-  }
+  }, [isAuthenticated, isUserLoading, currentUser]);
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
 };

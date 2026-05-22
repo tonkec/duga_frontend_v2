@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SocketProvider } from './context/SocketProvider.tsx';
 import { Auth0ProviderWithNavigate } from './Auth0ProviderWithNavigate.tsx';
+import AuthTokenBridge from './components/AuthTokenBridge/index.tsx';
 import { CookiesProvider } from 'react-cookie';
 
 const queryClient = new QueryClient({
@@ -28,9 +29,11 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <Auth0ProviderWithNavigate>
-            <SocketProvider>
-              <DugaRoutes />
-            </SocketProvider>
+            <AuthTokenBridge>
+              <SocketProvider>
+                <DugaRoutes />
+              </SocketProvider>
+            </AuthTokenBridge>
           </Auth0ProviderWithNavigate>
           <ReactQueryDevtools />
           <ToastContainer />

@@ -170,6 +170,8 @@ const PhotoComments = () => {
   }, [areCommentsLoading, allCommentsData?.data, photoId]);
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('receive-comment', (data) => {
       setAllComments((prev) => [data.data, ...prev]);
     });

@@ -117,7 +117,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       chatId,
       messagePhotoUrl: gifUrl,
     };
-    socket.emit('message', msg);
+    socket?.emit('message', msg);
     setShowGiphySearch(false);
   };
 
@@ -148,7 +148,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const emitImageToSockets = () => {
     if (currentUploadableImage) {
       Array.from(currentUploadableImage).forEach((file: File) => {
-        socket.emit('message', {
+        socket?.emit('message', {
           type: 'file',
           fromUserId: currentUserId,
           fromUser: currentUser?.data,
@@ -215,7 +215,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     };
 
     if (isValid && toUserId?.length) {
-      socket.emit('message', msg);
+      socket?.emit('message', msg);
     }
 
     reset();
@@ -252,7 +252,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
           onChange={(e) => {
-            socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+            socket?.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
             const files = e.target.files as FileList;
 
             if (!areValidImageTypes(files)) {
@@ -315,8 +315,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   field.onChange(e);
                 }}
                 onFocus={() => {
-                  socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
-                  socket.emit('markAsRead', {
+                  socket?.emit('typing', {
+                    chatId,
+                    userId: currentUserId,
+                    toUserId: [otherUserId],
+                  });
+                  socket?.emit('markAsRead', {
                     userId: currentUserId,
                     chatId: Number(chatId),
                   });
@@ -334,7 +338,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   }
                 }}
                 onBlur={() => {
-                  socket.emit('stop-typing', {
+                  socket?.emit('stop-typing', {
                     chatId,
                     userId: currentUserId,
                     toUserId: [otherUserId],

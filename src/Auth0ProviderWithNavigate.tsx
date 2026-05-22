@@ -25,6 +25,7 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
     <Auth0Provider
       domain={domain}
       clientId={clientId}
+      cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: redirectUri,
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,

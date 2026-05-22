@@ -30,7 +30,7 @@ export const useEditUploadComment = (onCommentUpdated?: (payload: unknown) => vo
       toast.success('Komentar uspješno izmijenjen.', toastConfig);
       const payload = toCommentUpdateSocketPayload(response.data, variables);
       onCommentUpdated?.(payload);
-      socket.emit('edit-comment', payload);
+      socket?.emit('edit-comment', payload);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
@@ -56,7 +56,7 @@ export const useAddUploadComment = () => {
     mutationFn: (formData: FormData) => addUploadComment(formData),
     onSuccess: (data) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
-      socket.emit('send-comment', data.data);
+      socket?.emit('send-comment', data.data);
     },
     onError: (error: AxiosError<BackendError>) => {
       const errors = error?.response?.data?.errors;
@@ -82,7 +82,7 @@ export const useDeleteUploadComment = () => {
   } = useMutation({
     mutationFn: (commentId: number) => deleteUploadComment(commentId),
     onSuccess: (data) => {
-      socket.emit('delete-comment', data);
+      socket?.emit('delete-comment', data);
       toast.success('Komentar uspiješno obrisan.', toastConfig);
     },
     onError: () => {

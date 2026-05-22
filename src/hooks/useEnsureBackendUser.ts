@@ -11,15 +11,14 @@ export const generateUniqueUsername = (): string => {
 };
 
 export const useEnsureBackendUser = () => {
-  const { getAccessTokenSilently, user: auth0User } = useAuth0();
+  const { user: auth0User, isAuthenticated, isLoading: isAuthLoading } = useAuth0();
 
   return useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
       if (!auth0User) throw new Error('Auth0 user not available');
 
-      const token = await getAccessTokenSilently();
-      const client = apiClient(token);
+      const client = apiClient();
 
       const input = {
         email: auth0User.email,
@@ -32,6 +31,6 @@ export const useEnsureBackendUser = () => {
       const res = await client.get('/users/current-user');
       return res.data;
     },
-    enabled: !!auth0User,
+    enabled: isAuthenticated && !isAuthLoading && !!auth0User,
   });
 };

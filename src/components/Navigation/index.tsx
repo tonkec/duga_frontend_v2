@@ -27,7 +27,9 @@ const Navigation = () => {
   }, [isMobile]);
 
   const onLogout = async () => {
-    await setOfflineStatus(socket);
+    if (socket) {
+      await setOfflineStatus(socket);
+    }
     setCookie('token', '');
     logout({
       logoutParams: {
