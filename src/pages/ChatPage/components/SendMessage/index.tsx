@@ -203,7 +203,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     setImageTimestamp(String(Date.now()));
   };
 
-  const { uploadMessageImage } = useUploadMessageImage(emitImageToSockets, clearSelectedFiles);
+  const { uploadMessageImage, isUploadingMessageImage } = useUploadMessageImage(
+    emitImageToSockets,
+    clearSelectedFiles
+  );
 
   const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -304,8 +307,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         />
         <button
           type="button"
-          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleIconClick}
+          disabled={isUploadingMessageImage}
           aria-label="Priloži datoteku"
         >
           <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
@@ -313,8 +317,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
         <button
           type="button"
-          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => setShowGiphySearch(!showGiphySearch)}
+          disabled={isUploadingMessageImage}
           aria-label="Odaberi GIF"
         >
           <BiSolidFileGif fontSize={20} />
@@ -375,8 +380,17 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           }}
         />
 
-        <Button type="blue" className="!rounded-full !p-2.5 shrink-0" htmlType="submit">
-          <BiSend fontSize={20} />
+        <Button
+          type="blue"
+          className="!rounded-full !p-2.5 shrink-0"
+          htmlType="submit"
+          disabled={isUploadingMessageImage}
+        >
+          {isUploadingMessageImage ? (
+            <span className="block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          ) : (
+            <BiSend fontSize={20} />
+          )}
         </Button>
       </form>
       <GiphySearch
@@ -400,13 +414,18 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <div className="flex items-end gap-2 flex-wrap">
           {currentUploadableImage.map((image: File) => {
             return (
-              <div key={image.name}>
+              <div key={image.name} className="relative">
                 <Image
                   src={URL.createObjectURL(image)}
                   alt={image.name}
                   style={{ width: 150, height: 150 }}
                   className="border mt-2"
                 />
+                {isUploadingMessageImage && (
+                  <div className="absolute inset-0 mt-2 flex items-center justify-center bg-black/50 text-sm font-semibold text-white">
+                    Slanje...
+                  </div>
+                )}
                 <Button
                   type="danger"
                   onClick={() => {
@@ -417,6 +436,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                     }
                   }}
                   className="mt-2"
+                  disabled={isUploadingMessageImage}
                 >
                   Makni sliku
                 </Button>

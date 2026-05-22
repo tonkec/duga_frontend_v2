@@ -30,6 +30,7 @@ interface IPhotoActionButtonsProps {
   isChecked?: boolean;
   onCheckboxChange?: (e: SyntheticEvent) => void;
   hasCheckbox?: boolean;
+  disabled?: boolean;
 }
 
 const DeleteButtonModal = ({
@@ -64,6 +65,7 @@ const PhotoActionButtons = ({
   isChecked,
   onCheckboxChange,
   hasCheckbox,
+  disabled,
 }: IPhotoActionButtonsProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   return (
@@ -79,11 +81,13 @@ const PhotoActionButtons = ({
         placeholder="Napiši nešto o fotografiji"
         onChange={onInputChange}
         type="text"
+        disabled={disabled}
       />
       {hasCheckbox && (
         <div className="flex gap-1 items-center mt-4">
           <input
             type="checkbox"
+            disabled={disabled}
             onChange={
               onCheckboxChange
                 ? onCheckboxChange
@@ -99,11 +103,13 @@ const PhotoActionButtons = ({
       <div className="mt-4 flex gap-2">
         <Button
           type="black"
+          htmlType="button"
           className="flex gap-1 items-center"
           onClick={(e: SyntheticEvent | undefined) => {
             e?.preventDefault();
             setIsDeleteModalOpen(true);
           }}
+          disabled={disabled}
         >
           <span>Obriši</span>
           <BiTrash fontSize={20} />
@@ -123,7 +129,7 @@ const PhotoUploader = () => {
   const [hasDescriptionError, setHasDescriptionError] = useState<boolean>(false);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
-  const { onUploadPhotos } = useUploadPhotos();
+  const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos();
   const [newImages, setNewImages] = useState<IImage[]>();
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []
@@ -170,13 +176,15 @@ const PhotoUploader = () => {
       formData.append('avatars', cleanedFile);
     }
 
-    onUploadPhotos(formData);
+    onUploadPhotos(formData, {
+      onSuccess: () => {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-
-    setNewImages([]);
+        setNewImages([]);
+      },
+    });
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
@@ -242,6 +250,12 @@ const PhotoUploader = () => {
 
   return (
     <div>
+      {isUploadingPhotos && (
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 font-semibold text-blue">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue border-t-transparent" />
+          Fotografije se spremaju...
+        </div>
+      )}
       {shouldShowEditable && (
         <Card className="mb-6 rounded-2xl p-5 md:p-6">
           <form onSubmit={onSubmitUpdatePhotos}>
@@ -289,6 +303,7 @@ const PhotoUploader = () => {
                           ?.isProfilePhoto || false
                       }
                       hasCheckbox
+                      disabled={isUploadingPhotos}
                       onCheckboxChange={(e: SyntheticEvent) => {
                         const isChecked = (e.target as HTMLInputElement).checked;
                         setAllCheckboxes((prev) =>
@@ -325,8 +340,12 @@ const PhotoUploader = () => {
               })}
             </div>
 
-            <Button type="blue" className="mt-4 w-full md:w-auto" disabled={hasDescriptionError}>
-              <span>Spremi</span>
+            <Button
+              type="blue"
+              className="mt-4 w-full md:w-auto"
+              disabled={hasDescriptionError || isUploadingPhotos}
+            >
+              <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi'}</span>
             </Button>
           </form>
         </Card>
@@ -354,11 +373,17 @@ const PhotoUploader = () => {
                         alt={image.name}
                         className="absolute top-0 left-0 w-full h-full object-cover"
                       />
+                      {isUploadingPhotos && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 font-semibold text-white">
+                          Spremanje...
+                        </div>
+                      )}
                     </div>
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDeleteFromState(image)}
                       defaultInputValue={image.description}
+                      disabled={isUploadingPhotos}
                     />
                   </div>
                 );
@@ -409,11 +434,16 @@ const PhotoUploader = () => {
                 }
               }}
               className="w-full cursor-pointer rounded-xl bg-white p-3 text-sm text-gray-700"
+              disabled={isUploadingPhotos}
             />
           </div>
           {newImages && newImages.length > 0 && (
-            <Button type="blue" className="w-full md:w-auto" disabled={hasDescriptionError}>
-              <span>Spremi</span>
+            <Button
+              type="blue"
+              className="w-full md:w-auto"
+              disabled={hasDescriptionError || isUploadingPhotos}
+            >
+              <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi'}</span>
             </Button>
           )}
         </form>

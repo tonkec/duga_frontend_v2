@@ -14,6 +14,7 @@ export const useUploadMessageImage = (
 ) => {
   const {
     mutate: uploadMessageImage,
+    isPending: isUploadingMessageImage,
     isError,
     isSuccess,
   } = useMutation({
@@ -29,5 +30,5 @@ export const useUploadMessageImage = (
     },
   });
 
-  return { uploadMessageImage, isError, isSuccess };
+  return { uploadMessageImage, isUploadingMessageImage, isError, isSuccess };
 };

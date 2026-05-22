@@ -71,7 +71,7 @@ const PhotoComments = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
-  const { mutateAddUploadComment } = useAddUploadComment();
+  const { mutateAddUploadComment, isAddingUploadComment } = useAddUploadComment();
   const { photoId } = useParams();
   const { allComments: allCommentsData, areCommentsLoading } = useGetUploadComments(
     photoId as string
@@ -151,10 +151,13 @@ const PhotoComments = () => {
       formData.append('commentImage', cleanedFile);
     }
 
-    mutateAddUploadComment(formData);
-    setTaggedUsers([]);
-    setCurrentEmojis([]);
-    reset({ comment: '', content: '', image: undefined });
+    mutateAddUploadComment(formData, {
+      onSuccess: () => {
+        setTaggedUsers([]);
+        setCurrentEmojis([]);
+        reset({ comment: '', content: '', image: undefined });
+      },
+    });
   };
 
   const clearImage = () => {
@@ -287,8 +290,9 @@ const PhotoComments = () => {
                   />
                   <button
                     type="button"
-                    className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900"
+                    className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={handleIconClick}
+                    disabled={isAddingUploadComment}
                     aria-label="Dodaj sliku"
                   >
                     <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
@@ -342,17 +346,38 @@ const PhotoComments = () => {
             }}
           />
 
-          <Button type="blue">Pošalji</Button>
+          <Button type="blue" disabled={isAddingUploadComment}>
+            {isAddingUploadComment ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Slanje
+              </span>
+            ) : (
+              'Pošalji'
+            )}
+          </Button>
         </div>
 
         {previewUrl && (
           <div className="mt-3 flex items-end gap-3">
-            <Image
-              src={previewUrl}
-              alt="Preview"
-              className="max-w-[150px] rounded-xl border border-[#dce4ff]"
-            />
-            <Button type="danger" onClick={clearImage}>
+            <div className="relative">
+              <Image
+                src={previewUrl}
+                alt="Preview"
+                className="max-w-[150px] rounded-xl border border-[#dce4ff]"
+              />
+              {isAddingUploadComment && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
+                  Slanje...
+                </div>
+              )}
+            </div>
+            <Button
+              type="danger"
+              htmlType="button"
+              onClick={clearImage}
+              disabled={isAddingUploadComment}
+            >
               Makni
             </Button>
           </div>
