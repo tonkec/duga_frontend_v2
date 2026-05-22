@@ -55,6 +55,14 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           options={selectOptions}
           isClearable
           placeholder="Odaberite kriterij"
+          theme={(theme) => ({
+            ...theme,
+            colors: {
+              ...theme.colors,
+              primary25: '#dce4ff',
+              primary: '#2D46B9',
+            },
+          })}
           value={selectValue.value ? selectValue : null}
           onChange={(e) => {
             if (!e) {

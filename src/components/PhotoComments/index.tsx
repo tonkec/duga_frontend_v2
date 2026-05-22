@@ -26,6 +26,7 @@ import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 import Paginated from '../Paginated';
 import Image from '../Image';
 import { parseCommentUpdatePayload } from './utils/parseCommentUpdate';
+import Loader from '../Loader';
 
 const schema = z
   .object({

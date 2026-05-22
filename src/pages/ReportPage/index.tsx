@@ -91,8 +91,8 @@ export default function ReportPage() {
                       ...theme,
                       colors: {
                         ...theme.colors,
-                        primary25: '#F037A5',
-                        primary: 'black',
+                        primary25: '#dce4ff',
+                        primary: '#2D46B9',
                       },
                     })}
                   />

@@ -243,12 +243,20 @@ const PhotoUploader = () => {
   return (
     <div>
       {shouldShowEditable && (
-        <Card className="mb-6">
+        <Card className="mb-6 rounded-2xl p-5 md:p-6">
           <form onSubmit={onSubmitUpdatePhotos}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Tvoje fotografije</h2>
+              <p className="mt-1 text-gray-600">Uredi opise i odaberi profilnu fotografiju.</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {allExistingImages.data.images.map((image: IImage, index: number) => {
                 return (
-                  <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
+                  <div
+                    key={`${image.name}-editable`}
+                    className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+                  >
                     <BlobImage imageUrl={image.securePhotoUrl} name={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => {
@@ -317,21 +325,30 @@ const PhotoUploader = () => {
               })}
             </div>
 
-            <Button type="primary" disabled={hasDescriptionError}>
+            <Button type="blue" className="mt-4 w-full md:w-auto" disabled={hasDescriptionError}>
               <span>Spremi</span>
             </Button>
           </form>
         </Card>
       )}
-      <Card>
+      <Card className="rounded-2xl p-5 md:p-6">
         <form onSubmit={onSubmitHandler}>
-          <h2 className="font-bold mt-5 mb-2"> Dodaj nove fotografije </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">Dodaj nove fotografije</h2>
+            <p className="mt-1 text-gray-600">
+              Možeš imati najviše {MAXIMUM_NUMBER_OF_IMAGES} fotografija ukupno.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {newImages &&
               newImages.map((image) => {
                 return (
-                  <div key={image.name} className="mb-4 max-w-[400px]">
-                    <div className="relative w-full aspect-[1/1] overflow-hidden rounded-md">
+                  <div
+                    key={image.name}
+                    className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+                  >
+                    <div className="relative w-full aspect-[1/1] overflow-hidden rounded-xl">
                       <Image
                         src={image.url}
                         alt={image.name}
@@ -348,7 +365,7 @@ const PhotoUploader = () => {
               })}
           </div>
 
-          <div className="mb-4">
+          <div className="my-4 rounded-2xl border border-dashed border-[#b9c6ff] bg-[#f7f9ff] p-5">
             <input
               ref={fileInputRef}
               type="file"
@@ -391,10 +408,11 @@ const PhotoUploader = () => {
                   setNewImages((prev) => [...(prev || []), ...(images as IImage[])]);
                 }
               }}
+              className="w-full cursor-pointer rounded-xl bg-white p-3 text-sm text-gray-700"
             />
           </div>
           {newImages && newImages.length > 0 && (
-            <Button type="primary" disabled={hasDescriptionError}>
+            <Button type="blue" className="w-full md:w-auto" disabled={hasDescriptionError}>
               <span>Spremi</span>
             </Button>
           )}
