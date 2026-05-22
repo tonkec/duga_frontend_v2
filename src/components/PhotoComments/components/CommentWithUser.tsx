@@ -16,6 +16,7 @@ import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface Inputs {
   comment: string;
@@ -96,7 +97,7 @@ const CommentWithUser: React.FC<{
   const renderContent = () => {
     if (isEditing) {
       return (
-        <form className="flex gap-2 justify-between w-full" onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col gap-3 w-full" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col w-full">
             <Controller
               name="comment"
@@ -112,11 +113,11 @@ const CommentWithUser: React.FC<{
             />
             {errors.comment && <FieldError message="Komentar je obavezan." />}
           </div>
-          <div className="flex gap-2 items-start pt-1">
-            <Button type="tertiary" htmlType="button" onClick={() => setIsEditing(false)}>
+          <div className="flex justify-end gap-2">
+            <Button type="transparent" htmlType="button" onClick={() => setIsEditing(false)}>
               Otkaži
             </Button>
-            <Button type="tertiary" htmlType="submit">
+            <Button type="blue" htmlType="submit">
               Spremi
             </Button>
           </div>
@@ -125,24 +126,28 @@ const CommentWithUser: React.FC<{
     }
 
     return (
-      <div className="flex gap-2 justify-between items-start">
+      <div className="flex flex-col gap-3">
         <div className="flex-1">
-          {comment.comment && <p className="text-lg">{renderFormattedComment(comment.comment)}</p>}
+          {comment.comment && (
+            <div className="text-base leading-relaxed text-gray-800">
+              {renderFormattedComment(comment.comment)}
+            </div>
+          )}
           {imageBlob && (
             <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Slika"
-              className="max-h-64 w-full object-cover rounded"
+              className="mt-3 max-h-64 w-full rounded-xl object-cover"
             />
           )}
         </div>
         {String(currentUserId) === String(comment.userId) && (
           <div className="flex gap-2">
-            <Button type="tertiary" htmlType="button" onClick={() => setIsEditing(true)}>
+            <Button type="transparent" htmlType="button" onClick={() => setIsEditing(true)}>
               Izmijeni
             </Button>
             <Button
-              type="tertiary"
+              type="transparent"
               htmlType="button"
               onClick={() => mutateDeleteUploadComment(Number(comment.id))}
             >
@@ -154,28 +159,34 @@ const CommentWithUser: React.FC<{
     );
   };
 
+  const username = user?.data.username || 'Korisnik';
+  const isOwnComment = String(currentUserId) === String(comment.userId);
+
   return (
-    <div className="flex flex-col gap-1 bg-gray-100 p-2 rounded">
+    <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          className="flex min-w-0 items-center gap-2 text-left"
+          onClick={() => !isOwnComment && navigate(`/user/${comment.userId}`)}
+          disabled={isOwnComment}
+        >
+          <UserAvatar
+            color="#F037A5"
+            userId={String(comment.userId)}
+            avatarFallbackName={username}
+            className="h-9 w-9 shrink-0 rounded-full"
+          />
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-gray-900">
+              {isOwnComment ? 'Tvoj komentar' : username}
+            </p>
+            {!isUserLoading && <RecordCreatedAt createdAt={comment.createdAt} />}
+          </div>
+        </button>
+      </div>
+
       {renderContent()}
-      {isUserLoading ? (
-        <p className="text-xs">Loading user...</p>
-      ) : String(currentUserId) === String(comment.userId) ? (
-        <p className="mt-3 text-sm">
-          <span>Tvoj komentar</span>
-          <RecordCreatedAt createdAt={comment.createdAt} />
-        </p>
-      ) : (
-        <p className="text-sm mt-3 ">
-          Kaže{' '}
-          <span
-            className="text-blue underline cursor-pointer"
-            onClick={() => navigate(`/user/${comment.userId}`)}
-          >
-            {user?.data.username}
-          </span>
-          <RecordCreatedAt createdAt={comment.createdAt} />
-        </p>
-      )}
     </div>
   );
 };

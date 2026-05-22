@@ -123,7 +123,12 @@ const PhotoComments = () => {
   const onSubmit = async (data: Inputs) => {
     if (!photoId || !isValid) return;
 
-    if (data?.image?.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    const existingImagesCount = Array.isArray(allUserImages?.data)
+      ? allUserImages.data.length
+      : allUserImages?.data?.images?.length || 0;
+    const selectedImagesCount = data?.image?.length || 0;
+
+    if (selectedImagesCount + existingImagesCount > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
@@ -235,20 +240,20 @@ const PhotoComments = () => {
 
   return (
     <CommentUpdateContext.Provider value={applyCommentUpdate}>
-      <div className="flex flex-col gap-2 ">
-        {!!sortedComments.length && (
-          <Paginated<IComment>
-            itemsPerPage={3}
-            gridClassName="grid grid-cols-1 gap-2"
-            data={sortedComments}
-            paginatedSingle={PaginatedComment}
-            getItemKey={(item) => item.id}
-          />
-        )}
+      <div className="mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">Komentari</p>
+        <h1 className="mt-1 text-2xl font-bold text-gray-900">
+          {sortedComments.length
+            ? `${sortedComments.length} komentara`
+            : 'Budi prva osoba koja komentira'}
+        </h1>
       </div>
 
-      <form className="w-full flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex w-full justify-between items-center gap-2">
+      <form
+        className="mb-5 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div className="flex w-full items-center gap-2">
           <Controller
             name="image"
             control={control}
@@ -279,12 +284,14 @@ const PhotoComments = () => {
                       field.onChange(e.target.files);
                     }}
                   />
-                  <BiPaperclip
-                    fontSize={20}
-                    style={{ transform: 'rotate(90deg)' }}
-                    className="cursor-pointer text-gray-600 hover:text-gray-800"
+                  <button
+                    type="button"
+                    className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900"
                     onClick={handleIconClick}
-                  />
+                    aria-label="Dodaj sliku"
+                  >
+                    <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+                  </button>
                 </>
               );
             }}
@@ -334,24 +341,44 @@ const PhotoComments = () => {
             }}
           />
 
-          <Button type="primary">Komentiraj</Button>
+          <Button type="blue">Pošalji</Button>
         </div>
 
         {previewUrl && (
-          <div className="relative w-fit">
+          <div className="mt-3 flex items-end gap-3">
             <Image
               src={previewUrl}
               alt="Preview"
-              className="max-w-[150px] rounded-md border border-gray-300"
+              className="max-w-[150px] rounded-xl border border-[#dce4ff]"
             />
-            <Button type="danger" className="mt-2" onClick={clearImage}>
+            <Button type="danger" onClick={clearImage}>
               Makni
             </Button>
           </div>
         )}
+
+        {errors.comment && <FieldError message="Unesi komentar ili dodaj sliku" />}
       </form>
 
-      {errors.comment && <FieldError message="Komentar je obavezan" />}
+      <div className="flex flex-col gap-3">
+        {areCommentsLoading && <Loader />}
+
+        {!areCommentsLoading && !sortedComments.length && (
+          <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
+            Još nema komentara.
+          </div>
+        )}
+
+        {!areCommentsLoading && !!sortedComments.length && (
+          <Paginated<IComment>
+            itemsPerPage={3}
+            gridClassName="grid grid-cols-1 gap-3"
+            data={sortedComments}
+            paginatedSingle={PaginatedComment}
+            getItemKey={(item) => item.id}
+          />
+        )}
+      </div>
     </CommentUpdateContext.Provider>
   );
 };
