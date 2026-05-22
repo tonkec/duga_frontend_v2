@@ -32,5 +32,6 @@ export const useEnsureBackendUser = () => {
       return res.data;
     },
     enabled: isAuthenticated && !isAuthLoading && !!auth0User,
+    throwOnError: false,
   });
 };

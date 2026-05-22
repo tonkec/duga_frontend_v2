@@ -14,17 +14,17 @@ const createSessionId = () => {
 };
 
 export const getAppSessionId = () => {
-  let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
+  let sessionId = localStorage.getItem(SESSION_ID_KEY);
   if (!sessionId) {
     sessionId = createSessionId();
-    sessionStorage.setItem(SESSION_ID_KEY, sessionId);
+    localStorage.setItem(SESSION_ID_KEY, sessionId);
   }
 
   return sessionId;
 };
 
 export const clearAppSessionId = () => {
-  sessionStorage.removeItem(SESSION_ID_KEY);
+  localStorage.removeItem(SESSION_ID_KEY);
 };
 
 export const clearAppSessionRevoked = () => {
