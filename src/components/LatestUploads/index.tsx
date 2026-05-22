@@ -18,7 +18,7 @@ const LatestUploads = () => {
 
   return (
     <div className="mt-8">
-      <h2 className="mb-2">📸 Nedavno dodane fotke</h2>
+      <h2 className="mb-2"> Nedavno dodane fotke</h2>
 
       <Card className="py-6 px-6">
         <div className="lg:grid lg:grid-cols-3 gap-6">
