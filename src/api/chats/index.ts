@@ -18,6 +18,7 @@ export const getCurrentChat = async (chatId: string) => {
     params: {
       id: chatId,
     },
+    skipGlobalErrorHandler: true,
   });
 };
 

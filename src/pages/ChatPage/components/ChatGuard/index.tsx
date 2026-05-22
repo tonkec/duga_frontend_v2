@@ -25,7 +25,7 @@ const ChatGuard = ({ children }: IChatGuardProps) => {
     }
 
     if (!shouldRender) {
-      navigate('/404');
+      navigate('/new-chat', { replace: true });
     }
   }, [shouldRender, navigate, isCurrentChatLoading, isUserLoading]);
 

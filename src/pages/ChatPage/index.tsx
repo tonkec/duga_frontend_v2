@@ -1,11 +1,13 @@
 import { useNavigate, useParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
+import Loader from '@app/components/Loader';
 import Card from '@app/components/Card';
 import SendMessage from './components/SendMessage';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
 import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
+import { getOtherUser } from './utils/getOtherUser';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
 import { useSocket } from '@app/context/useSocket';
@@ -16,18 +18,9 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 
-interface IChatUser {
-  userId: number;
-}
-
 interface ITypingData {
   userId: number;
 }
-
-export const getOtherUser = (chatUsers: IChatUser[], currentUserId: string) => {
-  if (!chatUsers) return null;
-  return chatUsers.find((user) => user.userId !== Number(currentUserId));
-};
 
 interface IDeleteChatModalProps {
   setIsDeleteModalVisible: (value: boolean) => void;
@@ -55,15 +48,18 @@ const DeleteChatModal = ({
 const ChatPage = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const deletedBySelfRef = useRef(false);
   const socket = useSocket();
   const navigate = useNavigate();
   const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
   const { chatId } = useParams();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
-  const { currentChat } = useGetCurrentChat(chatId as string);
+  const { currentChat, isCurrentChatLoading, isCurrentChatError } = useGetCurrentChat(
+    chatId as string
+  );
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
-  const { deleteChat } = useDeleteCurrentChat(socket, chatId);
+  const { deleteChat } = useDeleteCurrentChat(socket);
 
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const otherUserName = otherUser?.data.username;
@@ -131,10 +127,11 @@ const ChatPage = () => {
     if (!socket) return;
 
     socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
-      if (deletedChatId === chatId) {
-        toast.error('Chat obrisan. Preusmjeravam...', toastConfig);
-        navigate('/record-not-found');
+      if (String(deletedChatId) !== String(chatId)) return;
+      if (!deletedBySelfRef.current) {
+        toast.info('Razgovor je obrisan.', toastConfig);
       }
+      navigate('/new-chat', { replace: true });
     });
 
     return () => {
@@ -142,12 +139,17 @@ const ChatPage = () => {
     };
   }, [chatId, navigate, socket]);
 
-  if (!currentChat?.data) {
+  useEffect(() => {
+    if (!chatId || isCurrentChatLoading) return;
+    if (!currentChat?.data || isCurrentChatError) {
+      navigate('/new-chat', { replace: true });
+    }
+  }, [chatId, currentChat?.data, isCurrentChatError, isCurrentChatLoading, navigate]);
+
+  if (isCurrentChatLoading || !currentChat?.data || isCurrentChatError) {
     return (
       <AppLayout>
-        <Card>
-          <h1 className="text-center text-xl">Chat nije pronađen</h1>
-        </Card>
+        <Loader />
       </AppLayout>
     );
   }
@@ -160,6 +162,7 @@ const ChatPage = () => {
           setIsDeleteModalVisible={setIsDeleteModalVisible}
           onDeleteChat={() => {
             if (!chatId) return;
+            deletedBySelfRef.current = true;
             deleteChat({ chatId });
             setIsDeleteModalVisible(false);
           }}
