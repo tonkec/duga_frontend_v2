@@ -52,7 +52,7 @@ const UserAvatar = ({
         color={color}
         src={
           profilePhoto?.data.securePhotoUrl ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=2D46B9`
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=f7f9ff`
         }
         size={className ? '100%' : resolvedSize}
         round={false}
