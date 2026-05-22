@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IComment } from '..';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
@@ -25,7 +25,10 @@ const schema = z.object({
   comment: z.string().min(1),
 });
 
-const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
+const CommentWithUser: React.FC<{
+  comment: IComment;
+  onCommentUpdated?: (payload: unknown) => void;
+}> = ({ comment, onCommentUpdated }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
@@ -33,17 +36,24 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
   const currentUserId = currentUser?.data.id;
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
   const { mutateDeleteUploadComment } = useDeleteUploadComment();
-  const { mutateEditUploadComment } = useEditUploadComment();
+  const { mutateEditUploadComment } = useEditUploadComment(onCommentUpdated);
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || '');
 
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors, isValid },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
     defaultValues: { comment: comment.comment },
   });
+
+  useEffect(() => {
+    if (!isEditing) {
+      reset({ comment: comment.comment });
+    }
+  }, [comment.comment, isEditing, reset]);
 
   const onSubmit = (data: Inputs) => {
     if (!isValid) return;
@@ -52,6 +62,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       id: Number(comment.id),
       comment: data.comment,
       taggedUserIds: taggedUsers.map((user) => Number(user.id)),
+      uploadId: comment.uploadId,
     });
 
     setIsEditing(false);
@@ -102,10 +113,12 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
             {errors.comment && <FieldError message="Komentar je obavezan." />}
           </div>
           <div className="flex gap-2 items-start pt-1">
-            <Button type="tertiary" onClick={() => setIsEditing(false)}>
+            <Button type="tertiary" htmlType="button" onClick={() => setIsEditing(false)}>
               Otkaži
             </Button>
-            <Button type="tertiary">Spremi</Button>
+            <Button type="tertiary" htmlType="submit">
+              Spremi
+            </Button>
           </div>
         </form>
       );
@@ -123,12 +136,16 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
             />
           )}
         </div>
-        {currentUserId === comment.userId && (
+        {String(currentUserId) === String(comment.userId) && (
           <div className="flex gap-2">
-            <Button type="tertiary" onClick={() => setIsEditing(true)}>
+            <Button type="tertiary" htmlType="button" onClick={() => setIsEditing(true)}>
               Izmijeni
             </Button>
-            <Button type="tertiary" onClick={() => mutateDeleteUploadComment(Number(comment.id))}>
+            <Button
+              type="tertiary"
+              htmlType="button"
+              onClick={() => mutateDeleteUploadComment(Number(comment.id))}
+            >
               Obriši
             </Button>
           </div>
@@ -142,7 +159,7 @@ const CommentWithUser: React.FC<{ comment: IComment }> = ({ comment }) => {
       {renderContent()}
       {isUserLoading ? (
         <p className="text-xs">Loading user...</p>
-      ) : currentUserId === comment.userId ? (
+      ) : String(currentUserId) === String(comment.userId) ? (
         <p className="mt-3 text-sm">
           <span>Tvoj komentar</span>
           <RecordCreatedAt createdAt={comment.createdAt} />

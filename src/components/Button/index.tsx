@@ -16,6 +16,7 @@ interface IButtonProps {
   onClick?: (e?: SyntheticEvent) => void;
   className?: string;
   type: ButtonType;
+  htmlType?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
 }
 
@@ -46,11 +47,20 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
   }
 };
 
-const Button = ({ children, onClick, className, type, disabled, ...props }: IButtonProps) => {
+const Button = ({
+  children,
+  onClick,
+  className,
+  type,
+  htmlType,
+  disabled,
+  ...props
+}: IButtonProps) => {
   const bgColor = getBackgroundColor(type);
   return (
     <button
       {...props}
+      type={htmlType}
       disabled={disabled}
       className={`${defaultStyles} ${bgColor} ${className}`}
       onClick={onClick}

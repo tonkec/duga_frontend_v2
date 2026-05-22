@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '@app/components/FieldError';
-import { useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { BiPaperclip } from 'react-icons/bi';
 import { useRef } from 'react';
 import { useSocket } from '@app/context/useSocket';
@@ -25,6 +25,7 @@ import { toastConfig } from '@app/configs/toast.config';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 import Paginated from '../Paginated';
 import Image from '../Image';
+import { parseCommentUpdatePayload } from './utils/parseCommentUpdate';
 
 const schema = z
   .object({
@@ -57,9 +58,12 @@ export interface IComment {
   securePhotoUrl?: string;
 }
 
-const PaginatedSingle = ({ singleEntry }: { singleEntry: IComment }) => (
-  <CommentWithUser comment={singleEntry} />
-);
+const CommentUpdateContext = createContext<((payload: unknown) => void) | undefined>(undefined);
+
+const PaginatedComment = ({ singleEntry }: { singleEntry: IComment }) => {
+  const onCommentUpdated = useContext(CommentUpdateContext);
+  return <CommentWithUser comment={singleEntry} onCommentUpdated={onCommentUpdated} />;
+};
 
 const PhotoComments = () => {
   init({ data });
@@ -75,6 +79,28 @@ const PhotoComments = () => {
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
+
+  const applyCommentUpdate = useCallback(
+    (payload: unknown) => {
+      const updated = parseCommentUpdatePayload(payload);
+      if (!updated?.id) return;
+      if (updated.uploadId && photoId && String(updated.uploadId) !== String(photoId)) return;
+
+      setAllComments((prev) =>
+        prev.map((comment) =>
+          Number(comment.id) === Number(updated.id)
+            ? {
+                ...comment,
+                comment: updated.comment ?? comment.comment,
+                taggedUsers: updated.taggedUsers ?? comment.taggedUsers,
+              }
+            : comment
+        )
+      );
+    },
+    [photoId]
+  );
+
   const {
     handleSubmit,
     formState: { isValid, errors },
@@ -130,53 +156,51 @@ const PhotoComments = () => {
     setValue('image', undefined);
   };
 
-  useEffect(() => {
-    if (!areCommentsLoading) {
-      setAllComments(allCommentsData?.data as IComment[]);
-    }
+  const hasHydratedFromApi = useRef(false);
 
+  useEffect(() => {
+    hasHydratedFromApi.current = false;
+  }, [photoId]);
+
+  useEffect(() => {
+    if (!areCommentsLoading && allCommentsData?.data && !hasHydratedFromApi.current) {
+      setAllComments(allCommentsData.data as IComment[]);
+      hasHydratedFromApi.current = true;
+    }
+  }, [areCommentsLoading, allCommentsData?.data, photoId]);
+
+  useEffect(() => {
     socket.on('receive-comment', (data) => {
       setAllComments((prev) => [data.data, ...prev]);
     });
 
-    socket.on('remove-comment', (data) => {
-      setAllComments((prev) => {
-        const updatedComments = prev.filter(
-          (comment) => comment.id !== Number(data.data.commentId)
-        );
-        return updatedComments;
-      });
+    socket.on('remove-comment', (payload) => {
+      const { id, uploadId } = payload?.data ?? {};
+      if (!id) return;
+      if (uploadId && photoId && String(uploadId) !== String(photoId)) return;
+
+      setAllComments((prev) => prev.filter((comment) => comment.id !== Number(id)));
     });
 
-    socket.on('update-comment', (response) => {
+    const handleCommentUpdate = (payload: unknown) => {
       try {
-        const updatedComment = response.data?.data;
-        if (!updatedComment?.id) return;
-        setAllComments((prev) => {
-          const updatedComments = prev.map((comment) => {
-            if (Number(comment.id) === Number(response.data.data.id)) {
-              return {
-                ...comment,
-                comment: response.data.data.comment,
-              };
-            }
-            return comment;
-          });
-
-          return updatedComments;
-        });
+        applyCommentUpdate(payload);
       } catch (error) {
         console.error('Error updating comment:', error);
         toast.error('Greška prilikom ažuriranja komentara');
       }
-    });
+    };
+
+    socket.on('update-comment', handleCommentUpdate);
+    socket.on('edit-comment', handleCommentUpdate);
 
     return () => {
       socket.off('receive-comment');
-      socket.off('delete-comment');
-      socket.off('update-comment');
+      socket.off('remove-comment');
+      socket.off('update-comment', handleCommentUpdate);
+      socket.off('edit-comment', handleCommentUpdate);
     };
-  }, [areCommentsLoading, allCommentsData, socket]);
+  }, [applyCommentUpdate, photoId, socket]);
 
   useEffect(() => {
     if (!selectedImageFile) {
@@ -190,9 +214,13 @@ const PhotoComments = () => {
     return () => URL.revokeObjectURL(url);
   }, [selectedImageFile]);
 
-  const sortedComments = allComments?.sort((a, b) => {
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
+  const sortedComments = useMemo(
+    () =>
+      [...allComments].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [allComments]
+  );
 
   async function search(value: string) {
     const emojis = await SearchIndex.search(value);
@@ -204,14 +232,15 @@ const PhotoComments = () => {
   }
 
   return (
-    <>
+    <CommentUpdateContext.Provider value={applyCommentUpdate}>
       <div className="flex flex-col gap-2 ">
         {!!sortedComments.length && (
           <Paginated<IComment>
             itemsPerPage={3}
             gridClassName="grid grid-cols-1 gap-2"
             data={sortedComments}
-            paginatedSingle={PaginatedSingle}
+            paginatedSingle={PaginatedComment}
+            getItemKey={(item) => item.id}
           />
         )}
       </div>
@@ -321,7 +350,7 @@ const PhotoComments = () => {
       </form>
 
       {errors.comment && <FieldError message="Komentar je obavezan" />}
-    </>
+    </CommentUpdateContext.Provider>
   );
 };
 

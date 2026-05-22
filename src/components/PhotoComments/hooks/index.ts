@@ -10,8 +10,9 @@ import { toastConfig } from '@app/configs/toast.config';
 import { useSocket } from '@app/context/useSocket';
 import { AxiosError } from 'axios';
 import { BackendError } from '@app/pages/ChatPage/components/SendMessage/hooks';
+import { toCommentUpdateSocketPayload } from '../utils/parseCommentUpdate';
 
-export const useEditUploadComment = () => {
+export const useEditUploadComment = (onCommentUpdated?: (payload: unknown) => void) => {
   const socket = useSocket();
   const {
     mutate: mutateEditUploadComment,
@@ -19,11 +20,17 @@ export const useEditUploadComment = () => {
     isError: isEditUploadCommentError,
     isSuccess: isEditUploadCommentSuccess,
   } = useMutation({
-    mutationFn: (comment: { id: number; comment: string; taggedUserIds: number[] }) =>
-      editUploadComment(comment.id, comment.comment, comment.taggedUserIds),
-    onSuccess: (data) => {
+    mutationFn: (comment: {
+      id: number;
+      comment: string;
+      taggedUserIds: number[];
+      uploadId: string;
+    }) => editUploadComment(comment.id, comment.comment, comment.taggedUserIds),
+    onSuccess: (response, variables) => {
       toast.success('Komentar uspješno izmijenjen.', toastConfig);
-      socket.emit('edit-comment', data);
+      const payload = toCommentUpdateSocketPayload(response.data, variables);
+      onCommentUpdated?.(payload);
+      socket.emit('edit-comment', payload);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
