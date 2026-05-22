@@ -64,7 +64,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
 
   const renderMessageContent = () => {
     if (message.type === 'gif') {
-      return <GiphyMessage messagePhotoUrl={message.messagePhotoUrl} />;
+      return <GiphyMessage messagePhotoUrl={message.securePhotoUrl || message.messagePhotoUrl} />;
     }
 
     if (message.securePhotoUrl) {

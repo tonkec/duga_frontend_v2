@@ -13,7 +13,7 @@ const LastMessage = ({ message }: ILastMessageProps) => {
   }
 
   if (message.type === 'gif') {
-    return <GiphyMessage messagePhotoUrl={message.messagePhotoUrl} />;
+    return <GiphyMessage messagePhotoUrl={message.securePhotoUrl || message.messagePhotoUrl} />;
   }
 
   return (

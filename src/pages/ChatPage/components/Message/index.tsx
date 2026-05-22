@@ -33,8 +33,6 @@ export interface IMessage {
 
 interface IMessageProps {
   message: IMessage;
-  otherUserProfilePhoto: string;
-  currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
   otherUserId?: number;
@@ -62,12 +60,6 @@ interface IMessageContentProps {
 
 const messageStyles = 'p-2 rounded mb-2 text-white flex flex-col gap-2 max-w-[50vw]';
 
-const unwrapUploadsProxy = (url?: string) => {
-  if (!url) return '';
-  const prefix = '/uploads/files/';
-  return url.startsWith(prefix) ? decodeURIComponent(url.slice(prefix.length)) : url;
-};
-
 const MessageContent = ({
   messagePhotoUrl,
   message,
@@ -77,16 +69,13 @@ const MessageContent = ({
   const isS3File = messageType === 'file';
   const isGiphy = messageType === 'gif';
 
-  // For GIFs, use the unwrapped external URL directly
-  const externalGifUrl = isGiphy ? unwrapUploadsProxy(messagePhotoUrl || '') : '';
-
-  // Only fetch blobs for S3 files through your API
-  const proxiedUrl = !isGiphy && isS3File ? messagePhotoUrl || '' : '';
-  const { data: imageBlob, error } = useGetImageBlob(proxiedUrl);
+  const { data: imageBlob, error } = useGetImageBlob(
+    !isGiphy && isS3File ? messagePhotoUrl || '' : ''
+  );
 
   return (
     <div>
-      {isGiphy && externalGifUrl && <GiphyMessage messagePhotoUrl={externalGifUrl} />}
+      {isGiphy && messagePhotoUrl && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {!isGiphy && isS3File && imageBlob && (
         <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '30vw' }} />

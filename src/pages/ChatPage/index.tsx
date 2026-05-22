@@ -7,8 +7,6 @@ import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
 import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
 import { useGetUserById } from '@app/hooks/useGetUserById';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
 import Button from '@app/components/Button';
 import { useSocket } from '@app/context/useSocket';
 import ConfirmModal from '@app/components/ConfirmModal';
@@ -67,14 +65,6 @@ const ChatPage = () => {
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
   const { deleteChat } = useDeleteCurrentChat(socket, chatId);
 
-  const { allImages: allOtherUserImages } = useGetAllImages(String(otherUserId || ''));
-  const { allImages: allCurrentUserImages } = useGetAllImages(currentUserId as string);
-  const otherUserProfilePhoto = getProfilePhotoUrl(
-    getProfilePhoto(allOtherUserImages?.data.images)
-  );
-  const currentUserProfilePhoto = getProfilePhotoUrl(
-    getProfilePhoto(allCurrentUserImages?.data.images)
-  );
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const otherUserName = otherUser?.data.username;
   const currentUserName = currentUser?.data.username;
@@ -189,8 +179,6 @@ const ChatPage = () => {
             <PaginatedMessages
               currentUserName={currentUserName}
               otherUserName={otherUserName}
-              currentUserProfilePhoto={currentUserProfilePhoto}
-              otherUserProfilePhoto={otherUserProfilePhoto}
               otherUserId={otherUserId as number}
               receivedMessages={receivedMessages}
               currentUserId={currentUserId as number}

@@ -5,8 +5,6 @@ import { debounceScroll } from '@app/utils/debounceScroll';
 import { useGetAllMessages } from '@app/pages/ChatPage/hooks';
 
 const PaginatedMessages = ({
-  otherUserProfilePhoto,
-  currentUserProfilePhoto,
   otherUserName,
   currentUserName,
   otherUserId,
@@ -14,8 +12,6 @@ const PaginatedMessages = ({
   currentUserId,
   isCurrentUserLoading,
 }: {
-  otherUserProfilePhoto: string;
-  currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
   otherUserId: number | undefined;
@@ -87,9 +83,7 @@ const PaginatedMessages = ({
           <Message
             otherUserName={otherUserName}
             currentUserName={currentUserName}
-            currentUserProfilePhoto={currentUserProfilePhoto}
             currentUserId={currentUserId}
-            otherUserProfilePhoto={otherUserProfilePhoto}
             key={message.id}
             message={message}
             otherUserId={otherUserId}
