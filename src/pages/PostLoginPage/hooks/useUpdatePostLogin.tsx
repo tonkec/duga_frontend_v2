@@ -1,11 +1,12 @@
 import { IPostLoginProps, updatePostLoginData } from '@app/api/users';
 import { toastConfig } from '@app/configs/toast.config';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 
 export const useUpdateUser = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const {
     mutate: updatePostLoginMutation,
     isPending: isUpdateUserPending,
@@ -19,7 +20,8 @@ export const useUpdateUser = () => {
         acceptTerms,
         username,
       }),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      queryClient.setQueryData(['currentUser'], response);
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/');
     },

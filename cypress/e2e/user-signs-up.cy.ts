@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 const currentUser = {
   id: 'user-cypress-signup',
   username: 'cypress_signup',
@@ -7,6 +9,9 @@ const currentUser = {
 describe('user signup', () => {
   it('creates an account and completes onboarding', () => {
     let onboardingDone = false;
+
+    cy.clearLocalStorage();
+    cy.clearCookies();
 
     cy.intercept('POST', '**/register', {
       statusCode: 201,
@@ -22,10 +27,8 @@ describe('user signup', () => {
       req.reply({
         statusCode: 200,
         body: {
-          data: {
-            ...currentUser,
-            onboarding_done: onboardingDone,
-          },
+          ...currentUser,
+          onboarding_done: onboardingDone,
         },
       });
     }).as('getCurrentUser');
@@ -45,24 +48,23 @@ describe('user signup', () => {
       req.reply({
         statusCode: 200,
         body: {
-          data: {
-            ...currentUser,
-            onboarding_done: true,
-          },
+          ...currentUser,
+          onboarding_done: true,
         },
       });
     }).as('completeOnboarding');
 
     cy.intercept('GET', '**/users/get-users/**', {
       statusCode: 200,
-      body: { data: [] },
+      body: [],
     }).as('getUsers');
 
     cy.intercept('GET', '**/uploads/latest', {
       statusCode: 200,
-      body: { data: [] },
+      body: [],
     }).as('getLatestUploads');
 
+    cy.setCookie('cookieAccepted', 'true');
     cy.visit('/login');
     cy.contains('button', 'Prijavi se').first().click();
 
