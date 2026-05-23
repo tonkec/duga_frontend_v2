@@ -1,5 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
-import { getErrorMessage } from '@app/utils/getErrorMessage';
+import { resolveAccessToken } from './authToken';
+import { getAppSessionId, SESSION_HEADER } from './appSession';
+import { handleGlobalApiError } from './globalErrorHandler';
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipGlobalErrorHandler?: boolean;
+  }
+}
 
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
@@ -23,19 +31,14 @@ export const apiClient = (token?: string): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
+    validateStatus: (s) => s >= 200 && s < 300,
   });
 
   instance.interceptors.request.use(
-    (config) => {
-      // If token is explicitly passed, use it
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        return config;
-      }
+    async (config) => {
+      const authToken = await resolveAccessToken(token);
 
-      // Otherwise, try cookie-based fallback
-      const cookieToken = getCookie('token');
-      if (!cookieToken) {
+      if (!authToken) {
         return Promise.reject({
           response: {
             status: 401,
@@ -44,25 +47,16 @@ export const apiClient = (token?: string): AxiosInstance => {
         });
       }
 
-      config.headers.Authorization = `Bearer ${cookieToken}`;
+      config.headers.Authorization = `Bearer ${authToken}`;
+      config.headers[SESSION_HEADER] = getAppSessionId();
       return config;
     },
     (error) => Promise.reject(error)
   );
-
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status >= 500) {
-        console.error('🔥 Backend error:', error.response);
-      }
-      if (error.code === 'ERR_NETWORK') {
-        console.error('🚨 Network error: backend down?');
-      }
-      const errorMessage = getErrorMessage(error);
-      if (errorMessage) {
-        console.error('API Error:', errorMessage);
-      }
+      handleGlobalApiError(error);
       return Promise.reject(error);
     }
   );

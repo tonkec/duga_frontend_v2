@@ -14,6 +14,7 @@ export type INotification = {
   content: string;
   isRead: boolean;
   createdAt: string;
+  chatId?: number | null;
   actionId: number | null;
   actionType: 'upload' | 'comment' | 'message' | null;
 };
@@ -80,45 +81,45 @@ const NotificationDropdown = ({
 
   return (
     <div className="relative inline-block w-full" ref={dropdownRef}>
-      <button onClick={() => setOpen((prev) => !prev)} className="relative w-full">
-        <span
-          className={
-            isMobile
-              ? 'hover:bg-white hover:text-black text-lg bg-black text-white w-full inline-block px-2 py-1 rounded mb-2'
-              : 'text-white'
-          }
-        >
-          Obavijesti 🔔
-        </span>
+      <button
+        onClick={() => setOpen((prev) => !prev)}
+        className={
+          isMobile
+            ? 'relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white'
+            : 'relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/15 hover:text-white'
+        }
+      >
+        <span>Obavijesti</span>
+        <span aria-hidden>🔔</span>
         {notifications.some((n) => !n.isRead) && (
-          <span className="absolute top-0 right-0 h-2 w-2 bg-red rounded-full" />
+          <span className="ml-auto h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white/80" />
         )}
       </button>
 
       {open && (
         <div
-          className={`absolute left-0 right-0 mt-1 w-52 ${isMobile ? 'bg-black' : 'bg-white'} shadow-xl rounded-lg z-10 max-h-96 overflow-y-auto`}
+          className={`absolute z-50 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white text-gray-900 shadow-xl ${
+            isMobile ? 'left-0 right-0' : 'right-0 w-80'
+          }`}
         >
-          <Button
-            type="transparent"
-            className={`w-full text-left ${isMobile ? 'bg-black text-white' : 'bg-transparent'}`}
-            onClick={() => {
-              mutateMarkAllAsRead();
-              setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-            }}
-          >
-            Označi sve kao pročitano
-          </Button>
+          <div className="flex items-center justify-between gap-2 border-b border-[#eef2ff] p-3">
+            <span className="font-bold">Obavijesti</span>
+            <Button
+              type="transparent"
+              className="!px-2 !py-1 text-xs"
+              onClick={() => {
+                mutateMarkAllAsRead();
+                setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+              }}
+            >
+              Označi sve kao pročitano
+            </Button>
+          </div>
           {notifications.length === 0 ? (
-            <div className="p-4 text-sm text-black">Nema obavijesti</div>
+            <div className="p-4 text-sm text-gray-600">Nema obavijesti</div>
           ) : (
             notifications.map((n) => (
-              <Notification
-                key={n.id}
-                n={n}
-                isMobile={isMobile}
-                setNotifications={setNotifications}
-              />
+              <Notification key={n.id} n={n} setNotifications={setNotifications} />
             ))
           )}
         </div>

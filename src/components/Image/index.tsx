@@ -18,7 +18,7 @@ const Image = ({
 }) => {
   const isImageLoading = useImage(src);
   return isImageLoading ? (
-    <Loader />
+    <Loader variant="inline" size="sm" label="Učitavanje slike..." />
   ) : (
     <img
       src={src}

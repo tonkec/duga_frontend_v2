@@ -9,5 +9,7 @@ export const useUserOnlineStatus = () => {
         return res.data;
       }),
     staleTime: 10 * 1000,
+    retry: false,
+    throwOnError: false,
   });
 };

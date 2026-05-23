@@ -1,10 +1,7 @@
 import { IImage } from '@app/components/Photos';
-import { S3_URL } from './consts';
+
 export const getProfilePhotoUrl = (profilePhoto: IImage | undefined) => {
-  if (profilePhoto) {
-    return `${S3_URL}/${profilePhoto.url}`;
-  }
-  return '';
+  return profilePhoto?.securePhotoUrl || '';
 };
 
 export const getProfilePhoto = (allImages: IImage[] | undefined) => {

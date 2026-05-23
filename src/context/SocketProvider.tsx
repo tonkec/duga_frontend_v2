@@ -1,13 +1,64 @@
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { useLocalStorage } from '@uidotdev/usehooks';
+import { resolveAuth0AccessToken } from '@app/api/authToken';
+import { getAppSessionId, markSessionRevoked } from '@app/api/appSession';
+import { useAppSessionStatus } from './AppSessionContext';
+
+type CypressSocketEvent = {
+  event: string;
+  payload: unknown;
+};
+
+type CypressWindow = Window &
+  typeof globalThis & {
+    Cypress?: unknown;
+    __dugaCypressSocketEvents?: CypressSocketEvent[];
+  };
+
+const createCypressSocket = () => {
+  const handlers = new Map<string, Set<(payload: unknown) => void>>();
+
+  return {
+    on: (event: string, handler: (payload: unknown) => void) => {
+      const eventHandlers = handlers.get(event) ?? new Set();
+      eventHandlers.add(handler);
+      handlers.set(event, eventHandlers);
+    },
+    off: (event: string, handler?: (payload: unknown) => void) => {
+      if (!handler) {
+        handlers.delete(event);
+        return;
+      }
+
+      handlers.get(event)?.delete(handler);
+    },
+    emit: (event: string, payload: unknown) => {
+      const cypressWindow = window as CypressWindow;
+      cypressWindow.__dugaCypressSocketEvents = [
+        ...(cypressWindow.__dugaCypressSocketEvents ?? []),
+        { event, payload },
+      ];
+
+      if (event === 'message' && payload && typeof payload === 'object') {
+        handlers.get('received')?.forEach((handler) =>
+          handler({
+            id: Date.now(),
+            createdAt: new Date().toISOString(),
+            ...(payload as Record<string, unknown>),
+          })
+        );
+      }
+    },
+    disconnect: () => undefined,
+  } as unknown as Socket;
+};
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
-  if (hostname.includes('duga.app')) {
+  if (hostname.includes('duga.chat')) {
     return 'https://duga-backend-c67896e8029c.herokuapp.com/';
   }
   if (hostname.includes('staging--dugaprod.netlify.app')) {
@@ -16,27 +67,42 @@ const getBackendUrl = () => {
   return 'http://localhost:8080/';
 };
 
-export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const [, saveUserId] = useLocalStorage('userId');
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+const CypressSocketProvider = ({ children }: { children: ReactNode }) => (
+  <SocketContext.Provider value={createCypressSocket()}>{children}</SocketContext.Provider>
+);
+
+const RealSocketProvider = ({ children }: { children: ReactNode }) => {
+  const { isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
-  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
+  const socketRef = useRef<Socket | null>(null);
+  const appSessionStatus = useAppSessionStatus();
+  const isAppSessionActive = appSessionStatus === 'active';
+  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser({
+    enabled: isAppSessionActive,
+  });
 
   useEffect(() => {
-    if (!isAuthenticated || isUserLoading || !currentUser) return;
-    saveUserId(currentUser?.id);
+    if (!isAuthenticated || !isAppSessionActive || isUserLoading || !currentUser) {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+      setSocket(null);
+      return;
+    }
     let newSocket: Socket;
 
     const connectSocket = async () => {
       try {
-        const token = await getAccessTokenSilently();
+        const token = await resolveAuth0AccessToken();
+        if (!token) return;
 
         newSocket = io(getBackendUrl(), {
           auth: {
             token,
+            sessionId: getAppSessionId(),
           },
         });
 
+        socketRef.current = newSocket;
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
@@ -47,6 +113,11 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         newSocket.on('disconnect', () => {
           console.log('🔌 Socket disconnected');
         });
+
+        newSocket.on('session-revoked', () => {
+          markSessionRevoked();
+          newSocket.disconnect();
+        });
       } catch (error) {
         console.error('⚠️ Failed to connect socket:', error);
       }
@@ -56,16 +127,20 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       newSocket?.disconnect();
+      if (socketRef.current === newSocket) {
+        socketRef.current = null;
+        setSocket(null);
+      }
     };
-  }, [isAuthenticated, isUserLoading, currentUser, getAccessTokenSilently]);
-
-  if (!isAuthenticated) {
-    return <>{children}</>;
-  }
-
-  if (isAuthenticated && !socket) {
-    return null;
-  }
+  }, [isAuthenticated, isAppSessionActive, isUserLoading, currentUser]);
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+};
+
+export const SocketProvider = ({ children }: { children: ReactNode }) => {
+  if ((window as CypressWindow).Cypress) {
+    return <CypressSocketProvider>{children}</CypressSocketProvider>;
+  }
+
+  return <RealSocketProvider>{children}</RealSocketProvider>;
 };

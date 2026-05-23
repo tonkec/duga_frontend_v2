@@ -15,9 +15,13 @@ import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
 import TermsOfUsePage from '@app/pages/RulesPage';
 import ReportPage from '@app/pages/ReportPage';
 import PostLoginPage from '@app/pages/PostLoginPage';
+import UsersPage from '@app/pages/UsersPage';
 import { PageTitle } from '@app/components/PageTitle';
 import { AuthGuard } from './guards/AuthGuard';
 import PostLoginFormGuard from './guards/PostLoginFormGuard';
+import RecordNotFound from '@app/pages/RecordNotFound';
+import BrokenPage from '@app/pages/BrokenPage';
+import NetworkErrorPage from '@app/pages/NetworkErrorPage';
 
 export const publicRoutes = [
   {
@@ -60,6 +64,14 @@ export const publicRoutes = [
       </PageTitle>
     ),
   },
+  {
+    path: '/network-error',
+    element: (
+      <PageTitle title="Nešto se strgalo">
+        <NetworkErrorPage />
+      </PageTitle>
+    ),
+  },
 ];
 
 // Logged-in but NOT necessarily onboarded — and block onboarded users
@@ -95,6 +107,14 @@ export const onboardedRoutes = [
         <OnlineStatusWrapper isCurrentUser>
           <MyProfilePage />
         </OnlineStatusWrapper>
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/users',
+    element: (
+      <PageTitle title="Svi korisnici">
+        <UsersPage />
       </PageTitle>
     ),
   },
@@ -155,6 +175,22 @@ export const onboardedRoutes = [
     element: (
       <PageTitle title="Prijavi problem">
         <ReportPage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/record-not-found',
+    element: (
+      <PageTitle title="Ne postoji">
+        <RecordNotFound />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/broken',
+    element: (
+      <PageTitle title="Nešto se strgalo">
+        <BrokenPage />
       </PageTitle>
     ),
   },

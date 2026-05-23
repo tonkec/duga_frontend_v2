@@ -4,17 +4,18 @@ import { INotification } from '../Notifications';
 
 interface INotificationProps {
   n: INotification;
-  isMobile: boolean;
   setNotifications: React.Dispatch<React.SetStateAction<INotification[]>>;
 }
 
-const Notification = ({ n, isMobile, setNotifications }: INotificationProps) => {
+const Notification = ({ n, setNotifications }: INotificationProps) => {
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const navigate = useNavigate();
 
   return (
     <div
-      className={`px-4 py-2 text-sm cursor-pointer ${n.isRead ? (isMobile ? 'bg-black text-white' : 'bg-white') : 'bg-rose hover:bg-pink'}`}
+      className={`cursor-pointer border-b border-[#eef2ff] px-4 py-3 text-sm transition-colors ${
+        n.isRead ? 'bg-white hover:bg-[#f7f9ff]' : 'bg-[#f0f4ff] font-semibold hover:bg-[#dce4ff]'
+      }`}
       onClick={() => {
         if (!n.isRead) {
           mutateMarkAsRead(String(n.id));
@@ -25,24 +26,26 @@ const Notification = ({ n, isMobile, setNotifications }: INotificationProps) => 
           );
         }
 
-        if (n.actionType && n.actionId) {
+        if (n.actionType) {
           switch (n.actionType) {
             case 'upload':
-              navigate(`/photo/${n.actionId}`);
+              if (n.actionId) navigate(`/photo/${n.actionId}`);
               break;
             case 'comment':
-              navigate(`/photo/${n.actionId}`);
+              if (n.actionId) navigate(`/photo/${n.actionId}`);
               break;
-            case 'message':
-              navigate(`/chat/${n.actionId}`);
+            case 'message': {
+              const chatId = n.chatId ?? n.actionId;
+              if (chatId) navigate(`/chat/${chatId}`);
               break;
+            }
             default:
               break;
           }
         }
       }}
     >
-      <p className={isMobile ? 'text-white' : 'text-black'}> {n.content}</p>
+      <p className="text-gray-900">{n.content}</p>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 import { StatusProvider } from '@app/context/OnlineStatus';
 import { useGetCurrentChat } from '@app/pages/ChatPage/hooks';
-import { getOtherUser } from '@app/pages/ChatPage';
+import { getOtherUser } from '@app/pages/ChatPage/utils/getOtherUser';
 import { useEffect, useState } from 'react';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 

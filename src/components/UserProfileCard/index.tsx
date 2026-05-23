@@ -4,7 +4,6 @@ import {
   getFavoriteDayOfWeekTranslation,
   getLookingForTranslation,
   getRelationshipStatusTranslation,
-  getUserBio,
   shouldRenderField,
 } from './utils';
 import Iframe from 'react-iframe';
@@ -14,6 +13,7 @@ import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
 import ContentFormatter from '../ContentFormatter';
+import { cityOptions } from '@app/consts/cityOptions';
 
 const isYouTubeUrl = (url: string) => {
   try {
@@ -57,18 +57,54 @@ export interface IUserProfileCardProps {
   status: string;
 }
 
+const ProfileDetail = ({
+  icon,
+  label,
+  value,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) => (
+  <div className="rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 shadow-sm">
+    <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
+      {icon}
+      {label}
+    </p>
+    <div className="text-base font-semibold text-gray-900">{value}</div>
+  </div>
+);
+
+const BooleanDetail = ({ label, value }: { label: string; value: boolean }) => (
+  <div className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-800">
+    <span>{label}</span>
+    {value ? (
+      <BiCheckCircle fontSize={24} color="#34D399" />
+    ) : (
+      <BiX fontSize={24} color="#FF748B" />
+    )}
+  </div>
+);
+
+const ProfileSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <section className="rounded-2xl border border-[#dce4ff] bg-white p-5 shadow-sm">
+    <h2 className="mb-3 font-bold text-gray-900">{title}</h2>
+    <div className="text-gray-700">{children}</div>
+  </section>
+);
+
 const UserProfileCard = ({
   user,
   allImagesLoading,
 }: {
-  user: IUserProfileCardProps;
-  allImages: IImage[];
+  user?: IUserProfileCardProps;
+  allImages?: IImage[];
   allImagesLoading: boolean;
 }) => {
   const [isOnlineState, setIsOnlineState] = useState<boolean>(false);
   const socket = useSocket();
   useEffect(() => {
-    if (!socket || !user.id) return;
+    if (!socket || !user?.id) return;
 
     socket.on('status-update', (data) => {
       if (Number(data.userId) === Number(user.id)) {
@@ -79,173 +115,151 @@ const UserProfileCard = ({
     return () => {
       socket.off('status-update');
     };
-  }, [socket, user.id]);
+  }, [socket, user?.id]);
 
   useEffect(() => {
-    if (socket && user.id) {
+    if (socket && user?.id) {
       setIsOnlineState(user.status === 'online');
     }
-  }, [socket, user.id, user.status]);
+  }, [socket, user?.id, user?.status]);
 
   if (allImagesLoading) {
     return <Loader />;
   }
 
+  if (!user) {
+    return <Card className="rounded-2xl p-6">Profil nije dostupan.</Card>;
+  }
+
+  const locationLabel =
+    cityOptions.find((cityOption) => cityOption.value === user.location)?.label || 'N/A';
+
   return (
-    <Card>
-      <div className="xl:flex gap-6">
-        <div>
+    <Card className="rounded-2xl p-5 md:p-7">
+      <div className="rounded-2xl bg-[#f7f9ff] p-5 md:p-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center">
           <UserAvatar
             avatarFallbackName={`${user.username}`}
             color="#2D46B9"
             userId={user.id}
-            size="200"
+            size="160"
             round={false}
+            className="h-[160px] w-[160px] rounded-2xl shadow-sm"
+          />
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="truncate text-3xl font-bold text-gray-900">{user.username}</h1>
+              <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-gray-700 shadow-sm">
+                {isOnlineState ? 'Online' : 'Offline'}
+              </span>
+            </div>
+            <p className="mt-2 text-gray-600">
+              {locationLabel} {user.age ? `, ${user.age} godina` : ''}
+            </p>
+            {shouldRenderField(user.bio) && (
+              <div className="mt-4 max-w-3xl text-gray-700">
+                <ContentFormatter text={user.bio} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <ProfileDetail icon={<BiSolidMap />} label="Lokacija" value={locationLabel} />
+          <ProfileDetail icon={<BiBody />} label="Rod" value={user.gender || 'N/A'} />
+          <ProfileDetail
+            icon={<BiBoltCircle />}
+            label="Seksualnost"
+            value={user.sexuality || 'N/A'}
+          />
+          <ProfileDetail icon={<BiStopwatch />} label="Godine" value={user.age || 'N/A'} />
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <ProfileDetail label="Tražim" value={getLookingForTranslation(user.lookingFor)} />
+          <ProfileDetail
+            label="Trenutno sam"
+            value={getRelationshipStatusTranslation(user.relationshipStatus)}
           />
         </div>
 
-        <div className="flex gap-6">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-1 mb-4">
-              <h1>{user.username}</h1>
-              <span className="text-xs mt-1">{isOnlineState ? '🟢' : '🔴'}</span>
-            </div>
-            <p className="flex items-center text-lg gap-2">
-              <BiSolidMap /> <b>Lokacija: </b> {user.location || 'N/A'}
-            </p>
-            <p className="flex items-center text-lg gap-2">
-              <BiBody /> <b>Rod: </b> {user.gender || 'N/A'}
-            </p>
-            <p className="flex items-center text-lg gap-2">
-              <BiBoltCircle /> <b>Seksualnost: </b> {user.sexuality || 'N/A'}
-            </p>
-            <p className="flex items-center text-lg gap-2">
-              <BiStopwatch /> <b>Godine: </b> {user.age || 'N/A'}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2 mt-8">
-            <p className="flex items-center text-lg gap-2 mt-[-8px]">
-              <b>Tražim:</b> {getLookingForTranslation(user.lookingFor)}
-            </p>
-            <p className="flex items-center text-lg gap-2">
-              <b>Trenutno sam: </b> {getRelationshipStatusTranslation(user.relationshipStatus)}
-            </p>
-            <div className="flex flex-col gap-1">
-              <p className="flex items-center text-lg gap-1">
-                <b>Cigarete</b>{' '}
-                {user.cigarettes ? (
-                  <BiCheckCircle fontSize={30} color="#34D399" />
-                ) : (
-                  <BiX fontSize={30} color="#FF748B" />
-                )}
-              </p>
-              <p className="flex items-center text-lg gap-1">
-                <b>Alkohol</b>{' '}
-                {user.alcohol ? (
-                  <BiCheckCircle fontSize={30} color="#34D399" />
-                ) : (
-                  <BiX fontSize={30} color="#FF748B" />
-                )}
-              </p>
-
-              <p className="flex items-center text-lg gap-1">
-                <b>Sport</b>{' '}
-                {user.sport ? (
-                  <BiCheckCircle fontSize={30} color="#34D399" />
-                ) : (
-                  <BiX fontSize={30} color="#FF748B" />
-                )}
-              </p>
-            </div>
-          </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <BooleanDetail label="Cigarete" value={user.cigarettes} />
+          <BooleanDetail label="Alkohol" value={user.alcohol} />
+          <BooleanDetail label="Sport" value={user.sport} />
         </div>
       </div>
 
-      {shouldRenderField(user.bio) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">O meni</h2>
-          <ContentFormatter text={getUserBio(user.bio)} />
-        </div>
-      )}
+      <div className="mt-5 grid gap-4">
+        {shouldRenderField(user.favoriteDayOfWeek) && (
+          <ProfileSection title="Najdraži dan u tjednu">
+            {getFavoriteDayOfWeekTranslation(user.favoriteDayOfWeek)}
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.favoriteDayOfWeek) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Najdraži dan u tjednu:</h2>
-          {getFavoriteDayOfWeekTranslation(user.favoriteDayOfWeek)}
-        </div>
-      )}
+        {shouldRenderField(user.embarasement) && (
+          <ProfileSection title="Najsramotnija stvar koja mi se dogodila">
+            <ContentFormatter text={user.embarasement} />
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.embarasement) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Najsramotnija stvar koja mi se dogodila</h2>
-          <ContentFormatter text={user.embarasement} />
-        </div>
-      )}
+        {shouldRenderField(user.tooOldFor) && (
+          <ProfileSection title="Imam previše godina za...">
+            <ContentFormatter text={user.tooOldFor} />
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.tooOldFor) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Imam previše godina za...</h2>
-          <ContentFormatter text={user.tooOldFor} />
-        </div>
-      )}
+        {shouldRenderField(user.makesMyDay) && (
+          <ProfileSection title="Dan mi je ljepši ako...">
+            <ContentFormatter text={user.makesMyDay} />
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.makesMyDay) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Dan mi je ljepši ako...</h2>
-          <ContentFormatter text={user.makesMyDay} />
-        </div>
-      )}
+        {shouldRenderField(user.spirituality) && (
+          <ProfileSection title="Duhovnost/religioznost">
+            <ContentFormatter text={user.spirituality} />
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.spirituality) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Duhovnost/religioznost</h2>
-          <ContentFormatter text={user.spirituality} />
-        </div>
-      )}
+        {shouldRenderField(user.interests) && (
+          <ProfileSection title="Interesi">
+            <ContentFormatter text={user.interests} />
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.interests) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Interesi:</h2>
-          <ContentFormatter text={user.interests} />
-        </div>
-      )}
+        {shouldRenderField(user.languages) && (
+          <ProfileSection title="Jezici koje govorim">
+            <ContentFormatter text={user.languages} />
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.languages) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Jezici koje govorim: </h2>
-          <ContentFormatter text={user.languages} />
-        </div>
-      )}
+        {shouldRenderField(user.favoriteSong) && (
+          <ProfileSection title="Najdraža YouTube pjesma">
+            {isYouTubeUrl(user.favoriteSong) ? (
+              <Iframe url={user.favoriteSong} width="100%" height="360" />
+            ) : (
+              <p className="text-red-500">Neispravan YouTube URL</p>
+            )}
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.favoriteSong) && (
-        <div className="mb-10">
-          <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
-          {isYouTubeUrl(user.favoriteSong) ? (
-            <Iframe url={user.favoriteSong} width="600" height="400" />
-          ) : (
-            <p className="text-red-500">Neispravan YouTube URL</p>
-          )}
-        </div>
-      )}
+        {shouldRenderField(user.favoriteMovie) && (
+          <ProfileSection title="Najdraži YouTube video">
+            {isYouTubeUrl(user.favoriteMovie) ? (
+              <Iframe url={user.favoriteMovie} width="100%" height="360" />
+            ) : (
+              <p className="text-red-500">Neispravan YouTube URL</p>
+            )}
+          </ProfileSection>
+        )}
 
-      {shouldRenderField(user.favoriteMovie) && (
-        <div className="mb-10">
-          <h2 className="font-bold mb-5">Najdraža youtube pjesma</h2>
-          {isYouTubeUrl(user.favoriteMovie) ? (
-            <Iframe url={user.favoriteMovie} width="600" height="400" />
-          ) : (
-            <p className="text-red-500">Neispravan YouTube URL</p>
-          )}
-        </div>
-      )}
-
-      {shouldRenderField(user.ending) && (
-        <div className="mb-10">
-          <h2 className="font-bold mt-5">Za kraj ću reći još</h2>
-          <ContentFormatter text={user.ending} />
-        </div>
-      )}
+        {shouldRenderField(user.ending) && (
+          <ProfileSection title="Za kraj ću reći još">
+            <ContentFormatter text={user.ending} />
+          </ProfileSection>
+        )}
+      </div>
     </Card>
   );
 };

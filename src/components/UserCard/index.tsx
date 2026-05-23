@@ -1,11 +1,10 @@
-import Button from '@app/components/Button';
 import Card from '@app/components/Card';
-import { getUserBio } from '@app/components/UserProfileCard/utils';
 import { BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import clsx from 'clsx';
 import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
+import Button from '../Button';
 export interface IUser {
   avatar: string;
   email: string;
@@ -27,25 +26,21 @@ export interface IUser {
 interface IUserCardProps {
   user: IUser;
   onButtonClick: () => void;
-  buttonText: string;
-  secondButton?: React.ReactNode;
   isOnline?: boolean;
 }
 
 const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return (
-      <p className="text-gray-600 gap-1 flex items-center justify-center mb-2">
-        {' '}
-        <BiSolidMap /> Lokacija: n/a
+      <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+        <BiSolidMap className="text-blue" /> Lokacija nije unesena
       </p>
     );
   }
 
   return (
-    <p className="text-gray-600 gap-1 flex items-center justify-center mb-2">
-      {' '}
-      <BiSolidMap /> Lokacija: {location}
+    <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+      <BiSolidMap className="text-blue" /> {location}
     </p>
   );
 };
@@ -53,22 +48,21 @@ const getUserLocation = ({ location }: { location: string }) => {
 const getUserAge = ({ age }: { age: number }) => {
   if (!age) {
     return (
-      <p className="text-gray-600 gap-1 flex items-center justify-center">
-        {' '}
-        <BiStopwatch />
-        Godine: n/a
+      <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+        <BiStopwatch className="text-blue" />
+        Godine nisu unesene
       </p>
     );
   }
 
   return (
-    <p className="text-gray-600 gap-1 flex items-center justify-center">
-      <BiStopwatch /> Godine: {age}
+    <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+      <BiStopwatch className="text-blue" /> {age} godina
     </p>
   );
 };
 
-const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: IUserCardProps) => {
+const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
   const socket = useSocket();
   const [isOnlineState, setIsOnlineState] = useState(isOnline);
 
@@ -91,38 +85,38 @@ const UserCard = ({ user, onButtonClick, buttonText, secondButton, isOnline }: I
   }, [isOnline]);
 
   return (
-    <Card className="h-full">
-      <div className="w-full text-center mb-4">
+    <Card
+      className="group h-full rounded-2xl p-3 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer"
+      onClick={onButtonClick}
+    >
+      <div className="relative w-full overflow-hidden rounded-xl bg-[#f7f9ff]">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
-          color="#2D46B9"
+          color="#f7f9ff"
           userId={String(user.id)}
-          size="100"
+          className="aspect-[4/3] w-full transition-transform duration-300 group-hover:scale-105"
+          fgColor="#1f2937"
         />
+        <span
+          className={clsx(
+            'absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-semibold shadow-sm backdrop-blur',
+            isOnlineState ? 'bg-green text-white' : 'bg-white/90 text-gray-600'
+          )}
+        >
+          {isOnlineState ? 'Online' : 'Offline'}
+        </span>
       </div>
-      <div className="flex flex-col justify-between text-center">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
-            {user.username}
-            <span
-              className={clsx(
-                'inline-block w-2 h-2 rounded-full',
-                isOnlineState ? 'bg-green' : 'bg-gray-400'
-              )}
-            />
-          </h3>
-          {getUserLocation(user)}
-          {getUserAge(user)}
-          <p className="text-gray-600 mt-2 flex items-center justify-center gap-1">
-            {' '}
-            <span> {getUserBio(user.bio)}</span>
-          </p>
-        </div>
-        <div className="flex gap-2 justify-center items-center mt-4 flex-col">
-          <Button onClick={onButtonClick} type="primary">
-            {buttonText}
+      <div className="flex flex-col justify-between text-center px-2 py-4">
+        <div className="min-h-[116px]">
+          <h3 className="text-xl font-bold text-gray-900">{user.username}</h3>
+          <div className="mt-3 space-y-1.5 text-sm">
+            {getUserLocation(user)}
+            {getUserAge(user)}
+          </div>
+
+          <Button className="mt-5 w-full" onClick={onButtonClick} type="blue">
+            Pogledaj profil
           </Button>
-          {secondButton}
         </div>
       </div>
     </Card>

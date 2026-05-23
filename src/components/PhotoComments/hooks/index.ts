@@ -9,8 +9,11 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useSocket } from '@app/context/useSocket';
 import { getUsersByUsernames } from '@app/api/users';
+import { AxiosError } from 'axios';
+import { BackendError } from '@app/pages/ChatPage/components/SendMessage/hooks';
+import { toCommentUpdateSocketPayload } from '../utils/parseCommentUpdate';
 
-export const useEditUploadComment = () => {
+export const useEditUploadComment = (onCommentUpdated?: (payload: unknown) => void) => {
   const socket = useSocket();
   const {
     mutate: mutateEditUploadComment,
@@ -18,11 +21,17 @@ export const useEditUploadComment = () => {
     isError: isEditUploadCommentError,
     isSuccess: isEditUploadCommentSuccess,
   } = useMutation({
-    mutationFn: (comment: { id: number; comment: string; taggedUserIds: number[] }) =>
-      editUploadComment(comment.id, comment.comment, comment.taggedUserIds),
-    onSuccess: (data) => {
+    mutationFn: (comment: {
+      id: number;
+      comment: string;
+      taggedUserIds: number[];
+      uploadId: string;
+    }) => editUploadComment(comment.id, comment.comment, comment.taggedUserIds),
+    onSuccess: (response, variables) => {
       toast.success('Komentar uspješno izmijenjen.', toastConfig);
-      socket.emit('edit-comment', data);
+      const payload = toCommentUpdateSocketPayload(response.data, variables);
+      onCommentUpdated?.(payload);
+      socket?.emit('edit-comment', payload);
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
@@ -48,10 +57,11 @@ export const useAddUploadComment = () => {
     mutationFn: (formData: FormData) => addUploadComment(formData),
     onSuccess: (data) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
-      socket.emit('send-comment', data.data);
+      socket?.emit('send-comment', data.data);
     },
-    onError: () => {
-      toast.error('Došlo je do greške.', toastConfig);
+    onError: (error: AxiosError<BackendError>) => {
+      const errors = error?.response?.data?.errors;
+      toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);
     },
   });
 
@@ -62,7 +72,7 @@ export const useAddUploadComment = () => {
     isAddUploadCommentSuccess,
   };
 };
-export const useDeleteUploadComment = () => {
+export const useDeleteUploadComment = (onCommentDeleted?: (commentId: number) => void) => {
   const socket = useSocket();
 
   const {
@@ -72,8 +82,9 @@ export const useDeleteUploadComment = () => {
     isSuccess: isDeleteUploadCommentSuccess,
   } = useMutation({
     mutationFn: (commentId: number) => deleteUploadComment(commentId),
-    onSuccess: (data) => {
-      socket.emit('delete-comment', data);
+    onSuccess: (data, commentId) => {
+      onCommentDeleted?.(commentId);
+      socket?.emit('delete-comment', data?.data?.id ? data : { data: { id: commentId } });
       toast.success('Komentar uspiješno obrisan.', toastConfig);
     },
     onError: () => {

@@ -13,6 +13,8 @@ export const useGetAllNotifcations = () => {
   } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => getAllNotifications(),
+    retry: false,
+    throwOnError: false,
   });
 
   return {

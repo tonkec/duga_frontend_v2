@@ -3,7 +3,14 @@ import AppContainer from '@app/components/AppContainer';
 import Footer from '@app/components/Footer';
 import Navigation from '@app/components/Navigation';
 import CookieBanner from '../CookieBanner';
+import UserChatsSocketSync from '@app/components/UserChatsSocketSync';
 import { useAuth0 } from '@auth0/auth0-react';
+
+type CypressWindow = Window &
+  typeof globalThis & {
+    Cypress?: unknown;
+    __dugaCypressAuthUser?: unknown;
+  };
 
 interface IAppLayoutProps {
   children: React.ReactNode;
@@ -12,13 +19,20 @@ interface IAppLayoutProps {
 
 const AppLayout = ({ children, onScroll }: IAppLayoutProps) => {
   const { isAuthenticated } = useAuth0();
+  const isCypressAuthenticated =
+    Boolean((window as CypressWindow).Cypress) &&
+    Boolean(
+      (window as CypressWindow).__dugaCypressAuthUser ||
+        window.localStorage.getItem('duga:cypress-auth-user')
+    );
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isCypressAuthenticated) {
     return false;
   }
 
   return (
     <>
+      <UserChatsSocketSync />
       <Navigation />
       <AppContainer onScroll={(e) => onScroll?.(e)}>
         <main className="mt-10">{children}</main>
