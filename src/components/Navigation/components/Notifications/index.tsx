@@ -112,7 +112,7 @@ const NotificationDropdown = ({
                 setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
               }}
             >
-              Označi sve
+              Označi sve kao pročitano
             </Button>
           </div>
           {notifications.length === 0 ? (
