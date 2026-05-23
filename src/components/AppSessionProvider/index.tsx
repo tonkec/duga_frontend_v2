@@ -12,6 +12,13 @@ import {
 import { AppSessionContext, AppSessionStatus } from '@app/context/AppSessionContext';
 import { generateUniqueUsername } from '@app/hooks/useEnsureBackendUser';
 
+type CypressWindow = Window &
+  typeof globalThis & {
+    Cypress?: unknown;
+  };
+
+const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
+
 const AppSessionProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading, user } = useAuth0();
   const queryClient = useQueryClient();
@@ -40,6 +47,14 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
 
     if (isAppSessionRevoked()) {
       setStatus('revoked');
+      return;
+    }
+
+    if (
+      (window as CypressWindow).Cypress &&
+      localStorage.getItem(CYPRESS_SKIP_SESSION_START_KEY) === 'true'
+    ) {
+      setStatus('active');
       return;
     }
 

@@ -62,6 +62,7 @@ export const NavigationItems = ({
       <div className={isMobile ? 'mt-auto pt-6' : 'ml-auto'}>
         <button
           onClick={onLogout}
+          aria-label="Odjava"
           className={
             isMobile
               ? 'flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-4 py-3 font-semibold text-white transition-colors hover:bg-white hover:text-blue'

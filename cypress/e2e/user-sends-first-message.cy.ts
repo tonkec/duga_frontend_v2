@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+export {};
+
 const currentUser = {
   id: 1,
   username: 'cypress_sender',
