@@ -80,8 +80,8 @@ export default function PrivacyPolicyPage() {
         <p>
           Voditelj obrade je <strong>Duga</strong>. Službenika za zaštitu podataka, možete ga
           kontaktirati na{' '}
-          <a href="mailto:admin@duga.app" className="text-blue-600 hover:underline">
-            admin@duga.app
+          <a href="mailto:admin@duga.chat" className="text-blue-600 hover:underline">
+            admin@duga.chat
           </a>
           .
         </p>
@@ -182,8 +182,8 @@ export default function PrivacyPolicyPage() {
         <h2 className="text-2xl font-semibold mb-3">Kontakt</h2>
         <p>
           Ako imate pitanja o ovoj Politici ili obradi podataka, obratite nam se na{' '}
-          <a href="mailto:admin@duga.app" className="text-blue-600 hover:underline">
-            admin@duga.app
+          <a href="mailto:admin@duga.chat" className="text-blue-600 hover:underline">
+            admin@duga.chat
           </a>
           .
         </p>
