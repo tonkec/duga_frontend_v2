@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import Loader from '@app/components/Loader';
 import { useAppSessionStatus } from '@app/context/AppSessionContext';
+import { getAuth0Audience } from '@app/configs/auth0Env';
 
 interface IAuthGuardProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
     if (isAuthenticated) {
       getAccessTokenSilently({
         authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+          audience: getAuth0Audience(),
         },
       })
         .then((token) => {
