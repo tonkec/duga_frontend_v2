@@ -9,7 +9,6 @@ import { z } from 'zod';
 import FieldError from '@app/components/FieldError';
 import MentionInput from '@app/components/MentionInput';
 import { Link, useNavigate } from 'react-router-dom';
-import { IUser } from '@app/components/UserCard';
 import DOMPurify from 'dompurify';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
@@ -33,7 +32,9 @@ const CommentWithUser: React.FC<{
 }> = ({ comment, onCommentUpdated, onCommentDeleted }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
+  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>(
+    comment.taggedUsers ?? []
+  );
   const { user: currentUser } = useGetCurrentUser();
   const currentUserId = currentUser?.data.id;
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
@@ -44,6 +45,7 @@ const CommentWithUser: React.FC<{
   const {
     handleSubmit,
     control,
+    watch,
     reset,
     formState: { errors },
   } = useForm<Inputs>({
@@ -61,7 +63,7 @@ const CommentWithUser: React.FC<{
   const onSubmit = (data: Inputs) => {
     mutateEditUploadComment({
       id: Number(comment.id),
-      comment: data.comment,
+      comment: data.comment.trim(),
       taggedUserIds: taggedUsers.map((user) => Number(user.id)),
       uploadId: comment.uploadId,
     });
@@ -72,12 +74,13 @@ const CommentWithUser: React.FC<{
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
     if (!cleanText) return null;
-    const parts = cleanText.split(/(@\w+)/g);
+    const parts = cleanText.split(/(@[\w\d]+)/g);
 
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
         const username = part.slice(1);
-        const matchedUser = comment.taggedUsers?.find(
+
+        const matchedUser = (taggedUsers.length > 0 ? taggedUsers : comment.taggedUsers)?.find(
           (u) => u.username.toLowerCase() === username.toLowerCase()
         );
 
@@ -105,9 +108,12 @@ const CommentWithUser: React.FC<{
               render={({ field }) => (
                 <MentionInput
                   value={field.value}
-                  onChange={field.onChange}
-                  onTagUsersChange={setTaggedUsers}
+                  onChange={(val) => field.onChange(val)}
+                  onTagUsersChange={(users) => {
+                    setTaggedUsers(users);
+                  }}
                   placeholder="Izmijeni komentar"
+                  initialTaggedUsers={taggedUsers}
                 />
               )}
             />
@@ -117,7 +123,7 @@ const CommentWithUser: React.FC<{
             <Button type="transparent" htmlType="button" onClick={() => setIsEditing(false)}>
               Otkaži
             </Button>
-            <Button type="blue" htmlType="submit">
+            <Button type="blue" htmlType="submit" disabled={comment.comment === watch('comment')}>
               Spremi
             </Button>
           </div>

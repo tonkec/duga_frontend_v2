@@ -78,6 +78,11 @@ export const getAllUserPhotos = async () => {
   });
 };
 
+export const getUsersByUsernames = async (usernames: string[]) => {
+  const client = apiClient();
+  return client.post('/users/by-usernames', { usernames });
+};
+
 export const updatePostLoginData = async (data: IPostLoginProps) => {
   const client = apiClient();
   return client.post(`/users/post-login`, { data: data });
