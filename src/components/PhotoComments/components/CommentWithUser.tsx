@@ -45,9 +45,10 @@ const CommentWithUser: React.FC<{
     handleSubmit,
     control,
     reset,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
+    mode: 'onChange',
     defaultValues: { comment: comment.comment },
   });
 
@@ -58,8 +59,6 @@ const CommentWithUser: React.FC<{
   }, [comment.comment, isEditing, reset]);
 
   const onSubmit = (data: Inputs) => {
-    if (!isValid) return;
-
     mutateEditUploadComment({
       id: Number(comment.id),
       comment: data.comment,

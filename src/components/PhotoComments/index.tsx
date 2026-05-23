@@ -116,7 +116,7 @@ const PhotoComments = () => {
 
   const {
     handleSubmit,
-    formState: { isValid, errors },
+    formState: { errors },
     reset,
     control,
     watch,
@@ -124,6 +124,7 @@ const PhotoComments = () => {
     getValues,
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
+    mode: 'onChange',
     defaultValues: {
       content: '',
     },
@@ -134,7 +135,7 @@ const PhotoComments = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (data: Inputs) => {
-    if (!photoId || !isValid) return;
+    if (!photoId) return;
 
     const existingImagesCount = Array.isArray(allUserImages?.data)
       ? allUserImages.data.length
