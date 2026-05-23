@@ -53,7 +53,7 @@ const createCypressSocket = () => {
       }
     },
     disconnect: () => undefined,
-  } as Socket;
+  } as unknown as Socket;
 };
 
 const getBackendUrl = () => {
