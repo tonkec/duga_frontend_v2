@@ -1,23 +1,25 @@
-import ContentFormatter from '@app/components/ContentFormatter';
-import BlobImage from '@app/components/PhotoUploader/components/BlobImage';
-import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
+import clsx from 'clsx';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
+import { getMessagePreviewText } from '@app/utils/getMessagePreviewText';
 
 interface ILastMessageProps {
   message: IMessage;
+  isUnread?: boolean;
 }
 
-const LastMessage = ({ message }: ILastMessageProps) => {
-  if (message.message) {
-    return <ContentFormatter text={message.message} />;
-  }
-
-  if (message.type === 'gif') {
-    return <GiphyMessage messagePhotoUrl={message.messagePhotoUrl} />;
-  }
+const LastMessage = ({ message, isUnread }: ILastMessageProps) => {
+  const preview = getMessagePreviewText(message);
+  if (!preview) return null;
 
   return (
-    <BlobImage imageUrl={message.securePhotoUrl} name="poruka" className="rounded max-h-[50px]" />
+    <span
+      className={clsx(
+        'block truncate text-sm',
+        isUnread ? 'font-medium text-gray-700' : 'text-gray-500'
+      )}
+    >
+      {preview}
+    </span>
   );
 };
 

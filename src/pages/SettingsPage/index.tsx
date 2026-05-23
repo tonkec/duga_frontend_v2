@@ -8,6 +8,7 @@ import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
 import { useCookies } from 'react-cookie';
 import { useCookieConsent } from '@app/hooks/useCookieConsent';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -18,15 +19,42 @@ interface IDeleteProfileModalProp {
 const DeleteProfileModal = ({ isOpen, onClose, onDelete }: IDeleteProfileModalProp) => {
   return (
     <ConfirmModal isOpen={isOpen} onClose={onClose} onConfirm={onDelete}>
-      <div>
-        <h2 className="text-xl mb-2">Jesi li siguran_na da želiš obrisati svoj profil?</h2>
-        <p className="text-sm">
+      <div className="max-w-md text-center">
+        <h2 className="text-2xl font-bold mb-2">Obrisati profil?</h2>
+        <p className="text-gray-600">
           Brisanje profila briše sve tvoje fotografije, komentare, lajkove i poruke.
         </p>
       </div>
     </ConfirmModal>
   );
 };
+
+const SettingsSection = ({
+  title,
+  subtitle,
+  children,
+  danger = false,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  danger?: boolean;
+}) => (
+  <section
+    className={`rounded-2xl border p-5 shadow-sm ${
+      danger ? 'border-red/40 bg-red/5' : 'border-[#dce4ff] bg-white'
+    }`}
+  >
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+        <p className="mt-1 text-gray-600">{subtitle}</p>
+      </div>
+      <div className="shrink-0">{children}</div>
+    </div>
+  </section>
+);
+
 const SettingsPage = () => {
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
@@ -39,8 +67,8 @@ const SettingsPage = () => {
   if (isUserLoading) {
     return (
       <AppLayout>
-        <Card>
-          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+        <Card className="rounded-2xl p-6">
+          <h1 className="text-3xl font-bold text-gray-900">Postavke</h1>
           <p>Učitavanje...</p>
         </Card>
       </AppLayout>
@@ -50,8 +78,8 @@ const SettingsPage = () => {
   if (!currentUser?.data) {
     return (
       <AppLayout>
-        <Card>
-          <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+        <Card className="rounded-2xl p-6">
+          <h1 className="text-3xl font-bold text-gray-900">Postavke</h1>
           <p>Ne možemo učitati tvoje podatke. Molimo pokušaj ponovo kasnije.</p>
         </Card>
       </AppLayout>
@@ -71,31 +99,65 @@ const SettingsPage = () => {
         }}
       />
 
-      <Card>
-        <h1 className="text-2xl font-bold mt-4 mb-4">Postavke</h1>
+      <div className="mb-5">
+        <h1 className="text-3xl font-bold text-gray-900">Postavke</h1>
+      </div>
 
-        <div>{String(userId) && <OnlineStatus />}</div>
+      <div className="grid gap-5">
+        <Card className="rounded-2xl p-5 md:p-6">
+          <div className="flex items-center gap-4">
+            <UserAvatar
+              color="#2D46B9"
+              userId={String(userId)}
+              avatarFallbackName={currentUser.data.username}
+              className="h-16 w-16 rounded-2xl"
+              fgColor="#1f2937"
+            />
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">
+                Prijavljen_a si kao
+              </p>
+              <h2 className="text-2xl font-bold text-gray-900">{currentUser.data.username}</h2>
+            </div>
+          </div>
+        </Card>
 
-        <hr className="mb-5" />
+        <SettingsSection
+          title="Online status"
+          subtitle="Upravljaj vidljivošću svog online statusa drugim korisnicima."
+        >
+          {String(userId) && <OnlineStatus />}
+        </SettingsSection>
 
-        <div className="mb-5 flex gap-2">
+        <SettingsSection
+          title="Kolačići"
+          subtitle={
+            hasRejectedCookies
+              ? 'Kolačići su trenutno odbijeni.'
+              : 'Kolačići su trenutno prihvaćeni.'
+          }
+        >
           {hasRejectedCookies ? (
-            <Button type="primary" onClick={acceptCookies}>
+            <Button type="blue" onClick={acceptCookies}>
               Prihvati kolačiće
             </Button>
           ) : (
-            <Button type="primary" onClick={rejectCookies}>
+            <Button type="transparent" onClick={rejectCookies}>
               Odbij kolačiće
             </Button>
           )}
-        </div>
+        </SettingsSection>
 
-        <hr className="mb-5" />
-
-        <Button type="danger" onClick={() => setIsDeleteModalOpen(true)}>
-          Obriši svoj profil
-        </Button>
-      </Card>
+        <SettingsSection
+          title="Brisanje profila"
+          subtitle="Ova radnja trajno uklanja tvoj profil i povezane podatke."
+          danger
+        >
+          <Button type="danger" onClick={() => setIsDeleteModalOpen(true)}>
+            Obriši profil
+          </Button>
+        </SettingsSection>
+      </div>
     </AppLayout>
   );
 };

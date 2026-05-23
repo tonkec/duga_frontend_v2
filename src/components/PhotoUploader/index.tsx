@@ -30,6 +30,7 @@ interface IPhotoActionButtonsProps {
   isChecked?: boolean;
   onCheckboxChange?: (e: SyntheticEvent) => void;
   hasCheckbox?: boolean;
+  disabled?: boolean;
 }
 
 const DeleteButtonModal = ({
@@ -64,6 +65,7 @@ const PhotoActionButtons = ({
   isChecked,
   onCheckboxChange,
   hasCheckbox,
+  disabled,
 }: IPhotoActionButtonsProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   return (
@@ -79,11 +81,13 @@ const PhotoActionButtons = ({
         placeholder="Napiši nešto o fotografiji"
         onChange={onInputChange}
         type="text"
+        disabled={disabled}
       />
       {hasCheckbox && (
         <div className="flex gap-1 items-center mt-4">
           <input
             type="checkbox"
+            disabled={disabled}
             onChange={
               onCheckboxChange
                 ? onCheckboxChange
@@ -99,11 +103,13 @@ const PhotoActionButtons = ({
       <div className="mt-4 flex gap-2">
         <Button
           type="black"
+          htmlType="button"
           className="flex gap-1 items-center"
           onClick={(e: SyntheticEvent | undefined) => {
             e?.preventDefault();
             setIsDeleteModalOpen(true);
           }}
+          disabled={disabled}
         >
           <span>Obriši</span>
           <BiTrash fontSize={20} />
@@ -123,7 +129,7 @@ const PhotoUploader = () => {
   const [hasDescriptionError, setHasDescriptionError] = useState<boolean>(false);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
-  const { onUploadPhotos } = useUploadPhotos();
+  const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos();
   const [newImages, setNewImages] = useState<IImage[]>();
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []
@@ -170,13 +176,15 @@ const PhotoUploader = () => {
       formData.append('avatars', cleanedFile);
     }
 
-    onUploadPhotos(formData);
+    onUploadPhotos(formData, {
+      onSuccess: () => {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-
-    setNewImages([]);
+        setNewImages([]);
+      },
+    });
   };
 
   const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
@@ -242,13 +250,27 @@ const PhotoUploader = () => {
 
   return (
     <div>
+      {isUploadingPhotos && (
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 font-semibold text-blue">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue border-t-transparent" />
+          Fotografije se spremaju...
+        </div>
+      )}
       {shouldShowEditable && (
-        <Card className="mb-6">
+        <Card className="mb-6 rounded-2xl p-5 md:p-6">
           <form onSubmit={onSubmitUpdatePhotos}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Tvoje fotografije</h2>
+              <p className="mt-1 text-gray-600">Uredi opise i odaberi profilnu fotografiju.</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {allExistingImages.data.images.map((image: IImage, index: number) => {
                 return (
-                  <div key={`${image.name}-editable`} className="mb-4 max-w-[400px]">
+                  <div
+                    key={`${image.name}-editable`}
+                    className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+                  >
                     <BlobImage imageUrl={image.securePhotoUrl} name={image.name} />
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => {
@@ -281,6 +303,7 @@ const PhotoUploader = () => {
                           ?.isProfilePhoto || false
                       }
                       hasCheckbox
+                      disabled={isUploadingPhotos}
                       onCheckboxChange={(e: SyntheticEvent) => {
                         const isChecked = (e.target as HTMLInputElement).checked;
                         setAllCheckboxes((prev) =>
@@ -317,38 +340,57 @@ const PhotoUploader = () => {
               })}
             </div>
 
-            <Button type="primary" disabled={hasDescriptionError}>
-              <span>Spremi</span>
+            <Button
+              type="blue"
+              className="mt-4 w-full md:w-auto"
+              disabled={hasDescriptionError || isUploadingPhotos}
+            >
+              <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi'}</span>
             </Button>
           </form>
         </Card>
       )}
-      <Card>
+      <Card className="rounded-2xl p-5 md:p-6">
         <form onSubmit={onSubmitHandler}>
-          <h2 className="font-bold mt-5 mb-2"> Dodaj nove fotografije </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">Dodaj nove fotografije</h2>
+            <p className="mt-1 text-gray-600">
+              Možeš imati najviše {MAXIMUM_NUMBER_OF_IMAGES} fotografija ukupno.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {newImages &&
               newImages.map((image) => {
                 return (
-                  <div key={image.name} className="mb-4 max-w-[400px]">
-                    <div className="relative w-full aspect-[1/1] overflow-hidden rounded-md">
+                  <div
+                    key={image.name}
+                    className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+                  >
+                    <div className="relative w-full aspect-[1/1] overflow-hidden rounded-xl">
                       <Image
                         src={image.url}
                         alt={image.name}
                         className="absolute top-0 left-0 w-full h-full object-cover"
                       />
+                      {isUploadingPhotos && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 font-semibold text-white">
+                          Spremanje...
+                        </div>
+                      )}
                     </div>
                     <PhotoActionButtons
                       onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
                       onDelete={() => onDeleteFromState(image)}
                       defaultInputValue={image.description}
+                      disabled={isUploadingPhotos}
                     />
                   </div>
                 );
               })}
           </div>
 
-          <div className="mb-4">
+          <div className="my-4 rounded-2xl border border-dashed border-[#b9c6ff] bg-[#f7f9ff] p-5">
             <input
               ref={fileInputRef}
               type="file"
@@ -391,11 +433,17 @@ const PhotoUploader = () => {
                   setNewImages((prev) => [...(prev || []), ...(images as IImage[])]);
                 }
               }}
+              className="w-full cursor-pointer rounded-xl bg-white p-3 text-sm text-gray-700"
+              disabled={isUploadingPhotos}
             />
           </div>
           {newImages && newImages.length > 0 && (
-            <Button type="primary" disabled={hasDescriptionError}>
-              <span>Spremi</span>
+            <Button
+              type="blue"
+              className="w-full md:w-auto"
+              disabled={hasDescriptionError || isUploadingPhotos}
+            >
+              <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi'}</span>
             </Button>
           )}
         </form>

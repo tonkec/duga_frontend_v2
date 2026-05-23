@@ -1,14 +1,21 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance } from 'axios';
+import { resolveAccessToken } from './authToken';
+import {
+  getAppSessionId,
+  markSessionRevoked,
+  SESSION_HEADER,
+  SESSION_REVOKED_CODE,
+} from './appSession';
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipGlobalErrorHandler?: boolean;
+  }
+}
+
+/** Clears only the app API token cookie — never Auth0 session storage. */
 const clearAllAuthData = () => {
-  localStorage.clear();
-
-  sessionStorage.clear();
-
-  document.cookie.split(';').forEach((c) => {
-    document.cookie = c
-      .replace(/^ +/, '')
-      .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
-  });
+  document.cookie = `token=;expires=${new Date(0).toUTCString()};path=/`;
 };
 
 export const getCookie = (name: string): string | null => {
@@ -37,16 +44,10 @@ export const apiClient = (token?: string): AxiosInstance => {
   });
 
   instance.interceptors.request.use(
-    (config) => {
-      // If token is explicitly passed, use it
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        return config;
-      }
+    async (config) => {
+      const authToken = await resolveAccessToken(token);
 
-      // Otherwise, try cookie-based fallback
-      const cookieToken = getCookie('token');
-      if (!cookieToken) {
+      if (!authToken) {
         return Promise.reject({
           response: {
             status: 401,
@@ -55,19 +56,18 @@ export const apiClient = (token?: string): AxiosInstance => {
         });
       }
 
-      config.headers.Authorization = `Bearer ${cookieToken}`;
+      config.headers.Authorization = `Bearer ${authToken}`;
+      config.headers[SESSION_HEADER] = getAppSessionId();
       return config;
     },
     (error) => Promise.reject(error)
   );
-  type Cfg = AxiosRequestConfig & { skipGlobalErrorHandler?: boolean };
-
   const ERROR_ROUTES = ['/broken', '/record-not-found', '/network-error'];
 
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      const cfg = (error.config || {}) as Cfg;
+      const cfg = error.config || {};
 
       // let certain calls opt out
       if (cfg.skipGlobalErrorHandler) {
@@ -78,6 +78,14 @@ export const apiClient = (token?: string): AxiosInstance => {
       const alreadyOnErrorRoute = ERROR_ROUTES.includes(here);
 
       if (!alreadyOnErrorRoute) {
+        if (
+          error?.response?.status === 401 &&
+          error?.response?.data?.code === SESSION_REVOKED_CODE
+        ) {
+          clearAllAuthData();
+          markSessionRevoked();
+          return Promise.reject(error);
+        }
         if (error?.response?.status >= 500) {
           window.location.replace('/broken');
           return Promise.reject(error);

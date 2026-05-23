@@ -8,7 +8,11 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SocketProvider } from './context/SocketProvider.tsx';
 import { Auth0ProviderWithNavigate } from './Auth0ProviderWithNavigate.tsx';
+import AuthTokenBridge from './components/AuthTokenBridge/index.tsx';
 import { CookiesProvider } from 'react-cookie';
+import AppSessionProvider from './components/AppSessionProvider/index.tsx';
+import axios from 'axios';
+import { SESSION_REVOKED_CODE } from './api/appSession.ts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,7 +21,8 @@ const queryClient = new QueryClient({
       staleTime: 0,
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
-      throwOnError: true,
+      throwOnError: (error) =>
+        !(axios.isAxiosError(error) && error.response?.data?.code === SESSION_REVOKED_CODE),
     },
   },
 });
@@ -28,9 +33,13 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <Auth0ProviderWithNavigate>
-            <SocketProvider>
-              <DugaRoutes />
-            </SocketProvider>
+            <AuthTokenBridge>
+              <AppSessionProvider>
+                <SocketProvider>
+                  <DugaRoutes />
+                </SocketProvider>
+              </AppSessionProvider>
+            </AuthTokenBridge>
           </Auth0ProviderWithNavigate>
           <ReactQueryDevtools />
           <ToastContainer />

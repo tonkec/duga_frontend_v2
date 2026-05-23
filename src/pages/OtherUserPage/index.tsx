@@ -70,7 +70,7 @@ const OtherUserPage = () => {
               <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
                 <SendMessageButton
                   sendMessageToId={userId as string}
-                  buttonType="blue-dark"
+                  buttonType="blue"
                   buttonClasses="w-full"
                 />
               </Cta>
@@ -85,7 +85,7 @@ const OtherUserPage = () => {
           </div>
         </TabPanel>
         <TabPanel>
-          <Card>
+          <Card className="p-6 rounded">
             <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
           </Card>
         </TabPanel>

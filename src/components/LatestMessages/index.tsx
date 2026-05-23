@@ -7,9 +7,7 @@ import { IChat, useGetIsMessageRead, useMarkMessagesAsRead } from '@app/pages/Ne
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import UserAvatar from '../UserAvatar';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
-import ContentFormatter from '../ContentFormatter';
-import BlobImage from '../PhotoUploader/components/BlobImage';
-import GiphyMessage from '@app/pages/ChatPage/components/GiphyMessage';
+import { getMessagePreviewText } from '@app/utils/getMessagePreviewText';
 
 interface IMessageWrapper {
   message: IMessage;
@@ -62,22 +60,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     <LatestMessageAvatar userId={String(isFromSameUser ? userId : message.User.id)} />
   );
 
-  const renderMessageContent = () => {
-    if (message.type === 'gif') {
-      return <GiphyMessage messagePhotoUrl={message.messagePhotoUrl} />;
-    }
-
-    if (message.securePhotoUrl) {
-      return (
-        <BlobImage
-          imageUrl={message.securePhotoUrl}
-          name="komentar"
-          className="rounded max-h-[100px]"
-        />
-      );
-    }
-    return <ContentFormatter text={message.message} />;
-  };
+  const preview = getMessagePreviewText(message);
 
   return (
     <div
@@ -86,7 +69,7 @@ const LatestMessage = ({ message, onClick }: { message: IMessage; onClick: () =>
     >
       <div className="mb-2">
         <div className="mt-4 flex items-end gap-2 justify-between">
-          {renderMessageContent()}
+          {preview && <span className="line-clamp-2">{preview}</span>}
           <div className="flex flex-col items-end">
             {getLatestPerson()}
             <div className="mt-4">

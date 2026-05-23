@@ -15,6 +15,7 @@ import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
 import TermsOfUsePage from '@app/pages/RulesPage';
 import ReportPage from '@app/pages/ReportPage';
 import PostLoginPage from '@app/pages/PostLoginPage';
+import UsersPage from '@app/pages/UsersPage';
 import { PageTitle } from '@app/components/PageTitle';
 import { AuthGuard } from './guards/AuthGuard';
 import PostLoginFormGuard from './guards/PostLoginFormGuard';
@@ -106,6 +107,14 @@ export const onboardedRoutes = [
         <OnlineStatusWrapper isCurrentUser>
           <MyProfilePage />
         </OnlineStatusWrapper>
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/users',
+    element: (
+      <PageTitle title="Svi korisnici">
+        <UsersPage />
       </PageTitle>
     ),
   },

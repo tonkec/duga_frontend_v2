@@ -12,6 +12,72 @@ import Image from '@app/components/Image';
 import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
+import { clearAppSessionRevoked } from '@app/api/appSession';
+import { useAppSessionStatus } from '@app/context/AppSessionContext';
+
+const howItWorksItems = [
+  {
+    icon: BiHeart,
+    title: 'Pronađi osobu koja ti paše',
+    text: 'Pregledaj profile, interese i fotke bez pritiska.',
+  },
+  {
+    icon: BiStopwatch,
+    title: 'Filtriraj bez gubljenja vremena',
+    text: 'Brže dođi do ljudi iz svoje regije, grada ili faze života.',
+  },
+  {
+    icon: BiMessage,
+    title: 'Započni siguran razgovor',
+    text: 'Pošalji poruku kada osjetiš klik i nastavi svojim tempom.',
+  },
+];
+
+const reasonItems = [
+  {
+    number: '01',
+    title: 'Queer prostor za Balkan',
+    text: 'Duga je napravljena za ljude koji žele razgovor bez objašnjavanja tko su.',
+  },
+  {
+    number: '02',
+    title: 'Privatnost pod tvojom kontrolom',
+    text: 'Ti biraš što dijeliš, s kim razgovaraš i kada želiš nestati iz aplikacije.',
+  },
+  {
+    number: '03',
+    title: 'Manje buke, više stvarnih poruka',
+    text: 'Jednostavan profil, chat i fotke stavljaju fokus na upoznavanje, ne na beskonačno skrolanje.',
+  },
+];
+
+const statItems = [
+  {
+    icon: FaPeopleGroup,
+    value: '500+',
+    title: 'korisnika_ca',
+    text: 'Ljudi iz regije već pronalaze razgovore, podršku, prijateljstva i flert.',
+  },
+  {
+    icon: FaEnvelopesBulk,
+    value: '10k+',
+    title: 'poruka',
+    text: 'Chat je brz, jednostavan i napravljen za upoznavanje bez nepotrebnih komplikacija.',
+  },
+  {
+    icon: FaPhotoFilm,
+    value: '1000+',
+    title: 'fotki',
+    text: 'Dodaj profilne fotke i albume kada želiš pokazati malo više sebe.',
+  },
+];
+
+const priceFeatures = [
+  'Kreiranje profila',
+  'Pretraživanje profila',
+  'Neograničene poruke',
+  'Do ukupno 5 fotografija',
+];
 
 const getDomainPath = () => {
   const { hostname } = window.location;
@@ -69,234 +135,220 @@ const faqItems = [
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
+  const appSessionStatus = useAppSessionStatus();
   const learnMoreRef = useRef<HTMLDivElement>(null);
+
+  const onLogin = () => {
+    clearAppSessionRevoked();
+    loginWithRedirect({
+      authorizationParams: {
+        redirect_uri: URL,
+      },
+    });
+  };
 
   const scrollToLearnMore = () => {
     learnMoreRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="bg-white">
-      <header className="gradient  pb-32">
+    <div className="bg-[#f7f8ff] text-gray-900">
+      <header className="gradient relative overflow-hidden">
         <CookieBanner />
-        <nav className="transparent py-2 px-8 flex justify-between items-center fixed top-0 left-0 w-full z-10">
+        <nav className="fixed left-0 top-0 z-10 flex w-full items-center justify-between bg-blue-dark/20 px-5 py-4 backdrop-blur-md md:px-8">
+          <Link to="/" className="text-2xl font-black tracking-tight text-white">
+            Duga
+          </Link>
           <Button
-            className=""
+            className="!rounded-full !px-5 font-semibold shadow-lg"
             type="primary"
-            onClick={() => {
-              loginWithRedirect({
-                authorizationParams: {
-                  redirect_uri: URL,
-                },
-              });
-            }}
+            onClick={onLogin}
           >
-            Prijava
+            Prijavi se
           </Button>
         </nav>
 
-        <div className="container relative mx-auto">
-          <div className="lg:flex pt-52 items-center">
-            <div className="flex flex-col md:bg-blue pt-6 pb-8 rounded px-8">
-              <h1 className="mt-2 mb-12 text-8xl font-bold text-white">Duga</h1>
-              <p className="mt-8 text-white text-4xl max-w-xl">
-                Razgovaraj, flertaj ili prozuji s <b className="font-bold">queer</b> osobicama s
-                Balkana.
+        <div className="container relative mx-auto px-5 pb-24 pt-32 md:px-8 lg:pb-32 lg:pt-40">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="max-w-3xl">
+              <p className="mb-5 inline-flex rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/90 shadow-lg backdrop-blur">
+                Queer upoznavanje za Balkan
               </p>
-              <div className="flex flex-col sm:flex-row items-center mt-8 gap-4">
+              <h1 className="text-6xl font-black leading-none tracking-tight text-white sm:text-7xl lg:text-8xl">
+                Duga
+              </h1>
+              {appSessionStatus === 'revoked' && (
+                <p className="mt-6 max-w-xl rounded-2xl bg-white/95 p-4 font-medium text-blue shadow-xl">
+                  Odjavljeni ste jer je račun otvoren u drugoj sesiji.
+                </p>
+              )}
+              <p className="mt-8 max-w-2xl text-3xl font-semibold leading-tight text-white md:text-5xl">
+                Upoznaj queer osobe iz regije bez buke, pritiska i čudnih vibra.
+              </p>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/85 md:text-xl">
+                Razgovaraj, flertaj ili pronađi ekipu koja razumije tvoj kontekst. Profil, fotke i
+                poruke su jednostavni, a sigurnost je ugrađena od prvog klika.
+              </p>
+
+              <div className="mt-9 flex flex-col gap-4 sm:flex-row">
                 <Button
                   type="primary"
-                  className="!px-6 !py-4 !text-xl w-full sm:w-auto"
-                  onClick={() => {
-                    loginWithRedirect({
-                      authorizationParams: {
-                        redirect_uri: URL,
-                      },
-                    });
-                  }}
+                  className="w-full !rounded-full !px-7 !py-4 !text-lg font-bold shadow-xl sm:w-auto"
+                  onClick={onLogin}
                 >
-                  Prijavi se! 👉
+                  Prijavi se
                 </Button>
 
                 <Button
                   type="tertiary"
-                  className="!px-6 !py-4 !text-xl w-full sm:w-auto"
+                  className="w-full !rounded-full !bg-white/95 !px-7 !py-4 !text-lg font-bold shadow-xl hover:!bg-rose sm:w-auto"
                   onClick={scrollToLearnMore}
                 >
-                  Saznaj više 👇
+                  Saznaj više
                 </Button>
+              </div>
+
+              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3 text-white">
+                <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
+                  <p className="text-2xl font-black">18+</p>
+                  <p className="text-sm text-white/80">samo odrasli</p>
+                </div>
+                <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
+                  <p className="text-2xl font-black">0€</p>
+                  <p className="text-sm text-white/80">osnovni plan</p>
+                </div>
+                <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
+                  <p className="text-2xl font-black">AI</p>
+                  <p className="text-sm text-white/80">sigurnost</p>
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col max-w-lg items-center mx-auto lg:absolute lg:inline-block hidden -bottom-[13rem] right-8 ob">
-              <Image src={Love1} alt="Love" className="w-full" />
+            <div className="relative mx-auto hidden max-w-xl lg:block">
+              <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-pink/40 blur-3xl" />
+              <div className="absolute -right-8 bottom-8 h-48 w-48 rounded-full bg-white/20 blur-3xl" />
+              <div className="relative rounded-[2rem] border border-white/20 bg-white/15 p-8 shadow-2xl backdrop-blur">
+                <Image src={Love1} alt="Dvije osobe sjede zajedno" className="w-full" />
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="pt-24">
-        <FadeInSection>
-          <div className="bg-white pt-24 lg:pt-24 pb-12 px-12" ref={learnMoreRef}>
-            <div className="container mx-auto">
-              <h1 className="text-center text-4xl font-bold">Kako funkcionira Duga?</h1>
+      <FadeInSection>
+        <section className="bg-white px-5 py-20 md:px-8" ref={learnMoreRef}>
+          <div className="container mx-auto">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Kako radi</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                Upoznavanje bez kompliciranja
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-gray-600">
+                Sve što trebaš je profil, par interesa i poruka kada netko zapne za oko.
+              </p>
+            </div>
 
-              <div className="flex flex-col md:flex-row flex-wrap justify-center gap-8 mt-8">
-                <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
-                  <BiHeart className="text-white inline-block mb-6" fontSize={40} color="#F037A5" />
-                  <h4 className="text-white text-xl mb-2">Pronadi zanimljivu osobicu</h4>
-                  <p className="text-white">Pregledaj profile i pronađi nekoga tko ti se sviđa.</p>
-                </div>
-
-                <div className="bg-blue-dark text-center rounded-lg px-6 py-8 flex-1">
-                  <BiStopwatch
-                    className="text-white inline-block mb-6"
-                    fontSize={40}
-                    color="#F037A5"
-                  />
-                  <h4 className="text-white text-xl mb-2">Uštedi si vrijeme i živčeke</h4>
-                  <p className="text-white">
-                    Iskoristi naše filtere za brzo pronalaženje idealne osobice.
-                  </p>
-                </div>
-
-                <div className="bg-blue text-center rounded-lg px-6 py-8 flex-1">
-                  <BiMessage
-                    className="text-white inline-block mb-6"
-                    fontSize={40}
-                    color="#F037A5"
-                  />
-                  <h4 className="text-white text-xl mb-2">Pošalji poruku</h4>
-                  <p className="text-white">
-                    Pošalji poruku osobi koja ti se sviđa i započni razgovor.
-                  </p>
-                </div>
-              </div>
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {howItWorksItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="rounded-[1.75rem] border border-blue/10 bg-[#f7f8ff] p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+                  >
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose text-pink">
+                      <Icon fontSize={34} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-blue-dark">{item.title}</h3>
+                    <p className="mt-3 leading-7 text-gray-600">{item.text}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </FadeInSection>
-      </div>
-
-      <FadeInSection>
-        <div className="bg-white py-16 pb-12 px-12">
-          <h2 className="text-center text-4xl font-bold mb-8">Zašto odabrati baš nas?</h2>
-          <ul className="max-w-2xl mx-auto">
-            <li className="bg-blue-dark py-8 px-6 rounded-lg">
-              <div className="flex flex-col sm:flex-row items-center gap-5">
-                <div>
-                  <span className="text-6xl text-white">01.</span>
-                </div>
-                <div>
-                  <h4 className="text-xl text-white">
-                    Jednostavno i brzo povezivanje s queer osobama.
-                  </h4>
-                  <p className="text-white text-md mt-4">
-                    Naša platforma omogućava ti da se lako povežeš s osobama koje dijele slične
-                    interese i vrijednosti.
-                  </p>
-                </div>
-              </div>
-            </li>
-            <li className="gradient py-8 px-6 mt-2 rounded-lg">
-              <div className="flex flex-col sm:flex-row items-center gap-5">
-                <div>
-                  <span className="text-6xl text-white">02.</span>
-                </div>
-                <div>
-                  <h4 className="text-xl text-white">Sigurnost i privatnost su na prvom mjestu.</h4>
-                  <p className="text-white text-md mt-4">
-                    Osiguravamo zaštitu tvojih podataka i potpunu kontrolu nad svojim profilom.
-                  </p>
-                </div>
-              </div>
-            </li>
-
-            <li className="bg-blue-dark py-8 px-6 rounded-lg mt-2">
-              <div className="flex flex-col sm:flex-row items-center gap-5">
-                <div>
-                  <span className="text-6xl text-white">03.</span>
-                </div>
-                <div>
-                  <h4 className="text-xl text-white">
-                    Raznolike mogućnosti za komunikaciju i upoznavanje.
-                  </h4>
-                  <p className="text-white text-md mt-4">
-                    Nudimo različite načine za povezivanje s drugim korisnicima, uključujući chat,
-                    video pozive i grupne razgovore.
-                  </p>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <div className="text-center py-24 mb-32 mt-32 overflow-hidden px-12 bg-rose container mx-auto rounded">
-          <h2 className="text-center text-4xl font-bold mb-24">Duga u brojkama i iskustvu</h2>
-
-          <div className="lg:grid lg:grid-cols-3 gap-6 xl:gap-12">
-            <div className="space-y-2 mb-12 lg:mb-0">
-              <div className="flex items-center gap-2">
-                <FaPeopleGroup className="text-[#2D46B9]" fontSize="2rem" />
-                <h2 className="text-4xl">Mnogo korisnika</h2>
-              </div>
-              <p className="text-left text-gray-700">
-                Na Dugi već 500+ korisnika iz cijele regije upoznaje nove prijatelje, partnere ili
-                jednostavno pronalazi podršku. Svakog tjedna nam se pridružuju novi korisnici iz
-                cijele regije – studenti, mladi profesionalci, kreativci i svi oni koji žele
-                autentične razgovore. Duga je sigurno mjesto gdje možeš biti svoj i povezati se s
-                ljudima koji razumiju tvoju priču. Bez pritiska, bez predrasuda – samo iskrena
-                povezanost.
+        <section className="px-5 py-20 md:px-8">
+          <div className="container mx-auto grid items-start gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+            <div className="lg:sticky lg:top-28">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Zašto Duga</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                Manje dating aplikacija, više zajednice.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-gray-600">
+                Fokus je na jasnom profilu, sigurnom chatu i ljudima koji traže stvarnu povezanost.
               </p>
             </div>
 
-            <div className="space-y-2 mb-12 lg:mb-0">
-              <div className="flex items-center gap-2 ">
-                <FaEnvelopesBulk className="text-[#2D46B9]" fontSize="2rem" />
-                <h2 className="text-4xl">Gro poruka</h2>
-              </div>
-              <p className="text-left text-gray-700">
-                Već je razmijenjeno 10.000+ poruka. Naša chat platforma omogućuje ti da brzo i
-                jednostavno razmjenjuješ poruke. Bilo da tražiš lagani razgovor, flert ili ozbiljnu
-                vezu – komunikacija je brza, sigurna i uvijek pod tvojom kontrolom. Uz AI nadzor i
-                alate za prijavu, možeš biti siguran da je razgovor ugodan i zaštićen od neželjenog
-                sadržaja. Razmjenjuj misli, planiraj susrete ili jednostavno dijeli svakodnevne
-                trenutke – sve na jednom mjestu.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <FaPhotoFilm className="text-[#2D46B9]" fontSize="2rem" />
-                <h2 className="text-4xl">Hrpetina fotki</h2>
-              </div>
-              <p className="text-left text-gray-700">
-                Podijeli svoje najbolje trenutke s drugima – od profilnih fotki do albuma. Na Dugi
-                je već podijeljeno više od 1000 fotografija – pokaži i ti svoju jedinstvenost!
-                Dodavanjem fotografija stvaraš bolji dojam, povećavaš šanse za povezivanje i daješ
-                drugima priliku da te upoznaju. Tvoje fotografije su uvijek pod tvojom kontrolom –
-                odlučuješ što i kada želiš podijeliti.
-              </p>
+            <div className="space-y-5">
+              {reasonItems.map((item) => (
+                <div
+                  key={item.number}
+                  className="group rounded-[1.75rem] border border-blue/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl md:p-8"
+                >
+                  <div className="flex flex-col gap-5 sm:flex-row">
+                    <span className="text-5xl font-black leading-none text-pink/80">
+                      {item.number}
+                    </span>
+                    <div>
+                      <h3 className="text-2xl font-bold text-blue-dark">{item.title}</h3>
+                      <p className="mt-3 text-lg leading-8 text-gray-600">{item.text}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <div className="bg-white px-8">
-          <div className="flex pb-12 lg:pb-0 flex-col md:flex-row items-center gap-6 container mx-auto">
+        <section className="px-5 py-20 md:px-8">
+          <div className="container mx-auto overflow-hidden rounded-[2rem] bg-rose p-6 shadow-sm md:p-10 lg:p-14">
+            <div className="mx-auto mb-12 max-w-2xl text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Zajednica</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                Duga u brojkama
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-gray-700">
+                Mali proizvod, ali već dovoljno živ da se svaki novi profil osjeti.
+              </p>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-3">
+              {statItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.title} className="rounded-[1.5rem] bg-white p-7 shadow-sm">
+                    <Icon className="text-blue" fontSize="2.2rem" />
+                    <p className="mt-6 text-5xl font-black text-blue-dark">{item.value}</p>
+                    <h3 className="mt-2 text-2xl font-bold text-blue-dark">{item.title}</h3>
+                    <p className="mt-4 leading-7 text-gray-600">{item.text}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <FadeInSection>
+        <section className="bg-white px-5 py-20 md:px-8">
+          <div className="container mx-auto grid items-center gap-10 lg:grid-cols-2">
             <div className="max-w-xl">
-              <h2 className="text-3xl font-bold mb-6">AI nadgleda sigurnost sadržaja</h2>
-              <p className="text-lg mb-8">
-                Naša platforma koristi napredne AI alate za prepoznavanje i uklanjanje neprimjerenog
-                sadržaja. Bilo da se radi o uvredama, spam porukama ili bilo kojem obliku
-                zlostavljanja, naš AI sustav će ga prepoznati i ukloniti. Na taj način osiguravamo
-                sigurno i ugodno okruženje za sve naše korisnike i korisnice.
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Sigurnost</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                AI pomaže održati prostor ugodnim
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-gray-600">
+                Duga koristi alate za prepoznavanje neprimjerenog sadržaja, spama i prijava. Ljudi
+                ostaju u centru, a tehnologija pomaže da razgovori budu mirniji.
               </p>
               <Button
-                type="primary"
-                className="!px-4 !py-2 !text-lg"
+                type="blue"
+                className="mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
                 onClick={() => {
                   window.open('https://aws.amazon.com/rekognition/', '_blank');
                 }}
@@ -304,158 +356,142 @@ const LoginPage = () => {
                 Saznaj više
               </Button>
             </div>
-            <div>
-              <Image src={AI} alt="AI" className="w-full h-auto" />
+            <div className="rounded-[2rem] bg-[#f7f8ff] p-8 shadow-sm">
+              <Image src={AI} alt="AI sigurnost" className="w-full h-auto" />
             </div>
           </div>
-        </div>
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <div className="gradient text-center pt-12 overflow-hidden px-12">
-          <div className="flex items-end justify-center">
-            <div className="sm:w-1/4 -mb-4 -ml-24 transparent hidden lg:block">
-              {<Image src={Guy} alt="Guy" className="w-full h-auto" />}
+        <section className="gradient overflow-hidden px-5 pt-16 md:px-8">
+          <div className="container mx-auto grid items-end gap-8 lg:grid-cols-[0.65fr_1fr]">
+            <div className="-mb-16 hidden lg:block">
+              {<Image src={Guy} alt="Osoba s mobitelom" className="block h-auto w-full" />}
             </div>
-            <div className="flex flex-col text-left pb-6">
-              <h3 className="text-4xl text-white font-bold mb-4">Pridruži nam se danas!</h3>
-              <p className="text-white mb-8">
-                Iskoristi sve prednosti naše platforme i pronađi svoju srodnu dušu.
-                <br />
-                Postani član naše zajednice. Zaljubi se u trenu i pronađi ljubav svog života.
+            <div className="max-w-2xl py-16 text-white">
+              <h2 className="text-4xl font-black tracking-tight md:text-5xl">
+                Pridruži nam se danas
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-white/85">
+                Kreiraj profil, pronađi osobe koje ti odgovaraju i započni razgovor kada budeš
+                spreman_na.
               </p>
               <Button
                 type="primary"
-                className="!px-6 !py-4 !text-xl max-w-md"
-                onClick={() => {
-                  loginWithRedirect({
-                    authorizationParams: {
-                      redirect_uri: URL,
-                    },
-                  });
-                }}
+                className="mt-8 !rounded-full !px-7 !py-4 !text-lg font-bold shadow-xl"
+                onClick={onLogin}
               >
                 Prijavi se
               </Button>
             </div>
           </div>
-        </div>
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <div className="bg-white px-8 pt-12">
-          <div className="container mx-auto">
-            <h2 className="text-3xl font-bold mb-6">Cijena</h2>
-
-            <p className="text-lg max-w-2xl">
-              Naša platforma nudi različite planove pretplate kako bi zadovoljila potrebe svih
-              korisnika. Premium opcija je u izgradnji.
-            </p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12 mt-12">
-              <div className="bg-pink p-6 rounded-lg">
-                <h3 className="text-2xl font-bold mt-2 mb-4 text-white">Besplatni plan</h3>
-                <h3 className="text-lg text-white mb-12">0€ mjesečno</h3>
-
-                <ul>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                    <span className="text-white text-lg">Osnovne funkcionalnosti</span>
-                  </li>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                    <span className="text-white text-lg">Mogućnost kreiranja profila</span>
-                  </li>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                    <span className="text-white text-lg">Mogućnost pretraživanja profila</span>
-                  </li>
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                    <span className="text-white text-lg">Neograničene poruke</span>
-                  </li>
-
-                  <li className="text-md text-black mb-3">
-                    <BiSolidCircle className="inline-block mr-2 text-blue" fontSize={10} />
-                    <span className="text-white text-lg">Do ukupno 5 fotografija</span>
-                  </li>
-
-                  <li className="mt-12">
-                    <Button
-                      type="transparent"
-                      className="!px-6 !py-2 !text-lg no-underline !bg-pink-dark text-white"
-                      onClick={() => {
-                        loginWithRedirect({
-                          authorizationParams: {
-                            redirect_uri: URL,
-                          },
-                        });
-                      }}
-                    >
-                      Odaberi plan unutar aplikacije
-                    </Button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </FadeInSection>
-
-      <FadeInSection>
-        <div className="container mx-auto pt-24 pb-24 px-8">
-          <h2 className="text-3xl font-bold mb-6">FAQ</h2>
-
-          <Accordion items={faqItems} />
-        </div>
-      </FadeInSection>
-
-      <FadeInSection>
-        <div className="py-32 bg-blue text-white">
-          <div className="mx-auto container p-4">
-            <div className="flex flex-col md:flex-row mx-auto gap-12 items-center">
-              <div className="flex-1">
-                <h2 className="text-5xl mb-6"> Tražimo contributore! </h2>
-                <p className="text-lg">
-                  Duga je open source aplikacija bazirana na <b>React</b> tehnologijama. U potrazi
-                  smo za novim članovima_cama tima. Ako si zainteresiran_a za rad na ovom projektu,
-                  slobodno se javi našem adminu{' '}
-                  <a className="underline" href="mailto:admin@duga.app">
-                    admin@duga.app{' '}
-                  </a>
-                </p>
-              </div>
-
-              <div className="md:w-1/2">
-                <Image src={Girl} alt="AI" className="w-full h-auto" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </FadeInSection>
-
-      <footer>
-        <div className="bg-gray-800 text-white py-8">
-          <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+        <section className="px-5 py-20 md:px-8">
+          <div className="container mx-auto grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <Link to="/cookie-policy" className="text-white underline">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Cijena</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                Kreni besplatno
+              </h2>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-gray-600">
+                Osnovne funkcionalnosti su dostupne odmah. Premium opcija je još u izgradnji.
+              </p>
+            </div>
+
+            <div className="max-w-xl rounded-[2rem] bg-white p-7 shadow-xl ring-1 ring-blue/10 md:p-9">
+              <div className="flex items-start justify-between gap-6">
+                <div>
+                  <h3 className="text-3xl font-black text-blue-dark">Besplatni plan</h3>
+                  <p className="mt-2 text-gray-600">Sve što trebaš za početak upoznavanja.</p>
+                </div>
+                <p className="rounded-full bg-rose px-4 py-2 text-2xl font-black text-pink">0€</p>
+              </div>
+
+              <ul className="mt-8 space-y-4">
+                {priceFeatures.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-lg text-gray-700">
+                    <BiSolidCircle className="text-pink" fontSize={10} />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                type="primary"
+                className="mt-10 w-full !rounded-full !px-6 !py-4 !text-lg font-bold"
+                onClick={onLogin}
+              >
+                Odaberi plan u aplikaciji
+              </Button>
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <FadeInSection>
+        <section className="bg-white px-5 py-20 md:px-8">
+          <div className="container mx-auto max-w-4xl">
+            <div className="mb-10 text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">FAQ</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                Česta pitanja
+              </h2>
+            </div>
+
+            <div className="rounded-[2rem] border border-blue/10 bg-[#f7f8ff] p-5 shadow-sm md:p-8">
+              <Accordion items={faqItems} />
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <FadeInSection>
+        <section className="bg-blue px-5 py-20 text-white md:px-8">
+          <div className="container mx-auto grid items-center gap-12 md:grid-cols-2">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-white/70">
+                Open source
+              </p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">
+                Tražimo contributore!
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-white/85">
+                Duga je open source aplikacija bazirana na <b>React</b> tehnologijama. U potrazi smo
+                za novim članovima_cama tima. Ako želiš raditi na projektu, javi se na{' '}
+                <a className="font-bold underline" href="mailto:admin@duga.app">
+                  admin@duga.app
+                </a>
+                .
+              </p>
+            </div>
+
+            <div className="rounded-[2rem] bg-white/10 p-6">
+              <Image src={Girl} alt="Contributor ilustracija" className="w-full h-auto" />
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <footer className="bg-gray-900 px-5 py-8 text-white md:px-8">
+        <div className="container mx-auto">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <p className="text-center font-semibold">Duga © {new Date().getFullYear()}</p>
+            <div className="flex flex-col items-center gap-3 text-sm md:flex-row md:gap-6">
+              <Link to="/cookie-policy" className="text-white/80 underline hover:text-white">
                 Politika kolačića
               </Link>
-            </div>
-            <div>
-              <Link to="/privacy-policy" className="text-white underline">
+              <Link to="/privacy-policy" className="text-white/80 underline hover:text-white">
                 Politika privatnosti
               </Link>
-            </div>
-            <div>
-              <Link to="/terms-of-use" className="text-white underline">
+              <Link to="/terms-of-use" className="text-white/80 underline hover:text-white">
                 Uvjeti korištenja
               </Link>
             </div>
-          </div>
-          <div className="max-w-7xl mx-auto p-4 flex justify-center gap-2">
-            <p className="text-center">Duga © {new Date().getFullYear()}</p>
-            <p className="text-center">Sva prava pridržana.</p>
+            <p className="text-center text-sm text-white/60">Sva prava pridržana.</p>
           </div>
         </div>
       </footer>

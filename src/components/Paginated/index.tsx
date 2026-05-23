@@ -7,6 +7,7 @@ interface IPaginatedProps<T> {
   paginatedSingle: React.FC<{ singleEntry: T }>;
   gridClassName?: string;
   itemsPerPage?: number;
+  getItemKey?: (item: T) => string | number;
 }
 
 const Paginated = <T,>({
@@ -14,6 +15,7 @@ const Paginated = <T,>({
   paginatedSingle: PaginatedSingle,
   gridClassName,
   itemsPerPage = 8,
+  getItemKey,
 }: IPaginatedProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -39,7 +41,7 @@ const Paginated = <T,>({
     <div className="h-full">
       <ul className={gridClassName}>
         {currentPageData.map((item, index) => (
-          <li className="h-full xl:mb-4" key={index}>
+          <li className="h-full xl:mb-4" key={getItemKey ? getItemKey(item) : index}>
             <PaginatedSingle singleEntry={item} />
           </li>
         ))}

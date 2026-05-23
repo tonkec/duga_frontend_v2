@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import Button from '@app/components/Button';
 import { z } from 'zod';
@@ -8,7 +9,7 @@ import { IChat } from '@app/pages/NewChatPage/hooks';
 import { IUser } from '@app/components/UserCard';
 import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState, useRef, useEffect } from 'react';
+import { SyntheticEvent, useState, useRef, useEffect, useCallback } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '@app/components/EmojiPicker';
 import { debounce } from 'lodash';
@@ -97,7 +98,12 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
+  const queryClient = useQueryClient();
   const { user: currentUser } = useGetCurrentUser();
+
+  const refreshUserChatsList = () => {
+    queryClient.invalidateQueries({ queryKey: ['userChats'] });
+  };
   const currentUserId = currentUser?.data?.id;
   const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
@@ -108,6 +114,30 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const { allUserImages } = useGetAllUserImages();
 
+  const emitStopTyping = useCallback(() => {
+    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    socket.emit('stop-typing', {
+      chatId,
+      userId: currentUserId,
+      toUserId: [otherUserId],
+    });
+  }, [socket, currentUserId, otherUserId, chatId]);
+
+  const emitTyping = useCallback(() => {
+    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    socket.emit('typing', {
+      chatId,
+      userId: currentUserId,
+      toUserId: [otherUserId],
+    });
+  }, [socket, currentUserId, otherUserId, chatId]);
+
+  useEffect(() => {
+    return () => {
+      emitStopTyping();
+    };
+  }, [emitStopTyping]);
+
   const sendGif = (gifUrl: string) => {
     const msg = {
       type: 'gif',
@@ -117,7 +147,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       chatId,
       messagePhotoUrl: gifUrl,
     };
-    socket.emit('message', msg);
+    socket?.emit('message', msg);
+    refreshUserChatsList();
     setShowGiphySearch(false);
   };
 
@@ -148,7 +179,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const emitImageToSockets = () => {
     if (currentUploadableImage) {
       Array.from(currentUploadableImage).forEach((file: File) => {
-        socket.emit('message', {
+        socket?.emit('message', {
           type: 'file',
           fromUserId: currentUserId,
           fromUser: currentUser?.data,
@@ -158,6 +189,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           message: null,
         });
       });
+      refreshUserChatsList();
     }
 
     setCurrentUploadableImage(null);
@@ -171,7 +203,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     setImageTimestamp(String(Date.now()));
   };
 
-  const { uploadMessageImage } = useUploadMessageImage(emitImageToSockets, clearSelectedFiles);
+  const { uploadMessageImage, isUploadingMessageImage } = useUploadMessageImage(
+    emitImageToSockets,
+    clearSelectedFiles
+  );
 
   const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -215,7 +250,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     };
 
     if (isValid && toUserId?.length) {
-      socket.emit('message', msg);
+      socket?.emit('message', msg);
+      refreshUserChatsList();
     }
 
     reset();
@@ -243,7 +279,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   return (
     <div>
-      <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
+      <form onSubmit={onSubmit} className="flex items-center gap-2">
         <input
           name="avatars"
           type="file"
@@ -252,7 +288,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
           onChange={(e) => {
-            socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+            emitTyping();
             const files = e.target.files as FileList;
 
             if (!areValidImageTypes(files)) {
@@ -269,20 +305,25 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
             });
           }}
         />
-        <BiPaperclip
-          fontSize={20}
-          style={{
-            transform: 'rotate(90deg)',
-          }}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleIconClick}
-        />
+          disabled={isUploadingMessageImage}
+          aria-label="Priloži datoteku"
+        >
+          <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+        </button>
 
-        <BiSolidFileGif
-          fontSize={20}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => setShowGiphySearch(!showGiphySearch)}
-        />
+          disabled={isUploadingMessageImage}
+          aria-label="Odaberi GIF"
+        >
+          <BiSolidFileGif fontSize={20} />
+        </button>
 
         <Controller
           name="content"
@@ -305,9 +346,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
             return (
               <Input
-                className="py-[5px]"
+                className="!rounded-full !border-[#dce4ff] py-2.5"
                 type="text"
-                placeholder="Pošalji poruku. Iskoristi : za emojije!"
+                placeholder="Napiši poruku… ( : za emoji )"
                 {...field}
                 onChange={(e: SyntheticEvent) => {
                   const value = (e.target as HTMLInputElement).value;
@@ -315,8 +356,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   field.onChange(e);
                 }}
                 onFocus={() => {
-                  socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
-                  socket.emit('markAsRead', {
+                  emitTyping();
+                  socket?.emit('markAsRead', {
                     userId: currentUserId,
                     chatId: Number(chatId),
                   });
@@ -333,20 +374,23 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                     });
                   }
                 }}
-                onBlur={() => {
-                  socket.emit('stop-typing', {
-                    chatId,
-                    userId: currentUserId,
-                    toUserId: [otherUserId],
-                  });
-                }}
+                onBlur={emitStopTyping}
               />
             );
           }}
         />
 
-        <Button type="primary">
-          <BiSend fontSize={20} />
+        <Button
+          type="blue"
+          className="!rounded-full !p-2.5 shrink-0"
+          htmlType="submit"
+          disabled={isUploadingMessageImage}
+        >
+          {isUploadingMessageImage ? (
+            <span className="block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          ) : (
+            <BiSend fontSize={20} />
+          )}
         </Button>
       </form>
       <GiphySearch
@@ -370,13 +414,18 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <div className="flex items-end gap-2 flex-wrap">
           {currentUploadableImage.map((image: File) => {
             return (
-              <div key={image.name}>
+              <div key={image.name} className="relative">
                 <Image
                   src={URL.createObjectURL(image)}
                   alt={image.name}
                   style={{ width: 150, height: 150 }}
                   className="border mt-2"
                 />
+                {isUploadingMessageImage && (
+                  <div className="absolute inset-0 mt-2 flex items-center justify-center bg-black/50 text-sm font-semibold text-white">
+                    Slanje...
+                  </div>
+                )}
                 <Button
                   type="danger"
                   onClick={() => {
@@ -387,6 +436,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                     }
                   }}
                   className="mt-2"
+                  disabled={isUploadingMessageImage}
                 >
                   Makni sliku
                 </Button>

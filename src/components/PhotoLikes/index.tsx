@@ -43,6 +43,8 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   }, [allUploadUpvotes?.data, areUploadUpvotesLoading]);
 
   useEffect(() => {
+    if (!socket) return;
+
     const handleUpdate = (data: { uploadId: number; likes: ILike[] }) => {
       if (String(data.uploadId) === String(photoId)) {
         setAllLikes(data.likes);

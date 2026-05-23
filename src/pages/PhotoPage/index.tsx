@@ -10,7 +10,6 @@ import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import Image from '@app/components/Image';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import UserAvatar from '@app/components/UserAvatar';
-import Divider from '@app/components/Divider';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const PhotoPage = () => {
@@ -84,35 +83,44 @@ const PhotoPage = () => {
 
   return (
     <AppLayout>
-      <Card>
-        <div className="lg:flex gap-4 items-start">
-          <div className="flex-1">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <Card className="rounded-2xl p-4 md:p-5">
+          <div>
             {imageBlob ? (
               <>
-                <div>
-                  <Image src={URL.createObjectURL(imageBlob)} alt="Korisnikova slika" />
-                  <div className="flex justify-between mt-4">
+                <div className="overflow-hidden rounded-2xl bg-black">
+                  <Image
+                    src={URL.createObjectURL(imageBlob)}
+                    alt="Korisnikova slika"
+                    className="mx-auto max-h-[75vh] w-full object-contain"
+                  />
+                </div>
+
+                <div className="mt-4 rounded-2xl bg-[#f7f9ff] p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     {showAvatar()}
                     {singleImage?.data?.description && (
-                      <p className="py-2">{singleImage?.data.description}</p>
+                      <p className="text-gray-700 sm:text-right">{singleImage?.data.description}</p>
                     )}
                   </div>
-                </div>
-                <Divider className="my-4" height={1} />
-                <div className="flex justify-between items-center">
-                  <PhotoLikes photoId={photoId} />
+
+                  <div className="mt-3 flex items-center justify-between">
+                    <PhotoLikes photoId={photoId} />
+                  </div>
                 </div>
               </>
             ) : (
-              <p> Greška </p>
+              <div className="rounded-2xl bg-[#f7f9ff] p-8 text-center text-gray-600">
+                Fotografija se nije mogla učitati.
+              </div>
             )}
           </div>
+        </Card>
 
-          <div className="flex-1">
-            <PhotoComments />
-          </div>
-        </div>
-      </Card>
+        <Card className="self-start rounded-2xl p-4 md:p-5">
+          <PhotoComments />
+        </Card>
+      </div>
     </AppLayout>
   );
 };
