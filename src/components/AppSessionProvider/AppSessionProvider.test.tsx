@@ -45,7 +45,7 @@ const StatusProbe = () => {
   return <div data-testid="session-status">{status}</div>;
 };
 
-const renderAppSessionProvider = () => {
+const renderAppSessionProvider = ({ strictMode = false }: { strictMode?: boolean } = {}) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -54,13 +54,15 @@ const renderAppSessionProvider = () => {
     },
   });
 
-  return render(
+  const tree = (
     <QueryClientProvider client={queryClient}>
       <AppSessionProvider>
         <StatusProbe />
       </AppSessionProvider>
     </QueryClientProvider>
   );
+
+  return render(strictMode ? <React.StrictMode>{tree}</React.StrictMode> : tree);
 };
 
 describe('AppSessionProvider login/session start integration', () => {
@@ -98,6 +100,9 @@ describe('AppSessionProvider login/session start integration', () => {
     renderAppSessionProvider();
 
     await waitFor(() => expect(mockStartSession).toHaveBeenCalledTimes(1));
+    expect(mockStartSession.mock.invocationCallOrder[0]).toBeLessThan(
+      mockRegister.mock.invocationCallOrder[0]
+    );
     expect(mockRegister).toHaveBeenCalledWith(
       'auth0|login-session-user',
       'login-session@example.com',
@@ -105,6 +110,25 @@ describe('AppSessionProvider login/session start integration', () => {
       true
     );
     expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+  });
+
+  it('starts only one backend app session when React StrictMode replays effects', async () => {
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|strict-mode-user',
+          email: 'strict-mode@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider({ strictMode: true });
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(mockStartSession).toHaveBeenCalledTimes(1);
+    expect(mockRegister).toHaveBeenCalledTimes(1);
   });
 
   it('does not start a new session when the stored app session is revoked', async () => {
@@ -127,9 +151,36 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(mockStartSession).not.toHaveBeenCalled();
   });
 
+  it('marks the app session revoked when backend session startup conflicts', async () => {
+    mockStartSession.mockRejectedValue({
+      config: {
+        url: '/sessions/start',
+      },
+      response: {
+        status: 409,
+        data: {},
+      },
+    });
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|conflicting-user',
+          email: 'conflicting@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('revoked');
+    expect(sessionStorage.getItem(SESSION_REVOKED_KEY)).toBe('true');
+  });
+
   it('reports an error when backend session startup fails', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    mockRegister.mockRejectedValue(new Error('register failed'));
+    mockStartSession.mockRejectedValue(new Error('session failed'));
     mockUseAuth0.mockReturnValue(
       auth0State({
         isAuthenticated: true,
@@ -144,7 +195,7 @@ describe('AppSessionProvider login/session start integration', () => {
     renderAppSessionProvider();
 
     expect(await screen.findByTestId('session-status')).toHaveTextContent('error');
-    expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockRegister).not.toHaveBeenCalled();
     consoleErrorSpy.mockRestore();
   });
 });

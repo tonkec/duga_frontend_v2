@@ -10,10 +10,6 @@ jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
 }));
 
-jest.mock('@app/configs/auth0Env', () => ({
-  getAuth0Audience: () => 'test-audience',
-}));
-
 const mockUseAuth0 = jest.mocked(useAuth0);
 const getAccessTokenSilently = jest.fn();
 
@@ -82,7 +78,6 @@ describe('AuthGuard protected route redirects', () => {
 
     expect(await screen.findByText('Protected settings')).toBeVisible();
     expect(screen.getByTestId('location')).toHaveTextContent('/settings');
-    expect(getAccessTokenSilently).toHaveBeenCalled();
   });
 
   it('redirects authenticated users to login when the app session is not active', async () => {

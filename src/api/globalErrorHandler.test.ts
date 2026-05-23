@@ -35,6 +35,42 @@ describe('global API session conflict handling', () => {
     window.removeEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
   });
 
+  it('forces logout when session startup returns a conflict', () => {
+    const onSessionRevoked = jest.fn();
+    window.addEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
+    localStorage.setItem(SESSION_ID_KEY, 'conflicting-session-id');
+
+    handleGlobalApiError({
+      config: {
+        url: '/sessions/start',
+      },
+      response: {
+        status: 409,
+        data: {},
+      },
+    });
+
+    expect(sessionStorage.getItem(SESSION_REVOKED_KEY)).toBe('true');
+    expect(localStorage.getItem(SESSION_ID_KEY)).toBeNull();
+    expect(onSessionRevoked).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
+  });
+
+  it('does not force logout for unrelated conflict responses', () => {
+    handleGlobalApiError({
+      config: {
+        url: '/users/post-login',
+      },
+      response: {
+        status: 409,
+        data: {},
+      },
+    });
+
+    expect(sessionStorage.getItem(SESSION_REVOKED_KEY)).toBeNull();
+  });
+
   it('does not force logout when global handling is skipped', () => {
     document.cookie = 'token=active-token;path=/';
 

@@ -1,13 +1,15 @@
 import {
-  isSessionConflictCode,
+  isAppSessionConflictError,
   markSessionRevoked,
   SESSION_REVOKED_CODE,
   SESSION_CONFLICT_CODE,
 } from './appSession';
+import { clearTokenCookie } from './authToken';
 
 type ApiError = {
   config?: {
     skipGlobalErrorHandler?: boolean;
+    url?: string;
   };
   response?: {
     status?: number;
@@ -22,7 +24,7 @@ const ERROR_ROUTES = ['/broken', '/record-not-found', '/network-error'];
 
 /** Clears only the app API token cookie — never Auth0 session storage. */
 const clearAllAuthData = () => {
-  document.cookie = `token=;expires=${new Date(0).toUTCString()};path=/`;
+  clearTokenCookie();
 };
 
 export const handleGlobalApiError = (error: ApiError) => {
@@ -39,7 +41,7 @@ export const handleGlobalApiError = (error: ApiError) => {
     return;
   }
 
-  if (error.response?.status === 401 && isSessionConflictCode(error.response.data?.code)) {
+  if (isAppSessionConflictError(error)) {
     clearAllAuthData();
     markSessionRevoked();
     return;

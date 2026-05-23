@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
-import { useCookies } from 'react-cookie';
 import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
@@ -15,7 +14,6 @@ const Navigation = () => {
   const { width } = useWindowSize();
   const isMobile = width! < 768;
   const { logout } = useAuth0();
-  const [, setCookie] = useCookies(['token']);
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
 
@@ -33,7 +31,6 @@ const Navigation = () => {
     }
     clearAppSessionId();
     clearAppSessionRevoked();
-    setCookie('token', '');
     logout({
       logoutParams: {
         returnTo: window.location.origin,
