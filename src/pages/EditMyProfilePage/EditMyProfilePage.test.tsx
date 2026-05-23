@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import EditMyProfilePage from '.';
 import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
@@ -19,9 +19,11 @@ jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
 }));
 
+const updateUserMutation = jest.fn();
+
 jest.mock('./hooks', () => ({
   useUpdateUser: () => ({
-    updateUserMutation: jest.fn(),
+    updateUserMutation,
   }),
 }));
 
@@ -119,5 +121,69 @@ describe('EditMyProfilePage integration', () => {
       currentUser.languages
     );
     expect(screen.getByPlaceholderText('Za kraj još nešto o meni')).toHaveValue(currentUser.ending);
+  });
+
+  it('saves changed profile values through the update mutation', async () => {
+    renderEditPage();
+
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Korisničko ime')).toHaveValue(currentUser.username)
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Rod'), {
+      target: {
+        value: 'Trans žena',
+      },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Seksualnost'), {
+      target: {
+        value: 'Lezbijka',
+      },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Reci nešto o sebi jednom rečenicom'), {
+      target: {
+        value: 'Updated one-line bio',
+      },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Dan mi je ljepši ako...'), {
+      target: {
+        value: 'Updated day-maker answer',
+      },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Interesi (odvojeni zarezom)'), {
+      target: {
+        value: 'books, hiking',
+      },
+    });
+    fireEvent.click(screen.getByLabelText('Cigarete'));
+    fireEvent.click(screen.getByLabelText('Alkohol'));
+
+    expect(screen.getByPlaceholderText('Rod')).toHaveValue('Trans žena');
+    expect(screen.getByPlaceholderText('Seksualnost')).toHaveValue('Lezbijka');
+    expect(screen.getByPlaceholderText('Reci nešto o sebi jednom rečenicom')).toHaveValue(
+      'Updated one-line bio'
+    );
+    expect(screen.getByPlaceholderText('Dan mi je ljepši ako...')).toHaveValue(
+      'Updated day-maker answer'
+    );
+    expect(screen.getByPlaceholderText('Interesi (odvojeni zarezom)')).toHaveValue('books, hiking');
+    expect(screen.getByLabelText('Cigarete')).not.toBeChecked();
+    expect(screen.getByLabelText('Alkohol')).toBeChecked();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Spremi' }));
+
+    await waitFor(() =>
+      expect(updateUserMutation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          gender: 'Trans žena',
+          sexuality: 'Lezbijka',
+          bio: 'Updated one-line bio',
+          makesMyDay: 'Updated day-maker answer',
+          interests: 'books, hiking',
+          cigarettes: false,
+          alcohol: true,
+        })
+      )
+    );
   });
 });
