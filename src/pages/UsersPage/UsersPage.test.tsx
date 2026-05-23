@@ -48,12 +48,18 @@ const apiUser = ({
   isVerified = true,
   status = 'offline',
   updatedAt = '2026-05-23T08:00:00.000Z',
+  gender = 'Nebinarna osoba',
+  location = 'Zagreb',
+  sexuality = 'Queer',
 }: {
   id: number;
   username: string;
   isVerified?: boolean;
   status?: 'online' | 'offline';
   updatedAt?: string;
+  gender?: string;
+  location?: string;
+  sexuality?: string;
 }) => ({
   id,
   username,
@@ -65,10 +71,10 @@ const apiUser = ({
   lastName: '',
   firstName: '',
   bio: '',
-  gender: 'Nebinarna osoba',
-  location: 'Zagreb',
+  gender,
+  location,
   password: '',
-  sexuality: 'Queer',
+  sexuality,
   age: 30,
 });
 
@@ -190,5 +196,43 @@ describe('UsersPage dating flow integration', () => {
     renderUsersPage();
 
     expect(screen.getByRole('heading', { name: 'Nema korisnika 😢' })).toBeVisible();
+  });
+
+  it('updates visible users when filter and search change', () => {
+    mockUseGetAllUsers.mockReturnValue({
+      allUsers: {
+        data: [
+          apiUser({
+            id: 2,
+            username: 'alpha_match',
+          }),
+          apiUser({
+            id: 3,
+            username: 'beta_match',
+          }),
+        ],
+      },
+      allUsersError: null,
+      isAllUsersLoading: false,
+    } as ReturnType<typeof useGetAllUsers>);
+
+    renderUsersPage();
+
+    expect(screen.getByRole('heading', { name: 'alpha_match' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'beta_match' })).toBeVisible();
+
+    fireEvent.keyDown(screen.getByText('Odaberite kriterij'), {
+      key: 'ArrowDown',
+      code: 'ArrowDown',
+    });
+    fireEvent.click(screen.getByText('Ime'));
+    fireEvent.change(screen.getByPlaceholderText('Pretraži prema imenu...'), {
+      target: {
+        value: 'alpha',
+      },
+    });
+
+    expect(screen.getByRole('heading', { name: 'alpha_match' })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'beta_match' })).not.toBeInTheDocument();
   });
 });
