@@ -44,8 +44,10 @@ jest.mock('@app/pages/NewChatPage/hooks', () => ({
   }),
 }));
 
+let cookieState: Record<string, string | undefined> = { cookieAccepted: 'true' };
+
 jest.mock('react-cookie', () => ({
-  useCookies: () => [{ cookieAccepted: 'true' }],
+  useCookies: () => [cookieState],
 }));
 
 const mockUseGetAllUserChats = jest.mocked(useGetAllUserChats);
@@ -106,6 +108,7 @@ const renderNewChatPage = () =>
 describe('NewChatPage chat list integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    cookieState = { cookieAccepted: 'true' };
     mockUseGetCurrentUser.mockReturnValue({
       user: {
         data: {
@@ -163,5 +166,48 @@ describe('NewChatPage chat list integration', () => {
 
     expect(screen.getByRole('heading', { name: 'Nema razgovora' })).toBeVisible();
     expect(screen.getByText('Pronađi korisnike')).toBeVisible();
+  });
+
+  it('disables chat when cookies are rejected', () => {
+    cookieState = { cookieRejectedAt: '2026-05-23T12:00:00.000Z' };
+    mockUseGetAllUserChats.mockReturnValue({
+      userChats: {
+        data: [chat(10, 'cookie_blocked_friend', 'Can you read this?', '2026-05-23T07:00:00.000Z')],
+      },
+      userChatsError: null,
+      isUserChatsLoading: false,
+    } as ReturnType<typeof useGetAllUserChats>);
+
+    renderNewChatPage();
+
+    expect(
+      screen.getByText(
+        'Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da prihvatiš kolačiće u postavkama.'
+      )
+    ).toBeVisible();
+    expect(screen.queryByText('cookie_blocked_friend')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Nova poruka' })).not.toBeInTheDocument();
+  });
+
+  it('enables chat when cookies are accepted', () => {
+    cookieState = { cookieAccepted: 'true' };
+    mockUseGetAllUserChats.mockReturnValue({
+      userChats: {
+        data: [
+          chat(10, 'cookie_enabled_friend', 'Cookies are accepted', '2026-05-23T07:00:00.000Z'),
+        ],
+      },
+      userChatsError: null,
+      isUserChatsLoading: false,
+    } as ReturnType<typeof useGetAllUserChats>);
+
+    renderNewChatPage();
+
+    expect(screen.getByText('cookie_enabled_friend')).toBeVisible();
+    expect(screen.getByText('Cookies are accepted')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Nova poruka' })).toBeVisible();
+    expect(
+      screen.queryByText(/Nije moguće slati poruke jer si odbio_la kolačiće/)
+    ).not.toBeInTheDocument();
   });
 });
