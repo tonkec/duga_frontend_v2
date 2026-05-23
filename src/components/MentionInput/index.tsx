@@ -4,14 +4,15 @@ import { useGetUserByUsername } from './hooks';
 import { debounceScroll } from '@app/utils/debounceScroll';
 
 const usernameRegex = /@([\w\d]*)$/;
+type TaggedUser = { id: number; username: string };
 
 interface MentionInputProps {
   value: string;
   onChange: (text: string) => void;
-  onTagUsersChange?: (users: Array<{ id: number; username: string }>) => void;
+  onTagUsersChange?: (users: TaggedUser[]) => void;
   placeholder?: string;
   className?: string;
-  initialTaggedUsers?: Array<{ id: number; username: string }>;
+  initialTaggedUsers?: TaggedUser[];
 }
 
 const MentionInput = ({
@@ -25,8 +26,7 @@ const MentionInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [taggedUsers, setTaggedUsers] =
-    useState<Array<{ id: number; username: string }>>(initialTaggedUsers);
+  const [taggedUsers, setTaggedUsers] = useState<TaggedUser[]>(initialTaggedUsers);
   const [rawQuery, setRawQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ const MentionInput = ({
     }
   };
 
-  const handleSelect = (user: { id: number; username: string }) => {
+  const handleSelect = (user: TaggedUser) => {
     const match = value.match(usernameRegex);
     if (!match) return;
 
@@ -94,13 +94,17 @@ const MentionInput = ({
 
     const matchedUsernames = Array.from(newVal.matchAll(/@([^\s]*)/g))
       .map(([, username]) => username)
-      .filter((username) => userData?.data.users.some((u) => u.username === username))
+      .filter((username) =>
+        userData?.data.users.some((suggestedUser: IUser) => suggestedUser.username === username)
+      )
       .map((username) => {
-        const user = userData?.data.users.find((u) => u.username === username);
+        const user = userData?.data.users.find(
+          (suggestedUser: IUser) => suggestedUser.username === username
+        );
         if (!user) return undefined;
         return { id: user.id, username: user.username };
       })
-      .filter(Boolean);
+      .filter((matchedUser): matchedUser is TaggedUser => Boolean(matchedUser));
 
     if (!taggedUsers.some((u) => Number(u.id) === Number(user.id))) {
       // const updated = [...taggedUsers, user];
