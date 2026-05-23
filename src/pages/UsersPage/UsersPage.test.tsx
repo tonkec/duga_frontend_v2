@@ -174,6 +174,28 @@ describe('UsersPage dating flow integration', () => {
     expect(screen.getByRole('heading', { name: 'User profile' })).toBeVisible();
   });
 
+  it('opens a user profile when Pogledaj profil is clicked', () => {
+    mockUseGetAllUsers.mockReturnValue({
+      allUsers: {
+        data: [
+          apiUser({
+            id: 5,
+            username: 'button_profile_target',
+          }),
+        ],
+      },
+      allUsersError: null,
+      isAllUsersLoading: false,
+    } as ReturnType<typeof useGetAllUsers>);
+
+    renderUsersPage();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pogledaj profil' }));
+
+    expect(screen.getByTestId('location')).toHaveTextContent('/user/5');
+    expect(screen.getByRole('heading', { name: 'User profile' })).toBeVisible();
+  });
+
   it('shows an empty state when API users are not visible', () => {
     mockUseGetAllUsers.mockReturnValue({
       allUsers: {
