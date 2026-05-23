@@ -192,7 +192,7 @@ const EditMyProfilePage = () => {
         relationshipStatus: currentUser.data.relationshipStatus || '',
         cigarettes: currentUser.data.cigarettes || false,
         alcohol: currentUser.data.alcohol || false,
-        sport: currentUser.data.sports || false,
+        sport: currentUser.data.sport || currentUser.data.sports || false,
         favoriteDay: daysOfWeek.find(
           (option) => option.value === currentUser.data.favoriteDayOfWeek
         )?.value,
@@ -394,8 +394,11 @@ const EditMyProfilePage = () => {
                       <label className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-gray-800">
                         <input
                           type="checkbox"
-                          {...field}
-                          value={currentUser?.data.cigarettes || false}
+                          name={field.name}
+                          ref={field.ref}
+                          checked={Boolean(field.value)}
+                          onBlur={field.onBlur}
+                          onChange={(event) => field.onChange(event.target.checked)}
                         />
                         <span>Cigarete</span>
                       </label>
@@ -408,8 +411,11 @@ const EditMyProfilePage = () => {
                       <label className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-gray-800">
                         <input
                           type="checkbox"
-                          {...field}
-                          value={currentUser?.data.alcohol || false}
+                          name={field.name}
+                          ref={field.ref}
+                          checked={Boolean(field.value)}
+                          onBlur={field.onBlur}
+                          onChange={(event) => field.onChange(event.target.checked)}
                         />
                         <span>Alkohol</span>
                       </label>
@@ -422,8 +428,11 @@ const EditMyProfilePage = () => {
                       <label className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-gray-800">
                         <input
                           type="checkbox"
-                          {...field}
-                          value={currentUser?.data.sport || false}
+                          name={field.name}
+                          ref={field.ref}
+                          checked={Boolean(field.value)}
+                          onBlur={field.onBlur}
+                          onChange={(event) => field.onChange(event.target.checked)}
                         />
                         <span>Sport</span>
                       </label>
