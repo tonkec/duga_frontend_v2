@@ -190,4 +190,48 @@ describe('ChatPage integration', () => {
     expect(screen.getByRole('heading', { name: otherUser.username })).toBeVisible();
     expect(screen.getByText('Nema poruka u ovom razgovoru')).toBeVisible();
   });
+
+  it('renders a loading state while the chat is loading', () => {
+    mockUseGetCurrentChat.mockReturnValue({
+      currentChat: undefined,
+      currentChatError: null,
+      isCurrentChatLoading: true,
+      isCurrentChatSuccess: false,
+      isCurrentChatError: false,
+    } as ReturnType<typeof useGetCurrentChat>);
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: false,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    expect(screen.getByRole('status', { name: 'Učitavanje...' })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: otherUser.username })).not.toBeInTheDocument();
+  });
+
+  it('redirects to messages when the chat fails to load', async () => {
+    mockUseGetCurrentChat.mockReturnValue({
+      currentChat: undefined,
+      currentChatError: new Error('chat not found'),
+      isCurrentChatLoading: false,
+      isCurrentChatSuccess: false,
+      isCurrentChatError: true,
+    } as ReturnType<typeof useGetCurrentChat>);
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: false,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    expect(await screen.findByRole('heading', { name: 'Messages page' })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: otherUser.username })).not.toBeInTheDocument();
+  });
 });
