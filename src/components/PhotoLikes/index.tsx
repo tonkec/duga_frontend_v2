@@ -23,7 +23,7 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const [allLikes, setAllLikes] = useState<ILike[]>([]);
 
   const hasUserLiked = useMemo(() => {
-    return allLikes.some((like) => Number(like.userId) === Number(currentUser));
+    return allLikes.some((like) => Number(like.userId) === Number(currentUser?.data?.id));
   }, [allLikes, currentUser]);
 
   const onUpvote = () => {
@@ -43,6 +43,8 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   }, [allUploadUpvotes?.data, areUploadUpvotesLoading]);
 
   useEffect(() => {
+    if (!socket) return;
+
     const handleUpdate = (data: { uploadId: number; likes: ILike[] }) => {
       if (String(data.uploadId) === String(photoId)) {
         setAllLikes(data.likes);
@@ -63,9 +65,13 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   return (
     <div className="flex items-center gap-2 mt-2">
       {hasUserLiked ? (
-        <BiSolidHeart color="red" className="cursor-pointer" fontSize={30} onClick={onDownvote} />
+        <button type="button" aria-label="Ukloni lajk" onClick={onDownvote}>
+          <BiSolidHeart color="red" className="cursor-pointer" fontSize={30} />
+        </button>
       ) : (
-        <BiHeart color="red" className="cursor-pointer" fontSize={30} onClick={onUpvote} />
+        <button type="button" aria-label="Lajkaj fotografiju" onClick={onUpvote}>
+          <BiHeart color="red" className="cursor-pointer" fontSize={30} />
+        </button>
       )}
       <PhotoLikeDropdown likes={allLikes} />
     </div>

@@ -37,3 +37,10 @@ export const uploadMessagePhotos = async (data: FormData) => {
     },
   });
 };
+
+export const getProfilePhoto = async (userId: string) => {
+  const client = apiClient();
+  return client.get(`/uploads/profile-photo/${userId}`, {
+    skipGlobalErrorHandler: true,
+  });
+};

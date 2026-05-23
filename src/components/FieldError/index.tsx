@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BiError } from 'react-icons/bi';
 
 interface IFieldErrorProps {
-  message: string;
+  message?: string;
   className?: string;
   isSelfRemoving?: boolean;
 }
@@ -12,7 +12,7 @@ const defaultStyles =
 
 const disappearAfter = 4000;
 
-const FieldError = ({ message, className, isSelfRemoving }: IFieldErrorProps) => {
+const FieldError = ({ message = '', className, isSelfRemoving }: IFieldErrorProps) => {
   const [displayMessage, setDisplayMessage] = useState(message);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const FieldError = ({ message, className, isSelfRemoving }: IFieldErrorProps) =>
 
   return (
     <span className={`${defaultStyles} ${className}`}>
-      <span>{message}</span> <BiError fontSize={20} />
+      <span>{displayMessage}</span> <BiError fontSize={20} />
     </span>
   );
 };

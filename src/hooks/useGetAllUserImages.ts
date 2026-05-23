@@ -9,6 +9,8 @@ export const useGetAllUserImages = () => {
   } = useQuery({
     queryKey: ['uploads', 'user-photos'],
     queryFn: () => getAllUserPhotos(),
+    retry: false,
+    throwOnError: false,
   });
 
   return { allUserImages, allUserImagesError, allUserImagesLoading };

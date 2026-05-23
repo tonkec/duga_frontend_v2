@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { debounce } from 'lodash';
 import Input from '@app/components/Input';
 import { useGIFS } from './hooks';
+import Image from '@app/components/Image';
 
 interface GiphyResult {
   id: string;
@@ -78,11 +79,11 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
               onClick={() => handleGifSelect(gif.images.original.url)}
               className="relative group rounded overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all"
             >
-              <img
+              <Image
                 src={gif.images.fixed_height.url}
                 alt={gif.title}
                 className="w-full h-full object-cover"
-                loading="lazy"
+                loading
               />
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all" />
             </button>

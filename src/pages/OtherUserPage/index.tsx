@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
@@ -10,11 +10,22 @@ import Photos from '@app/components/Photos';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Loader from '@app/components/Loader';
 import SendMessageButton from '@app/components/SendMessageButton';
+import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
+import { IChat } from '@app/pages/NewChatPage/hooks';
+
+const getChatWithUser = (userChats: IChat[] | undefined, userId: string | undefined) => {
+  if (!userId) return undefined;
+
+  return userChats?.find((chat) => chat.Users[0]?.id === Number(userId));
+};
 
 const OtherUserPage = () => {
+  const navigate = useNavigate();
   const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
+  const { userChats } = useGetAllUserChats();
+  const existingChat = getChatWithUser(userChats?.data, userId);
 
   if (!userId || isNaN(Number(userId))) {
     return (
@@ -69,22 +80,24 @@ const OtherUserPage = () => {
               <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
                 <SendMessageButton
                   sendMessageToId={userId as string}
-                  buttonType="blue-dark"
+                  buttonType="blue"
                   buttonClasses="w-full"
+                  hasChatWithUser={Boolean(existingChat)}
+                  existingChatId={existingChat?.id}
                 />
               </Cta>
               <Cta
                 className="mt-4"
-                buttonText="Zaprati"
-                subtitle="Zaprati ovu zanimljivu osobicu."
-                title="Zaprati me!"
-                onClick={() => {}}
+                buttonText="Prijavi problem"
+                subtitle="Ako primijetiš bilo kakav problem s ovim profilom, slobodno ga prijavi putem forme."
+                title="Postoji li problem?"
+                onClick={() => navigate(`/report/`)}
               />
             </div>
           </div>
         </TabPanel>
         <TabPanel>
-          <Card>
+          <Card className="p-6 rounded">
             <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
           </Card>
         </TabPanel>

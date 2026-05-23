@@ -7,7 +7,7 @@ interface DeletePhotoParams {
   url: string;
 }
 
-export const useDeletePhoto = (id: string) => {
+export const useDeletePhoto = (queryKey: string[] = ['uploads']) => {
   const queryClient = useQueryClient();
   const {
     mutate: deletePhoto,
@@ -18,9 +18,7 @@ export const useDeletePhoto = (id: string) => {
     mutationFn: (params: DeletePhotoParams) => deleteImage(params.url),
     onSuccess: () => {
       toast.success('Fotografija uspješno obrisana.', toastConfig);
-      queryClient.invalidateQueries({
-        queryKey: ['uploads', 'avatar', id],
-      });
+      queryClient.invalidateQueries({ queryKey });
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);

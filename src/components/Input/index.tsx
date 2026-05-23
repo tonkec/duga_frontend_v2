@@ -14,6 +14,7 @@ interface InputProps {
   name?: string;
   error?: string;
   label?: string | React.ReactNode;
+  disabled?: boolean;
 }
 
 const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded px-4 block w-full appearance-none leading-normal focus:border-blue`;
@@ -33,6 +34,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       name,
       error,
       label,
+      disabled,
       ...props
     },
     ref
@@ -43,7 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           {...props}
           ref={ref}
-          className={`${inputStyles} ${className} pl-10`}
+          className={`${inputStyles} ${className} ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -52,6 +54,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           onFocus={onFocus}
           onBlur={onBlur}
           name={name}
+          disabled={disabled}
         />
         {icon && <span className="absolute left-3 top-[8px]">{icon}</span>}
         {error && <span className="text-red text-xs inline-block mb-4">{error}</span>}
@@ -62,7 +65,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           {...props}
           ref={ref}
-          className={`${inputStyles} ${className} py-[5px]`}
+          className={`${inputStyles} ${className} ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -71,6 +74,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           onFocus={onFocus}
           onBlur={onBlur}
           name={name}
+          disabled={disabled}
         />
         {error && <span className="text-red text-xs inline-block mb-2">{error}</span>}
       </>

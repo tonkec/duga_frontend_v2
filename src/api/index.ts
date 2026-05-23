@@ -1,10 +1,18 @@
-import axios from 'axios';
-import { getErrorMessage } from '@app/utils/getErrorMessage';
+import axios, { AxiosInstance } from 'axios';
+import { resolveAccessToken } from './authToken';
+import { getAppSessionId, SESSION_HEADER } from './appSession';
+import { handleGlobalApiError } from './globalErrorHandler';
 
-const getCookie = (name: string) => {
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipGlobalErrorHandler?: boolean;
+  }
+}
+
+export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
-  for (let i = 0; i < cookies.length; i++) {
-    const [key, value] = cookies[i].split('=');
+  for (const cookie of cookies) {
+    const [key, value] = cookie.split('=');
     if (key === name) {
       return decodeURIComponent(value);
     }
@@ -12,45 +20,46 @@ const getCookie = (name: string) => {
   return null;
 };
 
-const apiClient = (isAuth?: boolean) => {
-  const defaultOptions = {
+/**
+ * Creates an Axios instance with optional auth token support.
+ *
+ * @param token Optional access token (e.g., from Auth0).
+ */
+export const apiClient = (token?: string): AxiosInstance => {
+  const instance = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: {
       'Content-Type': 'application/json',
     },
-  };
-
-  const instance = axios.create(defaultOptions);
-  instance.interceptors.request.use(function (config) {
-    if (isAuth) return config;
-    const token = getCookie('token');
-    const isLoggedIn = !!token;
-
-    if (!isLoggedIn) {
-      return Promise.reject({
-        response: {
-          status: 401,
-          data: { message: 'Not authenticated: token missing' },
-        },
-      });
-    }
-
-    config.headers.Authorization = isLoggedIn ? `Bearer ${token}` : '';
-    return config;
+    validateStatus: (s) => s >= 200 && s < 300,
   });
 
+  instance.interceptors.request.use(
+    async (config) => {
+      const authToken = await resolveAccessToken(token);
+
+      if (!authToken) {
+        return Promise.reject({
+          response: {
+            status: 401,
+            data: { message: 'Not authenticated: token missing' },
+          },
+        });
+      }
+
+      config.headers.Authorization = `Bearer ${authToken}`;
+      config.headers[SESSION_HEADER] = getAppSessionId();
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      const errorMessage = getErrorMessage(error);
-      if (errorMessage) {
-        console.error('API Error:', errorMessage);
-      }
+      handleGlobalApiError(error);
       return Promise.reject(error);
     }
   );
 
   return instance;
 };
-
-export { apiClient };

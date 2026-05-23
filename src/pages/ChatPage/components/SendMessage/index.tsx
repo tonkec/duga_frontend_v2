@@ -1,15 +1,15 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import Button from '@app/components/Button';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FieldError from '@app/components/FieldError';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
 import { IUser } from '@app/components/UserCard';
 import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState, useRef, useEffect } from 'react';
+import { SyntheticEvent, useState, useRef, useEffect, useCallback } from 'react';
 import { init, SearchIndex } from 'emoji-mart';
 import EmojiPicker from '@app/components/EmojiPicker';
 import { debounce } from 'lodash';
@@ -24,6 +24,8 @@ import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts'
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
+import Image from '@app/components/Image';
 
 type Inputs = {
   content: string;
@@ -96,9 +98,14 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentEmojis, setCurrentEmojis] = useState([]);
   const socket = useSocket();
-  const [currentUserId] = useLocalStorage('userId');
-  const { userChats } = useGetAllUserChats();
+  const queryClient = useQueryClient();
   const { user: currentUser } = useGetCurrentUser();
+
+  const refreshUserChatsList = () => {
+    queryClient.invalidateQueries({ queryKey: ['userChats'] });
+  };
+  const currentUserId = currentUser?.data?.id;
+  const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
@@ -106,6 +113,30 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { allNotifications } = useGetAllNotifcations();
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const { allUserImages } = useGetAllUserImages();
+
+  const emitStopTyping = useCallback(() => {
+    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    socket.emit('stop-typing', {
+      chatId,
+      userId: currentUserId,
+      toUserId: [otherUserId],
+    });
+  }, [socket, currentUserId, otherUserId, chatId]);
+
+  const emitTyping = useCallback(() => {
+    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    socket.emit('typing', {
+      chatId,
+      userId: currentUserId,
+      toUserId: [otherUserId],
+    });
+  }, [socket, currentUserId, otherUserId, chatId]);
+
+  useEffect(() => {
+    return () => {
+      emitStopTyping();
+    };
+  }, [emitStopTyping]);
 
   const sendGif = (gifUrl: string) => {
     const msg = {
@@ -116,13 +147,14 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       chatId,
       messagePhotoUrl: gifUrl,
     };
-    socket.emit('message', msg);
+    socket?.emit('message', msg);
+    refreshUserChatsList();
     setShowGiphySearch(false);
   };
 
   const {
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     reset,
     control,
     setValue,
@@ -147,7 +179,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const emitImageToSockets = () => {
     if (currentUploadableImage) {
       Array.from(currentUploadableImage).forEach((file: File) => {
-        socket.emit('message', {
+        socket?.emit('message', {
           type: 'file',
           fromUserId: currentUserId,
           fromUser: currentUser?.data,
@@ -157,49 +189,71 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           message: null,
         });
       });
+      refreshUserChatsList();
     }
+
+    setCurrentUploadableImage(null);
+    reset({ content: '', files: null });
   };
 
-  const { uploadMessageImage } = useUploadMessageImage();
+  const clearSelectedFiles = () => {
+    setCurrentUploadableImage(null);
+    setValue('files', null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setImageTimestamp(String(Date.now()));
+  };
+
+  const { uploadMessageImage, isUploadingMessageImage } = useUploadMessageImage(
+    emitImageToSockets,
+    clearSelectedFiles
+  );
 
   const onImageSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
 
+    if (!currentUploadableImage?.length) return;
+
     const files = (e.target as HTMLFormElement).avatars.files as FileList;
-    const formData = new FormData();
-
-    formData.append('chatId', chatId);
-    formData.append('fromUserId', currentUserId as string);
-    formData.append('timestamp', imageTimestamp);
-    Array.from(files).forEach((file: File) => {
-      formData.append('avatars', file);
-    });
-
     if (!files || files.length === 0) return;
 
-    if (!!files.length && files.length + allUserImages?.data?.length > MAXIMUM_NUMBER_OF_IMAGES) {
+    if (files.length + (allUserImages?.data?.length || 0) > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
       return;
     }
 
-    emitImageToSockets();
+    const formData = new FormData();
+    formData.append('chatId', chatId);
+    formData.append('fromUserId', currentUserId as string);
+    formData.append('timestamp', imageTimestamp);
+
+    Array.from(files).forEach((file: File) => {
+      const cleanedName = removeSpacesAndDashes(file.name.toLowerCase().trim());
+      const cleanedFile = new File([file], cleanedName, { type: file.type });
+      formData.append('avatars', cleanedFile);
+    });
+
     uploadMessageImage(formData);
-    setCurrentUploadableImage(null);
-    reset();
   };
 
   const onMessageSubmit = (data: Inputs) => {
+    const toUserId = chat.Users?.filter(
+      (user: IUser) => !!user?.id && user.id !== Number(currentUserId)
+    ).map((user: IUser) => user.id);
+
     const msg = {
       type: 'text',
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
-      toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+      toUserId,
       chatId,
       message: data.content,
     };
-    if (isValid) {
-      socket.emit('message', msg);
+
+    if (toUserId?.length) {
+      socket?.emit('message', msg);
+      refreshUserChatsList();
     }
+
     reset();
   };
 
@@ -219,9 +273,13 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     setImageTimestamp(String(timestamp));
   }, []);
 
+  if (!currentUserId || !chat) {
+    return null;
+  }
+
   return (
     <div>
-      <form onSubmit={onSubmit} className="flex-1 flex items-center gap-1">
+      <form onSubmit={onSubmit} className="flex items-center gap-2">
         <input
           name="avatars"
           type="file"
@@ -230,7 +288,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
           onChange={(e) => {
-            socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
+            emitTyping();
             const files = e.target.files as FileList;
 
             if (!areValidImageTypes(files)) {
@@ -247,20 +305,25 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
             });
           }}
         />
-        <BiPaperclip
-          fontSize={20}
-          style={{
-            transform: 'rotate(90deg)',
-          }}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleIconClick}
-        />
+          disabled={isUploadingMessageImage}
+          aria-label="Priloži datoteku"
+        >
+          <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+        </button>
 
-        <BiSolidFileGif
-          fontSize={20}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => setShowGiphySearch(!showGiphySearch)}
-        />
+          disabled={isUploadingMessageImage}
+          aria-label="Odaberi GIF"
+        >
+          <BiSolidFileGif fontSize={20} />
+        </button>
 
         <Controller
           name="content"
@@ -283,8 +346,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
             return (
               <Input
+                className="!rounded-full !border-[#dce4ff] py-2.5"
                 type="text"
-                placeholder="Pošalji poruku. Iskoristi : za emojije!"
+                placeholder="Napiši poruku… ( : za emoji )"
                 {...field}
                 onChange={(e: SyntheticEvent) => {
                   const value = (e.target as HTMLInputElement).value;
@@ -292,8 +356,8 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   field.onChange(e);
                 }}
                 onFocus={() => {
-                  socket.emit('typing', { chatId, userId: currentUserId, toUserId: [otherUserId] });
-                  socket.emit('markAsRead', {
+                  emitTyping();
+                  socket?.emit('markAsRead', {
                     userId: currentUserId,
                     chatId: Number(chatId),
                   });
@@ -310,20 +374,23 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                     });
                   }
                 }}
-                onBlur={() => {
-                  socket.emit('stop-typing', {
-                    chatId,
-                    userId: currentUserId,
-                    toUserId: [otherUserId],
-                  });
-                }}
+                onBlur={emitStopTyping}
               />
             );
           }}
         />
 
-        <Button type="primary">
-          <BiSend fontSize={20} />
+        <Button
+          type="blue"
+          className="!rounded-full !p-2.5 shrink-0"
+          htmlType="submit"
+          disabled={isUploadingMessageImage}
+        >
+          {isUploadingMessageImage ? (
+            <span className="block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          ) : (
+            <BiSend fontSize={20} />
+          )}
         </Button>
       </form>
       <GiphySearch
@@ -347,15 +414,18 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <div className="flex items-end gap-2 flex-wrap">
           {currentUploadableImage.map((image: File) => {
             return (
-              <div key={image.name}>
-                <img
-                  key={image.name}
+              <div key={image.name} className="relative">
+                <Image
                   src={URL.createObjectURL(image)}
                   alt={image.name}
-                  width={150}
-                  height={150}
+                  style={{ width: 150, height: 150 }}
                   className="border mt-2"
                 />
+                {isUploadingMessageImage && (
+                  <div className="absolute inset-0 mt-2 flex items-center justify-center bg-black/50 text-sm font-semibold text-white">
+                    Slanje...
+                  </div>
+                )}
                 <Button
                   type="danger"
                   onClick={() => {
@@ -366,6 +436,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                     }
                   }}
                   className="mt-2"
+                  disabled={isUploadingMessageImage}
                 >
                   Makni sliku
                 </Button>

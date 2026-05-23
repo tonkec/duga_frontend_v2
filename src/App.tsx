@@ -1,73 +1,21 @@
 import './App.css';
 import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
-import UserFilters from './components/UserFilters';
-import { useEffect, useRef, useState } from 'react';
-import Paginated from './components/Paginated';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
 import { useNavigate } from 'react-router';
 import Loader from './components/Loader';
-import { useGetWindowSize } from './hooks/useGetWindowSize';
-import SendMessageButton from './components/SendMessageButton';
 import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
-import LatestMessages from './components/LatestMessages';
-import LatestComments from './components/LatestComments';
-import { useCreateUser } from './pages/Login/hooks';
-import { useAuth0 } from '@auth0/auth0-react';
-import { useGetAllUserChats } from './hooks/useGetAllUserChats';
-import { IChat } from '@app/pages/NewChatPage/hooks';
-import { z } from 'zod';
-import { useGetCurrentUser } from './hooks/useGetCurrentUser';
-
-const createUserSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(1),
-  isVerified: z.boolean(),
-  auth0Id: z.string().min(1),
-});
-
-const DEFAULT_USERNAME = 'Korisnik';
+import { useEnsureBackendUser } from './hooks/useEnsureBackendUser';
+import Button from './components/Button';
+import { getLastOnlineUsers, getVisibleVerifiedUsers } from './utils/userDirectory';
 
 function App() {
-  const hasBeenCalled = useRef(false);
-  const { createOrLoginUser } = useCreateUser();
-  const { user: auth0User } = useAuth0();
-  const windowSize = useGetWindowSize();
+  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
   const navigate = useNavigate();
-  const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
-  const [search, setSearch] = useState('');
 
-  const [selectValue, setSelectValue] = useState({
-    value: 'username',
-    label: 'ime',
-  });
-
-  const { userChats, isUserChatsLoading } = useGetAllUserChats();
-
-  useEffect(() => {
-    if (!auth0User || hasBeenCalled.current) return;
-
-    const input = {
-      email: auth0User.email,
-      username: DEFAULT_USERNAME.toLowerCase(),
-      isVerified: auth0User.email_verified,
-      auth0Id: auth0User.sub,
-    };
-
-    const parsed = createUserSchema.safeParse(input);
-    if (!parsed.success) {
-      console.error('❌ Invalid user input', parsed.error.flatten());
-      return;
-    }
-
-    createOrLoginUser(parsed.data);
-    // This prevents calling createOrLoginUser twice
-    hasBeenCalled.current = true;
-  }, [auth0User, createOrLoginUser]);
-
-  if (isAllUsersLoading || isUserLoading || isUserChatsLoading) {
+  if (isAllUsersLoading || isUserLoading) {
     return (
       <AppLayout>
         <Loader />
@@ -75,87 +23,42 @@ function App() {
     );
   }
 
-  const allUsersWithoutCurrentUser = allUsers?.data?.filter(
-    (user: IUser) => user.id !== currentUser?.data.id
-  );
-
-  const allVerifiedUsers = allUsersWithoutCurrentUser?.filter((user: IUser) => user.isVerified);
-
-  const filteredUsers = allVerifiedUsers?.filter((user: IUser) => {
-    if (selectValue.value === 'username') {
-      return user?.username?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectValue.value === 'gender') {
-      return user?.gender?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectValue.value === 'sexuality') {
-      return user?.sexuality?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectValue.value === 'location') {
-      return user?.location?.toLowerCase().includes(search.toLowerCase());
-    }
-
-    return false;
-  });
-
-  const renderedUsers = search ? filteredUsers : allUsersWithoutCurrentUser;
-  const itemsPerPage = windowSize.width < 1024 ? 2 : 4;
+  const visibleUsers = getVisibleVerifiedUsers(allUsers?.data, currentUser?.id);
+  const lastOnlineUsers = getLastOnlineUsers(visibleUsers, 4);
 
   return (
     <AppLayout>
-      <UserFilters
-        selectValue={selectValue}
-        setSelectValue={setSelectValue}
-        search={search}
-        setSearch={setSearch}
-      />
+      <section>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">
+              Zadnja aktivnost
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-gray-900">Zadnji online korisnici</h2>
+          </div>
+          <Button type="transparent" onClick={() => navigate('/users')}>
+            Pogledaj sve korisnike
+          </Button>
+        </div>
 
-      <div className="mt-12">
-        {!renderedUsers?.length && (
+        {!lastOnlineUsers.length && (
           <div className="text-center text-lg max-w-md mx-auto mt-12">
             <h2 className="mb-4">Nema korisnika 😢</h2>
           </div>
         )}
 
-        <Paginated<IUser>
-          gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-          data={renderedUsers}
-          itemsPerPage={itemsPerPage}
-          paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => {
-            const hasChatWithUser = userChats?.data?.some(
-              (chat: IChat) =>
-                chat.Users?.some((user) => user.id === Number(singleEntry.id)) &&
-                chat.Messages?.length > 0
-            );
-
-            return (
+        <ul className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {lastOnlineUsers.map((user: IUser) => (
+            <li className="h-full" key={user.id}>
               <UserCard
-                user={singleEntry}
-                onButtonClick={() => {
-                  navigate(`/user/${singleEntry.id}`);
-                }}
-                buttonText="Pogledaj profil 👀"
-                secondButton={
-                  <SendMessageButton
-                    sendMessageToId={singleEntry.id}
-                    buttonType="blue"
-                    disabled={hasChatWithUser}
-                  />
-                }
-                isOnline={singleEntry.status === 'online'}
+                user={user}
+                onButtonClick={() => navigate(`/user/${user.id}`)}
+                isOnline={user.status === 'online'}
               />
-            );
-          }}
-        />
-      </div>
-
-      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-        <LatestComments />
-        <LatestMessages />
-      </div>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <LatestUploads />
 

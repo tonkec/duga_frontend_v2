@@ -2,8 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { uploadPhotos } from '@app/api/uploads';
+import { AxiosError } from 'axios';
+import { BackendError } from '@app/pages/ChatPage/components/SendMessage/hooks';
 
-export const useUploadPhotos = (id: string) => {
+export const useUploadPhotos = () => {
   const queryClient = useQueryClient();
   const {
     mutate: onUploadPhotos,
@@ -15,12 +17,12 @@ export const useUploadPhotos = (id: string) => {
     onSuccess: () => {
       toast.success('Fotografije uspješno spremljene', toastConfig);
       queryClient.invalidateQueries({
-        queryKey: ['uploads', 'avatar', id],
+        queryKey: ['uploads'],
       });
     },
-    onError: (error) => {
-      console.error(error);
-      toast.error('Došlo je do greške.', toastConfig);
+    onError: (error: AxiosError<BackendError>) => {
+      const errors = error?.response?.data?.errors;
+      toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);
     },
   });
 

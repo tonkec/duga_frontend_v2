@@ -3,12 +3,16 @@ import { IUser } from '@app/components/UserCard';
 import { useGetUserByUsername } from './hooks';
 import { debounceScroll } from '@app/utils/debounceScroll';
 
+const usernameRegex = /@([\w\d]*)$/;
+type TaggedUser = { id: number; username: string };
+
 interface MentionInputProps {
   value: string;
   onChange: (text: string) => void;
-  onTagUsersChange?: (users: IUser[]) => void;
+  onTagUsersChange?: (users: TaggedUser[]) => void;
   placeholder?: string;
   className?: string;
+  initialTaggedUsers?: TaggedUser[];
 }
 
 const MentionInput = ({
@@ -17,10 +21,12 @@ const MentionInput = ({
   onTagUsersChange,
   placeholder = 'Napiši komentar...',
   className = '',
+  initialTaggedUsers = [],
 }: MentionInputProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
+  const [taggedUsers, setTaggedUsers] = useState<TaggedUser[]>(initialTaggedUsers);
   const [rawQuery, setRawQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,26 +64,51 @@ const MentionInput = ({
     const val = e.target.value;
     onChange(val);
 
-    const match = val.match(/@(\w*)$/);
+    const match = val.match(usernameRegex);
     if (match) {
-      const query = match[1].toLowerCase();
+      const query = match[1].toLowerCase().trim();
       setRawQuery(query);
       setShowSuggestions(true);
     } else {
+      setRawQuery('');
       setShowSuggestions(false);
     }
   };
 
-  const handleSelect = (user: IUser) => {
-    const match = value.match(/@(\w*)$/);
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const match = val.match(usernameRegex);
+
+    if (match) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleSelect = (user: TaggedUser) => {
+    const match = value.match(usernameRegex);
     if (!match) return;
 
     const before = value.slice(0, match.index);
     const newVal = `${before}@${user.username} `;
     onChange(newVal);
 
-    if (!taggedUsers.some((u) => u.id === user.id)) {
-      const updated = [...taggedUsers, user];
+    const matchedUsernames = Array.from(newVal.matchAll(/@([^\s]*)/g))
+      .map(([, username]) => username)
+      .filter((username) =>
+        userData?.data.users.some((suggestedUser: IUser) => suggestedUser.username === username)
+      )
+      .map((username) => {
+        const user = userData?.data.users.find(
+          (suggestedUser: IUser) => suggestedUser.username === username
+        );
+        if (!user) return undefined;
+        return { id: user.id, username: user.username };
+      })
+      .filter((matchedUser): matchedUser is TaggedUser => Boolean(matchedUser));
+
+    if (!taggedUsers.some((u) => Number(u.id) === Number(user.id))) {
+      // const updated = [...taggedUsers, user];
+      const updated = matchedUsernames;
       setTaggedUsers(updated);
       onTagUsersChange?.(updated);
     }
@@ -87,9 +118,11 @@ const MentionInput = ({
   return (
     <div className={`relative w-full ${className}`} ref={containerRef}>
       <input
+        ref={inputRef}
         type="text"
         value={value}
         onChange={handleInputChange}
+        onFocus={handleFocus}
         className="w-full p-2 border border-gray-300 rounded"
         placeholder={placeholder}
       />
@@ -99,7 +132,7 @@ const MentionInput = ({
           {suggestions.map((user) => (
             <li
               key={user.id}
-              onClick={() => handleSelect(user)}
+              onClick={() => handleSelect({ id: user.id, username: user.username })}
               className="p-2 hover:bg-gray-100 cursor-pointer"
             >
               @{user.username}

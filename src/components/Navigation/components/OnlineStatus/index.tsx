@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useUserOnlineStatus } from '@app/context/OnlineStatus/hooks';
 
 import { useSocket } from '@app/context/useSocket';
+import { toast } from 'react-toastify';
 
 const StatusDropdown = () => {
   const socket = useSocket();
@@ -22,8 +23,14 @@ const StatusDropdown = () => {
       throw new Error(`Unexpected status "${newStatus}"`);
     }
 
+    if (!socket?.connected) {
+      toast.error('Nije uspjelo spremanje statusa');
+      return;
+    }
+
     setStatus(newStatus);
     socket.emit('set-status', { status: newStatus });
+    toast.success(`Status je uspješno promijenjen na ${newStatus}`);
   };
 
   if (isLoading) return null;

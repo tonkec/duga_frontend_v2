@@ -1,9 +1,11 @@
-import { useMutation, useQuery, useInfiniteQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { getChatMessages } from '@app/api/chatMessages';
 import { deleteCurrentChat, getCurrentChat } from '@app/api/chats';
 import { toastConfig } from '@app/configs/toast.config';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
+import { Socket } from 'socket.io-client';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
 
 export const useGetAllMessages = (chatId: string) => {
   const {
@@ -24,6 +26,8 @@ export const useGetAllMessages = (chatId: string) => {
       return null;
     },
     enabled: !!chatId,
+    retry: false,
+    throwOnError: false,
   });
 
   return {
@@ -41,17 +45,28 @@ export const useGetCurrentChat = (chatId: string) => {
     error: currentChatError,
     isPending: isCurrentChatLoading,
     isSuccess: isCurrentChatSuccess,
+    isError: isCurrentChatError,
   } = useQuery({
     queryKey: ['chat', chatId],
     queryFn: () => getCurrentChat(chatId),
     enabled: !!chatId,
+    retry: false,
+    throwOnError: false,
   });
 
-  return { currentChat, currentChatError, isCurrentChatLoading, isCurrentChatSuccess };
+  return {
+    currentChat,
+    currentChatError,
+    isCurrentChatLoading,
+    isCurrentChatSuccess,
+    isCurrentChatError,
+  };
 };
 
-export const useDeleteCurrentChat = () => {
+export const useDeleteCurrentChat = (socket: Socket<DefaultEventsMap, DefaultEventsMap> | null) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const {
     mutate: deleteChat,
     isPending: isDeletingChat,
@@ -59,9 +74,13 @@ export const useDeleteCurrentChat = () => {
     isSuccess: isDeleteChatSuccess,
   } = useMutation({
     mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
-    onSuccess: () => {
-      toast.success('Chat izbrisan!', toastConfig);
-      navigate('/new-chat');
+    onSuccess: (_data, { chatId: deletedChatId }) => {
+      socket?.emit('deleteChat', { chatId: deletedChatId });
+      queryClient.removeQueries({ queryKey: ['chat', deletedChatId] });
+      queryClient.removeQueries({ queryKey: ['messages', deletedChatId] });
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+      toast.success('Razgovor obrisan.', toastConfig);
+      navigate('/new-chat', { replace: true });
     },
     onError: () => {
       toast.error('Greška! Probaj opet.', toastConfig);

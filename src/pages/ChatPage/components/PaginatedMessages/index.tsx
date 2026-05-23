@@ -5,19 +5,19 @@ import { debounceScroll } from '@app/utils/debounceScroll';
 import { useGetAllMessages } from '@app/pages/ChatPage/hooks';
 
 const PaginatedMessages = ({
-  otherUserProfilePhoto,
-  currentUserProfilePhoto,
   otherUserName,
   currentUserName,
   otherUserId,
   receivedMessages,
+  currentUserId,
+  isCurrentUserLoading,
 }: {
-  otherUserProfilePhoto: string;
-  currentUserProfilePhoto: string;
   otherUserName: string;
   currentUserName: string;
   otherUserId: number | undefined;
   receivedMessages: IMessage[];
+  currentUserId: number;
+  isCurrentUserLoading: boolean;
 }) => {
   const { chatId } = useParams();
   const { messages, fetchNextPage } = useGetAllMessages(chatId!);
@@ -47,29 +47,52 @@ const PaginatedMessages = ({
     }
   }, [messages.length, receivedMessages.length]);
 
+  if (!messages.length && !receivedMessages.length) {
+    return (
+      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+        <p className="text-center text-sm text-gray-500">Nema poruka u ovom razgovoru</p>
+      </div>
+    );
+  }
+
+  if (!chatId) {
+    return null;
+  }
+
+  if (currentUserId == null) {
+    return (
+      <div className="flex min-h-[280px] flex-1 items-center justify-center">
+        <p className="text-sm text-gray-500">Učitavanje poruka...</p>
+      </div>
+    );
+  }
+
+  const getSenderId = (msg: IMessage) => Number(msg.fromUserId ?? msg.User?.id);
+
   return (
     <div
       ref={containerRef}
       onScroll={debounceScroll(() => {
         fetchNextPage();
       }, 500)}
-      className="overflow-auto h-[calc(100vh-435px)]"
+      className="flex min-h-[min(420px,calc(100vh-22rem))] max-h-[min(560px,calc(100vh-18rem))] flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
     >
       {sortedMessages.map((message, index) => {
         const previousMessage = sortedMessages[index - 1];
-        const showAvatar = !previousMessage || previousMessage.User.id !== message.User.id;
+        const showAvatar =
+          !previousMessage || getSenderId(previousMessage) !== getSenderId(message);
 
         return (
           <Message
             otherUserName={otherUserName}
             currentUserName={currentUserName}
-            currentUserProfilePhoto={currentUserProfilePhoto}
-            otherUserProfilePhoto={otherUserProfilePhoto}
-            key={message.id}
+            currentUserId={currentUserId}
+            key={message.id ?? `${message.createdAt}-${index}`}
             message={message}
             otherUserId={otherUserId}
-            messagePhotoUrl={message.messagePhotoUrl}
+            messagePhotoUrl={message.securePhotoUrl || message.messagePhotoUrl}
             showAvatar={showAvatar}
+            isCurrentUserLoading={isCurrentUserLoading}
           />
         );
       })}

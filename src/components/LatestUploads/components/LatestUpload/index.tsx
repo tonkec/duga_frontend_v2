@@ -1,47 +1,60 @@
 import { useNavigate } from 'react-router';
-import { S3_URL } from '@app/utils/consts';
 import { useGetUserById } from '@app/hooks/useGetUserById';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
+import { useGetImageBlob } from '../../hooks';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface IUpload {
   id: string;
   url: string;
   userId: string;
+  securePhotoUrl: string;
 }
 
 const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
-  const { allImages } = useGetAllImages(upload.userId);
-  return (
-    <div className="flex flex-col gap-1">
-      <img
-        className="border rounded cursor-pointer"
-        src={`${S3_URL}/${upload.url}`}
-        alt={upload.id}
-        onClick={() => {
-          navigate(`/photo/${upload.id}`);
-        }}
-        style={{ maxWidth: '100%' }}
-      />
+  const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl);
+  const username = user?.data.username || 'Korisnik';
 
-      <div className="flex items-center gap-2 mt-4 mb-6 lg:mb-0">
-        <Avatar
+  return (
+    <article className="group overflow-hidden rounded-2xl border border-[#dce4ff] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <button
+        type="button"
+        className="block w-full overflow-hidden bg-[#f7f9ff] text-left"
+        onClick={() => navigate(`/photo/${upload.id}`)}
+      >
+        {imageBlob ? (
+          <div
+            className="aspect-[4/3] w-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
+            style={{ backgroundImage: `url(${URL.createObjectURL(imageBlob)})` }}
+          />
+        ) : (
+          <div className="flex aspect-[4/3] w-full items-center justify-center text-sm text-gray-500">
+            Fotografija nije dostupna
+          </div>
+        )}
+      </button>
+
+      <div className="flex items-center gap-3 p-3">
+        <UserAvatar
           color="#2D46B9"
-          name={`${user?.data.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="40"
-          round={true}
+          avatarFallbackName={username}
           onClick={() => {
             navigate(`/user/${upload.userId}`);
           }}
-          className="cursor-pointer"
+          userId={upload.userId}
+          className="h-10 w-10 rounded-full"
+          fgColor="#1f2937"
         />
-        <p>{user?.data.username}</p>
+        <button
+          type="button"
+          className="min-w-0 truncate font-semibold text-gray-900 hover:text-blue"
+          onClick={() => navigate(`/user/${upload.userId}`)}
+        >
+          {username}
+        </button>
       </div>
-    </div>
+    </article>
   );
 };
 

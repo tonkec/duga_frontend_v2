@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { FiMenu, FiX } from 'react-icons/fi';
-import ProfilePhoto from '@app/components/ProfilePhoto';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import { useCookies } from 'react-cookie';
 import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
 import { NavigationItems } from '../NavigationLinks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { useSocket } from '@app/context/useSocket';
+import { setOfflineStatus } from '@app/utils/setOfflineStatus';
+import { clearAppSessionId, clearAppSessionRevoked } from '@app/api/appSession';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { width } = useWindowSize();
   const isMobile = width! < 768;
   const { logout } = useAuth0();
-  const [, setCookie] = useCookies(['token']);
-  const [, saveUserId] = useLocalStorage('userId', null);
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
-  const { allImages } = useGetAllImages(String(userId) || '');
+
+  const socket = useSocket();
 
   useEffect(() => {
     if (!isMobile) {
@@ -28,9 +25,12 @@ const Navigation = () => {
     }
   }, [isMobile]);
 
-  const onLogout = () => {
-    setCookie('token', '');
-    saveUserId(null);
+  const onLogout = async () => {
+    if (socket) {
+      await setOfflineStatus(socket);
+    }
+    clearAppSessionId();
+    clearAppSessionRevoked();
     logout({
       logoutParams: {
         returnTo: window.location.origin,
@@ -38,60 +38,63 @@ const Navigation = () => {
     });
   };
 
-  const currentUserProfilePhoto = getProfilePhoto(allImages?.data.images);
-
   if (isUserLoading) return <Loader />;
 
   return (
     <>
       {!isMobile && (
-        <nav className="flex justify-between items-center gradient p-4 shadow-sm text-white">
-          <div className="flex gap-4 items-center space-between w-full">
-            <ProfilePhoto
-              currentUser={currentUser?.data}
-              url={getProfilePhotoUrl(currentUserProfilePhoto)}
-            />
+        <nav className="gradient sticky top-0 z-40 py-3 text-white shadow-sm">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-4 px-4">
+            <div className="mr-2 text-xl font-bold tracking-tight">Duga</div>
             <NavigationItems userId={userId} onLogout={onLogout} />
           </div>
         </nav>
       )}
 
       {isMobile && (
-        <div className="flex justify-between items-center gradient p-4 shadow-sm text-white">
-          <ProfilePhoto
-            currentUser={currentUser?.data}
-            url={getProfilePhotoUrl(currentUserProfilePhoto)}
-          />
-          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-white">
+        <div className="gradient sticky top-0 z-40 flex items-center justify-between p-4 text-white shadow-sm">
+          <div className="text-xl font-bold tracking-tight">Duga</div>
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25"
+            aria-label="Otvori navigaciju"
+          >
             <FiMenu size={24} />
           </button>
         </div>
       )}
 
       {isMobile && isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 max-w-[200px]">
+        <div className="fixed inset-0 z-50">
           <div
-            className="absolute inset-0 bg-blue opacity-90"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          <div className="relative h-full p-6 shadow-lg">
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute top-4 right-2 text-white"
-            >
-              <FiX size={24} />
-            </button>
+          <aside className="gradient relative flex h-full w-[min(86vw,340px)] flex-col p-5 text-white shadow-2xl">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.2em] text-white/70">Navigacija</p>
+                <h2 className="text-2xl font-bold">Duga</h2>
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25"
+                aria-label="Zatvori navigaciju"
+              >
+                <FiX size={22} />
+              </button>
+            </div>
 
-            <ul className="mt-12 space-y-6">
+            <nav className="flex min-h-0 flex-1 flex-col">
               <NavigationItems
                 userId={userId}
                 isMobile
                 onItemClick={() => setIsMobileMenuOpen(false)}
                 onLogout={onLogout}
               />
-            </ul>
-          </div>
+            </nav>
+          </aside>
         </div>
       )}
     </>

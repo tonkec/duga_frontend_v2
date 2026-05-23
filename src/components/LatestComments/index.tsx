@@ -4,10 +4,11 @@ import Card from '@app/components/Card';
 import Loader from '@app/components/Loader';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import { useGetLatestComments } from './hooks';
-import Avatar from 'react-avatar';
-import { getProfilePhoto, getProfilePhotoUrl } from '@app/utils/getProfilePhoto';
-import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import DOMPurify from 'dompurify';
+import { useGetImageBlob } from '../LatestUploads/hooks';
+import UserAvatar from '../UserAvatar';
+import Image from '../Image';
+import ContentFormatter from '../ContentFormatter';
 
 interface IComment {
   id: number;
@@ -17,12 +18,13 @@ interface IComment {
   userId: number;
   taggedUsers?: { id: number; username: string }[];
   imageUrl: string;
+  securePhotoUrl?: string;
 }
 
 export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick: () => void }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
-  const { allImages } = useGetAllImages(comment.userId.toString());
+  const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || comment.imageUrl);
 
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
@@ -51,42 +53,42 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
         }
       }
 
-      return <span key={index}>{part}</span>;
+      return (
+        <span key={index}>
+          <ContentFormatter text={part} />
+        </span>
+      );
     });
   };
 
   return (
     <div
-      className="flex flex-col gap-1 border-b p-4 hover:bg-gray-100 transition cursor-pointer"
+      className="border-b p-4 hover:bg-gray-100 transition cursor-pointer justify-between"
       onClick={onClick}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <p className="text-sm">
-          {comment.imageUrl ? (
-            <img
-              src={comment.imageUrl}
-              alt="User Avatar"
-              className="w-36 h-36"
+      <div className="flex items-end justify-between gap-2 mb-2">
+        <div>
+          {imageBlob ? (
+            <Image
+              src={URL.createObjectURL(imageBlob)}
+              alt="Comment image"
+              className="w-xl rounded max-h-[100px]"
               onClick={() => navigate(`/user/${comment.userId}`)}
             />
           ) : (
-            <span className="text-gray-500">{renderFormattedComment(comment.comment)}</span>
+            <span className="text-gray-500 text-sm">{renderFormattedComment(comment.comment)}</span>
           )}
-        </p>
-      </div>
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Avatar
-          color="#2D46B9"
-          name={`${user?.data.username}`}
-          src={getProfilePhotoUrl(getProfilePhoto(allImages?.data.images))}
-          size="20"
-          round={true}
-          onClick={() => {
-            navigate(`/user/${comment.userId}`);
-          }}
-          className="cursor-pointer"
-        />
-        <RecordCreatedAt createdAt={comment.createdAt} />
+        </div>
+
+        <div className="flex flex-col items-end gap-2 text-sm text-gray-500">
+          <UserAvatar
+            color="#F037A5"
+            userId={String(comment.userId)}
+            avatarFallbackName={user?.data.username}
+            className="w-[40px] h-[40px] rounded-full"
+          />
+          <RecordCreatedAt createdAt={comment.createdAt} />
+        </div>
       </div>
     </div>
   );
@@ -100,13 +102,13 @@ const LatestComments = () => {
     return <Loader />;
   }
 
-  if (allComments?.data.length < numberOfComments) {
+  if (allComments?.data.length === 0) {
     return null;
   }
 
   const comments = allComments?.data.slice(0, numberOfComments) || [];
   return (
-    <div className="col-span-2">
+    <div className="flex-1">
       <h2 className="mb-2">💬 Zadnji komentari na fotografije</h2>
       <Card className="!p-0 overflow-hidden">
         {comments.map((comment: IComment) => (
