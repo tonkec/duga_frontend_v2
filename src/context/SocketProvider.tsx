@@ -58,7 +58,7 @@ const createCypressSocket = () => {
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
-  if (hostname.includes('duga.app')) {
+  if (hostname.includes('duga.chat')) {
     return 'https://duga-backend-c67896e8029c.herokuapp.com/';
   }
   if (hostname.includes('staging--dugaprod.netlify.app')) {
