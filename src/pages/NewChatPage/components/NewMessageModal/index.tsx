@@ -121,7 +121,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
         <ul className="-mx-1 max-h-64 overflow-y-auto" role="listbox" aria-label="Korisnici">
           {isLoading ? (
             <li className="flex justify-center py-8">
-              <Loader />
+              <Loader variant="inline" label="Učitavanje korisnika..." />
             </li>
           ) : selectableUsers.length === 0 ? (
             <li className="py-8 text-center text-sm text-gray-500">

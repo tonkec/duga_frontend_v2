@@ -65,7 +65,7 @@ const UserAvatar = ({
   if (isProfilePhotoLoading) {
     return (
       <div className={containerClassName} style={sizeStyle}>
-        <Loader />
+        <Loader variant="inline" size="sm" label="Učitavanje avatara..." />
       </div>
     );
   }

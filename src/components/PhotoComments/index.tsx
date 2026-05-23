@@ -387,7 +387,11 @@ const PhotoComments = () => {
       </form>
 
       <div className="flex flex-col gap-3">
-        {areCommentsLoading && <Loader />}
+        {areCommentsLoading && (
+          <div className="rounded-2xl border border-[#dce4ff] bg-white py-8">
+            <Loader variant="inline" label="Učitavanje komentara..." />
+          </div>
+        )}
 
         {!areCommentsLoading && !sortedComments.length && (
           <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
