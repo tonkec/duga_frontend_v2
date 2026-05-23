@@ -40,6 +40,8 @@ const getChatSortTime = (chat: IChat) => {
   return new Date(last?.createdAt ?? chat.createdAt).getTime();
 };
 
+const getChatId = (chat: IChat) => chat.id ?? chat.ChatUser?.chatId;
+
 const AllUserChats = ({ userChats }: IAllUserChats) => {
   const navigate = useNavigate();
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
@@ -76,17 +78,22 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
 
       <Card className="!rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
         <ul className="divide-y divide-[#e8eeff]" role="list">
-          {sortedChats.map((chat, index) => (
-            <li key={chat.id}>
-              <UserChat
-                user={chat.Users[0]}
-                onClick={() => navigate(`/chat/${chat.id}`)}
-                lastMessage={getLastMessage(chat)}
-                isFirst={index === 0}
-                isLast={index === sortedChats.length - 1}
-              />
-            </li>
-          ))}
+          {sortedChats.map((chat, index) => {
+            const chatId = getChatId(chat);
+            return (
+              <li key={chatId}>
+                <UserChat
+                  user={chat.Users[0]}
+                  onClick={() => {
+                    if (chatId) navigate(`/chat/${chatId}`);
+                  }}
+                  lastMessage={getLastMessage(chat)}
+                  isFirst={index === 0}
+                  isLast={index === sortedChats.length - 1}
+                />
+              </li>
+            );
+          })}
         </ul>
       </Card>
     </div>

@@ -29,7 +29,9 @@ export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } =
       };
 
       await client.post('/register', input);
-      const res = await client.get('/users/current-user');
+      const res = await client.get('/users/current-user', {
+        skipGlobalErrorHandler: true,
+      });
       return res.data;
     },
     enabled: enabled && !isAppSessionRevoked() && isAuthenticated && !isAuthLoading && !!auth0User,

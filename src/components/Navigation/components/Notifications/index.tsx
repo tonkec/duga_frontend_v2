@@ -14,6 +14,7 @@ export type INotification = {
   content: string;
   isRead: boolean;
   createdAt: string;
+  chatId?: number | null;
   actionId: number | null;
   actionType: 'upload' | 'comment' | 'message' | null;
 };

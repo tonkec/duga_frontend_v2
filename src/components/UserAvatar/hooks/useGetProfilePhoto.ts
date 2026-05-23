@@ -10,6 +10,8 @@ export const useGetProfilePhoto = (userId: string) => {
     queryKey: ['profilePhoto', userId],
     queryFn: () => getProfilePhoto(userId),
     enabled: !!userId && userId !== 'undefined' && userId !== 'null',
+    retry: false,
+    throwOnError: false,
   });
 
   return { profilePhoto, profilePhotoError, isProfilePhotoLoading };

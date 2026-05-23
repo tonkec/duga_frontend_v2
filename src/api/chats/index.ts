@@ -9,7 +9,9 @@ export const createChat = async (data: { partnerId: number }) => {
 
 export const getAllUserChats = async () => {
   const client = apiClient();
-  return client.get(`/chats`);
+  return client.get(`/chats`, {
+    skipGlobalErrorHandler: true,
+  });
 };
 
 export const getCurrentChat = async (chatId: string) => {

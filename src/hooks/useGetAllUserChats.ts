@@ -10,6 +10,8 @@ export const useGetAllUserChats = (isQueryEnabled?: boolean) => {
     queryKey: ['userChats'],
     queryFn: () => getAllUserChats(),
     enabled: isQueryEnabled !== false,
+    retry: false,
+    throwOnError: false,
   });
 
   return { userChats, userChatsError, isUserChatsLoading };

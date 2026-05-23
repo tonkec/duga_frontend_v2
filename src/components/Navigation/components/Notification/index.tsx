@@ -26,17 +26,19 @@ const Notification = ({ n, setNotifications }: INotificationProps) => {
           );
         }
 
-        if (n.actionType && n.actionId) {
+        if (n.actionType) {
           switch (n.actionType) {
             case 'upload':
-              navigate(`/photo/${n.actionId}`);
+              if (n.actionId) navigate(`/photo/${n.actionId}`);
               break;
             case 'comment':
-              navigate(`/photo/${n.actionId}`);
+              if (n.actionId) navigate(`/photo/${n.actionId}`);
               break;
-            case 'message':
-              navigate(`/chat/${n.actionId}`);
+            case 'message': {
+              const chatId = n.chatId ?? n.actionId;
+              if (chatId) navigate(`/chat/${chatId}`);
               break;
+            }
             default:
               break;
           }

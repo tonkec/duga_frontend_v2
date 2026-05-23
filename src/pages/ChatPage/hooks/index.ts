@@ -26,6 +26,8 @@ export const useGetAllMessages = (chatId: string) => {
       return null;
     },
     enabled: !!chatId,
+    retry: false,
+    throwOnError: false,
   });
 
   return {
@@ -49,6 +51,7 @@ export const useGetCurrentChat = (chatId: string) => {
     queryFn: () => getCurrentChat(chatId),
     enabled: !!chatId,
     retry: false,
+    throwOnError: false,
   });
 
   return {
