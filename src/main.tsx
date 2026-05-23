@@ -12,7 +12,7 @@ import AuthTokenBridge from './components/AuthTokenBridge/index.tsx';
 import { CookiesProvider } from 'react-cookie';
 import AppSessionProvider from './components/AppSessionProvider/index.tsx';
 import axios from 'axios';
-import { SESSION_REVOKED_CODE } from './api/appSession.ts';
+import { isSessionConflictCode } from './api/appSession.ts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
       throwOnError: (error) =>
-        !(axios.isAxiosError(error) && error.response?.data?.code === SESSION_REVOKED_CODE),
+        !(axios.isAxiosError(error) && isSessionConflictCode(error.response?.data?.code)),
     },
   },
 });
