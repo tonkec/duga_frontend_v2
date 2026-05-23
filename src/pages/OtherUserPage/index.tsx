@@ -10,12 +10,22 @@ import Photos from '@app/components/Photos';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Loader from '@app/components/Loader';
 import SendMessageButton from '@app/components/SendMessageButton';
+import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
+import { IChat } from '@app/pages/NewChatPage/hooks';
+
+const getChatWithUser = (userChats: IChat[] | undefined, userId: string | undefined) => {
+  if (!userId) return undefined;
+
+  return userChats?.find((chat) => chat.Users[0]?.id === Number(userId));
+};
 
 const OtherUserPage = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
+  const { userChats } = useGetAllUserChats();
+  const existingChat = getChatWithUser(userChats?.data, userId);
 
   if (!userId || isNaN(Number(userId))) {
     return (
@@ -72,6 +82,8 @@ const OtherUserPage = () => {
                   sendMessageToId={userId as string}
                   buttonType="blue"
                   buttonClasses="w-full"
+                  hasChatWithUser={Boolean(existingChat)}
+                  existingChatId={existingChat?.id}
                 />
               </Cta>
               <Cta
