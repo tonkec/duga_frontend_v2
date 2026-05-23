@@ -364,12 +364,12 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <section className="gradient overflow-hidden px-5 py-16 md:px-8">
+        <section className="gradient overflow-hidden px-5 pt-16 md:px-8">
           <div className="container mx-auto grid items-end gap-8 lg:grid-cols-[0.65fr_1fr]">
-            <div className="hidden lg:block">
-              {<Image src={Guy} alt="Osoba s mobitelom" className="w-full h-auto" />}
+            <div className="-mb-16 hidden lg:block">
+              {<Image src={Guy} alt="Osoba s mobitelom" className="block h-auto w-full" />}
             </div>
-            <div className="max-w-2xl pb-4 text-white">
+            <div className="max-w-2xl py-16 text-white">
               <h2 className="text-4xl font-black tracking-tight md:text-5xl">
                 Pridruži nam se danas
               </h2>
