@@ -18,6 +18,9 @@ const authUser = {
   name: 'Cypress Logout User',
 };
 
+const sessionId = 'cypress-logout-session';
+const apiToken = 'cypress-api-token';
+
 const setupAuthenticatedUser = () => {
   cy.clearLocalStorage();
   cy.clearCookies();
@@ -58,8 +61,12 @@ const setupAuthenticatedUser = () => {
     onBeforeLoad(win) {
       win.localStorage.clear();
       win.sessionStorage.clear();
+      (win as typeof win & { __dugaCypressAuthUser?: typeof authUser }).__dugaCypressAuthUser =
+        authUser;
       win.localStorage.setItem('duga:cypress-auth-user', JSON.stringify(authUser));
       win.localStorage.setItem('duga:cypress-skip-session-start', 'true');
+      win.localStorage.setItem('dugaSessionId', sessionId);
+      win.localStorage.setItem('dugaApiToken', apiToken);
       win.document.cookie = 'token=cypress-access-token;path=/';
     },
   });

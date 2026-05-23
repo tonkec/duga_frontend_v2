@@ -13,7 +13,6 @@ import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
 import { clearAppSessionRevoked } from '@app/api/appSession';
-import { useAppSessionStatus } from '@app/context/AppSessionContext';
 
 const howItWorksItems = [
   {
@@ -135,7 +134,6 @@ const faqItems = [
 
 const LoginPage = () => {
   const { loginWithRedirect } = useAuth0();
-  const appSessionStatus = useAppSessionStatus();
   const learnMoreRef = useRef<HTMLDivElement>(null);
 
   const onLogin = () => {
@@ -177,11 +175,6 @@ const LoginPage = () => {
               <h1 className="text-6xl font-black leading-none tracking-tight text-white sm:text-7xl lg:text-8xl">
                 Duga
               </h1>
-              {appSessionStatus === 'revoked' && (
-                <p className="mt-6 max-w-xl rounded-2xl bg-white/95 p-4 font-medium text-blue shadow-xl">
-                  Odjavljeni ste jer je račun otvoren u drugoj sesiji.
-                </p>
-              )}
               <p className="mt-8 max-w-2xl text-3xl font-semibold leading-tight text-white md:text-5xl">
                 Upoznaj queer osobe iz regije bez buke, pritiska i čudnih vibra.
               </p>

@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import AppSessionProvider from '.';
 import { register } from '../../api/auth/register';
 import { startSession } from '../../api/sessions';
@@ -11,6 +12,12 @@ import { generateUniqueUsername } from '../../hooks/useEnsureBackendUser';
 
 jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
+}));
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    info: jest.fn(),
+  },
 }));
 
 jest.mock('@app/api/auth/register', () => ({
@@ -29,6 +36,8 @@ const mockUseAuth0 = jest.mocked(useAuth0);
 const mockRegister = jest.mocked(register);
 const mockStartSession = jest.mocked(startSession);
 const mockGenerateUniqueUsername = jest.mocked(generateUniqueUsername);
+const mockToastInfo = jest.mocked(toast.info);
+const logout = jest.fn();
 
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 
@@ -36,6 +45,7 @@ const auth0State = (overrides: Record<string, unknown>) =>
   ({
     isAuthenticated: false,
     isLoading: false,
+    logout,
     user: undefined,
     ...overrides,
   }) as unknown as ReturnType<typeof useAuth0>;
@@ -149,6 +159,40 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(await screen.findByTestId('session-status')).toHaveTextContent('revoked');
     expect(mockRegister).not.toHaveBeenCalled();
     expect(mockStartSession).not.toHaveBeenCalled();
+  });
+
+  it('logs out the Auth0 session when the app session is revoked', async () => {
+    mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
+
+    renderAppSessionProvider();
+
+    window.dispatchEvent(new Event('duga:session-revoked'));
+
+    await waitFor(() =>
+      expect(logout).toHaveBeenCalledWith({
+        logoutParams: {
+          returnTo: 'http://localhost',
+        },
+      })
+    );
+    expect(mockToastInfo).toHaveBeenCalledWith(
+      'Odjavljeni ste jer je račun otvoren u drugoj sesiji.',
+      expect.any(Object)
+    );
+  });
+
+  it('shows a one-time toast after returning from a revoked app session logout', async () => {
+    sessionStorage.setItem('dugaSessionRevokedNotice', 'true');
+    mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(mockToastInfo).toHaveBeenCalledWith(
+      'Odjavljeni ste jer je račun otvoren u drugoj sesiji.',
+      expect.any(Object)
+    );
+    expect(sessionStorage.getItem('dugaSessionRevokedNotice')).toBeNull();
   });
 
   it('marks the app session revoked when backend session startup conflicts', async () => {

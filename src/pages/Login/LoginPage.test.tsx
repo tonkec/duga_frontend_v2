@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate, MemoryRouter, Route, Routes } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import LoginPage from '.';
 import AppSessionProvider from '../../components/AppSessionProvider';
 import {
@@ -15,6 +16,12 @@ import { SESSION_REVOKED_EVENT } from '../../api/appSession';
 
 jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
+}));
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    info: jest.fn(),
+  },
 }));
 
 jest.mock('@app/components/FadeIn', () => ({
@@ -35,7 +42,9 @@ jest.mock('@app/hooks/useEnsureBackendUser', () => ({
 }));
 
 const mockUseAuth0 = jest.mocked(useAuth0);
+const mockToastInfo = jest.mocked(toast.info);
 const loginWithRedirect = jest.fn();
+const logout = jest.fn();
 
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 
@@ -67,6 +76,7 @@ describe('LoginPage redirects', () => {
     sessionStorage.clear();
     mockUseAuth0.mockReturnValue({
       loginWithRedirect,
+      logout,
     } as unknown as ReturnType<typeof useAuth0>);
   });
 
@@ -86,7 +96,9 @@ describe('LoginPage redirects', () => {
     sessionStorage.setItem(SESSION_REVOKED_KEY, 'true');
     renderLoginPage('revoked');
 
-    expect(screen.getByText('Odjavljeni ste jer je račun otvoren u drugoj sesiji.')).toBeVisible();
+    expect(
+      screen.queryByText('Odjavljeni ste jer je račun otvoren u drugoj sesiji.')
+    ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Prijavi se' })[0]);
 
@@ -94,12 +106,13 @@ describe('LoginPage redirects', () => {
     expect(loginWithRedirect).toHaveBeenCalledTimes(1);
   });
 
-  it('redirects to login and shows logout message when the app session expires', async () => {
+  it('redirects to login and shows a toast when the app session expires', async () => {
     mockUseAuth0.mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
       user: undefined,
       loginWithRedirect,
+      logout,
     } as unknown as ReturnType<typeof useAuth0>);
 
     const queryClient = new QueryClient({
@@ -129,9 +142,12 @@ describe('LoginPage redirects', () => {
       window.dispatchEvent(new Event(SESSION_REVOKED_EVENT));
     });
 
-    expect(
-      await screen.findByText('Odjavljeni ste jer je račun otvoren u drugoj sesiji.')
-    ).toBeVisible();
+    await waitFor(() =>
+      expect(mockToastInfo).toHaveBeenCalledWith(
+        'Odjavljeni ste jer je račun otvoren u drugoj sesiji.',
+        expect.any(Object)
+      )
+    );
     await waitFor(() => expect(screen.queryByText('Protected page')).not.toBeInTheDocument());
   });
 });

@@ -6,6 +6,12 @@ import CookieBanner from '../CookieBanner';
 import UserChatsSocketSync from '@app/components/UserChatsSocketSync';
 import { useAuth0 } from '@auth0/auth0-react';
 
+type CypressWindow = Window &
+  typeof globalThis & {
+    Cypress?: unknown;
+    __dugaCypressAuthUser?: unknown;
+  };
+
 interface IAppLayoutProps {
   children: React.ReactNode;
   onScroll?: (e: SyntheticEvent) => void;
@@ -13,8 +19,14 @@ interface IAppLayoutProps {
 
 const AppLayout = ({ children, onScroll }: IAppLayoutProps) => {
   const { isAuthenticated } = useAuth0();
+  const isCypressAuthenticated =
+    Boolean((window as CypressWindow).Cypress) &&
+    Boolean(
+      (window as CypressWindow).__dugaCypressAuthUser ||
+        window.localStorage.getItem('duga:cypress-auth-user')
+    );
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isCypressAuthenticated) {
     return false;
   }
 

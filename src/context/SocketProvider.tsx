@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { resolveAccessToken } from '@app/api/authToken';
+import { resolveAuth0AccessToken } from '@app/api/authToken';
 import { getAppSessionId, markSessionRevoked } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
 
@@ -92,7 +92,7 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
 
     const connectSocket = async () => {
       try {
-        const token = await resolveAccessToken();
+        const token = await resolveAuth0AccessToken();
         if (!token) return;
 
         newSocket = io(getBackendUrl(), {

@@ -10,6 +10,7 @@ type AppState = {
 type CypressWindow = Window &
   typeof globalThis & {
     Cypress?: unknown;
+    __dugaCypressAuthUser?: ReturnType<typeof createCypressUser>;
   };
 
 const CYPRESS_AUTH_USER_KEY = 'duga:cypress-auth-user';
@@ -22,6 +23,9 @@ const createCypressUser = () => ({
 });
 
 const getStoredCypressUser = () => {
+  const cypressUser = (window as CypressWindow).__dugaCypressAuthUser;
+  if (cypressUser) return cypressUser;
+
   const rawUser = window.localStorage.getItem(CYPRESS_AUTH_USER_KEY);
   return rawUser ? JSON.parse(rawUser) : null;
 };
@@ -29,12 +33,13 @@ const getStoredCypressUser = () => {
 const CypressAuth0Provider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(getStoredCypressUser);
+  const currentUser = user ?? getStoredCypressUser();
 
   const value = useMemo(
     () => ({
-      isAuthenticated: Boolean(user),
+      isAuthenticated: Boolean(currentUser),
       isLoading: false,
-      user: user ?? undefined,
+      user: currentUser ?? undefined,
       error: undefined,
       getAccessTokenSilently: async () => 'cypress-access-token',
       getAccessTokenWithPopup: async () => 'cypress-access-token',
@@ -53,7 +58,7 @@ const CypressAuth0Provider = ({ children }: { children: ReactNode }) => {
         navigate('/login');
       },
     }),
-    [navigate, user]
+    [currentUser, navigate]
   );
 
   return <Auth0Context.Provider value={value as never}>{children}</Auth0Context.Provider>;
