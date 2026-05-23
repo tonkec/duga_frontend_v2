@@ -186,4 +186,38 @@ describe('EditMyProfilePage integration', () => {
       )
     );
   });
+
+  it('shows validation errors and does not save invalid profile values', async () => {
+    renderEditPage();
+
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Korisničko ime')).toHaveValue(currentUser.username)
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Reci nešto o sebi jednom rečenicom'), {
+      target: {
+        value: 'x'.repeat(101),
+      },
+    });
+    fireEvent.change(
+      screen.getByPlaceholderText('Najdraža youtube pjesma (https://www.youtube.com/embed/)'),
+      {
+        target: {
+          value: 'not-a-youtube-link',
+        },
+      }
+    );
+    fireEvent.change(screen.getByPlaceholderText('Interesi (odvojeni zarezom)'), {
+      target: {
+        value: 'x'.repeat(201),
+      },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Spremi' }));
+
+    expect(await screen.findAllByText('Polje ne smije biti dulje od 100 znakova.')).toHaveLength(1);
+    expect(screen.getByText('Mora biti YouTube link (youtube.com ili youtu.be)')).toBeVisible();
+    expect(screen.getByText('Polje ne smije biti dulje od 200 znakova.')).toBeVisible();
+    expect(updateUserMutation).not.toHaveBeenCalled();
+  });
 });
