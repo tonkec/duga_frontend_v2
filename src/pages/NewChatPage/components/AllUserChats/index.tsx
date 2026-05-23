@@ -7,7 +7,7 @@ import { IMessage } from '@app/pages/ChatPage/components/Message';
 import Card from '@app/components/Card';
 import Button from '@app/components/Button';
 
-interface IChat {
+export interface IChat {
   id: number;
   Messages: IMessage[];
   Users: IUser[];

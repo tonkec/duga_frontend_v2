@@ -6,7 +6,7 @@ import Button from '@app/components/Button';
 import { PageTitle } from '@app/components/PageTitle';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { filterChatsWithMessages } from '@app/utils/filterChatsWithMessages';
-import AllUserChats from './components/AllUserChats';
+import AllUserChats, { IChat } from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
 
 const EmptyChats = () => {
@@ -32,7 +32,10 @@ const NewChatPage = () => {
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
-  const visibleChats = useMemo(() => filterChatsWithMessages(userChats?.data), [userChats?.data]);
+  const visibleChats = useMemo(
+    () => filterChatsWithMessages<IChat>(userChats?.data),
+    [userChats?.data]
+  );
 
   if (isUserChatsLoading) {
     return (

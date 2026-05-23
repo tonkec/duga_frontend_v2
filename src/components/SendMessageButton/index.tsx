@@ -14,6 +14,7 @@ interface ISendMessageButtonProps {
   buttonType: ButtonType;
   buttonClasses?: string;
   hasChatWithUser?: boolean;
+  existingChatId?: number;
 }
 
 const SendMessageButton = ({
@@ -21,8 +22,9 @@ const SendMessageButton = ({
   buttonType,
   buttonClasses,
   hasChatWithUser = false,
+  existingChatId,
 }: ISendMessageButtonProps) => {
-  const [isQueryEnabled, setIsQueryEnabled] = useState(false);
+  const [isQueryEnabled, setIsQueryEnabled] = useState(Boolean(existingChatId));
   const navigate = useNavigate();
   const { onCreateChat } = useCreateNewChat();
   const { userChats } = useGetAllUserChats(isQueryEnabled);
@@ -31,6 +33,11 @@ const SendMessageButton = ({
       className={buttonClasses}
       onClick={() => {
         setIsQueryEnabled(true);
+        if (existingChatId) {
+          navigate(`/chat/${existingChatId}`);
+          return;
+        }
+
         if (!hasAlreadyChatted(userChats?.data, sendMessageToId)) {
           onCreateChat({ partnerId: Number(sendMessageToId) });
         }
@@ -43,7 +50,7 @@ const SendMessageButton = ({
       }}
       type={buttonType}
     >
-      {hasChatWithUser ? 'Nastavi razgovor' : 'Započni razgovor'}
+      {hasChatWithUser || existingChatId ? 'Nastavi razgovor' : 'Započni razgovor'}
     </Button>
   );
 };

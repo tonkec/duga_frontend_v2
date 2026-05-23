@@ -154,7 +154,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   const {
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     reset,
     control,
     setValue,
@@ -249,7 +249,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       message: data.content,
     };
 
-    if (isValid && toUserId?.length) {
+    if (toUserId?.length) {
       socket?.emit('message', msg);
       refreshUserChatsList();
     }

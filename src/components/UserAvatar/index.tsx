@@ -37,6 +37,10 @@ const UserAvatar = ({
   );
 
   const renderAvatar = () => {
+    const placeholderUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      avatarFallbackName
+    )}&background=f7f9ff`;
+
     if (imageBlob) {
       return (
         <Image
@@ -51,8 +55,7 @@ const UserAvatar = ({
       <Avatar
         color={color}
         src={
-          profilePhoto?.data.securePhotoUrl ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=f7f9ff`
+          imageBlob === null ? placeholderUrl : profilePhoto?.data.securePhotoUrl || placeholderUrl
         }
         size={className ? '100%' : resolvedSize}
         round={false}

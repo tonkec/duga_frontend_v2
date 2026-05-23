@@ -7,6 +7,55 @@ import { resolveAccessToken } from '@app/api/authToken';
 import { getAppSessionId, markSessionRevoked } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
 
+type CypressSocketEvent = {
+  event: string;
+  payload: unknown;
+};
+
+type CypressWindow = Window &
+  typeof globalThis & {
+    Cypress?: unknown;
+    __dugaCypressSocketEvents?: CypressSocketEvent[];
+  };
+
+const createCypressSocket = () => {
+  const handlers = new Map<string, Set<(payload: unknown) => void>>();
+
+  return {
+    on: (event: string, handler: (payload: unknown) => void) => {
+      const eventHandlers = handlers.get(event) ?? new Set();
+      eventHandlers.add(handler);
+      handlers.set(event, eventHandlers);
+    },
+    off: (event: string, handler?: (payload: unknown) => void) => {
+      if (!handler) {
+        handlers.delete(event);
+        return;
+      }
+
+      handlers.get(event)?.delete(handler);
+    },
+    emit: (event: string, payload: unknown) => {
+      const cypressWindow = window as CypressWindow;
+      cypressWindow.__dugaCypressSocketEvents = [
+        ...(cypressWindow.__dugaCypressSocketEvents ?? []),
+        { event, payload },
+      ];
+
+      if (event === 'message' && payload && typeof payload === 'object') {
+        handlers.get('received')?.forEach((handler) =>
+          handler({
+            id: Date.now(),
+            createdAt: new Date().toISOString(),
+            ...(payload as Record<string, unknown>),
+          })
+        );
+      }
+    },
+    disconnect: () => undefined,
+  } as Socket;
+};
+
 const getBackendUrl = () => {
   const { hostname } = window.location;
   if (hostname.includes('duga.app')) {
@@ -18,7 +67,11 @@ const getBackendUrl = () => {
   return 'http://localhost:8080/';
 };
 
-export const SocketProvider = ({ children }: { children: ReactNode }) => {
+const CypressSocketProvider = ({ children }: { children: ReactNode }) => (
+  <SocketContext.Provider value={createCypressSocket()}>{children}</SocketContext.Provider>
+);
+
+const RealSocketProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -82,4 +135,12 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   }, [isAuthenticated, isAppSessionActive, isUserLoading, currentUser]);
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+};
+
+export const SocketProvider = ({ children }: { children: ReactNode }) => {
+  if ((window as CypressWindow).Cypress) {
+    return <CypressSocketProvider>{children}</CypressSocketProvider>;
+  }
+
+  return <RealSocketProvider>{children}</RealSocketProvider>;
 };
