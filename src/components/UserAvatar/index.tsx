@@ -1,4 +1,5 @@
 import Avatar from 'react-avatar';
+import clsx from 'clsx';
 import { useGetProfilePhoto } from './hooks/useGetProfilePhoto';
 import Loader from '../Loader';
 import { useGetImageBlob } from '../LatestUploads/hooks';
@@ -8,10 +9,11 @@ interface IUserAvatarProps {
   avatarFallbackName: string;
   color: string;
   onClick?: () => void;
-  userId: string;
+  userId: string | undefined;
   size?: string;
   round?: boolean;
   className?: string;
+  fgColor?: string;
 }
 
 const UserAvatar = ({
@@ -19,39 +21,62 @@ const UserAvatar = ({
   color,
   onClick,
   userId,
-  size = '40',
-  round = true,
+  size,
   className,
+  fgColor,
 }: IUserAvatarProps) => {
-  const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId);
+  const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
   const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
+  const resolvedSize = size || '40';
+  const cssSize = /^\d+(\.\d+)?$/.test(resolvedSize) ? `${resolvedSize}px` : resolvedSize;
+  const sizeStyle = size || !className ? { width: cssSize, height: cssSize } : undefined;
+  const containerClassName = clsx(
+    'inline-block overflow-hidden align-middle',
+    onClick && 'cursor-pointer',
+    className
+  );
+
+  const renderAvatar = () => {
+    const placeholderUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      avatarFallbackName
+    )}&background=f7f9ff`;
+
+    if (imageBlob) {
+      return (
+        <Image
+          src={URL.createObjectURL(imageBlob)}
+          alt="Avatar"
+          className={clsx('h-full w-full object-cover', className)}
+        />
+      );
+    }
+
+    return (
+      <Avatar
+        color={color}
+        src={
+          imageBlob === null ? placeholderUrl : profilePhoto?.data.securePhotoUrl || placeholderUrl
+        }
+        size={className ? '100%' : resolvedSize}
+        round={false}
+        textSizeRatio={2}
+        fgColor={fgColor || '#fff'}
+      />
+    );
+  };
 
   if (isProfilePhotoLoading) {
-    return <Loader />;
-  }
-
-  if (imageBlob) {
     return (
-      <Image
-        onClick={onClick}
-        src={URL.createObjectURL(imageBlob)}
-        alt="Avatar"
-        className={`${className} ${onClick ? 'cursor-pointer' : ''}`}
-      />
+      <div className={containerClassName} style={sizeStyle}>
+        <Loader variant="inline" size="sm" label="Učitavanje avatara..." />
+      </div>
     );
   }
 
   return (
-    <Avatar
-      color={color}
-      name={avatarFallbackName}
-      src={profilePhoto?.data.securePhotoUrl}
-      size={size}
-      round={round}
-      onClick={onClick}
-      className={onClick ? `cursor-pointer ${className}` : `${className}`}
-      textSizeRatio={2}
-    />
+    <div className={containerClassName} style={sizeStyle} onClick={onClick}>
+      {renderAvatar()}
+    </div>
   );
 };
 

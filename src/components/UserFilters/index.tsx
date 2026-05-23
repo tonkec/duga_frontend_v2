@@ -5,10 +5,10 @@ import { IUser } from '@app/components/UserCard';
 import { SyntheticEvent } from 'react';
 
 const selectOptions: { value: keyof IUser; label: string }[] = [
-  { value: 'gender', label: 'rod' },
-  { value: 'sexuality', label: 'seksualnost' },
-  { value: 'location', label: 'lokacija' },
-  { value: 'username', label: 'ime' },
+  { value: 'gender', label: 'Rod' },
+  { value: 'sexuality', label: 'Seksualnost' },
+  { value: 'location', label: 'Lokacija' },
+  { value: 'username', label: 'Ime' },
 ];
 
 interface IUserFiltersProps {
@@ -32,41 +32,53 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
     case 'location':
       return 'Pretraži prema lokaciji...';
     default:
-      return 'Pretraži prema...';
+      return 'Odaberite kriterij pretrage...';
   }
 };
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="lg:flex gap-2 justify-between mb-4">
-      <h2 className="justify-start mb-2 lg:mb-0">
-        <span>🦄 Neke zanimljive osobice </span>
-      </h2>
-      <div className="lg:flex gap-2">
-        <div className="mb-2 lg:mb-0">
-          <Input
-            type="text"
-            placeholder={getPlaceholder(selectValue)}
-            icon={<BiSearch color="grey" fontSize="20px" className="mt-1" />}
-            value={search}
-            onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-            className="md:min-w-[600px] py-[6px]"
-          />
-        </div>
-        <div className="min-w-[200px]">
-          <Select
-            isClearable={false}
-            options={selectOptions}
-            placeholder="Pretraži prema..."
-            onChange={(e) => {
+    <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm sm:flex gap-3 justify-between">
+      <div className="w-full mb-3 sm:mb-0">
+        <Input
+          type="text"
+          placeholder={getPlaceholder(selectValue)}
+          icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
+          value={search}
+          onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
+          className="w-full py-[6px] pl-[40px]"
+          disabled={!selectValue.value}
+        />
+      </div>
+      <div className="w-full sm:max-w-[220px]">
+        <Select
+          options={selectOptions}
+          isClearable
+          placeholder="Odaberite kriterij"
+          theme={(theme) => ({
+            ...theme,
+            colors: {
+              ...theme.colors,
+              primary25: '#dce4ff',
+              primary: '#2D46B9',
+            },
+          })}
+          value={selectValue.value ? selectValue : null}
+          onChange={(e) => {
+            if (!e) {
               setSelectValue({
-                value: e?.value || '',
-                label: e?.label || '',
+                value: '',
+                label: '',
               });
-            }}
-            defaultValue={selectOptions.find((option) => option.value === selectValue.value)}
-          />
-        </div>
+              setSearch('');
+              return;
+            }
+            setSelectValue({
+              value: e.value,
+              label: e.label,
+            });
+          }}
+        />
       </div>
     </div>
   );

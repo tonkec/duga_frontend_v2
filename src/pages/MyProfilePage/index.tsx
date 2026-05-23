@@ -12,6 +12,10 @@ import Loader from '@app/components/Loader';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import AllUserPhotos from './components/AllUserPhotos';
 
+const tabClassName =
+  'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
+const selectedTabClassName = 'bg-blue text-white shadow-sm';
+
 const MyProfilePage = () => {
   const navigate = useNavigate();
   const { user: currentUser } = useGetCurrentUser();
@@ -28,29 +32,35 @@ const MyProfilePage = () => {
 
   return (
     <AppLayout>
-      <Tabs selectedTabClassName="bg-black text-white rounded-t-md">
-        <TabList style={{ borderBottom: 'none', marginBottom: 0 }}>
-          <Tab style={{ border: 'none' }}>
-            <div className="flex items-center gap-1">
-              Općenito <BiSolidFile fontSize={25} />
-            </div>
-          </Tab>
-          <Tab>
-            <div className="flex items-center gap-1">
-              Profilne Fotografije <BiSolidCamera fontSize={25} />
-            </div>
-          </Tab>
+      <Tabs selectedTabClassName={selectedTabClassName}>
+        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Moj profil</h1>
+          </div>
 
-          <Tab>
-            <div className="flex items-center gap-1">
-              Sve fotografije <BiGlobe fontSize={25} />
-            </div>
-          </Tab>
-        </TabList>
+          <TabList className="flex flex-wrap gap-2 rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm">
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Općenito <BiSolidFile fontSize={20} />
+              </div>
+            </Tab>
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Profilne fotografije <BiSolidCamera fontSize={20} />
+              </div>
+            </Tab>
+
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Sve fotografije <BiGlobe fontSize={20} />
+              </div>
+            </Tab>
+          </TabList>
+        </div>
 
         <TabPanel>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-5 mb-3">
+            <div>
               <UserProfileCard
                 user={currentUser?.data}
                 allImages={allImages?.data.images}
@@ -58,44 +68,42 @@ const MyProfilePage = () => {
               />
             </div>
 
-            <div className="lg:col-span-1 max-w-[300px]">
+            <div className="grid content-start items-start gap-4 md:grid-cols-3 xl:grid-cols-1">
               <Cta
                 buttonText="Uredi profil"
-                className="mb-4"
-                subtitle="Impresioniraj ekipu svojim profilom."
-                title="Uredi svoj profil!"
+                subtitle="Dodaj detalje i fotografije."
+                title="Uredi profil"
                 onClick={() => {
                   navigate('/edit');
                 }}
               />
               <Cta
-                buttonText="Pošalji poruku"
-                subtitle="Možda te baš čeka zanimljiva osoba."
-                title="Pošalji nekome poruku!"
+                buttonText="Nova poruka"
+                subtitle="Započni razgovor s nekim."
+                title="Poruke"
                 onClick={() => {
                   navigate('/new-chat');
                 }}
               />
               <Cta
-                buttonText="Pretraži ekipu"
-                className="mt-4"
-                subtitle="Istraži koga ima okolo."
-                title="Istraži!"
+                buttonText="Korisnici"
+                subtitle="Pogledaj tko je online."
+                title="Istraži"
                 onClick={() => {
-                  navigate('/');
+                  navigate('/users');
                 }}
               />
             </div>
           </div>
         </TabPanel>
         <TabPanel>
-          <Card>
+          <Card className="rounded-2xl p-5">
             <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
           </Card>
         </TabPanel>
 
         <TabPanel>
-          <Card>
+          <Card className="rounded-2xl p-5">
             <AllUserPhotos />
           </Card>
         </TabPanel>

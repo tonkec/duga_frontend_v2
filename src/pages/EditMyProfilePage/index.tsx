@@ -160,6 +160,10 @@ const schema = z.object({
   ending: z.string().max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' }).optional(),
 });
 
+const tabClassName =
+  'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
+const selectedTabClassName = 'bg-blue text-white shadow-sm';
+
 const EditMyProfilePage = () => {
   const { user: currentUser } = useGetCurrentUser();
   const { updateUserMutation } = useUpdateUser();
@@ -188,7 +192,7 @@ const EditMyProfilePage = () => {
         relationshipStatus: currentUser.data.relationshipStatus || '',
         cigarettes: currentUser.data.cigarettes || false,
         alcohol: currentUser.data.alcohol || false,
-        sport: currentUser.data.sports || false,
+        sport: currentUser.data.sport || currentUser.data.sports || false,
         favoriteDay: daysOfWeek.find(
           (option) => option.value === currentUser.data.favoriteDayOfWeek
         )?.value,
@@ -215,29 +219,35 @@ const EditMyProfilePage = () => {
 
   return (
     <AppLayout>
-      <Tabs selectedTabClassName="bg-black text-white rounded-t-md">
-        <TabList style={{ borderBottom: 'none', marginBottom: 0 }}>
-          <Tab style={{ border: 'none' }}>
-            <div className="flex items-center gap-1">
-              Općenito <BiSolidFile fontSize={25} />
-            </div>
-          </Tab>
+      <Tabs selectedTabClassName={selectedTabClassName}>
+        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Uredi profil</h1>
+          </div>
 
-          <Tab>
-            <div className="flex items-center gap-1">
-              Fotografije <BiSolidCamera fontSize={25} />
-            </div>
-          </Tab>
-        </TabList>
+          <TabList className="flex flex-wrap gap-2 rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm">
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Općenito <BiSolidFile fontSize={20} />
+              </div>
+            </Tab>
+
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Fotografije <BiSolidCamera fontSize={20} />
+              </div>
+            </Tab>
+          </TabList>
+        </div>
 
         <TabPanel>
-          <Card>
-            <form onSubmit={handleSubmit(onSubmitForm)}>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
+          <Card className="rounded-2xl p-5 md:p-7">
+            <form className="space-y-5" onSubmit={handleSubmit(onSubmitForm)}>
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <Input
                     type="text"
-                    className="mb-2 !bg-gray-200"
+                    className="!bg-gray-100"
                     placeholder="Korisničko ime"
                     value={currentUser?.data.username}
                     label="Korisničko ime"
@@ -245,13 +255,15 @@ const EditMyProfilePage = () => {
                   />
                   <Input
                     type="text"
-                    className="mb-2 !bg-gray-200"
+                    className="!bg-gray-100"
                     placeholder="Godine"
                     value={currentUser?.data?.age}
                     label="Dob"
                     disabled
                   />
+                </div>
 
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <Controller
                     name="location"
                     control={control}
@@ -263,13 +275,12 @@ const EditMyProfilePage = () => {
                           {...field}
                           options={cityOptions}
                           placeholder="Tvoja lokacija otprilike..."
-                          className="mb-2"
                           theme={(theme) => ({
                             ...theme,
                             colors: {
                               ...theme.colors,
-                              primary25: '#F037A5',
-                              primary: 'black',
+                              primary25: '#dce4ff',
+                              primary: '#2D46B9',
                             },
                           })}
                           value={cityOptions.find((option) => option.value === field.value) || null}
@@ -280,23 +291,18 @@ const EditMyProfilePage = () => {
                       </>
                     )}
                   />
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Rod"
-                    {...register('gender')}
-                    label="Rod"
-                  />
+                  <Input type="text" placeholder="Rod" {...register('gender')} label="Rod" />
                   {errors.gender?.message && <FieldError message={errors.gender.message} />}
                   <Input
                     label="Seksualnost"
                     type="text"
-                    className="mb-2"
                     placeholder="Seksualnost"
                     {...register('sexuality')}
                   />
                   {errors.sexuality?.message && <FieldError message={errors.sexuality.message} />}
+                </div>
 
+                <div className="mt-4">
                   <Label>Jedna rečenica o meni</Label>
                   <Input
                     type="text"
@@ -307,8 +313,8 @@ const EditMyProfilePage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <Controller
                     name="lookingFor"
                     control={control}
@@ -320,13 +326,12 @@ const EditMyProfilePage = () => {
                           {...field}
                           options={lookingForOptions}
                           placeholder="Trenutno tražim..."
-                          className="mb-2"
                           theme={(theme) => ({
                             ...theme,
                             colors: {
                               ...theme.colors,
-                              primary25: '#F037A5',
-                              primary: 'black',
+                              primary25: '#dce4ff',
+                              primary: '#2D46B9',
                             },
                           })}
                           value={
@@ -354,13 +359,12 @@ const EditMyProfilePage = () => {
                           {...field}
                           options={relationshipStatusOptions}
                           placeholder="Trenutno sam..."
-                          className="mb-2"
                           theme={(theme) => ({
                             ...theme,
                             colors: {
                               ...theme.colors,
-                              primary25: '#F037A5',
-                              primary: 'black',
+                              primary25: '#dce4ff',
+                              primary: '#2D46B9',
                             },
                           })}
                           value={
@@ -377,213 +381,213 @@ const EditMyProfilePage = () => {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
-                <div className="col-span-2">
+
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <div className="mb-3">
                   <Label>Zdravstveni i životni stil</Label>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
                   <Controller
                     name="cigarettes"
                     control={control}
                     render={({ field }) => (
-                      <>
+                      <label className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-gray-800">
                         <input
                           type="checkbox"
-                          {...field}
-                          value={currentUser?.data.cigarettes || false}
-                        />{' '}
-                        Cigarete
-                      </>
+                          name={field.name}
+                          ref={field.ref}
+                          checked={Boolean(field.value)}
+                          onBlur={field.onBlur}
+                          onChange={(event) => field.onChange(event.target.checked)}
+                        />
+                        <span>Cigarete</span>
+                      </label>
                     )}
                   />
-                </div>
-                <div className="col-span-2">
                   <Controller
                     name="alcohol"
                     control={control}
                     render={({ field }) => (
-                      <>
+                      <label className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-gray-800">
                         <input
                           type="checkbox"
-                          {...field}
-                          value={currentUser?.data.alcohol || false}
-                        />{' '}
-                        Alkohol
-                      </>
+                          name={field.name}
+                          ref={field.ref}
+                          checked={Boolean(field.value)}
+                          onBlur={field.onBlur}
+                          onChange={(event) => field.onChange(event.target.checked)}
+                        />
+                        <span>Alkohol</span>
+                      </label>
                     )}
                   />
-                </div>
-                <div className="col-span-2">
                   <Controller
                     name="sport"
                     control={control}
                     render={({ field }) => (
-                      <>
+                      <label className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-gray-800">
                         <input
                           type="checkbox"
-                          {...field}
-                          value={currentUser?.data.sport || false}
-                        />{' '}
-                        Sport
-                      </>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
-                  <Controller
-                    name="favoriteDay"
-                    control={control}
-                    render={({ field }) => (
-                      <>
-                        <Label>Moj najdraži dan u tjednu</Label>
-                        <Select
-                          isClearable
-                          {...field}
-                          options={daysOfWeek}
-                          placeholder="Najdraži dan u tjednu"
-                          className="mb-2"
-                          theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                              ...theme.colors,
-                              primary25: '#F037A5',
-                              primary: 'black',
-                            },
-                          })}
-                          value={daysOfWeek.find((option) => option.value === field.value) || null}
-                          onChange={(selectedOption) =>
-                            field.onChange(selectedOption ? selectedOption.value : null)
-                          }
+                          name={field.name}
+                          ref={field.ref}
+                          checked={Boolean(field.value)}
+                          onBlur={field.onBlur}
+                          onChange={(event) => field.onChange(event.target.checked)}
                         />
-                      </>
+                        <span>Sport</span>
+                      </label>
                     )}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
-                  <Label>Najsramotnija stvar koja mi se dogodila</Label>
-                  <TextArea
-                    className="mb-4"
-                    placeholder="Najsramotnija stvar koja mi se dogodila..."
-                    {...register('embarasement')}
-                  />
-                  {errors.embarasement?.message && (
-                    <FieldError message={errors.embarasement.message} />
+
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <Controller
+                  name="favoriteDay"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <Label>Moj najdraži dan u tjednu</Label>
+                      <Select
+                        isClearable
+                        {...field}
+                        options={daysOfWeek}
+                        placeholder="Najdraži dan u tjednu"
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: '#dce4ff',
+                            primary: '#2D46B9',
+                          },
+                        })}
+                        value={daysOfWeek.find((option) => option.value === field.value) || null}
+                        onChange={(selectedOption) =>
+                          field.onChange(selectedOption ? selectedOption.value : null)
+                        }
+                      />
+                    </>
                   )}
-
-                  <Label>Imam previše godina za...</Label>
-                  <TextArea
-                    className="mb-4"
-                    placeholder="Imam previše godina za...."
-                    {...register('tooOldFor')}
-                  />
-                  {errors.tooOldFor?.message && <FieldError message={errors.tooOldFor.message} />}
-
-                  <Label>Stvari koje mi uljepšavaju dan</Label>
-                  <TextArea
-                    className="mb-4"
-                    placeholder="Dan mi je ljepši ako..."
-                    {...register('makesMyDay')}
-                  />
-                  {errors.makesMyDay?.message && <FieldError message={errors.makesMyDay.message} />}
-
-                  <Input
-                    label={
-                      <div className="flex items-center gap-1">
-                        <span>Unesi svoju najdražu pjesmu sa Youtube-a</span>
-                        <span data-tooltip-id="youtubesong">
-                          <BiInfoCircle fontSize={20} />
-                        </span>
-                        <Tooltip
-                          id="youtubesong"
-                          style={{
-                            backgroundColor: 'black',
-                            color: 'white',
-                          }}
-                        >
-                          Unesi link u formatu <code>https://www.youtube.com/embed/</code>
-                        </Tooltip>
-                      </div>
-                    }
-                    type="text"
-                    className="mb-2"
-                    placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
-                    {...register('favoriteSong')}
-                    error={errors.favoriteSong?.message}
-                  />
-
-                  <Input
-                    label={
-                      <div className="flex items-center gap-1">
-                        <span>Unesi svoju najdraži film sa Youtube-a</span>
-                        <span data-tooltip-id="youtubetrailer">
-                          <BiInfoCircle fontSize={20} />
-                        </span>
-                        <Tooltip
-                          id="youtubetrailer"
-                          style={{
-                            backgroundColor: 'black',
-                            color: 'white',
-                          }}
-                        >
-                          Unesi link u formatu <code>https://www.youtube.com/embed/</code>
-                        </Tooltip>
-                      </div>
-                    }
-                    type="text"
-                    className="mb-2"
-                    placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
-                    {...register('favoriteMovie')}
-                    error={errors.favoriteMovie?.message}
-                  />
-                </div>
+                />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
-                  <Label>Duhovnost/religioznost</Label>
-                  <TextArea
-                    className="mb-2"
-                    placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
-                    {...register('spirituality')}
-                  />
-                  {errors.spirituality?.message && (
-                    <FieldError message={errors.spirituality.message} />
-                  )}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3">
-                <div className="col-span-2">
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Interesi (odvojeni zarezom)"
-                    {...register('interests')}
-                    label="Interesi"
-                  />
-                  {errors.interests?.message && <FieldError message={errors.interests.message} />}
 
-                  <Input
-                    type="text"
-                    className="mb-2"
-                    placeholder="Jezici koje govorim (odvojeni zarezom)"
-                    {...register('languages')}
-                    label="Jezici"
-                  />
-                  {errors.languages?.message && <FieldError message={errors.languages.message} />}
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <Label>Najsramotnija stvar koja mi se dogodila</Label>
+                <TextArea
+                  className="mb-4"
+                  placeholder="Najsramotnija stvar koja mi se dogodila..."
+                  {...register('embarasement')}
+                />
+                {errors.embarasement?.message && (
+                  <FieldError message={errors.embarasement.message} />
+                )}
 
-                  <Label>Za kraj, još nešto o meni</Label>
-                  <TextArea placeholder="Za kraj još nešto o meni" {...register('ending')} />
-                  {errors.ending?.message && <FieldError message={errors.ending.message} />}
-                </div>
+                <Label>Imam previše godina za...</Label>
+                <TextArea
+                  className="mb-4"
+                  placeholder="Imam previše godina za...."
+                  {...register('tooOldFor')}
+                />
+                {errors.tooOldFor?.message && <FieldError message={errors.tooOldFor.message} />}
+
+                <Label>Stvari koje mi uljepšavaju dan</Label>
+                <TextArea
+                  className="mb-4"
+                  placeholder="Dan mi je ljepši ako..."
+                  {...register('makesMyDay')}
+                />
+                {errors.makesMyDay?.message && <FieldError message={errors.makesMyDay.message} />}
+
+                <Input
+                  label={
+                    <div className="flex items-center gap-1">
+                      <span>Unesi svoju najdražu pjesmu sa Youtube-a</span>
+                      <span data-tooltip-id="youtubesong">
+                        <BiInfoCircle fontSize={20} />
+                      </span>
+                      <Tooltip
+                        id="youtubesong"
+                        style={{
+                          backgroundColor: 'black',
+                          color: 'white',
+                        }}
+                      >
+                        Unesi link u formatu <code>https://www.youtube.com/embed/</code>
+                      </Tooltip>
+                    </div>
+                  }
+                  type="text"
+                  className="mb-2"
+                  placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
+                  {...register('favoriteSong')}
+                  error={errors.favoriteSong?.message}
+                />
+
+                <Input
+                  label={
+                    <div className="flex items-center gap-1">
+                      <span>Unesi svoju najdraži film sa Youtube-a</span>
+                      <span data-tooltip-id="youtubetrailer">
+                        <BiInfoCircle fontSize={20} />
+                      </span>
+                      <Tooltip
+                        id="youtubetrailer"
+                        style={{
+                          backgroundColor: 'black',
+                          color: 'white',
+                        }}
+                      >
+                        Unesi link u formatu <code>https://www.youtube.com/embed/</code>
+                      </Tooltip>
+                    </div>
+                  }
+                  type="text"
+                  className="mb-2"
+                  placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
+                  {...register('favoriteMovie')}
+                  error={errors.favoriteMovie?.message}
+                />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-3 mt-3">
-                <div className="col-span-2">
-                  <Button type="primary" className="mt-4 w-full">
-                    Spremi
-                  </Button>
-                </div>
+
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <Label>Duhovnost/religioznost</Label>
+                <TextArea
+                  placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
+                  {...register('spirituality')}
+                />
+                {errors.spirituality?.message && (
+                  <FieldError message={errors.spirituality.message} />
+                )}
+              </div>
+
+              <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+                <Input
+                  type="text"
+                  className="mb-2"
+                  placeholder="Interesi (odvojeni zarezom)"
+                  {...register('interests')}
+                  label="Interesi"
+                />
+                {errors.interests?.message && <FieldError message={errors.interests.message} />}
+
+                <Input
+                  type="text"
+                  className="mb-2"
+                  placeholder="Jezici koje govorim (odvojeni zarezom)"
+                  {...register('languages')}
+                  label="Jezici"
+                />
+                {errors.languages?.message && <FieldError message={errors.languages.message} />}
+
+                <Label>Za kraj, još nešto o meni</Label>
+                <TextArea placeholder="Za kraj još nešto o meni" {...register('ending')} />
+                {errors.ending?.message && <FieldError message={errors.ending.message} />}
+              </div>
+
+              <div className="max-w-3xl">
+                <Button type="blue" className="w-full">
+                  Spremi
+                </Button>
               </div>
             </form>
           </Card>

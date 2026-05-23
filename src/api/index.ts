@@ -1,15 +1,13 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-const clearAllAuthData = () => {
-  localStorage.clear();
+import axios, { AxiosInstance } from 'axios';
+import { resolveAccessToken } from './authToken';
+import { getAppSessionId, SESSION_HEADER } from './appSession';
+import { handleGlobalApiError } from './globalErrorHandler';
 
-  sessionStorage.clear();
-
-  document.cookie.split(';').forEach((c) => {
-    document.cookie = c
-      .replace(/^ +/, '')
-      .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
-  });
-};
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipGlobalErrorHandler?: boolean;
+  }
+}
 
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
@@ -37,16 +35,10 @@ export const apiClient = (token?: string): AxiosInstance => {
   });
 
   instance.interceptors.request.use(
-    (config) => {
-      // If token is explicitly passed, use it
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        return config;
-      }
+    async (config) => {
+      const authToken = await resolveAccessToken(token);
 
-      // Otherwise, try cookie-based fallback
-      const cookieToken = getCookie('token');
-      if (!cookieToken) {
+      if (!authToken) {
         return Promise.reject({
           response: {
             status: 401,
@@ -55,44 +47,16 @@ export const apiClient = (token?: string): AxiosInstance => {
         });
       }
 
-      config.headers.Authorization = `Bearer ${cookieToken}`;
+      config.headers.Authorization = `Bearer ${authToken}`;
+      config.headers[SESSION_HEADER] = getAppSessionId();
       return config;
     },
     (error) => Promise.reject(error)
   );
-  type Cfg = AxiosRequestConfig & { skipGlobalErrorHandler?: boolean };
-
-  const ERROR_ROUTES = ['/broken', '/record-not-found', '/network-error'];
-
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      const cfg = (error.config || {}) as Cfg;
-
-      // let certain calls opt out
-      if (cfg.skipGlobalErrorHandler) {
-        return Promise.reject(error);
-      }
-
-      const here = window.location.pathname;
-      const alreadyOnErrorRoute = ERROR_ROUTES.includes(here);
-
-      if (!alreadyOnErrorRoute) {
-        if (error?.response?.status >= 500) {
-          window.location.replace('/broken');
-          return Promise.reject(error);
-        }
-        if (error?.response?.status === 404) {
-          window.location.replace('/record-not-found');
-          return Promise.reject(error);
-        }
-        if (error.code === 'ERR_NETWORK') {
-          clearAllAuthData();
-          window.location.replace('/network-error');
-          return Promise.reject(error);
-        }
-      }
-
+      handleGlobalApiError(error);
       return Promise.reject(error);
     }
   );

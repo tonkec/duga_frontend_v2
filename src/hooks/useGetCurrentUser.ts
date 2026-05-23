@@ -9,6 +9,8 @@ export const useGetCurrentUser = () => {
   } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => getCurrentUser(),
+    retry: false,
+    throwOnError: false,
   });
 
   return { user, userError, isUserLoading };

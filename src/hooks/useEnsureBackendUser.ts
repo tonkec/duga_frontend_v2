@@ -2,6 +2,7 @@ import { apiClient } from '@app/api';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
+import { isAppSessionRevoked } from '@app/api/appSession';
 
 export const generateUniqueUsername = (): string => {
   const [word] = generate({ exactly: 1, formatter: (w) => w.toLowerCase() });
@@ -10,16 +11,15 @@ export const generateUniqueUsername = (): string => {
   return username;
 };
 
-export const useEnsureBackendUser = () => {
-  const { getAccessTokenSilently, user: auth0User } = useAuth0();
+export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } = {}) => {
+  const { user: auth0User, isAuthenticated, isLoading: isAuthLoading } = useAuth0();
 
   return useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
       if (!auth0User) throw new Error('Auth0 user not available');
 
-      const token = await getAccessTokenSilently();
-      const client = apiClient(token);
+      const client = apiClient();
 
       const input = {
         email: auth0User.email,
@@ -29,9 +29,12 @@ export const useEnsureBackendUser = () => {
       };
 
       await client.post('/register', input);
-      const res = await client.get('/users/current-user');
+      const res = await client.get('/users/current-user', {
+        skipGlobalErrorHandler: true,
+      });
       return res.data;
     },
-    enabled: !!auth0User,
+    enabled: enabled && !isAppSessionRevoked() && isAuthenticated && !isAuthLoading && !!auth0User,
+    throwOnError: false,
   });
 };

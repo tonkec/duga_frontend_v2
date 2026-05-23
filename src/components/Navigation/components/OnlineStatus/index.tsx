@@ -23,6 +23,11 @@ const StatusDropdown = () => {
       throw new Error(`Unexpected status "${newStatus}"`);
     }
 
+    if (!socket?.connected) {
+      toast.error('Nije uspjelo spremanje statusa');
+      return;
+    }
+
     setStatus(newStatus);
     socket.emit('set-status', { status: newStatus });
     toast.success(`Status je uspješno promijenjen na ${newStatus}`);

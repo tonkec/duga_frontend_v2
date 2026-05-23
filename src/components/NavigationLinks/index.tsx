@@ -1,13 +1,21 @@
-import { Link } from 'react-router-dom';
-import { BiExit } from 'react-icons/bi';
+import { NavLink } from 'react-router-dom';
+import { BiCog, BiExit, BiGroup, BiHomeAlt, BiMessageRounded, BiUser } from 'react-icons/bi';
 import NotificationDropdown from '../Navigation/components/Notifications';
 
 interface NavigationItemsProps {
-  userId: string | null;
+  userId: string | number | null;
   isMobile?: boolean;
   onItemClick?: () => void;
   onLogout: () => void;
 }
+
+const navItems = [
+  { to: '/', label: 'Početna', icon: <BiHomeAlt fontSize={20} /> },
+  { to: '/new-chat', label: 'Poruke', icon: <BiMessageRounded fontSize={20} /> },
+  { to: '/users', label: 'Korisnici', icon: <BiGroup fontSize={20} /> },
+  { to: '/profile', label: 'Profil', icon: <BiUser fontSize={20} /> },
+  { to: '/settings', label: 'Postavke', icon: <BiCog fontSize={20} /> },
+];
 
 export const NavigationItems = ({
   userId,
@@ -16,64 +24,53 @@ export const NavigationItems = ({
   onLogout,
 }: NavigationItemsProps) => {
   const numericUserId = userId ? Number(userId) : null;
+  const linkBase = isMobile
+    ? 'flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold transition-colors'
+    : 'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors';
+  const getLinkClassName = ({ isActive }: { isActive: boolean }) =>
+    `${linkBase} ${
+      isActive
+        ? isMobile
+          ? 'bg-white text-blue shadow-sm'
+          : 'bg-white text-blue shadow-sm'
+        : isMobile
+          ? 'text-white/90 hover:bg-white/10 hover:text-white'
+          : 'text-white/90 hover:bg-white/15 hover:text-white'
+    }`;
 
   return (
     <>
-      <div className="flex items-center space-between w-full">
-        <div className={`${isMobile ? 'block w-full' : 'flex'}  items-center space-between gap-6`}>
-          <Link
-            to="/"
+      <div className={isMobile ? 'w-full space-y-2' : 'flex items-center gap-2'}>
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
             onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black flex-1 px-2 py-1 rounded mb-2 w-full justify-center '}`}
+            className={getLinkClassName}
           >
-            <span>Početna</span>
-            {!isMobile && String.fromCodePoint(parseInt('1F3D8', 16))}
-          </Link>
-          <Link
-            to="/new-chat"
-            onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
-          >
-            <span>Poruke</span>
-            {!isMobile && String.fromCodePoint(parseInt('1F4EB', 16))}
-          </Link>
-          <Link
-            to="/profile"
-            onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
-          >
-            <span>Profil</span>
-            {!isMobile && String.fromCodePoint(parseInt('1F9D1', 16))}
-          </Link>
+            {item.icon}
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
 
-          <Link
-            to="/settings"
-            onClick={onItemClick}
-            className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black px-2 py-1 rounded mb-2 w-full justify-center '}`}
-          >
-            <span>Postavke</span>
-            {!isMobile && String.fromCodePoint(9881, 65039)}
-          </Link>
-
-          <div>
-            <NotificationDropdown userId={numericUserId} isMobile={isMobile} />
-          </div>
+        <div className={isMobile ? 'pt-2' : 'ml-1'}>
+          <NotificationDropdown userId={numericUserId} isMobile={isMobile} />
         </div>
       </div>
 
-      <div className={isMobile ? 'absolute bottom-2 left-6 right-6' : 'relative'}>
+      <div className={isMobile ? 'mt-auto pt-6' : 'ml-auto'}>
         <button
           onClick={onLogout}
-          className={`flex items-center gap-1 ${isMobile && 'text-lg bg-black text-white hover:bg-white hover:text-black flex-1 px-2 py-1 rounded mb-2 w-full flex-1 justify-center '}`}
+          aria-label="Odjava"
+          className={
+            isMobile
+              ? 'flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-4 py-3 font-semibold text-white transition-colors hover:bg-white hover:text-blue'
+              : 'flex items-center gap-2 rounded-full px-3 py-2 text-white/90 transition-colors hover:bg-white/15 hover:text-white'
+          }
         >
-          {isMobile ? (
-            <>
-              <span>Odjava</span>
-              <BiExit fontSize={20} />
-            </>
-          ) : (
-            <BiExit fontSize={25} />
-          )}
+          <BiExit fontSize={22} />
+          {isMobile && <span>Odjava</span>}
         </button>
       </div>
     </>

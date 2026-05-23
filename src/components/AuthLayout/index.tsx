@@ -4,8 +4,8 @@ interface IAuthLayoutProps {
 
 const AuthLayout = ({ children }: IAuthLayoutProps) => {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8 gradient">
-      <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 w-full max-w-sm md:max-w-md">
+    <div className="gradient flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 md:px-8">
+      <div className="w-full max-w-md rounded-[2rem] border border-white/30 bg-white/90 p-6 shadow-2xl backdrop-blur-xl sm:p-8 md:p-10">
         {children}
       </div>
     </div>

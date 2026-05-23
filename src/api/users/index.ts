@@ -37,12 +37,16 @@ export const getAllUsers = async () => {
 
 export const getCurrentUser = () => {
   const client = apiClient();
-  return client.get(`/users/current-user/`);
+  return client.get(`/users/current-user/`, {
+    skipGlobalErrorHandler: true,
+  });
 };
 
 export const getUserById = async (id: string) => {
   const client = apiClient();
-  return client.get(`/users/${id}`);
+  return client.get(`/users/${id}`, {
+    skipGlobalErrorHandler: true,
+  });
 };
 
 export const updateUser = async (data: IUserUpdateProps) => {
@@ -62,12 +66,16 @@ export const getUserByUsername = async (username: string) => {
 
 export const getUserOnlineStatus = async () => {
   const client = apiClient();
-  return client.get(`/users/online-status/`);
+  return client.get(`/users/online-status/`, {
+    skipGlobalErrorHandler: true,
+  });
 };
 
 export const getAllUserPhotos = async () => {
   const client = apiClient();
-  return client.get(`/uploads/user-photos/`);
+  return client.get(`/uploads/user-photos/`, {
+    skipGlobalErrorHandler: true,
+  });
 };
 
 export const updatePostLoginData = async (data: IPostLoginProps) => {
