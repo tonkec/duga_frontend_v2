@@ -71,7 +71,7 @@ export const useAddUploadComment = () => {
     isAddUploadCommentSuccess,
   };
 };
-export const useDeleteUploadComment = () => {
+export const useDeleteUploadComment = (onCommentDeleted?: (commentId: number) => void) => {
   const socket = useSocket();
 
   const {
@@ -81,8 +81,9 @@ export const useDeleteUploadComment = () => {
     isSuccess: isDeleteUploadCommentSuccess,
   } = useMutation({
     mutationFn: (commentId: number) => deleteUploadComment(commentId),
-    onSuccess: (data) => {
-      socket?.emit('delete-comment', data);
+    onSuccess: (data, commentId) => {
+      onCommentDeleted?.(commentId);
+      socket?.emit('delete-comment', data?.data?.id ? data : { data: { id: commentId } });
       toast.success('Komentar uspiješno obrisan.', toastConfig);
     },
     onError: () => {

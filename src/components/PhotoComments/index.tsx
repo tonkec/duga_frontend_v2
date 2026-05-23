@@ -60,10 +60,18 @@ export interface IComment {
 }
 
 const CommentUpdateContext = createContext<((payload: unknown) => void) | undefined>(undefined);
+const CommentDeleteContext = createContext<((commentId: number) => void) | undefined>(undefined);
 
 const PaginatedComment = ({ singleEntry }: { singleEntry: IComment }) => {
   const onCommentUpdated = useContext(CommentUpdateContext);
-  return <CommentWithUser comment={singleEntry} onCommentUpdated={onCommentUpdated} />;
+  const onCommentDeleted = useContext(CommentDeleteContext);
+  return (
+    <CommentWithUser
+      comment={singleEntry}
+      onCommentUpdated={onCommentUpdated}
+      onCommentDeleted={onCommentDeleted}
+    />
+  );
 };
 
 const PhotoComments = () => {
@@ -101,6 +109,10 @@ const PhotoComments = () => {
     },
     [photoId]
   );
+
+  const removeComment = useCallback((commentId: number) => {
+    setAllComments((prev) => prev.filter((comment) => Number(comment.id) !== Number(commentId)));
+  }, []);
 
   const {
     handleSubmit,
@@ -190,7 +202,7 @@ const PhotoComments = () => {
       if (!id) return;
       if (uploadId && photoId && String(uploadId) !== String(photoId)) return;
 
-      setAllComments((prev) => prev.filter((comment) => comment.id !== Number(id)));
+      removeComment(Number(id));
     });
 
     const handleCommentUpdate = (payload: unknown) => {
@@ -211,7 +223,7 @@ const PhotoComments = () => {
       socket.off('update-comment', handleCommentUpdate);
       socket.off('edit-comment', handleCommentUpdate);
     };
-  }, [applyCommentUpdate, photoId, socket]);
+  }, [applyCommentUpdate, photoId, removeComment, socket]);
 
   useEffect(() => {
     if (!selectedImageFile) {
@@ -244,171 +256,173 @@ const PhotoComments = () => {
 
   return (
     <CommentUpdateContext.Provider value={applyCommentUpdate}>
-      <div className="mb-4">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">Komentari</p>
-        <h1 className="mt-1 text-2xl font-bold text-gray-900">
-          {sortedComments.length
-            ? `${sortedComments.length} komentara`
-            : 'Budi prva osoba koja komentira'}
-        </h1>
-      </div>
-
-      <form
-        className="mb-5 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className="flex w-full items-center gap-2">
-          <Controller
-            name="image"
-            control={control}
-            render={({ field }) => {
-              const handleIconClick = () => {
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = '';
-                  fileInputRef.current.click();
-                }
-              };
-              return (
-                <>
-                  <input
-                    type="file"
-                    accept={ALLOWED_FILE_TYPES}
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={(e) => {
-                      if (!e.target.files) {
-                        return;
-                      }
-
-                      if (!areValidImageTypes(e.target.files)) {
-                        toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
-                        return;
-                      }
-
-                      field.onChange(e.target.files);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={handleIconClick}
-                    disabled={isAddingUploadComment}
-                    aria-label="Dodaj sliku"
-                  >
-                    <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
-                  </button>
-                </>
-              );
-            }}
-          />
-
-          <Controller
-            name="comment"
-            control={control}
-            render={({ field }) => {
-              const handleSearch = async (value: string) => {
-                const emojiRegex = /(?:\s|^):([^\s:]+)/;
-                const match = value.match(emojiRegex);
-
-                if (match) {
-                  const searchTerm = match[1];
-                  const emojis = await search(searchTerm);
-                  setCurrentEmojis(emojis);
-                } else {
-                  setCurrentEmojis([]);
-                }
-              };
-
-              const debouncedSearch = debounce(handleSearch, 300);
-              return (
-                <MentionInput
-                  value={field.value}
-                  onChange={(e) => {
-                    const value = e;
-                    debouncedSearch(value);
-                    field.onChange(value);
-                  }}
-                  onTagUsersChange={setTaggedUsers}
-                  placeholder="Dodaj komentar"
-                  className="flex-grow"
-                />
-              );
-            }}
-          />
-
-          <EmojiPicker
-            emojis={currentEmojis}
-            onEmojiSelect={(emoji: string) => {
-              const currentComment = getValues('comment');
-              const updatedComment = currentComment?.replace(/(?:\s|^):([^\s:]+)?/, emoji);
-              setValue('comment', updatedComment, { shouldValidate: true });
-              setCurrentEmojis([]);
-            }}
-          />
-
-          <Button type="blue" disabled={isAddingUploadComment}>
-            {isAddingUploadComment ? (
-              <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Slanje
-              </span>
-            ) : (
-              'Pošalji'
-            )}
-          </Button>
+      <CommentDeleteContext.Provider value={removeComment}>
+        <div className="mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">Komentari</p>
+          <h1 className="mt-1 text-2xl font-bold text-gray-900">
+            {sortedComments.length
+              ? `${sortedComments.length} komentara`
+              : 'Budi prva osoba koja komentira'}
+          </h1>
         </div>
 
-        {previewUrl && (
-          <div className="mt-3 flex items-end gap-3">
-            <div className="relative">
-              <Image
-                src={previewUrl}
-                alt="Preview"
-                className="max-w-[150px] rounded-xl border border-[#dce4ff]"
-              />
-              {isAddingUploadComment && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
-                  Slanje...
-                </div>
+        <form
+          className="mb-5 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className="flex w-full items-center gap-2">
+            <Controller
+              name="image"
+              control={control}
+              render={({ field }) => {
+                const handleIconClick = () => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                    fileInputRef.current.click();
+                  }
+                };
+                return (
+                  <>
+                    <input
+                      type="file"
+                      accept={ALLOWED_FILE_TYPES}
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={(e) => {
+                        if (!e.target.files) {
+                          return;
+                        }
+
+                        if (!areValidImageTypes(e.target.files)) {
+                          toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+                          return;
+                        }
+
+                        field.onChange(e.target.files);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                      onClick={handleIconClick}
+                      disabled={isAddingUploadComment}
+                      aria-label="Dodaj sliku"
+                    >
+                      <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+                    </button>
+                  </>
+                );
+              }}
+            />
+
+            <Controller
+              name="comment"
+              control={control}
+              render={({ field }) => {
+                const handleSearch = async (value: string) => {
+                  const emojiRegex = /(?:\s|^):([^\s:]+)/;
+                  const match = value.match(emojiRegex);
+
+                  if (match) {
+                    const searchTerm = match[1];
+                    const emojis = await search(searchTerm);
+                    setCurrentEmojis(emojis);
+                  } else {
+                    setCurrentEmojis([]);
+                  }
+                };
+
+                const debouncedSearch = debounce(handleSearch, 300);
+                return (
+                  <MentionInput
+                    value={field.value}
+                    onChange={(e) => {
+                      const value = e;
+                      debouncedSearch(value);
+                      field.onChange(value);
+                    }}
+                    onTagUsersChange={setTaggedUsers}
+                    placeholder="Dodaj komentar"
+                    className="flex-grow"
+                  />
+                );
+              }}
+            />
+
+            <EmojiPicker
+              emojis={currentEmojis}
+              onEmojiSelect={(emoji: string) => {
+                const currentComment = getValues('comment');
+                const updatedComment = currentComment?.replace(/(?:\s|^):([^\s:]+)?/, emoji);
+                setValue('comment', updatedComment, { shouldValidate: true });
+                setCurrentEmojis([]);
+              }}
+            />
+
+            <Button type="blue" disabled={isAddingUploadComment}>
+              {isAddingUploadComment ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Slanje
+                </span>
+              ) : (
+                'Pošalji'
               )}
-            </div>
-            <Button
-              type="danger"
-              htmlType="button"
-              onClick={clearImage}
-              disabled={isAddingUploadComment}
-            >
-              Makni
             </Button>
           </div>
-        )}
 
-        {errors.comment && <FieldError message="Unesi komentar ili dodaj sliku" />}
-      </form>
+          {previewUrl && (
+            <div className="mt-3 flex items-end gap-3">
+              <div className="relative">
+                <Image
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-w-[150px] rounded-xl border border-[#dce4ff]"
+                />
+                {isAddingUploadComment && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
+                    Slanje...
+                  </div>
+                )}
+              </div>
+              <Button
+                type="danger"
+                htmlType="button"
+                onClick={clearImage}
+                disabled={isAddingUploadComment}
+              >
+                Makni
+              </Button>
+            </div>
+          )}
 
-      <div className="flex flex-col gap-3">
-        {areCommentsLoading && (
-          <div className="rounded-2xl border border-[#dce4ff] bg-white py-8">
-            <Loader variant="inline" label="Učitavanje komentara..." />
-          </div>
-        )}
+          {errors.comment && <FieldError message="Unesi komentar ili dodaj sliku" />}
+        </form>
 
-        {!areCommentsLoading && !sortedComments.length && (
-          <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
-            Još nema komentara.
-          </div>
-        )}
+        <div className="flex flex-col gap-3">
+          {areCommentsLoading && (
+            <div className="rounded-2xl border border-[#dce4ff] bg-white py-8">
+              <Loader variant="inline" label="Učitavanje komentara..." />
+            </div>
+          )}
 
-        {!areCommentsLoading && !!sortedComments.length && (
-          <Paginated<IComment>
-            itemsPerPage={3}
-            gridClassName="grid grid-cols-1 gap-3"
-            data={sortedComments}
-            paginatedSingle={PaginatedComment}
-            getItemKey={(item) => item.id}
-          />
-        )}
-      </div>
+          {!areCommentsLoading && !sortedComments.length && (
+            <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
+              Još nema komentara.
+            </div>
+          )}
+
+          {!areCommentsLoading && !!sortedComments.length && (
+            <Paginated<IComment>
+              itemsPerPage={3}
+              gridClassName="grid grid-cols-1 gap-3"
+              data={sortedComments}
+              paginatedSingle={PaginatedComment}
+              getItemKey={(item) => item.id}
+            />
+          )}
+        </div>
+      </CommentDeleteContext.Provider>
     </CommentUpdateContext.Provider>
   );
 };

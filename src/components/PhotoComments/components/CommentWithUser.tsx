@@ -29,14 +29,15 @@ const schema = z.object({
 const CommentWithUser: React.FC<{
   comment: IComment;
   onCommentUpdated?: (payload: unknown) => void;
-}> = ({ comment, onCommentUpdated }) => {
+  onCommentDeleted?: (commentId: number) => void;
+}> = ({ comment, onCommentUpdated, onCommentDeleted }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<IUser[]>([]);
   const { user: currentUser } = useGetCurrentUser();
   const currentUserId = currentUser?.data.id;
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
-  const { mutateDeleteUploadComment } = useDeleteUploadComment();
+  const { mutateDeleteUploadComment } = useDeleteUploadComment(onCommentDeleted);
   const { mutateEditUploadComment } = useEditUploadComment(onCommentUpdated);
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || '');
 
