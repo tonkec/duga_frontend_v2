@@ -85,4 +85,32 @@ describe('UserAvatar integration', () => {
       'blob:uploaded-profile-image'
     );
   });
+
+  it('falls back to the profile placeholder when the uploaded image is missing', () => {
+    mockUseGetProfilePhoto.mockReturnValue({
+      profilePhoto: {
+        data: {
+          securePhotoUrl: '/uploads/missing-profile-image',
+        },
+      },
+      profilePhotoError: null,
+      isProfilePhotoLoading: false,
+    } as ReturnType<typeof useGetProfilePhoto>);
+    mockUseGetImageBlob.mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: false,
+    } as ReturnType<typeof useGetImageBlob>);
+
+    render(
+      <UserAvatar avatarFallbackName="Broken Image User" color="#2D46B9" userId="123" size="160" />
+    );
+
+    expect(mockUseGetImageBlob).toHaveBeenCalledWith('/uploads/missing-profile-image');
+    expect(createObjectURLMock).not.toHaveBeenCalled();
+    expect(screen.getByRole('img', { name: 'profile placeholder' })).toHaveAttribute(
+      'src',
+      'https://ui-avatars.com/api/?name=Broken%20Image%20User&background=f7f9ff'
+    );
+  });
 });
