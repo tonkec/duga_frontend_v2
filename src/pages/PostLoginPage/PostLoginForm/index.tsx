@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from '@app/components/Input';
 import { useUpdateUser } from '../hooks/useUpdatePostLogin';
+import Button from '@app/components/Button';
+import FieldError from '@app/components/FieldError';
 
 const Schema = z.object({
   username: z
@@ -46,77 +48,86 @@ export default function PostLoginForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-lg mx-auto space-y-5 bg-white border border-gray-200 rounded-2xl p-6"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="username" className="mb-2 block text-sm font-bold text-gray-800">
           Korisničko ime
         </label>
 
         <Input
           type="text"
-          className="mt-1 block w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="!rounded-2xl !border-[#dce4ff] px-4 py-3 text-base shadow-sm focus:!border-blue"
           placeholder="npr. jazavac123"
           {...register('username')}
         />
-        {errors.username && <p className="mt-1 text-sm text-red">{errors.username.message}</p>}
+        {errors.username && (
+          <FieldError className="!rounded-xl !py-2 text-sm" message={errors.username.message} />
+        )}
       </div>
 
       <div>
-        <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="age" className="mb-2 block text-sm font-bold text-gray-800">
           Dob
         </label>
         <Input
           type="number"
           min={18}
-          className="mt-1 block w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="!rounded-2xl !border-[#dce4ff] px-4 py-3 text-base shadow-sm focus:!border-blue"
           placeholder="18+"
           {...register('age')}
         />
-        {errors.age && <p className="mt-1 text-sm text-red">{errors.age.message}</p>}
+        {errors.age && (
+          <FieldError className="!rounded-xl !py-2 text-sm" message={errors.age.message} />
+        )}
       </div>
 
-      <div className="space-y-3">
-        <label className="flex items-start gap-3">
+      <div className="space-y-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+        <label className="flex items-start gap-3 text-sm text-gray-700">
           <input
             type="checkbox"
-            className="h-4 w-4 rounded border-gray-300"
+            className="mt-0.5 h-5 w-5 rounded border-[#dce4ff] accent-pink"
             {...register('acceptPrivacy')}
           />
-          <span className="text-sm flex flex-col sm:flex-row sm:items-center gap-1">
-            <span> Prihvaćam </span>
-            <a href="/privacy-policy" className="text-blue-600 underline">
+          <span>
+            Prihvaćam{' '}
+            <a href="/privacy-policy" className="font-semibold text-blue underline">
               Politiku privatnosti
             </a>
           </span>
         </label>
-        {errors.acceptPrivacy && <p className="text-sm text-red">{errors.acceptPrivacy.message}</p>}
+        {errors.acceptPrivacy && (
+          <FieldError
+            className="!rounded-xl !py-2 text-sm"
+            message={errors.acceptPrivacy.message}
+          />
+        )}
 
-        <label className="flex items-start gap-3">
+        <label className="flex items-start gap-3 text-sm text-gray-700">
           <input
             type="checkbox"
-            className="h-4 w-4 rounded border-gray-300"
+            className="mt-0.5 h-5 w-5 rounded border-[#dce4ff] accent-pink"
             {...register('acceptTerms')}
           />
-          <span className="text-sm flex flex-col sm:flex-row sm:items-center gap-1">
-            <span>Prihvaćam </span>
-            <a href="/terms-of-use" className="text-blue-600 underline">
+          <span>
+            Prihvaćam{' '}
+            <a href="/terms-of-use" className="font-semibold text-blue underline">
               Pravila upotrebe
             </a>
           </span>
         </label>
-        {errors.acceptTerms && <p className="text-sm text-red">{errors.acceptTerms.message}</p>}
+        {errors.acceptTerms && (
+          <FieldError className="!rounded-xl !py-2 text-sm" message={errors.acceptTerms.message} />
+        )}
       </div>
 
-      <button
-        type="submit"
+      <Button
+        htmlType="submit"
+        type="primary"
         disabled={isSubmitting || !isValid || isUpdateUserPending}
-        className="inline-flex items-center justify-center rounded-lg bg-pink px-4 py-2.5 text-white font-medium hover:bg-blue-700 disabled:opacity-60"
+        className="w-full !rounded-full !py-4 text-base font-bold shadow-lg"
       >
-        Nastavi
-      </button>
+        {isUpdateUserPending ? 'Spremam...' : 'Nastavi'}
+      </Button>
     </form>
   );
 }
