@@ -10,25 +10,23 @@ interface ICtaProps {
 }
 
 const Cta = ({ title, subtitle, onClick, className, buttonText, children }: ICtaProps) => {
+  const cardClassName = `flex h-full flex-col bg-[#f7f9ff] text-black border border-[#dce4ff] rounded px-5 py-5 ${className ?? ''}`;
+
   if (children) {
     return (
-      <div
-        className={`bg-[#f7f9ff] text-black border border-[#dce4ff] rounded px-5 py-5 ${className}`}
-      >
+      <div className={cardClassName}>
         <h2 className="font-bold mb-2">{title}</h2>
         <p className="mb-4">{subtitle}</p>
-        {children}
+        <div className="mt-auto">{children}</div>
       </div>
     );
   }
 
   return (
-    <div
-      className={`bg-[#f7f9ff] text-black border border-[#dce4ff] rounded px-5 py-5 ${className}`}
-    >
+    <div className={cardClassName}>
       <h2 className="font-bold mb-2">{title}</h2>
       <p className="mb-4">{subtitle}</p>
-      <Button className="block w-full" onClick={onClick} type="blue">
+      <Button className="mt-auto block w-full" onClick={onClick} type="blue">
         {buttonText}
       </Button>
     </div>
