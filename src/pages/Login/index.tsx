@@ -80,10 +80,10 @@ const priceFeatures = [
 
 const getDomainPath = () => {
   const { hostname } = window.location;
-  if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
-    return 'https://duga.chat/';
-  } else if (hostname.includes('staging--dugaprod.netlify.app')) {
+  if (hostname.includes('staging--dugaprod.netlify.app')) {
     return 'https://staging--dugaprod.netlify.app';
+  } else if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
+    return 'https://duga.chat/';
   } else {
     return 'http://localhost:5173';
   }
@@ -139,6 +139,9 @@ const LoginPage = () => {
   const onLogin = () => {
     clearAppSessionRevoked();
     loginWithRedirect({
+      appState: {
+        returnTo: '/post-login',
+      },
       authorizationParams: {
         redirect_uri: URL,
       },

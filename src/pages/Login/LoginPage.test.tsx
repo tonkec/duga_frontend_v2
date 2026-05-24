@@ -86,6 +86,9 @@ describe('LoginPage redirects', () => {
     fireEvent.click(screen.getAllByRole('button', { name: 'Prijavi se' })[0]);
 
     expect(loginWithRedirect).toHaveBeenCalledWith({
+      appState: {
+        returnTo: '/post-login',
+      },
       authorizationParams: {
         redirect_uri: 'http://localhost:5173',
       },

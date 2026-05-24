@@ -93,13 +93,13 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
 
     const startAppSession = async () => {
       try {
-        await startSession();
         await register(
           user.sub!,
           user.email!,
           generateUniqueUsername(),
           Boolean(user.email_verified)
         );
+        await startSession();
         if (!cancelled) {
           setStatus('active');
         }

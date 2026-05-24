@@ -95,7 +95,7 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(mockStartSession).not.toHaveBeenCalled();
   });
 
-  it('registers the backend user and starts an app session after Auth0 login', async () => {
+  it('registers the backend user before starting an app session after Auth0 login', async () => {
     mockUseAuth0.mockReturnValue(
       auth0State({
         isAuthenticated: true,
@@ -109,16 +109,17 @@ describe('AppSessionProvider login/session start integration', () => {
 
     renderAppSessionProvider();
 
-    await waitFor(() => expect(mockStartSession).toHaveBeenCalledTimes(1));
-    expect(mockStartSession.mock.invocationCallOrder[0]).toBeLessThan(
-      mockRegister.mock.invocationCallOrder[0]
-    );
+    await waitFor(() => expect(mockRegister).toHaveBeenCalledTimes(1));
     expect(mockRegister).toHaveBeenCalledWith(
       'auth0|login-session-user',
       'login-session@example.com',
       'generated-user',
       true
     );
+    expect(mockRegister.mock.invocationCallOrder[0]).toBeLessThan(
+      mockStartSession.mock.invocationCallOrder[0]
+    );
+    expect(mockStartSession).toHaveBeenCalledTimes(1);
     expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
   });
 
@@ -239,7 +240,12 @@ describe('AppSessionProvider login/session start integration', () => {
     renderAppSessionProvider();
 
     expect(await screen.findByTestId('session-status')).toHaveTextContent('error');
-    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockRegister).toHaveBeenCalledWith(
+      'auth0|failing-user',
+      'failing@example.com',
+      'generated-user',
+      true
+    );
     consoleErrorSpy.mockRestore();
   });
 });
