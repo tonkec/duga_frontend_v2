@@ -10,6 +10,12 @@ import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
 import Image from '@app/components/Image';
 import Loader from '@app/components/Loader';
 
+const photoTypeLabels = {
+  chat: 'Chat fotografija',
+  comment: 'Fotografija iz komentara',
+  profile: 'Profilna fotografija',
+};
+
 interface IDeletePhotoModalProps {
   setIsDeleteModalVisible: (visible: boolean) => void;
   onDeletePhoto: () => void;
@@ -33,6 +39,44 @@ const DeletePhotoModal = ({
       </p>
     </ConfirmModal>
   );
+};
+
+const getPhotoTypeLabel = (image: IImage) => {
+  const explicitType = [image.photoType, image.source, image.type, image.origin]
+    .find(Boolean)
+    ?.toLowerCase();
+  const imagePath = [
+    image.url,
+    image.securePhotoUrl,
+    image.messagePhotoUrl,
+    image.imageUrl,
+    image.name,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (
+    explicitType?.includes('chat') ||
+    image.chatId ||
+    image.messageId ||
+    imagePath.includes('/chat/') ||
+    imagePath.includes('chat/')
+  ) {
+    return photoTypeLabels.chat;
+  }
+
+  if (
+    explicitType?.includes('comment') ||
+    image.commentId ||
+    image.uploadCommentId ||
+    imagePath.includes('/comment') ||
+    imagePath.includes('comment/')
+  ) {
+    return photoTypeLabels.comment;
+  }
+
+  return photoTypeLabels.profile;
 };
 
 const AllUserPhotos = () => {
@@ -80,6 +124,11 @@ const AllUserPhotos = () => {
         {photos.map((image: IImage) => (
           <div key={image.id} className="relative mb-6 lg:mb-0 max-w-[400px]">
             <Photo image={image} />
+            <div className="mt-3">
+              <span className="inline-flex rounded-full bg-[#dce4ff] px-3 py-1 text-sm font-semibold text-blue">
+                {getPhotoTypeLabel(image)}
+              </span>
+            </div>
             <Button
               onClick={() => {
                 setIsDeleteModalVisible(true);

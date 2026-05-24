@@ -12,6 +12,17 @@ export interface IImage {
   fileType: string;
   id: number;
   isProfilePhoto: boolean;
+  photoType?: string;
+  source?: string;
+  type?: string;
+  origin?: string;
+  chatId?: number | string;
+  messageId?: number | string;
+  commentId?: number | string;
+  uploadCommentId?: number | string;
+  uploadId?: number | string;
+  messagePhotoUrl?: string;
+  imageUrl?: string;
   name: string;
   updatedAt: string;
   url: string;
