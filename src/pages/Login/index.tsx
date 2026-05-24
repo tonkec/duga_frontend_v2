@@ -80,8 +80,8 @@ const priceFeatures = [
 
 const getDomainPath = () => {
   const { hostname } = window.location;
-  if (hostname.includes('duga.app')) {
-    return 'https://duga.app/';
+  if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
+    return 'https://duga.chat/';
   } else if (hostname.includes('staging--dugaprod.netlify.app')) {
     return 'https://staging--dugaprod.netlify.app';
   } else {
@@ -455,8 +455,8 @@ const LoginPage = () => {
               <p className="mt-5 text-lg leading-8 text-white/85">
                 Duga je open source aplikacija bazirana na <b>React</b> tehnologijama. U potrazi smo
                 za novim članovima_cama tima. Ako želiš raditi na projektu, javi se na{' '}
-                <a className="font-bold underline" href="mailto:admin@duga.app">
-                  admin@duga.app
+                <a className="font-bold underline" href="mailto:admin@duga.chat">
+                  admin@duga.chat
                 </a>
                 .
               </p>
