@@ -114,6 +114,7 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
           auth: {
             token,
             sessionId,
+            [SESSION_HEADER]: sessionId,
           },
         });
 
