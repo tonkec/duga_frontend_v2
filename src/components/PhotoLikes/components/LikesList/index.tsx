@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import UserAvatar from '@app/components/UserAvatar';
 
 interface IUser {
   id: number;
@@ -50,30 +51,56 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <span
-        className={`cursor-pointer text-sm text-blue-600 ${shouldShowDropdown ? 'underline' : ''}`}
+      <button
+        type="button"
+        className={`rounded-full text-sm font-semibold transition-colors ${
+          shouldShowDropdown
+            ? 'cursor-pointer text-blue underline hover:text-blue/80'
+            : 'cursor-default text-gray-500'
+        }`}
         onClick={() => setOpen((prev) => !prev)}
+        disabled={!shouldShowDropdown}
       >
         {likes?.length > 0
           ? `${likes.length} ${getLikesTranslation(likes.length)}`
           : 'Nema lajkova'}
-      </span>
+      </button>
 
       {shouldShowDropdown && open && (
-        <div
-          className={`absolute mt-2 bg-white shadow-md rounded-lg p-2 max-h-60 overflow-y-auto w-56 z-10`}
-        >
-          {likes.map((like) => (
-            <div
-              key={like.id}
-              className="text-sm py-1 px-2 hover:bg-gray-100 rounded cursor-pointer"
-              onClick={() => {
-                navigate(`/user/${like.userId}`);
-              }}
-            >
-              {like.user?.username || `User #${like.userId}`}
-            </div>
-          ))}
+        <div className="absolute bottom-full left-0 z-20 mb-3 w-72 overflow-hidden rounded-2xl border border-[#dce4ff] bg-white shadow-xl shadow-blue/10">
+          <div className="border-b border-[#edf1ff] px-4 py-3">
+            <p className="text-sm font-bold text-gray-900">Sviđanja</p>
+            <p className="text-xs text-gray-500">
+              {likes.length} {getLikesTranslation(likes.length)}
+            </p>
+          </div>
+          <div className="max-h-64 overflow-y-auto p-2">
+            {likes.map((like) => (
+              <button
+                type="button"
+                key={like.id}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#f7f9ff]"
+                onClick={() => {
+                  setOpen(false);
+                  navigate(`/user/${like.userId}`);
+                }}
+              >
+                <UserAvatar
+                  userId={String(like.userId)}
+                  avatarFallbackName={like.user?.username || `User ${like.userId}`}
+                  color="#2D46B9"
+                  size="36"
+                  className="rounded-full"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-gray-900">
+                    {like.user?.username || `User #${like.userId}`}
+                  </p>
+                  <p className="text-xs text-gray-500">Sviđa mu_joj se fotografija</p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
