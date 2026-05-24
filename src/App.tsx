@@ -82,15 +82,15 @@ function App() {
         <Cta
           className="flex-1"
           title="Želiš li nam pomoći?"
-          buttonText="Javi nam se"
-          subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike 🙏"
-          onClick={() =>
-            window.open(
-              'https://github.com/tonkec/duga_frontend_v2?tab=readme-ov-file#contribution',
-              '_blank'
-            )
-          }
-        />
+          subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike. Piši nam na admin@duga.chat 🙏"
+        >
+          <a
+            className="block w-full rounded bg-blue px-4 py-2 text-center text-sm text-white transition-all duration-200 hover:bg-blue-dark"
+            href="mailto:admin@duga.chat"
+          >
+            Javi nam se
+          </a>
+        </Cta>
       </div>
     </AppLayout>
   );
