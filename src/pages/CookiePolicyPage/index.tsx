@@ -166,7 +166,7 @@ export default function CookiePolicyPage() {
         <h2 className="text-2xl font-semibold mb-3">Kontakt</h2>
         <p>
           Ako imate pitanja o ovoj politici, kontaktirajte nas na:{' '}
-          <a href="mailto:admint@duga.chat" className="text-blue-600 hover:underline">
+          <a href="mailto:admin@duga.chat" className="text-blue-600 hover:underline">
             admin@duga.chat
           </a>
         </p>
