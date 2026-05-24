@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '@app/components/FieldError';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { BiPaperclip } from 'react-icons/bi';
+import { BiPaperclip, BiSolidFileGif } from 'react-icons/bi';
 import { useRef } from 'react';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
@@ -26,24 +26,36 @@ import Paginated from '../Paginated';
 import Image from '../Image';
 import { parseCommentUpdatePayload } from './utils/parseCommentUpdate';
 import Loader from '../Loader';
+import GiphySearch from '../GiphySearch';
 
 const schema = z
   .object({
     comment: z.string().optional(),
     image: z.any().optional(),
+    gifUrl: z.string().optional(),
     content: z
       .string()
       .optional()
       .refine((val) => !val || val.trim().length > 0, { message: 'Poruka ne može biti prazna.' }),
   })
-  .refine((data) => (data.comment && data.comment.trim().length > 0) || data.image?.length > 0, {
-    message: 'Unesi komentar ili dodaj sliku',
-    path: ['comment'],
-  });
+  .refine(
+    (data) => {
+      return (
+        (data.comment && data.comment.trim().length > 0) ||
+        data.image?.length > 0 ||
+        Boolean(data.gifUrl)
+      );
+    },
+    {
+      message: 'Unesi komentar, dodaj sliku ili GIF',
+      path: ['comment'],
+    }
+  );
 
 interface Inputs {
   comment: string;
   image?: FileList;
+  gifUrl?: string;
   content: string;
 }
 
@@ -87,6 +99,7 @@ const PhotoComments = () => {
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>([]);
+  const [showGiphySearch, setShowGiphySearch] = useState(false);
 
   const applyCommentUpdate = useCallback(
     (payload: unknown) => {
@@ -128,11 +141,13 @@ const PhotoComments = () => {
       content: '',
       comment: '',
       image: undefined,
+      gifUrl: '',
     },
   });
 
   const imageFileList = watch('image');
   const selectedImageFile = imageFileList?.[0];
+  const selectedGifUrl = watch('gifUrl');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (data: Inputs) => {
@@ -150,7 +165,12 @@ const PhotoComments = () => {
 
     const formData = new FormData();
     formData.append('uploadId', photoId);
-    formData.append('comment', data?.comment.trim() || '');
+    const trimmedComment = data?.comment.trim() || '';
+    const commentWithGif = data.gifUrl
+      ? [trimmedComment, data.gifUrl].filter(Boolean).join(' ')
+      : trimmedComment;
+
+    formData.append('comment', commentWithGif);
     if (taggedUsers.length > 0) {
       formData.append('taggedUserIds', JSON.stringify(taggedUsers.map((u) => u.id)));
     }
@@ -169,7 +189,8 @@ const PhotoComments = () => {
       onSuccess: () => {
         setTaggedUsers([]);
         setCurrentEmojis([]);
-        reset({ comment: '', content: '', image: undefined });
+        setShowGiphySearch(false);
+        reset({ comment: '', content: '', image: undefined, gifUrl: '' });
       },
     });
   };
@@ -177,6 +198,10 @@ const PhotoComments = () => {
   const clearImage = () => {
     setPreviewUrl(null);
     setValue('image', undefined);
+  };
+
+  const clearGif = () => {
+    setValue('gifUrl', '', { shouldValidate: true });
   };
 
   const hasHydratedFromApi = useRef(false);
@@ -361,6 +386,16 @@ const PhotoComments = () => {
               }}
             />
 
+            <button
+              type="button"
+              className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => setShowGiphySearch((isOpen) => !isOpen)}
+              disabled={isAddingUploadComment}
+              aria-label="Dodaj GIF"
+            >
+              <BiSolidFileGif fontSize={20} />
+            </button>
+
             <Button type="blue" disabled={isAddingUploadComment}>
               {isAddingUploadComment ? (
                 <span className="flex items-center gap-2">
@@ -372,6 +407,14 @@ const PhotoComments = () => {
               )}
             </Button>
           </div>
+
+          <GiphySearch
+            onGifSelect={(gifUrl) => {
+              setValue('gifUrl', gifUrl, { shouldValidate: true });
+            }}
+            isOpen={showGiphySearch}
+            onClose={() => setShowGiphySearch(false)}
+          />
 
           {previewUrl && (
             <div className="mt-3 flex items-end gap-3">
@@ -398,7 +441,32 @@ const PhotoComments = () => {
             </div>
           )}
 
-          {errors.comment && <FieldError message="Unesi komentar ili dodaj sliku" />}
+          {selectedGifUrl && (
+            <div className="mt-3 flex items-end gap-3">
+              <div className="relative">
+                <Image
+                  src={selectedGifUrl}
+                  alt="GIF preview"
+                  className="max-w-[150px] rounded-xl border border-[#dce4ff]"
+                />
+                {isAddingUploadComment && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
+                    Slanje...
+                  </div>
+                )}
+              </div>
+              <Button
+                type="danger"
+                htmlType="button"
+                onClick={clearGif}
+                disabled={isAddingUploadComment}
+              >
+                Makni
+              </Button>
+            </div>
+          )}
+
+          {errors.comment && <FieldError message="Unesi komentar, dodaj sliku ili GIF" />}
         </form>
 
         <div className="flex flex-col gap-3">

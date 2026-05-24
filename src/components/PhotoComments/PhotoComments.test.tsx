@@ -61,6 +61,16 @@ jest.mock('@app/components/RecordCreatedAt', () => ({
   default: () => <span>just now</span>,
 }));
 
+jest.mock('@app/components/GiphySearch', () => ({
+  __esModule: true,
+  default: ({ isOpen, onGifSelect }: { isOpen: boolean; onGifSelect: (gifUrl: string) => void }) =>
+    isOpen ? (
+      <button type="button" onClick={() => onGifSelect('https://media.giphy.com/test.gif')}>
+        Select test GIF
+      </button>
+    ) : null,
+}));
+
 jest.mock('@app/utils/consts', () => ({
   ALLOWED_FILE_TYPES: 'image/png,image/jpeg',
   MAXIMUM_NUMBER_OF_IMAGES: 5,
@@ -243,5 +253,18 @@ describe('PhotoComments integration', () => {
     await waitFor(() => expect(mutateDeleteUploadComment).toHaveBeenCalledWith(101));
     expect(screen.queryByText('Updated comment')).not.toBeInTheDocument();
     expect(screen.getByText('Još nema komentara.')).toBeVisible();
+  });
+
+  it('creates a GIF-only photo comment', async () => {
+    renderPhotoComments();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dodaj GIF' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Select test GIF' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pošalji' }));
+
+    await waitFor(() => expect(mutateAddUploadComment).toHaveBeenCalled());
+    const addFormData = mutateAddUploadComment.mock.calls[0][0] as FormData;
+    expect(addFormData.get('uploadId')).toBe('42');
+    expect(addFormData.get('comment')).toBe('https://media.giphy.com/test.gif');
   });
 });
