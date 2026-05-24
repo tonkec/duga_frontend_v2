@@ -9,16 +9,18 @@ const EmojiPicker = ({ emojis, onEmojiSelect }: IEmojiPickerProps) => {
   }
 
   return (
-    <div className="absolute bg-gray-100 border border-gray-200 shadow-lg rounded-lg ml-11 p-2 max-h-24 overflow-y-auto w-80 grid grid-cols-8 gap-1">
+    <div className="absolute z-50 mt-2 grid max-h-44 w-72 grid-cols-8 gap-1 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white/95 p-2 shadow-xl shadow-blue-dark/10 backdrop-blur sm:w-80">
       {emojis.map((emoji, index) => {
         return (
-          <span
-            className="cursor-pointer text-lg p-1 hover:bg-gray-200 rounded-md block"
+          <button
+            type="button"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-xl transition-colors hover:bg-[#f0f4ff] focus:bg-[#f0f4ff] focus:outline-none focus:ring-2 focus:ring-blue/30"
             key={index}
             onClick={() => onEmojiSelect(emoji)}
+            aria-label={`Odaberi emoji ${emoji}`}
           >
             {emoji}
-          </span>
+          </button>
         );
       })}
     </div>

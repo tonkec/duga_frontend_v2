@@ -1,6 +1,6 @@
-import { forwardRef } from 'react';
+import { forwardRef, TextareaHTMLAttributes } from 'react';
 
-interface ITextAreaProps {
+interface ITextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   placeholder: string;
   className?: string;
 }

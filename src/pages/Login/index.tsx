@@ -107,11 +107,6 @@ const faqItems = [
       'Ne, ali preporučujemo dodavanje profilne slike jer povećava povjerenje i šanse za povezivanje s drugim korisnicima.',
   },
   {
-    question: 'Mogu li otkazati pretplatu u bilo kojem trenutku?',
-    answer:
-      'Da, pretplatu možeš otkazati kad god želiš u postavkama računa, bez dodatnih troškova.',
-  },
-  {
     question: 'Na kojim jezicima je dostupna Duga?',
     answer:
       'Trenutno podržavamo hrvatski jezik, a planiramo dodati i druge balkanske jezike u budućnosti.',

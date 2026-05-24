@@ -21,6 +21,13 @@ jest.mock('./hooks', () => ({
   useUpvoteUpload: jest.fn(),
 }));
 
+jest.mock('@app/components/UserAvatar', () => ({
+  __esModule: true,
+  default: ({ avatarFallbackName }: { avatarFallbackName: string }) => (
+    <span>{avatarFallbackName}</span>
+  ),
+}));
+
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
 const mockUseUpvoteUpload = jest.mocked(useUpvoteUpload);
