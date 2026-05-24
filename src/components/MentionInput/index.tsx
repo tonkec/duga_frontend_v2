@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IUser } from '@app/components/UserCard';
 import { useGetUserByUsername } from './hooks';
 import { debounceScroll } from '@app/utils/debounceScroll';
+import UserAvatar from '@app/components/UserAvatar';
 
 const usernameRegex = /@([\w\d]*)$/;
 type TaggedUser = { id: number; username: string };
@@ -133,9 +134,15 @@ const MentionInput = ({
             <li
               key={user.id}
               onClick={() => handleSelect({ id: user.id, username: user.username })}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
             >
-              @{user.username}
+              <UserAvatar
+                avatarFallbackName={user.username}
+                color="#F037A5"
+                userId={String(user.id)}
+                className="h-8 w-8 shrink-0 rounded-full"
+              />
+              <span>@{user.username}</span>
             </li>
           ))}
         </ul>
