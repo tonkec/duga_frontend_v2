@@ -3,8 +3,8 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { resolveAuth0AccessToken } from '@app/api/authToken';
-import { getAppSessionId, markSessionRevoked } from '@app/api/appSession';
+import { getDugaApiToken } from '@app/api/authToken';
+import { getAppSessionId, markSessionRevoked, SESSION_HEADER } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
 
 type CypressSocketEvent = {
@@ -58,11 +58,11 @@ const createCypressSocket = () => {
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
-  if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
-    return 'https://duga-backend-c67896e8029c.herokuapp.com/';
-  }
   if (hostname.includes('staging--dugaprod.netlify.app')) {
     return 'https://dugastaging-394ccba7a9ef.herokuapp.com';
+  }
+  if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
+    return 'https://duga-backend-c67896e8029c.herokuapp.com/';
   }
   return 'http://localhost:8080/';
 };
@@ -92,13 +92,25 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
 
     const connectSocket = async () => {
       try {
-        const token = await resolveAuth0AccessToken();
+        const token = getDugaApiToken();
         if (!token) return;
+        const sessionId = getAppSessionId();
+        const authHeaders = {
+          Authorization: `Bearer ${token}`,
+          [SESSION_HEADER]: sessionId,
+        };
 
         newSocket = io(getBackendUrl(), {
+          extraHeaders: authHeaders,
+          transportOptions: {
+            polling: {
+              extraHeaders: authHeaders,
+            },
+          },
           auth: {
             token,
-            sessionId: getAppSessionId(),
+            sessionId,
+            [SESSION_HEADER]: sessionId,
           },
         });
 
