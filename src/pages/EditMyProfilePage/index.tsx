@@ -10,7 +10,7 @@ import { useUpdateUser } from './hooks';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '@app/components/Button';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
@@ -18,6 +18,9 @@ import Label from '@app/components/Label';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { cityOptions } from '@app/consts/cityOptions';
 import FieldError from '@app/components/FieldError';
+import EmojiPicker from '@app/components/EmojiPicker';
+import data from '@emoji-mart/data';
+import { init, SearchIndex } from 'emoji-mart';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -80,33 +83,54 @@ type Inputs = {
   ending: string;
 };
 
+interface IEmoji {
+  skins: {
+    native: string;
+  }[];
+}
+
+type EmojiFieldName =
+  | 'gender'
+  | 'sexuality'
+  | 'bio'
+  | 'spirituality'
+  | 'embarasement'
+  | 'tooOldFor'
+  | 'makesMyDay'
+  | 'interests'
+  | 'languages'
+  | 'ending';
+
+const EMOJI_SHORTCODE_REGEX = /(?:\s|^):([^\s:]+)/;
+
+const searchEmojis = async (value: string) => {
+  const emojis = await SearchIndex.search(value);
+  return emojis.map((emoji: IEmoji) => emoji.skins[0].native);
+};
+
+const maxProfileTextLength = (maxLength: number) =>
+  z
+    .string()
+    .refine((value) => Array.from(value).length <= maxLength, {
+      message: `Polje ne smije biti dulje od ${maxLength} znakova.`,
+    })
+    .optional();
+
 const schema = z.object({
-  bio: z.string().max(100, { message: 'Polje ne smije biti dulje od 100 znakova.' }).optional(),
+  bio: maxProfileTextLength(100),
   location: z.string().nullable().optional(),
   sexuality: z.string().optional(),
-  gender: z.string().max(100, { message: 'Polje ne smije biti dulje od 100 znakova.' }).optional(),
+  gender: maxProfileTextLength(100),
   lookingFor: z.string().optional(),
   relationshipStatus: z.string().optional(),
   cigarettes: z.boolean().optional(),
   alcohol: z.boolean().optional(),
   sport: z.boolean().optional(),
   favoriteDay: z.string().min(1).optional(),
-  spirituality: z
-    .string()
-    .max(300, { message: 'Polje ne smije biti dulje od 300 znakova.' })
-    .optional(),
-  embarasement: z
-    .string()
-    .max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' })
-    .optional(),
-  tooOldFor: z
-    .string()
-    .max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' })
-    .optional(),
-  makesMyDay: z
-    .string()
-    .max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' })
-    .optional(),
+  spirituality: maxProfileTextLength(300),
+  embarasement: maxProfileTextLength(500),
+  tooOldFor: maxProfileTextLength(500),
+  makesMyDay: maxProfileTextLength(500),
   favoriteSong: z
     .string()
     .refine(
@@ -149,15 +173,9 @@ const schema = z.object({
       }
     )
     .optional(),
-  interests: z
-    .string()
-    .max(200, { message: 'Polje ne smije biti dulje od 200 znakova.' })
-    .optional(),
-  languages: z
-    .string()
-    .max(200, { message: 'Polje ne smije biti dulje od 200 znakova.' })
-    .optional(),
-  ending: z.string().max(500, { message: 'Polje ne smije biti dulje od 500 znakova.' }).optional(),
+  interests: maxProfileTextLength(200),
+  languages: maxProfileTextLength(200),
+  ending: maxProfileTextLength(500),
 });
 
 const tabClassName =
@@ -165,8 +183,12 @@ const tabClassName =
 const selectedTabClassName = 'bg-blue text-white shadow-sm';
 
 const EditMyProfilePage = () => {
+  init({ data });
+
   const { user: currentUser } = useGetCurrentUser();
   const { updateUserMutation } = useUpdateUser();
+  const [activeEmojiField, setActiveEmojiField] = useState<EmojiFieldName | null>(null);
+  const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
   const {
     register,
     handleSubmit,
@@ -216,6 +238,112 @@ const EditMyProfilePage = () => {
       });
     }
   };
+
+  const handleEmojiSearch = async (fieldName: EmojiFieldName, value: string) => {
+    const match = value.match(EMOJI_SHORTCODE_REGEX);
+
+    if (match) {
+      const emojis = await searchEmojis(match[1]);
+      setActiveEmojiField(fieldName);
+      setCurrentEmojis(emojis);
+      return;
+    }
+
+    setActiveEmojiField(null);
+    setCurrentEmojis([]);
+  };
+
+  const renderEmojiPicker = (
+    fieldName: EmojiFieldName,
+    value: string,
+    onChange: (value: string) => void
+  ) =>
+    activeEmojiField === fieldName ? (
+      <EmojiPicker
+        emojis={currentEmojis}
+        onEmojiSelect={(emoji: string) => {
+          onChange(value.replace(EMOJI_SHORTCODE_REGEX, emoji));
+          setActiveEmojiField(null);
+          setCurrentEmojis([]);
+        }}
+      />
+    ) : null;
+
+  const renderEmojiInput = ({
+    name,
+    placeholder,
+    label,
+    className,
+  }: {
+    name: EmojiFieldName;
+    placeholder: string;
+    label?: string;
+    className?: string;
+  }) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => {
+        const value = field.value || '';
+        return (
+          <div className="relative">
+            <Input
+              type="text"
+              className={className}
+              placeholder={placeholder}
+              label={label}
+              name={field.name}
+              value={value}
+              onBlur={field.onBlur}
+              ref={field.ref}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                field.onChange(nextValue);
+                handleEmojiSearch(name, nextValue);
+              }}
+            />
+            {renderEmojiPicker(name, value, field.onChange)}
+          </div>
+        );
+      }}
+    />
+  );
+
+  const renderEmojiTextArea = ({
+    name,
+    placeholder,
+    className,
+  }: {
+    name: EmojiFieldName;
+    placeholder: string;
+    className?: string;
+  }) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => {
+        const value = field.value || '';
+        return (
+          <div className="relative">
+            <TextArea
+              className={className}
+              placeholder={placeholder}
+              name={field.name}
+              value={value}
+              onBlur={field.onBlur}
+              ref={field.ref}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                field.onChange(nextValue);
+                handleEmojiSearch(name, nextValue);
+              }}
+            />
+            {renderEmojiPicker(name, value, field.onChange)}
+          </div>
+        );
+      }}
+    />
+  );
 
   return (
     <AppLayout>
@@ -291,24 +419,22 @@ const EditMyProfilePage = () => {
                       </>
                     )}
                   />
-                  <Input type="text" placeholder="Rod" {...register('gender')} label="Rod" />
+                  {renderEmojiInput({ name: 'gender', placeholder: 'Rod', label: 'Rod' })}
                   {errors.gender?.message && <FieldError message={errors.gender.message} />}
-                  <Input
-                    label="Seksualnost"
-                    type="text"
-                    placeholder="Seksualnost"
-                    {...register('sexuality')}
-                  />
+                  {renderEmojiInput({
+                    name: 'sexuality',
+                    placeholder: 'Seksualnost',
+                    label: 'Seksualnost',
+                  })}
                   {errors.sexuality?.message && <FieldError message={errors.sexuality.message} />}
                 </div>
 
                 <div className="mt-4">
                   <Label>Jedna rečenica o meni</Label>
-                  <Input
-                    type="text"
-                    placeholder="Reci nešto o sebi jednom rečenicom"
-                    {...register('bio')}
-                  />
+                  {renderEmojiInput({
+                    name: 'bio',
+                    placeholder: 'Reci nešto o sebi jednom rečenicom',
+                  })}
                   {errors.bio?.message && <FieldError message={errors.bio.message} />}
                 </div>
               </div>
@@ -473,29 +599,29 @@ const EditMyProfilePage = () => {
 
               <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
                 <Label>Najsramotnija stvar koja mi se dogodila</Label>
-                <TextArea
-                  className="mb-4"
-                  placeholder="Najsramotnija stvar koja mi se dogodila..."
-                  {...register('embarasement')}
-                />
+                {renderEmojiTextArea({
+                  name: 'embarasement',
+                  className: 'mb-4',
+                  placeholder: 'Najsramotnija stvar koja mi se dogodila...',
+                })}
                 {errors.embarasement?.message && (
                   <FieldError message={errors.embarasement.message} />
                 )}
 
                 <Label>Imam previše godina za...</Label>
-                <TextArea
-                  className="mb-4"
-                  placeholder="Imam previše godina za...."
-                  {...register('tooOldFor')}
-                />
+                {renderEmojiTextArea({
+                  name: 'tooOldFor',
+                  className: 'mb-4',
+                  placeholder: 'Imam previše godina za....',
+                })}
                 {errors.tooOldFor?.message && <FieldError message={errors.tooOldFor.message} />}
 
                 <Label>Stvari koje mi uljepšavaju dan</Label>
-                <TextArea
-                  className="mb-4"
-                  placeholder="Dan mi je ljepši ako..."
-                  {...register('makesMyDay')}
-                />
+                {renderEmojiTextArea({
+                  name: 'makesMyDay',
+                  className: 'mb-4',
+                  placeholder: 'Dan mi je ljepši ako...',
+                })}
                 {errors.makesMyDay?.message && <FieldError message={errors.makesMyDay.message} />}
 
                 <Input
@@ -551,36 +677,37 @@ const EditMyProfilePage = () => {
 
               <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
                 <Label>Duhovnost/religioznost</Label>
-                <TextArea
-                  placeholder="Reci nam nešto o svojoj duhovnosti/religioznosti"
-                  {...register('spirituality')}
-                />
+                {renderEmojiTextArea({
+                  name: 'spirituality',
+                  placeholder: 'Reci nam nešto o svojoj duhovnosti/religioznosti',
+                })}
                 {errors.spirituality?.message && (
                   <FieldError message={errors.spirituality.message} />
                 )}
               </div>
 
               <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
-                <Input
-                  type="text"
-                  className="mb-2"
-                  placeholder="Interesi (odvojeni zarezom)"
-                  {...register('interests')}
-                  label="Interesi"
-                />
+                {renderEmojiInput({
+                  name: 'interests',
+                  className: 'mb-2',
+                  placeholder: 'Interesi (odvojeni zarezom)',
+                  label: 'Interesi',
+                })}
                 {errors.interests?.message && <FieldError message={errors.interests.message} />}
 
-                <Input
-                  type="text"
-                  className="mb-2"
-                  placeholder="Jezici koje govorim (odvojeni zarezom)"
-                  {...register('languages')}
-                  label="Jezici"
-                />
+                {renderEmojiInput({
+                  name: 'languages',
+                  className: 'mb-2',
+                  placeholder: 'Jezici koje govorim (odvojeni zarezom)',
+                  label: 'Jezici',
+                })}
                 {errors.languages?.message && <FieldError message={errors.languages.message} />}
 
                 <Label>Za kraj, još nešto o meni</Label>
-                <TextArea placeholder="Za kraj još nešto o meni" {...register('ending')} />
+                {renderEmojiTextArea({
+                  name: 'ending',
+                  placeholder: 'Za kraj još nešto o meni',
+                })}
                 {errors.ending?.message && <FieldError message={errors.ending.message} />}
               </div>
 

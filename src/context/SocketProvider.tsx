@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { getDugaApiToken } from '@app/api/authToken';
+import { resolveAuth0AccessToken } from '@app/api/authToken';
 import { getAppSessionId, markSessionRevoked, SESSION_HEADER } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
 
@@ -92,9 +92,13 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
 
     const connectSocket = async () => {
       try {
-        const token = getDugaApiToken();
-        if (!token) return;
+        const token = await resolveAuth0AccessToken();
         const sessionId = getAppSessionId();
+        if (!token || !sessionId) {
+          console.warn('Socket connection skipped: missing auth token or app session.');
+          return;
+        }
+
         const authHeaders = {
           Authorization: `Bearer ${token}`,
           [SESSION_HEADER]: sessionId,
@@ -110,7 +114,6 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
           auth: {
             token,
             sessionId,
-            [SESSION_HEADER]: sessionId,
           },
         });
 
@@ -124,6 +127,10 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
 
         newSocket.on('disconnect', () => {
           console.log('🔌 Socket disconnected');
+        });
+
+        newSocket.on('connect_error', (error) => {
+          console.error('⚠️ Socket connect_error:', error.message, error);
         });
 
         newSocket.on('session-revoked', () => {

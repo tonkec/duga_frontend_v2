@@ -17,21 +17,34 @@ import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import BlobImage from './components/BlobImage';
 import Image from '../Image';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import EmojiPicker from '@app/components/EmojiPicker';
+import data from '@emoji-mart/data';
+import { init, SearchIndex } from 'emoji-mart';
+
 export interface ImageDescription {
   description: string;
   imageId: string;
   isProfilePhoto?: boolean;
 }
 
+interface IEmoji {
+  skins: {
+    native: string;
+  }[];
+}
+
 interface IPhotoActionButtonsProps {
-  onInputChange: (e: SyntheticEvent) => void;
+  onInputChange: (value: string) => void;
   onDelete: () => void;
-  defaultInputValue: string;
+  inputValue: string;
   isChecked?: boolean;
   onCheckboxChange?: (e: SyntheticEvent) => void;
   hasCheckbox?: boolean;
   disabled?: boolean;
 }
+
+const DESCRIPTION_MAX_LENGTH = 100;
+const EMOJI_SHORTCODE_REGEX = /(?:\s|^):([^\s:]+)/;
 
 const DeleteButtonModal = ({
   onDelete,
@@ -58,10 +71,17 @@ const normalizeDescription = (raw: string) =>
     .trim()
     .replace(/\s+/g, ' ');
 
+const getDescriptionLength = (description: string) => Array.from(description).length;
+
+const searchEmojis = async (value: string) => {
+  const emojis = await SearchIndex.search(value);
+  return emojis.map((emoji: IEmoji) => emoji.skins[0].native);
+};
+
 const PhotoActionButtons = ({
   onInputChange,
   onDelete,
-  defaultInputValue,
+  inputValue,
   isChecked,
   onCheckboxChange,
   hasCheckbox,
@@ -76,10 +96,10 @@ const PhotoActionButtons = ({
         onDelete={onDelete}
       />
       <Input
-        defaultValue={defaultInputValue}
+        value={inputValue}
         className="mt-4"
-        placeholder="Napiši nešto o fotografiji"
-        onChange={onInputChange}
+        placeholder="Napiši nešto o fotografiji ( : za emoji )"
+        onChange={(e) => onInputChange(e.target.value)}
         type="text"
         disabled={disabled}
       />
@@ -120,6 +140,8 @@ const PhotoActionButtons = ({
 };
 
 const PhotoUploader = () => {
+  init({ data });
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
@@ -127,6 +149,9 @@ const PhotoUploader = () => {
   const [updatedImageDescriptions, setUpdatedImageDescriptions] = useState<ImageDescription[]>([]);
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const [hasDescriptionError, setHasDescriptionError] = useState<boolean>(false);
+  const [descriptionInputValues, setDescriptionInputValues] = useState<Record<string, string>>({});
+  const [activeDescriptionId, setActiveDescriptionId] = useState<string | null>(null);
+  const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
   const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos();
@@ -143,6 +168,54 @@ const PhotoUploader = () => {
       setAllCheckboxes(checkboxes);
     }
   }, [allExistingImages]);
+
+  const handleEmojiSearch = async (descriptionId: string, value: string) => {
+    const match = value.match(EMOJI_SHORTCODE_REGEX);
+
+    if (match) {
+      const emojis = await searchEmojis(match[1]);
+      setActiveDescriptionId(descriptionId);
+      setCurrentEmojis(emojis);
+      return;
+    }
+
+    setActiveDescriptionId(null);
+    setCurrentEmojis([]);
+  };
+
+  const setDescriptionInputValue = (descriptionId: string, value: string) => {
+    setDescriptionInputValues((prev) => ({ ...prev, [descriptionId]: value }));
+    handleEmojiSearch(descriptionId, value);
+  };
+
+  const isValidDescriptionLength = (description: string) => {
+    if (getDescriptionLength(description) <= DESCRIPTION_MAX_LENGTH) {
+      setHasDescriptionError(false);
+      return true;
+    }
+
+    setHasDescriptionError(true);
+    toast.error(
+      `Opis fotografije ne može biti duži od ${DESCRIPTION_MAX_LENGTH} znakova!`,
+      toastConfig
+    );
+    return false;
+  };
+
+  const getDescriptionInputValue = (imageId: string, defaultValue: string) =>
+    descriptionInputValues[imageId] ?? defaultValue;
+
+  const applyEmojiToDescriptionInput = (
+    descriptionId: string,
+    currentValue: string,
+    emoji: string
+  ) => {
+    const updatedValue = currentValue.replace(EMOJI_SHORTCODE_REGEX, emoji);
+    setDescriptionInputValues((prev) => ({ ...prev, [descriptionId]: updatedValue }));
+    setActiveDescriptionId(null);
+    setCurrentEmojis([]);
+    return updatedValue;
+  };
 
   const onSubmitHandler = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -187,19 +260,16 @@ const PhotoUploader = () => {
     });
   };
 
-  const onDescriptionChange = (e: SyntheticEvent, file: IImage) => {
+  const onDescriptionChange = (value: string, file: IImage) => {
+    const imageId = removeSpacesAndDashes(file.name);
+    const description = normalizeDescription(value);
+
+    if (!isValidDescriptionLength(description)) {
+      return;
+    }
+
+    setDescriptionInputValue(imageId, value);
     setNewImageDescriptions((prevState) => {
-      const target = e.target as HTMLInputElement;
-      const description = normalizeDescription(target.value);
-      if (description.length > 100) {
-        setHasDescriptionError(true);
-        toast.error('Opis fotografije ne može biti duži od 100 znakova!', toastConfig);
-        return prevState;
-      }
-
-      setHasDescriptionError(false);
-
-      const imageId = removeSpacesAndDashes(file.name);
       const image = { description, imageId };
       const newState = prevState.filter(
         (item) => removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
@@ -213,6 +283,12 @@ const PhotoUploader = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    const imageId = removeSpacesAndDashes(image.name);
+    setDescriptionInputValues((prev) => {
+      const next = { ...prev };
+      delete next[imageId];
+      return next;
+    });
     setNewImages((prev) =>
       prev?.filter((img) => removeSpacesAndDashes(img.name) !== removeSpacesAndDashes(image.name))
     );
@@ -266,75 +342,102 @@ const PhotoUploader = () => {
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {allExistingImages.data.images.map((image: IImage, index: number) => {
+                const imageId = removeSpacesAndDashes(image.name);
+                const inputValue = getDescriptionInputValue(imageId, image.description);
+
                 return (
                   <div
                     key={`${image.name}-editable`}
                     className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
                   >
                     <BlobImage imageUrl={image.securePhotoUrl} name={image.name} />
-                    <PhotoActionButtons
-                      onInputChange={(e: SyntheticEvent) => {
-                        setUpdatedImageDescriptions((prev) => {
-                          const target = e.target as HTMLInputElement;
-                          const description = normalizeDescription(target.value);
-                          if (description.length > 100) {
-                            setHasDescriptionError(true);
-                            toast.error(
-                              'Opis fotografije ne može biti duži od 100 znakova!',
-                              toastConfig
+                    <div className="relative">
+                      <PhotoActionButtons
+                        onInputChange={(value: string) => {
+                          const description = normalizeDescription(value);
+                          if (!isValidDescriptionLength(description)) {
+                            return;
+                          }
+
+                          setDescriptionInputValue(imageId, value);
+                          setUpdatedImageDescriptions((prev) => {
+                            const newImage = { description, imageId };
+                            const newState = prev.filter(
+                              (item) =>
+                                removeSpacesAndDashes(item.imageId) !==
+                                removeSpacesAndDashes(imageId)
                             );
-                            return prev;
-                          }
-                          setHasDescriptionError(false);
-                          const imageId = removeSpacesAndDashes(image.name);
-                          const newImage = { description, imageId };
-                          const newState = prev.filter(
-                            (item) =>
-                              removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
-                          );
-                          newState.push(newImage);
-                          return newState;
-                        });
-                      }}
-                      onDelete={() => onDeleteFromS3(image)}
-                      defaultInputValue={image.description}
-                      isChecked={
-                        allCheckboxes.find((checkbox) => checkbox.index === index)
-                          ?.isProfilePhoto || false
-                      }
-                      hasCheckbox
-                      disabled={isUploadingPhotos}
-                      onCheckboxChange={(e: SyntheticEvent) => {
-                        const isChecked = (e.target as HTMLInputElement).checked;
-                        setAllCheckboxes((prev) =>
-                          prev.map((checkbox) => ({
-                            ...checkbox,
-                            isProfilePhoto: checkbox.index === index ? isChecked : false,
-                          }))
-                        );
-                        setUpdatedImageDescriptions((prev) => {
-                          const imageId = removeSpacesAndDashes(image.name);
-                          if (prev.length === 0) {
-                            return [
-                              {
-                                description: image.description,
-                                imageId,
-                                isProfilePhoto: (e.target as HTMLInputElement).checked,
-                              },
-                            ];
-                          }
-
-                          const newState = prev.map((item) => {
-                            if (removeSpacesAndDashes(item.imageId) === imageId) {
-                              return { ...item, isProfilePhoto: !item.isProfilePhoto };
-                            }
-                            return item;
+                            newState.push(newImage);
+                            return newState;
                           });
+                        }}
+                        onDelete={() => onDeleteFromS3(image)}
+                        inputValue={inputValue}
+                        isChecked={
+                          allCheckboxes.find((checkbox) => checkbox.index === index)
+                            ?.isProfilePhoto || false
+                        }
+                        hasCheckbox
+                        disabled={isUploadingPhotos}
+                        onCheckboxChange={(e: SyntheticEvent) => {
+                          const isChecked = (e.target as HTMLInputElement).checked;
+                          setAllCheckboxes((prev) =>
+                            prev.map((checkbox) => ({
+                              ...checkbox,
+                              isProfilePhoto: checkbox.index === index ? isChecked : false,
+                            }))
+                          );
+                          setUpdatedImageDescriptions((prev) => {
+                            if (prev.length === 0) {
+                              return [
+                                {
+                                  description: image.description,
+                                  imageId,
+                                  isProfilePhoto: (e.target as HTMLInputElement).checked,
+                                },
+                              ];
+                            }
 
-                          return newState;
-                        });
-                      }}
-                    />
+                            const newState = prev.map((item) => {
+                              if (removeSpacesAndDashes(item.imageId) === imageId) {
+                                return { ...item, isProfilePhoto: !item.isProfilePhoto };
+                              }
+                              return item;
+                            });
+
+                            return newState;
+                          });
+                        }}
+                      />
+                      {activeDescriptionId === imageId && (
+                        <EmojiPicker
+                          emojis={currentEmojis}
+                          onEmojiSelect={(emoji: string) => {
+                            const updatedValue = applyEmojiToDescriptionInput(
+                              imageId,
+                              inputValue,
+                              emoji
+                            );
+                            const description = normalizeDescription(updatedValue);
+
+                            if (!isValidDescriptionLength(description)) {
+                              return;
+                            }
+
+                            setUpdatedImageDescriptions((prev) => {
+                              const newImage = { description, imageId };
+                              const newState = prev.filter(
+                                (item) =>
+                                  removeSpacesAndDashes(item.imageId) !==
+                                  removeSpacesAndDashes(imageId)
+                              );
+                              newState.push(newImage);
+                              return newState;
+                            });
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -362,6 +465,9 @@ const PhotoUploader = () => {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {newImages &&
               newImages.map((image) => {
+                const imageId = removeSpacesAndDashes(image.name);
+                const inputValue = getDescriptionInputValue(imageId, image.description);
+
                 return (
                   <div
                     key={image.name}
@@ -379,12 +485,27 @@ const PhotoUploader = () => {
                         </div>
                       )}
                     </div>
-                    <PhotoActionButtons
-                      onInputChange={(e: SyntheticEvent) => onDescriptionChange(e, image)}
-                      onDelete={() => onDeleteFromState(image)}
-                      defaultInputValue={image.description}
-                      disabled={isUploadingPhotos}
-                    />
+                    <div className="relative">
+                      <PhotoActionButtons
+                        onInputChange={(value: string) => onDescriptionChange(value, image)}
+                        onDelete={() => onDeleteFromState(image)}
+                        inputValue={inputValue}
+                        disabled={isUploadingPhotos}
+                      />
+                      {activeDescriptionId === imageId && (
+                        <EmojiPicker
+                          emojis={currentEmojis}
+                          onEmojiSelect={(emoji: string) => {
+                            const updatedValue = applyEmojiToDescriptionInput(
+                              imageId,
+                              inputValue,
+                              emoji
+                            );
+                            onDescriptionChange(updatedValue, image);
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                 );
               })}
