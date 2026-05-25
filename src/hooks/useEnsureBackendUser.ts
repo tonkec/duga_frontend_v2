@@ -1,4 +1,6 @@
 import { apiClient } from '@app/api';
+import { register } from '@app/api/auth/register';
+import { resolveAuth0AccessToken } from '@app/api/authToken';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
@@ -18,17 +20,18 @@ export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } =
     queryKey: ['current-user'],
     queryFn: async () => {
       if (!auth0User) throw new Error('Auth0 user not available');
+      if (!auth0User.email) throw new Error('Auth0 email not available');
 
-      const client = apiClient();
+      const auth0AccessToken = await resolveAuth0AccessToken();
+      const client = apiClient(auth0AccessToken ?? undefined);
 
-      const input = {
-        email: auth0User.email,
-        username: generateUniqueUsername(),
-        isVerified: auth0User.email_verified,
-        auth0Id: auth0User.sub,
-      };
-
-      await client.post('/register', input);
+      await register(
+        auth0User.sub,
+        auth0User.email,
+        generateUniqueUsername(),
+        Boolean(auth0User.email_verified),
+        auth0AccessToken
+      );
       const res = await client.get('/users/current-user', {
         skipGlobalErrorHandler: true,
       });

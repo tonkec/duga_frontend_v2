@@ -82,8 +82,8 @@ const Navigation = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          <aside className="gradient relative flex h-full w-[min(86vw,360px)] flex-col p-5 text-white shadow-2xl">
-            <div className="mb-8 rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+          <aside className="gradient relative flex h-dvh w-[min(86vw,360px)] flex-col overflow-hidden p-5 text-white shadow-2xl">
+            <div className="mb-8 shrink-0 rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.2em] text-white/70">Navigacija</p>
@@ -98,7 +98,7 @@ const Navigation = () => {
               </div>
             </div>
 
-            <nav className="flex min-h-0 flex-1 flex-col">
+            <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain pr-1">
               <NavigationItems
                 userId={userId}
                 isMobile
