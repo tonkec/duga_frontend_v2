@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
@@ -19,13 +19,26 @@ const getChatWithUser = (userChats: IChat[] | undefined, userId: string | undefi
   return userChats?.find((chat) => chat.Users[0]?.id === Number(userId));
 };
 
+const tabClassName =
+  'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
+const selectedTabClassName = 'bg-blue text-white shadow-sm';
+const profileTabs = ['general', 'photos'];
+
 const OtherUserPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
   const { userChats } = useGetAllUserChats();
   const existingChat = getChatWithUser(userChats?.data, userId);
+  const selectedTabIndex = Math.max(profileTabs.indexOf(searchParams.get('tab') || ''), 0);
+
+  const handleTabSelect = (index: number) => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.set('tab', profileTabs[index]);
+    setSearchParams(nextSearchParams);
+  };
 
   if (!userId || isNaN(Number(userId))) {
     return (
@@ -53,51 +66,61 @@ const OtherUserPage = () => {
 
   return (
     <AppLayout>
-      <Tabs selectedTabClassName="bg-black text-white rounded-t-md">
-        <TabList style={{ borderBottom: 'none', marginBottom: 0 }}>
-          <Tab style={{ border: 'none' }}>
-            <div className="flex items-center gap-1">
-              Općenito <BiSolidFile fontSize={25} />
-            </div>
-          </Tab>
-          <Tab>
-            <div className="flex items-center gap-1">
-              Fotografije <BiSolidCamera fontSize={25} />
-            </div>
-          </Tab>
-        </TabList>
+      <Tabs
+        selectedIndex={selectedTabIndex}
+        onSelect={handleTabSelect}
+        selectedTabClassName={selectedTabClassName}
+      >
+        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{otherUser?.data?.username}</h1>
+          </div>
+
+          <TabList className="flex flex-wrap gap-2 rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm">
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Općenito <BiSolidFile fontSize={20} />
+              </div>
+            </Tab>
+            <Tab className={tabClassName}>
+              <div className="flex items-center gap-2">
+                Fotografije <BiSolidCamera fontSize={20} />
+              </div>
+            </Tab>
+          </TabList>
+        </div>
 
         <TabPanel>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 gap-5 mb-3 xl:grid-cols-[1fr_280px]">
+            <div className="min-w-0">
               <UserProfileCard
                 user={otherUser?.data}
                 allImages={allImages?.data.images}
                 allImagesLoading={allImagesLoading}
               />
             </div>
-            <div className="lg:col-span-1 max-w-[300px]">
+
+            <aside className="grid content-start items-start gap-4 md:grid-cols-2 xl:grid-cols-1">
               <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
                 <SendMessageButton
                   sendMessageToId={userId as string}
                   buttonType="blue"
-                  buttonClasses="w-full"
+                  buttonClasses="w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
                   hasChatWithUser={Boolean(existingChat)}
                   existingChatId={existingChat?.id}
                 />
               </Cta>
               <Cta
-                className="mt-4"
                 buttonText="Prijavi problem"
                 subtitle="Ako primijetiš bilo kakav problem s ovim profilom, slobodno ga prijavi putem forme."
                 title="Postoji li problem?"
                 onClick={() => navigate(`/report/`)}
               />
-            </div>
+            </aside>
           </div>
         </TabPanel>
         <TabPanel>
-          <Card className="p-6 rounded">
+          <Card className="rounded-2xl p-5">
             <Photos notFoundText="Nema fotografija" images={allImages?.data.images} />
           </Card>
         </TabPanel>

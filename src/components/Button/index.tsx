@@ -37,7 +37,7 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
     case 'blue':
       return 'py-2 px-4 bg-blue text-white hover:bg-blue-dark';
     case 'danger':
-      return 'py-2 px-4 bg-red text-white';
+      return 'py-2 px-4 border border-red/30 bg-red/10 text-red hover:bg-red hover:text-white';
     case 'blue-dark':
       return 'py-2 px-4 bg-blue-dark text-white';
     case 'transparent':

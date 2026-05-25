@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '@app/components/FieldError';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { BiPaperclip } from 'react-icons/bi';
+import { BiAt, BiHeart, BiMessageRoundedDots, BiPaperclip, BiSolidFileGif } from 'react-icons/bi';
 import { useRef } from 'react';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
@@ -26,24 +26,36 @@ import Paginated from '../Paginated';
 import Image from '../Image';
 import { parseCommentUpdatePayload } from './utils/parseCommentUpdate';
 import Loader from '../Loader';
+import GiphySearch from '../GiphySearch';
 
 const schema = z
   .object({
     comment: z.string().optional(),
     image: z.any().optional(),
+    gifUrl: z.string().optional(),
     content: z
       .string()
       .optional()
       .refine((val) => !val || val.trim().length > 0, { message: 'Poruka ne može biti prazna.' }),
   })
-  .refine((data) => (data.comment && data.comment.trim().length > 0) || data.image?.length > 0, {
-    message: 'Unesi komentar ili dodaj sliku',
-    path: ['comment'],
-  });
+  .refine(
+    (data) => {
+      return (
+        (data.comment && data.comment.trim().length > 0) ||
+        data.image?.length > 0 ||
+        Boolean(data.gifUrl)
+      );
+    },
+    {
+      message: 'Unesi komentar, dodaj sliku ili GIF',
+      path: ['comment'],
+    }
+  );
 
 interface Inputs {
   comment: string;
   image?: FileList;
+  gifUrl?: string;
   content: string;
 }
 
@@ -87,6 +99,7 @@ const PhotoComments = () => {
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>([]);
+  const [showGiphySearch, setShowGiphySearch] = useState(false);
 
   const applyCommentUpdate = useCallback(
     (payload: unknown) => {
@@ -128,11 +141,13 @@ const PhotoComments = () => {
       content: '',
       comment: '',
       image: undefined,
+      gifUrl: '',
     },
   });
 
   const imageFileList = watch('image');
   const selectedImageFile = imageFileList?.[0];
+  const selectedGifUrl = watch('gifUrl');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const onSubmit = async (data: Inputs) => {
@@ -150,7 +165,12 @@ const PhotoComments = () => {
 
     const formData = new FormData();
     formData.append('uploadId', photoId);
-    formData.append('comment', data?.comment.trim() || '');
+    const trimmedComment = data?.comment.trim() || '';
+    const commentWithGif = data.gifUrl
+      ? [trimmedComment, data.gifUrl].filter(Boolean).join(' ')
+      : trimmedComment;
+
+    formData.append('comment', commentWithGif);
     if (taggedUsers.length > 0) {
       formData.append('taggedUserIds', JSON.stringify(taggedUsers.map((u) => u.id)));
     }
@@ -169,7 +189,8 @@ const PhotoComments = () => {
       onSuccess: () => {
         setTaggedUsers([]);
         setCurrentEmojis([]);
-        reset({ comment: '', content: '', image: undefined });
+        setShowGiphySearch(false);
+        reset({ comment: '', content: '', image: undefined, gifUrl: '' });
       },
     });
   };
@@ -177,6 +198,10 @@ const PhotoComments = () => {
   const clearImage = () => {
     setPreviewUrl(null);
     setValue('image', undefined);
+  };
+
+  const clearGif = () => {
+    setValue('gifUrl', '', { shouldValidate: true });
   };
 
   const hasHydratedFromApi = useRef(false);
@@ -259,170 +284,260 @@ const PhotoComments = () => {
   return (
     <CommentUpdateContext.Provider value={applyCommentUpdate}>
       <CommentDeleteContext.Provider value={removeComment}>
-        <div className="mb-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">Komentari</p>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900">
-            {sortedComments.length
-              ? `${sortedComments.length} komentara`
-              : 'Budi prva osoba koja komentira'}
-          </h1>
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">Komentari</p>
+            <h1 className="mt-1 text-2xl font-bold text-gray-900">
+              {sortedComments.length
+                ? `${sortedComments.length} komentara`
+                : 'Budi prva osoba koja komentira'}
+            </h1>
+            <p className="mt-1 text-sm text-gray-600">
+              Podijeli reakciju, dodaj GIF ili označi osobu kojoj želiš odgovoriti.
+            </p>
+          </div>
+          <span className="w-fit rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">
+            Razgovor uz fotografiju
+          </span>
         </div>
 
-        <form
-          className="mb-5 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className="flex w-full items-center gap-2">
-            <Controller
-              name="image"
-              control={control}
-              render={({ field }) => {
-                const handleIconClick = () => {
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                    fileInputRef.current.click();
-                  }
-                };
-                return (
-                  <>
-                    <input
-                      type="file"
-                      accept={ALLOWED_FILE_TYPES}
-                      ref={fileInputRef}
-                      className="hidden"
-                      onChange={(e) => {
-                        if (!e.target.files) {
-                          return;
-                        }
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
+          <div className="min-w-0">
+            <form
+              className="mb-5 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3 shadow-sm"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[auto_minmax(24rem,1fr)_auto_auto]">
+                <Controller
+                  name="image"
+                  control={control}
+                  render={({ field }) => {
+                    const handleIconClick = () => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                        fileInputRef.current.click();
+                      }
+                    };
+                    return (
+                      <>
+                        <input
+                          type="file"
+                          accept={ALLOWED_FILE_TYPES}
+                          ref={fileInputRef}
+                          className="hidden"
+                          onChange={(e) => {
+                            if (!e.target.files) {
+                              return;
+                            }
 
-                        if (!areValidImageTypes(e.target.files)) {
-                          toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
-                          return;
-                        }
+                            if (!areValidImageTypes(e.target.files)) {
+                              toast.error(
+                                `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`,
+                                toastConfig
+                              );
+                              return;
+                            }
 
-                        field.onChange(e.target.files);
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-                      onClick={handleIconClick}
-                      disabled={isAddingUploadComment}
-                      aria-label="Dodaj sliku"
-                    >
-                      <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
-                    </button>
-                  </>
-                );
-              }}
-            />
+                            field.onChange(e.target.files);
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                          onClick={handleIconClick}
+                          disabled={isAddingUploadComment}
+                          aria-label="Dodaj sliku"
+                        >
+                          <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+                        </button>
+                      </>
+                    );
+                  }}
+                />
 
-            <Controller
-              name="comment"
-              control={control}
-              render={({ field }) => {
-                const handleSearch = async (value: string) => {
-                  const emojiRegex = /(?:\s|^):([^\s:]+)/;
-                  const match = value.match(emojiRegex);
+                <Controller
+                  name="comment"
+                  control={control}
+                  render={({ field }) => {
+                    const handleSearch = async (value: string) => {
+                      const emojiRegex = /(?:\s|^):([^\s:]+)/;
+                      const match = value.match(emojiRegex);
 
-                  if (match) {
-                    const searchTerm = match[1];
-                    const emojis = await search(searchTerm);
-                    setCurrentEmojis(emojis);
-                  } else {
+                      if (match) {
+                        const searchTerm = match[1];
+                        const emojis = await search(searchTerm);
+                        setCurrentEmojis(emojis);
+                      } else {
+                        setCurrentEmojis([]);
+                      }
+                    };
+
+                    const debouncedSearch = debounce(handleSearch, 300);
+                    return (
+                      <MentionInput
+                        value={field.value}
+                        onChange={(e) => {
+                          const value = e;
+                          debouncedSearch(value);
+                          field.onChange(value);
+                        }}
+                        onTagUsersChange={setTaggedUsers}
+                        placeholder="Dodaj komentar"
+                        className="min-w-0"
+                      />
+                    );
+                  }}
+                />
+
+                <EmojiPicker
+                  emojis={currentEmojis}
+                  onEmojiSelect={(emoji: string) => {
+                    const currentComment = getValues('comment');
+                    const updatedComment = currentComment?.replace(/(?:\s|^):([^\s:]+)?/, emoji);
+                    setValue('comment', updatedComment, { shouldValidate: true });
                     setCurrentEmojis([]);
-                  }
-                };
+                  }}
+                />
 
-                const debouncedSearch = debounce(handleSearch, 300);
-                return (
-                  <MentionInput
-                    value={field.value}
-                    onChange={(e) => {
-                      const value = e;
-                      debouncedSearch(value);
-                      field.onChange(value);
-                    }}
-                    onTagUsersChange={setTaggedUsers}
-                    placeholder="Dodaj komentar"
-                    className="flex-grow"
-                  />
-                );
-              }}
-            />
+                <button
+                  type="button"
+                  className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={() => setShowGiphySearch((isOpen) => !isOpen)}
+                  disabled={isAddingUploadComment}
+                  aria-label="Dodaj GIF"
+                >
+                  <BiSolidFileGif fontSize={20} />
+                </button>
 
-            <EmojiPicker
-              emojis={currentEmojis}
-              onEmojiSelect={(emoji: string) => {
-                const currentComment = getValues('comment');
-                const updatedComment = currentComment?.replace(/(?:\s|^):([^\s:]+)?/, emoji);
-                setValue('comment', updatedComment, { shouldValidate: true });
-                setCurrentEmojis([]);
-              }}
-            />
+                <Button
+                  type="blue"
+                  className="col-span-3 rounded-2xl py-4 text-base font-semibold md:col-span-1"
+                  disabled={isAddingUploadComment}
+                >
+                  {isAddingUploadComment ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Slanje
+                    </span>
+                  ) : (
+                    'Pošalji'
+                  )}
+                </Button>
+              </div>
 
-            <Button type="blue" disabled={isAddingUploadComment}>
-              {isAddingUploadComment ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Slanje
-                </span>
-              ) : (
-                'Pošalji'
+              <GiphySearch
+                onGifSelect={(gifUrl) => {
+                  setValue('gifUrl', gifUrl, { shouldValidate: true });
+                }}
+                isOpen={showGiphySearch}
+                onClose={() => setShowGiphySearch(false)}
+              />
+
+              {previewUrl && (
+                <div className="mt-3 flex items-end gap-3">
+                  <div className="relative">
+                    <Image
+                      src={previewUrl}
+                      alt="Preview"
+                      className="max-w-[150px] rounded-xl border border-[#dce4ff]"
+                    />
+                    {isAddingUploadComment && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
+                        Slanje...
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    type="danger"
+                    htmlType="button"
+                    onClick={clearImage}
+                    disabled={isAddingUploadComment}
+                  >
+                    Makni
+                  </Button>
+                </div>
               )}
-            </Button>
+
+              {selectedGifUrl && (
+                <div className="mt-3 flex items-end gap-3">
+                  <div className="relative">
+                    <Image
+                      src={selectedGifUrl}
+                      alt="GIF preview"
+                      className="max-w-[150px] rounded-xl border border-[#dce4ff]"
+                    />
+                    {isAddingUploadComment && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
+                        Slanje...
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    type="danger"
+                    htmlType="button"
+                    onClick={clearGif}
+                    disabled={isAddingUploadComment}
+                  >
+                    Makni
+                  </Button>
+                </div>
+              )}
+
+              {errors.comment && <FieldError message="Unesi komentar, dodaj sliku ili GIF" />}
+            </form>
+
+            <div className="flex flex-col gap-3">
+              {areCommentsLoading && (
+                <div className="rounded-2xl border border-[#dce4ff] bg-white py-8">
+                  <Loader variant="inline" label="Učitavanje komentara..." />
+                </div>
+              )}
+
+              {!areCommentsLoading && !sortedComments.length && (
+                <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
+                  Još nema komentara.
+                </div>
+              )}
+
+              {!areCommentsLoading && !!sortedComments.length && (
+                <Paginated<IComment>
+                  itemsPerPage={3}
+                  gridClassName="grid grid-cols-1 gap-3"
+                  data={sortedComments}
+                  paginatedSingle={PaginatedComment}
+                  getItemKey={(item) => item.id}
+                />
+              )}
+            </div>
           </div>
 
-          {previewUrl && (
-            <div className="mt-3 flex items-end gap-3">
-              <div className="relative">
-                <Image
-                  src={previewUrl}
-                  alt="Preview"
-                  className="max-w-[150px] rounded-xl border border-[#dce4ff]"
-                />
-                {isAddingUploadComment && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white">
-                    Slanje...
-                  </div>
-                )}
+          <aside className="rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue">Ideje</p>
+            <h2 className="mt-1 text-lg font-bold text-gray-950">Pokreni razgovor</h2>
+            <div className="mt-4 grid gap-3">
+              <div className="rounded-2xl bg-white p-3 shadow-sm">
+                <BiMessageRoundedDots className="mb-2 text-blue" size={22} />
+                <p className="text-sm font-semibold text-gray-950">Napiši kratku reakciju</p>
+                <p className="mt-1 text-xs leading-5 text-gray-600">
+                  Jedna iskrena rečenica je dosta.
+                </p>
               </div>
-              <Button
-                type="danger"
-                htmlType="button"
-                onClick={clearImage}
-                disabled={isAddingUploadComment}
-              >
-                Makni
-              </Button>
+              <div className="rounded-2xl bg-white p-3 shadow-sm">
+                <BiAt className="mb-2 text-blue" size={22} />
+                <p className="text-sm font-semibold text-gray-950">Označi osobu</p>
+                <p className="mt-1 text-xs leading-5 text-gray-600">
+                  Koristi @ ako se nadovezuješ na nekoga.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-white p-3 shadow-sm">
+                <BiHeart className="mb-2 text-red" size={22} />
+                <p className="text-sm font-semibold text-gray-950">Budi podržavajuć_a</p>
+                <p className="mt-1 text-xs leading-5 text-gray-600">
+                  Komentari su prostor za ugodan razgovor.
+                </p>
+              </div>
             </div>
-          )}
-
-          {errors.comment && <FieldError message="Unesi komentar ili dodaj sliku" />}
-        </form>
-
-        <div className="flex flex-col gap-3">
-          {areCommentsLoading && (
-            <div className="rounded-2xl border border-[#dce4ff] bg-white py-8">
-              <Loader variant="inline" label="Učitavanje komentara..." />
-            </div>
-          )}
-
-          {!areCommentsLoading && !sortedComments.length && (
-            <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
-              Još nema komentara.
-            </div>
-          )}
-
-          {!areCommentsLoading && !!sortedComments.length && (
-            <Paginated<IComment>
-              itemsPerPage={3}
-              gridClassName="grid grid-cols-1 gap-3"
-              data={sortedComments}
-              paginatedSingle={PaginatedComment}
-              getItemKey={(item) => item.id}
-            />
-          )}
+          </aside>
         </div>
       </CommentDeleteContext.Provider>
     </CommentUpdateContext.Provider>

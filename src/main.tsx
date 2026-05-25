@@ -13,6 +13,7 @@ import { CookiesProvider } from 'react-cookie';
 import AppSessionProvider from './components/AppSessionProvider/index.tsx';
 import axios from 'axios';
 import { isSessionConflictCode } from './api/appSession.ts';
+import ScrollToTop from './components/ScrollToTop/index.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CookiesProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <QueryClientProvider client={queryClient}>
           <Auth0ProviderWithNavigate>
             <AuthTokenBridge>
@@ -42,7 +44,18 @@ createRoot(document.getElementById('root')!).render(
             </AuthTokenBridge>
           </Auth0ProviderWithNavigate>
           <ReactQueryDevtools />
-          <ToastContainer />
+          <ToastContainer
+            position="top-right"
+            autoClose={4000}
+            closeOnClick
+            pauseOnHover
+            closeButton
+            toastClassName={() =>
+              'relative flex min-h-16 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 text-gray-950 shadow-xl shadow-blue-dark/10'
+            }
+            bodyClassName={() => 'm-0 flex flex-1 items-center text-sm font-semibold leading-6'}
+            progressClassName={() => '!bg-blue'}
+          />
         </QueryClientProvider>
       </BrowserRouter>
     </CookiesProvider>

@@ -2,14 +2,16 @@ import Image from '@app/components/Image';
 
 interface IContentFormatterProps {
   text: string;
+  renderRichContent?: boolean;
 }
 
-const ContentFormatter = ({ text }: IContentFormatterProps) => {
+const ContentFormatter = ({ text, renderRichContent = true }: IContentFormatterProps) => {
   const parts = text.split(/(\s+)/);
 
   const youtubeRegex =
     /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
-  const giphyRegex = /(?:https?:\/\/)?(?:www\.)?giphy\.com\/(?:gifs|embed)\/([\w-]+)/;
+  const giphyRegex =
+    /(?:https?:\/\/)?(?:(?:www\.)?giphy\.com\/(?:gifs|embed)\/([\w-]+)|media[0-9]?\.giphy\.com\/media\/([\w-]+)\/giphy\.gif)/;
   const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i;
   const urlRegex = /(https?:\/\/[^\s]+)/;
 
@@ -19,6 +21,10 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
         if (youtubeRegex.test(part)) {
           const match = part.match(youtubeRegex);
           if (match) {
+            if (!renderRichContent) {
+              return <span key={i}>YouTube video</span>;
+            }
+
             return (
               <iframe
                 key={i}
@@ -36,10 +42,16 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
         if (giphyRegex.test(part)) {
           const match = part.match(giphyRegex);
           if (match) {
+            const giphyId = match[1] || match[2];
+
+            if (!renderRichContent) {
+              return <span key={i}>GIF</span>;
+            }
+
             return (
               <iframe
                 key={i}
-                src={`https://giphy.com/embed/${match[1]}`}
+                src={`https://giphy.com/embed/${giphyId}`}
                 width="280"
                 height="170"
                 allowFullScreen
@@ -51,6 +63,10 @@ const ContentFormatter = ({ text }: IContentFormatterProps) => {
         if (imageRegex.test(part)) {
           const match = part.match(imageRegex);
           if (match) {
+            if (!renderRichContent) {
+              return <span key={i}>Slika</span>;
+            }
+
             return (
               <Image src={match[1]} alt="content" style={{ display: 'inline-block' }} key={i} />
             );

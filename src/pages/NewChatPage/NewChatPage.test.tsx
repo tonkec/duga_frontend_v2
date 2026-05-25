@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import NewChatPage from '.';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
@@ -20,7 +20,8 @@ jest.mock('@app/components/UserAvatar', () => ({
 
 jest.mock('@app/pages/NewChatPage/components/NewMessageModal', () => ({
   __esModule: true,
-  default: () => null,
+  default: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div role="dialog">Mock new message modal</div> : null,
 }));
 
 jest.mock('@app/hooks/useGetAllUserChats', () => ({
@@ -148,7 +149,7 @@ describe('NewChatPage chat list integration', () => {
     expect(screen.queryByText('empty_friend')).not.toBeInTheDocument();
   });
 
-  it('renders the empty state when there are no conversations with messages', () => {
+  it('opens the new message modal from the empty state', () => {
     mockUseGetAllUserChats.mockReturnValue({
       userChats: {
         data: [
@@ -165,7 +166,9 @@ describe('NewChatPage chat list integration', () => {
     renderNewChatPage();
 
     expect(screen.getByRole('heading', { name: 'Nema razgovora' })).toBeVisible();
-    expect(screen.getByText('Pronađi korisnike')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Pronađi korisnike' }));
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Mock new message modal');
   });
 
   it('disables chat when cookies are rejected', () => {

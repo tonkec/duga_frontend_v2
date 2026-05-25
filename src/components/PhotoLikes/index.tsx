@@ -63,14 +63,24 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   if (!photoId) return null;
 
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="inline-flex items-center gap-2 rounded-full border border-red/20 bg-white px-3 py-2 shadow-sm">
       {hasUserLiked ? (
-        <button type="button" aria-label="Ukloni lajk" onClick={onDownvote}>
-          <BiSolidHeart color="red" className="cursor-pointer" fontSize={30} />
+        <button
+          type="button"
+          aria-label="Ukloni lajk"
+          onClick={onDownvote}
+          className="grid h-9 w-9 place-items-center rounded-full bg-red text-white shadow-sm shadow-red/20 transition-transform hover:scale-105"
+        >
+          <BiSolidHeart fontSize={22} />
         </button>
       ) : (
-        <button type="button" aria-label="Lajkaj fotografiju" onClick={onUpvote}>
-          <BiHeart color="red" className="cursor-pointer" fontSize={30} />
+        <button
+          type="button"
+          aria-label="Lajkaj fotografiju"
+          onClick={onUpvote}
+          className="grid h-9 w-9 place-items-center rounded-full bg-red/10 text-red transition-all hover:scale-105 hover:bg-red hover:text-white"
+        >
+          <BiHeart fontSize={22} />
         </button>
       )}
       <PhotoLikeDropdown likes={allLikes} />

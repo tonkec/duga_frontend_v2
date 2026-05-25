@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IUser } from '@app/components/UserCard';
 import { useGetUserByUsername } from './hooks';
 import { debounceScroll } from '@app/utils/debounceScroll';
+import UserAvatar from '@app/components/UserAvatar';
 
 const usernameRegex = /@([\w\d]*)$/;
 type TaggedUser = { id: number; username: string };
@@ -123,19 +124,25 @@ const MentionInput = ({
         value={value}
         onChange={handleInputChange}
         onFocus={handleFocus}
-        className="w-full p-2 border border-gray-300 rounded"
+        className="h-14 w-full rounded-2xl border border-[#dce4ff] bg-white px-4 text-base shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
         placeholder={placeholder}
       />
 
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-10 top-full left-0 right-0 bg-white shadow-lg border rounded max-h-48 overflow-y-auto">
+        <ul className="absolute left-0 right-0 top-full z-10 mt-2 max-h-48 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white shadow-lg">
           {suggestions.map((user) => (
             <li
               key={user.id}
               onClick={() => handleSelect({ id: user.id, username: user.username })}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
             >
-              @{user.username}
+              <UserAvatar
+                avatarFallbackName={user.username}
+                color="#F037A5"
+                userId={String(user.id)}
+                className="h-8 w-8 shrink-0 rounded-full"
+              />
+              <span>@{user.username}</span>
             </li>
           ))}
         </ul>

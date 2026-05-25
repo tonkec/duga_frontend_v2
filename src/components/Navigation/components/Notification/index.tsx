@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { useMarkAsReadNotification } from '../../hooks';
 import { INotification } from '../Notifications';
+import { BiBell, BiCheckCircle, BiMessageRoundedDots } from 'react-icons/bi';
 
 interface INotificationProps {
   n: INotification;
@@ -10,11 +11,16 @@ interface INotificationProps {
 const Notification = ({ n, setNotifications }: INotificationProps) => {
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const navigate = useNavigate();
+  const Icon =
+    n.actionType === 'message' ? BiMessageRoundedDots : n.isRead ? BiCheckCircle : BiBell;
 
   return (
-    <div
-      className={`cursor-pointer border-b border-[#eef2ff] px-4 py-3 text-sm transition-colors ${
-        n.isRead ? 'bg-white hover:bg-[#f7f9ff]' : 'bg-[#f0f4ff] font-semibold hover:bg-[#dce4ff]'
+    <button
+      type="button"
+      className={`flex w-full cursor-pointer items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm shadow-sm transition-all hover:-translate-y-0.5 ${
+        n.isRead
+          ? 'border-[#dce4ff] bg-white text-gray-700 hover:bg-white'
+          : 'border-blue/30 bg-white font-semibold text-gray-950 shadow-blue/10'
       }`}
       onClick={() => {
         if (!n.isRead) {
@@ -45,8 +51,21 @@ const Notification = ({ n, setNotifications }: INotificationProps) => {
         }
       }}
     >
-      <p className="text-gray-900">{n.content}</p>
-    </div>
+      <span
+        className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full ${
+          n.isRead ? 'bg-[#f0f4ff] text-blue' : 'bg-blue text-white'
+        }`}
+      >
+        <Icon fontSize={20} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block leading-6">{n.content}</span>
+        <span className="mt-1 block text-xs font-medium text-gray-500">
+          {n.isRead ? 'Pročitano' : 'Novo'}
+        </span>
+      </span>
+      {!n.isRead && <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-red" />}
+    </button>
   );
 };
 

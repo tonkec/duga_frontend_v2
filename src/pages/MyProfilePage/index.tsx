@@ -4,7 +4,7 @@ import Cta from '@app/components/Cta';
 import Photos from '@app/components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile, BiGlobe } from 'react-icons/bi';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import UserProfileCard from '@app/components/UserProfileCard';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import 'react-tabs/style/react-tabs.css';
@@ -15,12 +15,21 @@ import AllUserPhotos from './components/AllUserPhotos';
 const tabClassName =
   'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
 const selectedTabClassName = 'bg-blue text-white shadow-sm';
+const profileTabs = ['general', 'profile-photos', 'all-photos'];
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user: currentUser } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
   const { allImages, allImagesLoading } = useGetAllImages(currentUserId);
+  const selectedTabIndex = Math.max(profileTabs.indexOf(searchParams.get('tab') || ''), 0);
+
+  const handleTabSelect = (index: number) => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.set('tab', profileTabs[index]);
+    setSearchParams(nextSearchParams);
+  };
 
   if (allImagesLoading) {
     return (
@@ -32,7 +41,11 @@ const MyProfilePage = () => {
 
   return (
     <AppLayout>
-      <Tabs selectedTabClassName={selectedTabClassName}>
+      <Tabs
+        selectedIndex={selectedTabIndex}
+        onSelect={handleTabSelect}
+        selectedTabClassName={selectedTabClassName}
+      >
         <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Moj profil</h1>
@@ -70,25 +83,25 @@ const MyProfilePage = () => {
 
             <div className="grid content-start items-start gap-4 md:grid-cols-3 xl:grid-cols-1">
               <Cta
-                buttonText="Uredi profil"
-                subtitle="Dodaj detalje i fotografije."
-                title="Uredi profil"
+                buttonText="Dopuni profil"
+                subtitle="Dodaj detalje, interese i fotografije kako bi te drugi lakše upoznali."
+                title="Predstavi se"
                 onClick={() => {
                   navigate('/edit');
                 }}
               />
               <Cta
-                buttonText="Nova poruka"
-                subtitle="Započni razgovor s nekim."
-                title="Poruke"
+                buttonText="Započni razgovor"
+                subtitle="Pronađi nekoga zanimljivog i pošalji prvu poruku."
+                title="Vrijeme je za razgovor"
                 onClick={() => {
                   navigate('/new-chat');
                 }}
               />
               <Cta
-                buttonText="Korisnici"
-                subtitle="Pogledaj tko je online."
-                title="Istraži"
+                buttonText="Istraži korisnike"
+                subtitle="Pregledaj profile i pronađi osobe s kojima želiš kliknuti."
+                title="Upoznaj zajednicu"
                 onClick={() => {
                   navigate('/users');
                 }}
