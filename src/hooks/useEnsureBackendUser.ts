@@ -24,7 +24,6 @@ export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } =
       if (!auth0User.email) throw new Error('Auth0 email not available');
 
       const auth0AccessToken = await resolveAuth0AccessToken();
-      const client = apiClient(auth0AccessToken ?? undefined);
 
       await register(
         auth0User.sub,
@@ -33,6 +32,9 @@ export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } =
         Boolean(auth0User.email_verified),
         auth0AccessToken
       );
+      const client = auth0User.email_verified
+        ? apiClient()
+        : apiClient(auth0AccessToken ?? undefined);
       const res = await client.get('/users/current-user', {
         skipGlobalErrorHandler: true,
       });

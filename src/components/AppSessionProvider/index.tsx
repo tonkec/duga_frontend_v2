@@ -105,6 +105,7 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
           generateUniqueUsername(),
           Boolean(user.email_verified)
         );
+        startedSessionKeyRef.current = `${user.sub}:${getAppSessionId()}`;
         await startSession();
         if (!cancelled) {
           setStatus('active');
