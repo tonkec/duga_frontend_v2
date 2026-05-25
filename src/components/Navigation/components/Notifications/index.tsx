@@ -5,7 +5,7 @@ import {
 } from '@app/components/Navigation/hooks';
 import { useSocket } from '@app/context/useSocket';
 import Notification from './../Notification';
-import Button from '@app/components/Button';
+import { BiBell, BiCheckDouble } from 'react-icons/bi';
 
 export type INotification = {
   id: number;
@@ -90,7 +90,7 @@ const NotificationDropdown = ({
         }
       >
         <span>Obavijesti</span>
-        <span aria-hidden>🔔</span>
+        <BiBell aria-hidden fontSize={20} />
         {notifications.some((n) => !n.isRead) && (
           <span className="ml-auto h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white/80" />
         )}
@@ -98,29 +98,52 @@ const NotificationDropdown = ({
 
       {open && (
         <div
-          className={`absolute z-50 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white text-gray-900 shadow-xl ${
-            isMobile ? 'left-0 right-0' : 'right-0 w-80'
+          className={`absolute z-50 mt-2 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white text-gray-900 shadow-2xl shadow-blue-dark/15 ${
+            isMobile ? 'left-0 right-0' : 'right-0 w-96'
           }`}
         >
-          <div className="flex items-center justify-between gap-2 border-b border-[#eef2ff] p-3">
-            <span className="font-bold">Obavijesti</span>
-            <Button
-              type="transparent"
-              className="!px-2 !py-1 text-xs"
+          <div className="bg-gradient-to-br from-white via-[#fbfcff] to-[#f0f4ff] px-4 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue">
+                  Obavijesti
+                </p>
+                <h2 className="mt-1 text-xl font-bold text-gray-950">Najnovije aktivnosti</h2>
+              </div>
+              <span className="rounded-full border border-[#dce4ff] bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm">
+                {notifications.length}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-3 py-2 text-xs font-semibold text-blue shadow-sm transition-colors hover:bg-blue hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => {
                 mutateMarkAllAsRead();
                 setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
               }}
+              disabled={!notifications.some((n) => !n.isRead)}
             >
+              <BiCheckDouble fontSize={18} />
               Označi sve kao pročitano
-            </Button>
+            </button>
           </div>
+
           {notifications.length === 0 ? (
-            <div className="p-4 text-sm text-gray-600">Nema obavijesti</div>
+            <div className="p-6 text-center">
+              <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-[#f0f4ff] text-blue">
+                <BiBell fontSize={24} />
+              </div>
+              <p className="font-semibold text-gray-950">Nema obavijesti</p>
+              <p className="mt-1 text-sm text-gray-600">
+                Nove poruke i aktivnosti prikazat će se ovdje.
+              </p>
+            </div>
           ) : (
-            notifications.map((n) => (
-              <Notification key={n.id} n={n} setNotifications={setNotifications} />
-            ))
+            <div className="max-h-[28rem] space-y-2 overflow-y-auto bg-[#f7f9ff] p-3">
+              {notifications.map((n) => (
+                <Notification key={n.id} n={n} setNotifications={setNotifications} />
+              ))}
+            </div>
           )}
         </div>
       )}

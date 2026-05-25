@@ -10,6 +10,8 @@ const selectOptions: { value: keyof IUser; label: string }[] = [
   { value: 'location', label: 'Lokacija' },
 ];
 
+const defaultSelectValue = { value: 'username', label: 'Ime' };
+
 interface IUserFiltersProps {
   selectValue: {
     value: string;
@@ -31,7 +33,7 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
     case 'location':
       return 'Pretraži prema lokaciji...';
     default:
-      return 'Odaberi kriterij pretrage...';
+      return 'Pretraži prema imenu...';
   }
 };
 
@@ -56,7 +58,6 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           value={search}
           onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
           className="h-12 w-full rounded-2xl border-[#dce4ff] bg-white pl-11 text-sm shadow-sm disabled:bg-gray-50"
-          disabled={!selectValue.value}
         />
 
         <div className="flex flex-wrap gap-2" role="group" aria-label="Kriterij pretrage">
@@ -91,10 +92,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
               type="button"
               className="rounded-xl border border-red/30 bg-red/10 px-4 py-2 text-sm font-semibold text-red shadow-sm transition-colors hover:bg-red hover:text-white"
               onClick={() => {
-                setSelectValue({
-                  value: '',
-                  label: '',
-                });
+                setSelectValue(defaultSelectValue);
                 setSearch('');
               }}
             >

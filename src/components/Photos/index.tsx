@@ -67,28 +67,42 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
   }
 
   return (
-    <>
-      <div className="mb-4 flex flex-col gap-1">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Fotografije</p>
-        <h2 className="text-2xl font-bold text-gray-900">Galerija ({images.length})</h2>
+    <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff]">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue/10 blur-3xl" />
+      <div className="relative z-10 mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Fotografije</p>
+          <h2 className="mt-1 text-2xl font-bold text-gray-950">Galerija</h2>
+          <p className="mt-1 text-sm text-gray-600">Pregled javnih fotografija s ovog profila.</p>
+        </div>
+        <span className="w-fit rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">
+          {images.length} {images.length === 1 ? 'fotografija' : 'fotografije'}
+        </span>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+
+      <div className="relative z-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {images.map((image: IImage, index: number) => {
           return (
             <div
-              className="overflow-hidden rounded-2xl border border-[#dce4ff] bg-white p-3 shadow-sm"
+              className="group overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10"
               key={index}
             >
-              <Photo image={image} onClick={() => navigate(`/photo/${image.id}`)} />
-              {image.description && (
-                <p className="mt-3 text-sm leading-6 text-gray-700">{image.description}</p>
-              )}
-              <PhotoLikes photoId={String(image.id)} />
+              <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-[#eef3ff]">
+                <Photo image={image} onClick={() => navigate(`/photo/${image.id}`)} />
+              </div>
+              <div className="mt-3 rounded-2xl bg-[#f7f9ff] px-3 py-2">
+                {image.description && (
+                  <p className="mb-2 line-clamp-2 text-sm leading-6 text-gray-700">
+                    {image.description}
+                  </p>
+                )}
+                <PhotoLikes photoId={String(image.id)} />
+              </div>
             </div>
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 

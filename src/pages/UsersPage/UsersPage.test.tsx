@@ -217,7 +217,7 @@ describe('UsersPage dating flow integration', () => {
 
     renderUsersPage();
 
-    expect(screen.getByRole('heading', { name: 'Nema korisnika 😢' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Nema dostupnih korisnika' })).toBeVisible();
   });
 
   it('updates visible users when filter and search change', () => {

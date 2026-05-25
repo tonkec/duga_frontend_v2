@@ -36,7 +36,7 @@ const Cta = ({
         <div className="mt-auto">
           {children ?? (
             <Button
-              className="block w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
+              className="inline-flex w-fit items-center justify-center rounded-full px-8 py-3 font-semibold shadow-md shadow-blue/15"
               onClick={onClick}
               type="blue"
             >

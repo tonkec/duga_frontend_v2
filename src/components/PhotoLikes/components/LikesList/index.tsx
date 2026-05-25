@@ -53,10 +53,10 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         type="button"
-        className={`rounded-full text-sm font-semibold transition-colors ${
+        className={`rounded-full px-1 text-sm font-semibold transition-colors ${
           shouldShowDropdown
-            ? 'cursor-pointer text-blue underline hover:text-blue/80'
-            : 'cursor-default text-gray-500'
+            ? 'cursor-pointer text-blue hover:text-blue-dark'
+            : 'cursor-default text-gray-600'
         }`}
         onClick={() => setOpen((prev) => !prev)}
         disabled={!shouldShowDropdown}

@@ -9,6 +9,12 @@ import { useGetWindowSize } from '@app/hooks/useGetWindowSize';
 import { filterUsers, getVisibleVerifiedUsers } from '@app/utils/userDirectory';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { BiGroup, BiSearch } from 'react-icons/bi';
+
+const defaultSelectValue = {
+  value: 'username',
+  label: 'Ime',
+};
 
 const UsersPage = () => {
   const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
@@ -16,10 +22,7 @@ const UsersPage = () => {
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [selectValue, setSelectValue] = useState({
-    value: 'username',
-    label: 'Ime',
-  });
+  const [selectValue, setSelectValue] = useState(defaultSelectValue);
 
   if (isAllUsersLoading || isUserLoading) {
     return (
@@ -44,9 +47,39 @@ const UsersPage = () => {
 
       <div className="mt-4">
         {!renderedUsers.length && (
-          <div className="text-center text-lg max-w-md mx-auto mt-12">
-            <h2 className="mb-4">Nema korisnika 😢</h2>
-          </div>
+          <section className="relative isolate mx-auto mt-8 max-w-2xl overflow-hidden rounded-3xl border border-dashed border-[#b9c6ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#eef3ff] px-6 py-10 text-center shadow-sm">
+            <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-blue/10 blur-3xl" />
+            <div className="pointer-events-none absolute -right-16 bottom-2 h-40 w-40 rounded-full bg-pink/10 blur-3xl" />
+
+            <div className="relative z-10 mx-auto flex max-w-md flex-col items-center">
+              <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue shadow-lg shadow-blue/10">
+                {search.trim() ? <BiSearch size={34} /> : <BiGroup size={34} />}
+              </div>
+              <span className="mb-3 rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
+                Nema rezultata
+              </span>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-950">
+                {search.trim() ? 'Nema korisnika za ovaj upit' : 'Nema dostupnih korisnika'}
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                {search.trim()
+                  ? `Nismo pronašli nikoga za "${search}" prema kriteriju ${selectValue.label.toLowerCase()}. Pokušaj s kraćim pojmom ili drugim kriterijem.`
+                  : 'Trenutno nema drugih verificiranih profila za prikaz. Navrati ponovno kasnije.'}
+              </p>
+              {search.trim() && (
+                <button
+                  type="button"
+                  className="mt-6 rounded-full bg-blue px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue/15 transition-colors hover:bg-blue-dark"
+                  onClick={() => {
+                    setSelectValue(defaultSelectValue);
+                    setSearch('');
+                  }}
+                >
+                  Očisti pretragu
+                </button>
+              )}
+            </div>
+          </section>
         )}
 
         <Paginated<IUser>

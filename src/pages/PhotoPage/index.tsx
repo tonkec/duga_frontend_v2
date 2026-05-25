@@ -53,14 +53,14 @@ const PhotoPage = () => {
 
     if (currentUser?.data?.id === userId) {
       return (
-        <div className="flex items-center gap-2">
+        <div className="inline-flex items-center gap-3 rounded-full border border-[#dce4ff] bg-white px-3 py-2 shadow-sm">
           <UserAvatar
-            className="w-8 h-8 rounded-full"
+            className="h-10 w-10 rounded-full"
             color="#F037A5"
             avatarFallbackName={`${username}`}
             userId={String(userId)}
           />
-          <span>{username}</span>
+          <span className="text-sm font-bold text-gray-950">{username}</span>
         </div>
       );
     }
@@ -68,15 +68,15 @@ const PhotoPage = () => {
     return (
       <button
         onClick={() => navigate(`/user/${userId}`)}
-        className="flex items-center gap-2 hover:underline"
+        className="inline-flex items-center gap-3 rounded-full border border-[#dce4ff] bg-white px-3 py-2 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue/40 hover:shadow-md hover:shadow-blue/10"
       >
         <UserAvatar
-          className="w-8 h-8 rounded-full"
+          className="h-10 w-10 rounded-full"
           color="#F037A5"
           avatarFallbackName={`${username}`}
           userId={String(userId)}
         />
-        <span>{username}</span>
+        <span className="text-sm font-bold text-gray-950">{username}</span>
       </button>
     );
   };
@@ -96,17 +96,14 @@ const PhotoPage = () => {
                   />
                 </div>
 
-                <div className="mt-4 rounded-2xl bg-[#f7f9ff] p-4">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="mt-4 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-4 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-3">
                     {showAvatar()}
-                    {singleImage?.data?.description && (
-                      <p className="text-gray-700 sm:text-right">{singleImage?.data.description}</p>
-                    )}
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between">
                     <PhotoLikes photoId={photoId} />
                   </div>
+                  {singleImage?.data?.description && (
+                    <p className="mt-3 text-gray-700">{singleImage?.data.description}</p>
+                  )}
                 </div>
               </>
             ) : (

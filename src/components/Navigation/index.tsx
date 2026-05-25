@@ -45,9 +45,6 @@ const Navigation = () => {
       {!isMobile && (
         <nav className="gradient sticky top-0 z-40 px-4 py-3 text-white shadow-sm">
           <div className="mx-auto flex max-w-[1200px] items-center gap-4 rounded-full border border-white/15 bg-white/10 px-3 py-2 shadow-lg shadow-blue-dark/10 backdrop-blur-md">
-            <div className="mr-1 rounded-full bg-white px-4 py-2 text-lg font-bold tracking-tight text-blue shadow-sm">
-              Duga
-            </div>
             <NavigationItems userId={userId} onLogout={onLogout} />
           </div>
         </nav>
@@ -55,10 +52,7 @@ const Navigation = () => {
 
       {isMobile && (
         <div className="gradient sticky top-0 z-40 p-3 text-white shadow-sm">
-          <div className="flex items-center justify-between rounded-3xl border border-white/15 bg-white/10 px-4 py-3 shadow-lg shadow-blue-dark/10 backdrop-blur-md">
-            <div className="rounded-full bg-white px-4 py-2 text-lg font-bold tracking-tight text-blue shadow-sm">
-              Duga
-            </div>
+          <div className="flex items-center justify-end rounded-3xl border border-white/15 bg-white/10 px-4 py-3 shadow-lg shadow-blue-dark/10 backdrop-blur-md">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="rounded-full bg-white/15 p-2.5 text-white transition-colors hover:bg-white/25"
@@ -82,7 +76,6 @@ const Navigation = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.2em] text-white/70">Navigacija</p>
-                  <h2 className="text-2xl font-bold">Duga</h2>
                 </div>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}

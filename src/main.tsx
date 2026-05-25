@@ -13,6 +13,7 @@ import { CookiesProvider } from 'react-cookie';
 import AppSessionProvider from './components/AppSessionProvider/index.tsx';
 import axios from 'axios';
 import { isSessionConflictCode } from './api/appSession.ts';
+import ScrollToTop from './components/ScrollToTop/index.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CookiesProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <QueryClientProvider client={queryClient}>
           <Auth0ProviderWithNavigate>
             <AuthTokenBridge>

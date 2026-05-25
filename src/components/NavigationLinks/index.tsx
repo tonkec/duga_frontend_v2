@@ -13,8 +13,8 @@ interface NavigationItemsProps {
 const navItems = [
   { to: '/', label: 'Početna', icon: <BiHomeAlt fontSize={20} /> },
   { to: '/new-chat', label: 'Poruke', icon: <BiMessageRounded fontSize={20} /> },
-  { to: '/users', label: 'Korisnici', icon: <BiGroup fontSize={20} /> },
   { to: '/profile', label: 'Profil', icon: <BiUser fontSize={20} /> },
+  { to: '/users', label: 'Korisnici', icon: <BiGroup fontSize={20} /> },
   { to: '/settings', label: 'Postavke', icon: <BiCog fontSize={20} /> },
 ];
 

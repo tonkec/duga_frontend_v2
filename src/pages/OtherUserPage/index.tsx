@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { BiSolidCamera, BiSolidFile } from 'react-icons/bi';
@@ -22,14 +22,23 @@ const getChatWithUser = (userChats: IChat[] | undefined, userId: string | undefi
 const tabClassName =
   'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
 const selectedTabClassName = 'bg-blue text-white shadow-sm';
+const profileTabs = ['general', 'photos'];
 
 const OtherUserPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { userId } = useParams();
   const { allImages, allImagesLoading } = useGetAllImages(userId as string);
   const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
   const { userChats } = useGetAllUserChats();
   const existingChat = getChatWithUser(userChats?.data, userId);
+  const selectedTabIndex = Math.max(profileTabs.indexOf(searchParams.get('tab') || ''), 0);
+
+  const handleTabSelect = (index: number) => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.set('tab', profileTabs[index]);
+    setSearchParams(nextSearchParams);
+  };
 
   if (!userId || isNaN(Number(userId))) {
     return (
@@ -57,7 +66,11 @@ const OtherUserPage = () => {
 
   return (
     <AppLayout>
-      <Tabs selectedTabClassName={selectedTabClassName}>
+      <Tabs
+        selectedIndex={selectedTabIndex}
+        onSelect={handleTabSelect}
+        selectedTabClassName={selectedTabClassName}
+      >
         <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{otherUser?.data?.username}</h1>
@@ -78,7 +91,7 @@ const OtherUserPage = () => {
         </div>
 
         <TabPanel>
-          <div className="mb-3 grid gap-5">
+          <div className="grid grid-cols-1 gap-5 mb-3 xl:grid-cols-[1fr_280px]">
             <div className="min-w-0">
               <UserProfileCard
                 user={otherUser?.data}
@@ -87,13 +100,8 @@ const OtherUserPage = () => {
               />
             </div>
 
-            <aside className="grid gap-4 md:grid-cols-2">
-              <Cta
-                className="!h-auto rounded-2xl"
-                compact
-                subtitle="Pošalji poruku ovoj osobici."
-                title="Pošalji poruku!"
-              >
+            <aside className="grid content-start items-start gap-4 md:grid-cols-2 xl:grid-cols-1">
+              <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
                 <SendMessageButton
                   sendMessageToId={userId as string}
                   buttonType="blue"
@@ -103,8 +111,6 @@ const OtherUserPage = () => {
                 />
               </Cta>
               <Cta
-                className="!h-auto rounded-2xl"
-                compact
                 buttonText="Prijavi problem"
                 subtitle="Ako primijetiš bilo kakav problem s ovim profilom, slobodno ga prijavi putem forme."
                 title="Postoji li problem?"
