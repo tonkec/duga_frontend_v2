@@ -6,7 +6,7 @@ import SendMessage from './components/SendMessage';
 import { useEffect, useRef, useState } from 'react';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
-import { useDeleteCurrentChat, useGetCurrentChat } from './hooks';
+import { useDeleteCurrentChat, useGetAllMessages, useGetCurrentChat } from './hooks';
 import { getOtherUser } from './utils/getOtherUser';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
@@ -59,6 +59,8 @@ const ChatPage = () => {
   const { currentChat, isCurrentChatLoading, isCurrentChatError } = useGetCurrentChat(
     chatId as string
   );
+  const { messages, fetchNextPage } = useGetAllMessages(chatId as string);
+  const hasMessages = messages.length + receivedMessages.length > 0;
   const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
   const { deleteChat } = useDeleteCurrentChat(socket);
 
@@ -187,16 +189,18 @@ const ChatPage = () => {
                 <p className="text-xs text-gray-500">{isOnlineState ? 'Na mreži' : 'Offline'}</p>
               </div>
             </button>
-            <Button
-              type="danger"
-              className="shrink-0 !py-1.5 !px-3 !text-xs"
-              onClick={(e) => {
-                e?.preventDefault();
-                setIsDeleteModalVisible(true);
-              }}
-            >
-              Izbriši
-            </Button>
+            {hasMessages && (
+              <Button
+                type="danger"
+                className="shrink-0 !py-1.5 !px-3 !text-xs"
+                onClick={(e) => {
+                  e?.preventDefault();
+                  setIsDeleteModalVisible(true);
+                }}
+              >
+                Izbriši
+              </Button>
+            )}
           </header>
 
           <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
@@ -205,6 +209,8 @@ const ChatPage = () => {
               otherUserName={otherUserName}
               otherUserId={otherUserId as number}
               receivedMessages={receivedMessages}
+              messages={messages}
+              fetchNextPage={fetchNextPage}
               currentUserId={currentUserId as number}
               isCurrentUserLoading={isCurrentUserLoading}
             />

@@ -34,7 +34,7 @@ const WelcomeHero = ({ onEditProfile, onFindUsers, onSendMessage }: WelcomeHeroP
           Prvi korak
         </span>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Dobrodošao_la. Kreni od profila.
+          Izvrsno! Možeš krenuti od profila.
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
           Dodaj par detalja i profilnu fotografiju kako bi drugi odmah znali tko si. Nakon toga
@@ -455,19 +455,27 @@ function App() {
             buttonText="Postavi pitanje"
             onClick={() => navigate('/forum/ask')}
           />
+        </div>
 
-          <Cta
-            className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
-            title="Želiš li nam pomoći?"
-            subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike. Piši nam na admin@duga.chat 🙏"
-          >
+        <div className="relative z-10 mt-5 rounded-3xl border border-blue/20 bg-blue px-5 py-6 text-white shadow-lg shadow-blue/15 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                Community builders
+              </p>
+              <h3 className="mt-2 text-2xl font-bold">Želiš doprinijeti platformi?</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/85">
+                Ako voliš Dugu i želiš pomoći oko ideja, testiranja ili razvoja, javi nam se na
+                admin@duga.chat. Gradimo prostor koji ostaje siguran i koristan.
+              </p>
+            </div>
             <a
-              className="block w-full rounded-full bg-blue px-4 py-3 text-center text-sm font-semibold text-white shadow-md shadow-blue/15 transition-all duration-200 hover:bg-blue-dark"
+              className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-blue shadow-md shadow-blue-dark/10 transition-colors hover:bg-[#f0f4ff] sm:w-auto"
               href="mailto:admin@duga.chat"
             >
-              Javi nam se
+              Uključi se
             </a>
-          </Cta>
+          </div>
         </div>
       </section>
     </AppLayout>

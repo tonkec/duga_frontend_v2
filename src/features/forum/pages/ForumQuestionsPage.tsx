@@ -582,30 +582,47 @@ const ForumQuestionsPage = () => {
         )}
 
         {!questionsQuery.isPending && !questionsQuery.isError && filteredQuestions.length === 0 && (
-          <div className="rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-14 text-center shadow-sm">
+          <div
+            className={`rounded-3xl border px-6 py-14 text-center shadow-sm ${
+              hasActiveFilters
+                ? 'border-blue/20 bg-white'
+                : 'border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff]'
+            }`}
+          >
+            <span className="mx-auto mb-4 inline-flex rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
+              {hasActiveFilters ? 'Nema rezultata' : 'Forum'}
+            </span>
             <h2 className="text-2xl font-bold text-gray-950">
-              {questions.length === 0 ? 'Još nema pitanja' : 'Nema pitanja za odabrane filtere'}
+              {hasActiveFilters ? 'Nema pitanja za ove kriterije' : 'Još nema pitanja'}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-600">
-              {questions.length === 0
-                ? 'Budi prvi_a koji_a će otvoriti temu na forumu.'
-                : 'Promijeni ili očisti filtere za širi prikaz pitanja.'}
+              {hasActiveFilters
+                ? 'Pokušaj proširiti pretragu ili očisti filtere da ponovno vidiš sva pitanja.'
+                : 'Budi prvi_a koji_a će otvoriti temu na forumu.'}
             </p>
-            {questions.length === 0 ? (
+            {hasActiveFilters ? (
+              <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="inline-flex items-center justify-center rounded-full bg-blue px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue/20 transition-colors hover:bg-blue-dark"
+                >
+                  Očisti filtere
+                </button>
+                <Link
+                  to="/forum/ask"
+                  className="inline-flex items-center justify-center rounded-full border border-[#dce4ff] bg-white px-6 py-3 text-sm font-semibold text-blue-dark transition-colors hover:border-blue hover:text-blue"
+                >
+                  Postavi pitanje
+                </Link>
+              </div>
+            ) : (
               <Link
                 to="/forum/ask"
                 className="mt-6 inline-flex items-center justify-center rounded-full bg-blue px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue/20 transition-colors hover:bg-blue-dark"
               >
                 Postavi pitanje
               </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="mt-6 inline-flex items-center justify-center rounded-full bg-blue px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue/20 transition-colors hover:bg-blue-dark"
-              >
-                Očisti filtere
-              </button>
             )}
           </div>
         )}

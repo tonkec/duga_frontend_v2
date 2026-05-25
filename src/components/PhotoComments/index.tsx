@@ -114,6 +114,18 @@ const PhotoComments = () => {
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
 
+  const addCommentToState = useCallback((comment: IComment | undefined) => {
+    if (!comment?.id) return;
+
+    setAllComments((prev) => {
+      if (prev.some((currentComment) => Number(currentComment.id) === Number(comment.id))) {
+        return prev;
+      }
+
+      return [comment, ...prev];
+    });
+  }, []);
+
   const applyCommentUpdate = useCallback(
     (payload: unknown) => {
       const updated = parseCommentUpdatePayload(payload);
@@ -199,7 +211,8 @@ const PhotoComments = () => {
     }
 
     mutateAddUploadComment(formData, {
-      onSuccess: () => {
+      onSuccess: (response) => {
+        addCommentToState(response.data as IComment);
         setTaggedUsers([]);
         setCurrentEmojis([]);
         setShowGiphySearch(false);
@@ -235,7 +248,7 @@ const PhotoComments = () => {
     if (!socket) return;
 
     socket.on('receive-comment', (data) => {
-      setAllComments((prev) => [data.data, ...prev]);
+      addCommentToState(data.data as IComment);
     });
 
     socket.on('remove-comment', (payload) => {
@@ -264,7 +277,7 @@ const PhotoComments = () => {
       socket.off('update-comment', handleCommentUpdate);
       socket.off('edit-comment', handleCommentUpdate);
     };
-  }, [applyCommentUpdate, photoId, removeComment, socket]);
+  }, [addCommentToState, applyCommentUpdate, photoId, removeComment, socket]);
 
   useEffect(() => {
     if (!selectedImageFile) {
@@ -309,57 +322,10 @@ const PhotoComments = () => {
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
           <div className="min-w-0">
             <form
-              className="mb-5 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3 shadow-sm"
+              className="mb-5 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-4 shadow-sm"
               onSubmit={handleSubmit(onSubmit)}
             >
-              <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[auto_minmax(24rem,1fr)_auto_auto_auto]">
-                <Controller
-                  name="image"
-                  control={control}
-                  render={({ field }) => {
-                    const handleIconClick = () => {
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = '';
-                        fileInputRef.current.click();
-                      }
-                    };
-                    return (
-                      <>
-                        <input
-                          type="file"
-                          accept={ALLOWED_FILE_TYPES}
-                          ref={fileInputRef}
-                          className="hidden"
-                          onChange={(e) => {
-                            if (!e.target.files) {
-                              return;
-                            }
-
-                            if (!areValidImageTypes(e.target.files)) {
-                              toast.error(
-                                `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`,
-                                toastConfig
-                              );
-                              return;
-                            }
-
-                            field.onChange(e.target.files);
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-                          onClick={handleIconClick}
-                          disabled={isAddingUploadComment}
-                          aria-label="Dodaj sliku"
-                        >
-                          <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
-                        </button>
-                      </>
-                    );
-                  }}
-                />
-
+              <div className="grid w-full gap-3">
                 <Controller
                   name="comment"
                   control={control}
@@ -392,57 +358,108 @@ const PhotoComments = () => {
                   }}
                 />
 
-                <EmojiPicker
-                  emojis={currentEmojis}
-                  onEmojiSelect={(emoji: string) => {
-                    const currentComment = getValues('comment');
-                    const updatedComment = replaceEmojiToken(currentComment, emoji);
-                    setValue('comment', updatedComment, { shouldValidate: true });
-                    setCurrentEmojis([]);
-                  }}
-                />
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-wrap gap-2">
+                    <Controller
+                      name="image"
+                      control={control}
+                      render={({ field }) => {
+                        const handleIconClick = () => {
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                            fileInputRef.current.click();
+                          }
+                        };
+                        return (
+                          <>
+                            <input
+                              type="file"
+                              accept={ALLOWED_FILE_TYPES}
+                              ref={fileInputRef}
+                              className="hidden"
+                              onChange={(e) => {
+                                if (!e.target.files) {
+                                  return;
+                                }
 
-                <button
-                  type="button"
-                  className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-                  onClick={() => {
-                    setShowGiphySearch((isOpen) => !isOpen);
-                    setShowEmojiSearch(false);
-                  }}
-                  disabled={isAddingUploadComment}
-                  aria-label="Dodaj GIF"
-                >
-                  <BiSolidFileGif fontSize={20} />
-                </button>
+                                if (!areValidImageTypes(e.target.files)) {
+                                  toast.error(
+                                    `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`,
+                                    toastConfig
+                                  );
+                                  return;
+                                }
 
-                <button
-                  type="button"
-                  className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-                  onClick={() => {
-                    setShowEmojiSearch((isOpen) => !isOpen);
-                    setShowGiphySearch(false);
-                    setCurrentEmojis([]);
-                  }}
-                  disabled={isAddingUploadComment}
-                  aria-label="Dodaj emoji"
-                >
-                  <BiSmile fontSize={20} />
-                </button>
+                                field.onChange(e.target.files);
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="grid h-12 w-12 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                              onClick={handleIconClick}
+                              disabled={isAddingUploadComment}
+                              aria-label="Dodaj sliku"
+                            >
+                              <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+                            </button>
+                          </>
+                        );
+                      }}
+                    />
 
-                <Button
-                  type="blue"
-                  className="col-span-3 rounded-2xl py-4 text-base font-semibold md:col-span-1"
-                  disabled={isAddingUploadComment}
-                >
-                  {isAddingUploadComment ? (
-                    <span className="flex items-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Slanje
-                    </span>
-                  ) : (
-                    'Pošalji'
-                  )}
-                </Button>
+                    <EmojiPicker
+                      emojis={currentEmojis}
+                      onEmojiSelect={(emoji: string) => {
+                        const currentComment = getValues('comment');
+                        const updatedComment = replaceEmojiToken(currentComment, emoji);
+                        setValue('comment', updatedComment, { shouldValidate: true });
+                        setCurrentEmojis([]);
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      className="grid h-12 w-12 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                      onClick={() => {
+                        setShowGiphySearch((isOpen) => !isOpen);
+                        setShowEmojiSearch(false);
+                      }}
+                      disabled={isAddingUploadComment}
+                      aria-label="Dodaj GIF"
+                    >
+                      <BiSolidFileGif fontSize={20} />
+                    </button>
+
+                    <button
+                      type="button"
+                      className="grid h-12 w-12 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                      onClick={() => {
+                        setShowEmojiSearch((isOpen) => !isOpen);
+                        setShowGiphySearch(false);
+                        setCurrentEmojis([]);
+                      }}
+                      disabled={isAddingUploadComment}
+                      aria-label="Dodaj emoji"
+                    >
+                      <BiSmile fontSize={20} />
+                    </button>
+                  </div>
+
+                  <Button
+                    type="blue"
+                    className="w-full rounded-2xl py-4 text-base font-semibold sm:w-auto sm:px-8"
+                    disabled={isAddingUploadComment}
+                  >
+                    {isAddingUploadComment ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Slanje
+                      </span>
+                    ) : (
+                      'Pošalji'
+                    )}
+                  </Button>
+                </div>
               </div>
 
               <GiphySearch

@@ -15,13 +15,17 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import ForumImageGallery from './ForumImageGallery';
+import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
+import { getForumImageItems } from '../utils/forumImages';
 
 type QuestionFormPayload = CreateQuestionPayload & Pick<UpdateQuestionPayload, 'removeImage'>;
 
 interface QuestionFormProps {
   initialQuestion?: Question;
+  isDeletingExistingImage?: boolean;
   isSubmitting: boolean;
   onCancel?: () => void;
+  onDeleteExistingImage?: () => void;
   onSubmit: (payload: QuestionFormPayload) => void;
   submitLabel?: string;
   submittingLabel?: string;
@@ -30,9 +34,15 @@ interface QuestionFormProps {
 interface QuestionFormErrors {
   title?: string;
   body?: string;
+  images?: string;
 }
 
-const validateQuestionForm = (title: string, body: string): QuestionFormErrors => {
+const validateQuestionForm = (
+  title: string,
+  body: string,
+  images: File[],
+  existingImageCount: number
+): QuestionFormErrors => {
   const errors: QuestionFormErrors = {};
 
   if (!title) {
@@ -47,6 +57,13 @@ const validateQuestionForm = (title: string, body: string): QuestionFormErrors =
     errors.body = 'Opis je obavezan.';
   } else if (body.length < 10) {
     errors.body = 'Opis mora imati barem 10 znakova.';
+  } else if (body.length > FORUM_MAX_BODY_LENGTH) {
+    errors.body = `Opis može imati najviše ${FORUM_MAX_BODY_LENGTH} znakova.`;
+  }
+
+  const imageError = validateForumImages(images, existingImageCount);
+  if (imageError) {
+    errors.images = imageError;
   }
 
   return errors;
@@ -54,8 +71,10 @@ const validateQuestionForm = (title: string, body: string): QuestionFormErrors =
 
 const QuestionForm = ({
   initialQuestion,
+  isDeletingExistingImage = false,
   isSubmitting,
   onCancel,
+  onDeleteExistingImage,
   onSubmit,
   submitLabel = 'Objavi pitanje',
   submittingLabel = 'Objavljujem...',
@@ -80,6 +99,8 @@ const QuestionForm = ({
   );
   const shouldShowExistingImage =
     hasExistingImage && imagePreviewUrls.length === 0 && !removeExistingImage;
+  const existingImageCount =
+    initialQuestion && !removeExistingImage ? getForumImageItems(initialQuestion).length : 0;
 
   const updateBody = async (value: string) => {
     setBody(value);
@@ -102,7 +123,7 @@ const QuestionForm = ({
     const bodyWithGif = selectedGifUrl
       ? [trimmedBody, selectedGifUrl].filter(Boolean).join(' ')
       : trimmedBody;
-    const nextErrors = validateQuestionForm(trimmedTitle, bodyWithGif);
+    const nextErrors = validateQuestionForm(trimmedTitle, bodyWithGif, images, existingImageCount);
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
@@ -113,7 +134,6 @@ const QuestionForm = ({
       title: trimmedTitle,
       body: bodyWithGif,
       images,
-      removeImage: removeExistingImage || undefined,
     });
     setSelectedGifUrl('');
     setCurrentEmojis([]);
@@ -142,71 +162,6 @@ const QuestionForm = ({
       </div>
 
       <div className="mt-5">
-        <label htmlFor="question-image" className="text-sm font-bold text-gray-950">
-          Slika (opcionalno)
-        </label>
-        <FileUploadInput
-          id="question-image"
-          accept="image/*"
-          containerClassName="py-5"
-          multiple
-          label="Odaberi sliku"
-          helperText="Podržane su slikovne datoteke. Maksimalno 5 slika, do 1 MB po slici."
-          onChange={(event) => {
-            setImages(Array.from(event.target.files ?? []));
-            setRemoveExistingImage(false);
-          }}
-        />
-        {(imagePreviewUrls.length > 0 || shouldShowExistingImage) && (
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
-                {imagePreviewUrls.length > 0 ? 'Nove slike' : 'Trenutne slike'}
-              </p>
-              {imagePreviewUrls.length > 0 ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {imagePreviewUrls.map((previewUrl, index) => (
-                    <Image
-                      key={`${previewUrl}-${index}`}
-                      src={previewUrl}
-                      alt={`Pregled slike pitanja ${index + 1}`}
-                      className="max-w-[180px] rounded-xl border border-[#dce4ff]"
-                    />
-                  ))}
-                </div>
-              ) : (
-                <ForumImageGallery
-                  item={initialQuestion as Question}
-                  alt="Trenutna slika pitanja"
-                  imageClassName="max-w-[180px] rounded-xl border border-[#dce4ff]"
-                />
-              )}
-            </div>
-            {imagePreviewUrls.length > 0 && (
-              <Button type="danger" htmlType="button" onClick={() => setImages([])}>
-                Makni
-              </Button>
-            )}
-            {shouldShowExistingImage && (
-              <Button
-                type="danger"
-                htmlType="button"
-                onClick={() => setRemoveExistingImage(true)}
-                disabled={isSubmitting}
-              >
-                Makni postojeću
-              </Button>
-            )}
-          </div>
-        )}
-        {removeExistingImage && (
-          <p className="mt-3 rounded-2xl bg-red/10 px-4 py-3 text-sm font-medium text-red">
-            Postojeća slika bit će uklonjena nakon spremanja.
-          </p>
-        )}
-      </div>
-
-      <div className="mt-5">
         <label htmlFor="question-body" className="text-sm font-bold text-gray-950">
           Opis
         </label>
@@ -217,9 +172,13 @@ const QuestionForm = ({
             updateBody(event.target.value);
           }}
           rows={8}
+          maxLength={FORUM_MAX_BODY_LENGTH}
           className="mt-2 w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm leading-6 outline-none transition-colors focus:border-blue"
           placeholder="Dodaj kontekst, što si već pokušao_la i kakvu pomoć trebaš. Upiši : za brzi emoji."
         />
+        <p className="mt-1 text-right text-xs text-gray-400">
+          {body.length}/{FORUM_MAX_BODY_LENGTH}
+        </p>
         <EmojiPicker
           emojis={currentEmojis}
           onEmojiSelect={(emoji) => {
@@ -288,6 +247,83 @@ const QuestionForm = ({
           </Button>
         </div>
       )}
+
+      <div className="mt-5">
+        <label htmlFor="question-image" className="text-sm font-bold text-gray-950">
+          Slika (opcionalno)
+        </label>
+        <FileUploadInput
+          id="question-image"
+          accept="image/*"
+          containerClassName="py-5"
+          multiple
+          label="Odaberi slike"
+          helperText="Podržane su slikovne datoteke. Maksimalno 5 slika, do 1 MB po slici."
+          onChange={(event) => {
+            const selectedImages = Array.from(event.target.files ?? []);
+            const currentExistingImageCount = initialQuestion
+              ? getForumImageItems(initialQuestion).length
+              : 0;
+            setImages(selectedImages);
+            setRemoveExistingImage(false);
+            setErrors((currentErrors) => ({
+              ...currentErrors,
+              images: validateForumImages(selectedImages, currentExistingImageCount) || undefined,
+            }));
+          }}
+        />
+        {errors.images && <p className="mt-2 text-sm font-medium text-red">{errors.images}</p>}
+        {(imagePreviewUrls.length > 0 || shouldShowExistingImage) && (
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
+                {imagePreviewUrls.length > 0 ? 'Nove slike' : 'Trenutne slike'}
+              </p>
+              {imagePreviewUrls.length > 0 ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {imagePreviewUrls.map((previewUrl, index) => (
+                    <Image
+                      key={`${previewUrl}-${index}`}
+                      src={previewUrl}
+                      alt={`Pregled slike pitanja ${index + 1}`}
+                      className="max-w-[180px] rounded-xl border border-[#dce4ff]"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <ForumImageGallery
+                  item={initialQuestion as Question}
+                  alt="Trenutna slika pitanja"
+                  imageClassName="max-w-[180px] rounded-xl border border-[#dce4ff]"
+                />
+              )}
+            </div>
+            {imagePreviewUrls.length > 0 && (
+              <Button type="danger" htmlType="button" onClick={() => setImages([])}>
+                Makni
+              </Button>
+            )}
+            {shouldShowExistingImage && (
+              <Button
+                type="danger"
+                htmlType="button"
+                onClick={() => {
+                  onDeleteExistingImage?.();
+                  setRemoveExistingImage(true);
+                }}
+                disabled={isSubmitting || isDeletingExistingImage}
+              >
+                {isDeletingExistingImage ? 'Miči...' : 'Makni postojeću'}
+              </Button>
+            )}
+          </div>
+        )}
+        {removeExistingImage && (
+          <p className="mt-3 rounded-2xl bg-red/10 px-4 py-3 text-sm font-medium text-red">
+            Postojeća slika se uklanja.
+          </p>
+        )}
+      </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
         {onCancel && (

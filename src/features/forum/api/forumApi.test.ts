@@ -3,11 +3,17 @@ import {
   createAnswer,
   createQuestion,
   deleteAnswer,
+  deleteAnswerImage,
+  deleteAnswerVote,
   deleteQuestion,
+  deleteQuestionImage,
+  deleteQuestionVote,
   getQuestion,
   getQuestions,
   updateAnswer,
   updateQuestion,
+  voteAnswer,
+  voteQuestion,
 } from './forumApi';
 import type { Answer, Question } from '../types/forum.types';
 
@@ -177,6 +183,59 @@ describe('forumApi CRUD', () => {
         skipGlobalErrorHandler: true,
       });
     });
+
+    it('deletes an existing question image', async () => {
+      deleteRequest.mockResolvedValue({});
+
+      await deleteQuestionImage(1);
+
+      expect(deleteRequest).toHaveBeenCalledWith('/forum/questions/1/image', {
+        skipGlobalErrorHandler: true,
+      });
+    });
+
+    it('upvotes and downvotes a question', async () => {
+      post.mockResolvedValueOnce({
+        data: { data: questionResponse({ id: 1, voteScore: 1, currentUserVote: 1 }) },
+      });
+      post.mockResolvedValueOnce({
+        data: { data: questionResponse({ id: 1, voteScore: -1, currentUserVote: -1 }) },
+      });
+
+      const upvotedQuestion = await voteQuestion(1, { value: 1 });
+      const downvotedQuestion = await voteQuestion(1, { value: -1 });
+
+      expect(post).toHaveBeenNthCalledWith(
+        1,
+        '/forum/questions/1/votes',
+        { value: 1 },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(post).toHaveBeenNthCalledWith(
+        2,
+        '/forum/questions/1/votes',
+        { value: -1 },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(upvotedQuestion.voteScore).toBe(1);
+      expect(upvotedQuestion.currentUserVote).toBe(1);
+      expect(downvotedQuestion.voteScore).toBe(-1);
+      expect(downvotedQuestion.currentUserVote).toBe(-1);
+    });
+
+    it('clears a question vote', async () => {
+      deleteRequest.mockResolvedValue({});
+
+      await deleteQuestionVote(1);
+
+      expect(deleteRequest).toHaveBeenCalledWith('/forum/questions/1/votes', {
+        skipGlobalErrorHandler: true,
+      });
+    });
   });
 
   describe('answers', () => {
@@ -230,6 +289,59 @@ describe('forumApi CRUD', () => {
       await deleteAnswer(11);
 
       expect(deleteRequest).toHaveBeenCalledWith('/forum/answers/11', {
+        skipGlobalErrorHandler: true,
+      });
+    });
+
+    it('deletes an existing answer image', async () => {
+      deleteRequest.mockResolvedValue({});
+
+      await deleteAnswerImage(11);
+
+      expect(deleteRequest).toHaveBeenCalledWith('/forum/answers/11/image', {
+        skipGlobalErrorHandler: true,
+      });
+    });
+
+    it('upvotes and downvotes an answer', async () => {
+      post.mockResolvedValueOnce({
+        data: { data: answerResponse({ id: 11, voteScore: 1, currentUserVote: 1 }) },
+      });
+      post.mockResolvedValueOnce({
+        data: { data: answerResponse({ id: 11, voteScore: -1, currentUserVote: -1 }) },
+      });
+
+      const upvotedAnswer = await voteAnswer(11, { value: 1 });
+      const downvotedAnswer = await voteAnswer(11, { value: -1 });
+
+      expect(post).toHaveBeenNthCalledWith(
+        1,
+        '/forum/answers/11/votes',
+        { value: 1 },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(post).toHaveBeenNthCalledWith(
+        2,
+        '/forum/answers/11/votes',
+        { value: -1 },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(upvotedAnswer.voteScore).toBe(1);
+      expect(upvotedAnswer.currentUserVote).toBe(1);
+      expect(downvotedAnswer.voteScore).toBe(-1);
+      expect(downvotedAnswer.currentUserVote).toBe(-1);
+    });
+
+    it('clears an answer vote', async () => {
+      deleteRequest.mockResolvedValue({});
+
+      await deleteAnswerVote(11);
+
+      expect(deleteRequest).toHaveBeenCalledWith('/forum/answers/11/votes', {
         skipGlobalErrorHandler: true,
       });
     });

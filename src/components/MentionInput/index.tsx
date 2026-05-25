@@ -24,7 +24,7 @@ const MentionInput = ({
   className = '',
   initialTaggedUsers = [],
 }: MentionInputProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<TaggedUser[]>(initialTaggedUsers);
@@ -61,7 +61,7 @@ const MentionInput = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     onChange(val);
 
@@ -76,7 +76,7 @@ const MentionInput = ({
     }
   };
 
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     const match = val.match(usernameRegex);
 
@@ -118,13 +118,13 @@ const MentionInput = ({
 
   return (
     <div className={`relative w-full ${className}`} ref={containerRef}>
-      <input
+      <textarea
         ref={inputRef}
-        type="text"
         value={value}
         onChange={handleInputChange}
         onFocus={handleFocus}
-        className="h-14 w-full rounded-2xl border border-[#dce4ff] bg-white px-4 text-base shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
+        rows={3}
+        className="min-h-28 w-full resize-y rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 text-base leading-6 shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
         placeholder={placeholder}
       />
 
@@ -134,7 +134,7 @@ const MentionInput = ({
             <li
               key={user.id}
               onClick={() => handleSelect({ id: user.id, username: user.username })}
-              className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
+              className="flex cursor-pointer items-center gap-3 px-4 py-3 text-gray-800 transition-colors hover:bg-[#f0f4ff] hover:text-blue-dark active:bg-[#dce4ff]"
             >
               <UserAvatar
                 avatarFallbackName={user.username}

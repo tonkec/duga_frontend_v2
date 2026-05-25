@@ -6,8 +6,10 @@ import {
   createAnswer,
   createQuestion,
   deleteAnswer,
+  deleteAnswerImage,
   deleteAnswerVote,
   deleteQuestion,
+  deleteQuestionImage,
   deleteQuestionVote,
   getQuestion,
   getQuestions,
@@ -140,7 +142,10 @@ const removeCachedAnswer = (
   return {
     ...question,
     Answers: nextAnswers,
-    answerCount: typeof question.answerCount === 'number' ? Math.max(0, question.answerCount - 1) : nextAnswers.length,
+    answerCount:
+      typeof question.answerCount === 'number'
+        ? Math.max(0, question.answerCount - 1)
+        : nextAnswers.length,
   };
 };
 
@@ -157,7 +162,9 @@ const applyAcceptedAnswer = (
       : true;
 
   if (!acceptedAnswerId) {
-    return isRecord(payload.data) ? { ...question, ...(payload.data as Partial<Question>) } : question;
+    return isRecord(payload.data)
+      ? { ...question, ...(payload.data as Partial<Question>) }
+      : question;
   }
 
   return {
@@ -165,7 +172,9 @@ const applyAcceptedAnswer = (
     isResolved: isAccepted,
     Answers: question.Answers?.map((answer) => ({
       ...answer,
-      ...(answer.id === acceptedAnswerId && isRecord(payload.data) ? (payload.data as Partial<Answer>) : {}),
+      ...(answer.id === acceptedAnswerId && isRecord(payload.data)
+        ? (payload.data as Partial<Answer>)
+        : {}),
       isAccepted: isAccepted ? answer.id === acceptedAnswerId : false,
     })),
   };
@@ -207,7 +216,9 @@ const updateCachedAnswerVoteFromSocket = (
   return {
     ...question,
     Answers: question.Answers.map((answer) =>
-      answer.id === answerId ? applyVoteMetadata(answer, payload.data as Record<string, unknown>) : answer
+      answer.id === answerId
+        ? applyVoteMetadata(answer, payload.data as Record<string, unknown>)
+        : answer
     ),
   };
 };
@@ -237,7 +248,9 @@ const updateCachedQuestionFromSocket = (
     case 'forum-answer-vote-updated':
       return updateCachedAnswerVoteFromSocket(question, payload);
     case 'forum-question-updated':
-      return isRecord(payload.data) && question ? { ...question, ...(payload.data as Partial<Question>) } : question;
+      return isRecord(payload.data) && question
+        ? { ...question, ...(payload.data as Partial<Question>) }
+        : question;
     default:
       return question;
   }
@@ -313,7 +326,10 @@ const applyCachedVote = <T extends VoteMetadata>(item: T, nextVote: VoteValue | 
   const scoreDelta = nextVoteValue - previousVoteValue;
   const nextUpvotes =
     typeof item.upvotes === 'number'
-      ? Math.max(0, item.upvotes + (nextVoteValue === 1 ? 1 : 0) - (previousVoteValue === 1 ? 1 : 0))
+      ? Math.max(
+          0,
+          item.upvotes + (nextVoteValue === 1 ? 1 : 0) - (previousVoteValue === 1 ? 1 : 0)
+        )
       : item.upvotes;
   const nextDownvotes =
     typeof item.downvotes === 'number'
@@ -349,10 +365,7 @@ const updateCachedAnswerVote = (
   };
 };
 
-const addCachedAnswer = (
-  question: Question | undefined,
-  answer: Answer
-): Question | undefined => {
+const addCachedAnswer = (question: Question | undefined, answer: Answer): Question | undefined => {
   if (!question) return question;
 
   return {
@@ -510,6 +523,18 @@ export const useDeleteQuestion = () => {
   });
 };
 
+export const useDeleteQuestionImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteQuestionImage(id),
+    onSuccess: (_response, questionId) => {
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.question(questionId) });
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
+    },
+  });
+};
+
 export const useUpdateAnswer = () => {
   const queryClient = useQueryClient();
 
@@ -536,6 +561,18 @@ export const useDeleteAnswer = (questionId?: number) => {
         );
       }
       invalidateForumQuestionLists(queryClient);
+    },
+  });
+};
+
+export const useDeleteAnswerImage = (questionId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (answerId: number) => deleteAnswerImage(answerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.question(questionId) });
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
     },
   });
 };

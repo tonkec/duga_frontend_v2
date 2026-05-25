@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { BiDotsVerticalRounded, BiEdit, BiFlag, BiTrash } from 'react-icons/bi';
+import Select from 'react-select';
 import AppLayout from '@app/components/AppLayout';
 import Button from '@app/components/Button';
 import ConfirmModal from '@app/components/ConfirmModal';
@@ -17,8 +18,10 @@ import {
   useAcceptAnswer,
   useCreateAnswer,
   useDeleteAnswer,
+  useDeleteAnswerImage,
   useDeleteAnswerVote,
   useDeleteQuestion,
+  useDeleteQuestionImage,
   useDeleteQuestionVote,
   useForumSocketEvents,
   useQuestion,
@@ -29,6 +32,7 @@ import {
 } from '../hooks/useForum';
 import { getForumErrorMessage } from '../utils/forumErrors';
 import ForumImageGallery from '../components/ForumImageGallery';
+import type { Answer } from '../types/forum.types';
 
 interface CurrentUserData {
   id?: number;
@@ -38,6 +42,66 @@ interface CurrentUserData {
 }
 
 const ANSWERS_PER_PAGE = 5;
+type AnswerSortOption = 'newest' | 'oldest' | 'mostVotes' | 'accepted';
+
+const answerSortOptions: { label: string; value: AnswerSortOption }[] = [
+  { label: 'Najnoviji', value: 'newest' },
+  { label: 'Najstariji', value: 'oldest' },
+  { label: 'Najviše glasova', value: 'mostVotes' },
+  { label: 'Prihvaćeni prvo', value: 'accepted' },
+];
+
+const answerSortSelectStyles = {
+  control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
+    ...base,
+    minHeight: '2.75rem',
+    borderRadius: '1rem',
+    borderColor: state.isFocused ? '#2D46B9' : '#dce4ff',
+    boxShadow: state.isFocused ? '0 0 0 1px #2D46B9' : '0 1px 2px rgba(15, 23, 42, 0.05)',
+    '&:hover': {
+      borderColor: '#2D46B9',
+    },
+  }),
+  menu: (base: Record<string, unknown>) => ({
+    ...base,
+    borderRadius: '1rem',
+    overflow: 'hidden',
+    border: '1px solid #dce4ff',
+    boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
+  }),
+  option: (base: Record<string, unknown>, state: { isSelected: boolean; isFocused: boolean }) => ({
+    ...base,
+    backgroundColor: state.isSelected ? '#2D46B9' : state.isFocused ? '#f0f4ff' : 'white',
+    color: state.isSelected ? 'white' : '#111827',
+    ':active': {
+      backgroundColor: '#2D46B9',
+      color: 'white',
+    },
+  }),
+};
+
+const sortAnswers = (answers: Answer[], sortOption: AnswerSortOption) => {
+  return [...answers].sort((firstAnswer, secondAnswer) => {
+    const firstCreatedAt = new Date(firstAnswer.createdAt).getTime();
+    const secondCreatedAt = new Date(secondAnswer.createdAt).getTime();
+
+    if (sortOption === 'accepted') {
+      const acceptedDifference = Number(secondAnswer.isAccepted) - Number(firstAnswer.isAccepted);
+      return acceptedDifference || secondCreatedAt - firstCreatedAt;
+    }
+
+    if (sortOption === 'mostVotes') {
+      const voteDifference = getVoteScore(secondAnswer) - getVoteScore(firstAnswer);
+      return voteDifference || secondCreatedAt - firstCreatedAt;
+    }
+
+    if (sortOption === 'oldest') {
+      return firstCreatedAt - secondCreatedAt;
+    }
+
+    return secondCreatedAt - firstCreatedAt;
+  });
+};
 
 const ForumQuestionDetailsPage = () => {
   const navigate = useNavigate();
@@ -46,6 +110,8 @@ const ForumQuestionDetailsPage = () => {
   const isValidQuestionId = Number.isFinite(questionId) && questionId > 0;
   useForumSocketEvents(isValidQuestionId ? questionId : undefined);
   const [answerPage, setAnswerPage] = useState(1);
+  const [answerSort, setAnswerSort] = useState<AnswerSortOption>('newest');
+  const questionActionsDropdownRef = useRef<HTMLDivElement>(null);
   const [isEditingQuestion, setIsEditingQuestion] = useState(false);
   const [isQuestionActionsOpen, setIsQuestionActionsOpen] = useState(false);
   const [isDeleteQuestionModalOpen, setIsDeleteQuestionModalOpen] = useState(false);
@@ -68,17 +134,16 @@ const ForumQuestionDetailsPage = () => {
   const acceptAnswerMutation = useAcceptAnswer(isValidQuestionId ? questionId : 0);
   const updateQuestionMutation = useUpdateQuestion();
   const deleteQuestionMutation = useDeleteQuestion();
+  const deleteQuestionImageMutation = useDeleteQuestionImage();
   const voteQuestionMutation = useVoteQuestion(isValidQuestionId ? questionId : 0);
   const deleteQuestionVoteMutation = useDeleteQuestionVote(isValidQuestionId ? questionId : 0);
   const voteAnswerMutation = useVoteAnswer(isValidQuestionId ? questionId : 0);
   const deleteAnswerVoteMutation = useDeleteAnswerVote(isValidQuestionId ? questionId : 0);
   const updateAnswerMutation = useUpdateAnswer();
   const deleteAnswerMutation = useDeleteAnswer(isValidQuestionId ? questionId : undefined);
+  const deleteAnswerImageMutation = useDeleteAnswerImage(isValidQuestionId ? questionId : 0);
   const question = questionQuery.data;
-  const answers = [...(question?.Answers ?? [])].sort(
-    (firstAnswer, secondAnswer) =>
-      new Date(secondAnswer.createdAt).getTime() - new Date(firstAnswer.createdAt).getTime()
-  );
+  const answers = sortAnswers(question?.Answers ?? [], answerSort);
   const hasAcceptedAnswer = answers.some((answer) => answer.isAccepted);
   const totalAnswerPages = Math.max(1, Math.ceil(answers.length / ANSWERS_PER_PAGE));
   const visibleAnswerPage = Math.min(answerPage, totalAnswerPages);
@@ -95,6 +160,22 @@ const ForumQuestionDetailsPage = () => {
     voteQuestionMutation.isPending || deleteQuestionVoteMutation.isPending;
   const isAnswerVotePending = voteAnswerMutation.isPending || deleteAnswerVoteMutation.isPending;
   const questionVoteScore = question ? getVoteScore(question) : 0;
+
+  useEffect(() => {
+    if (!isQuestionActionsOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        questionActionsDropdownRef.current &&
+        !questionActionsDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsQuestionActionsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isQuestionActionsOpen]);
 
   if (!isValidQuestionId) {
     return (
@@ -157,10 +238,20 @@ const ForumQuestionDetailsPage = () => {
                 )}
               </div>
             )}
+            {deleteQuestionImageMutation.isError && (
+              <div className="mb-4 rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
+                {getForumErrorMessage(
+                  deleteQuestionImageMutation.error,
+                  'Nije moguće obrisati sliku pitanja. Pokušaj ponovno.'
+                )}
+              </div>
+            )}
             <QuestionForm
               initialQuestion={question}
+              isDeletingExistingImage={deleteQuestionImageMutation.isPending}
               isSubmitting={updateQuestionMutation.isPending}
               onCancel={() => setIsEditingQuestion(false)}
+              onDeleteExistingImage={() => deleteQuestionImageMutation.mutate(question.id)}
               onSubmit={(payload) =>
                 updateQuestionMutation.mutate(
                   { id: question.id, payload },
@@ -190,7 +281,7 @@ const ForumQuestionDetailsPage = () => {
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <h1 className="text-3xl font-bold text-gray-950">{question.title}</h1>
-              <div className="relative">
+              <div className="relative" ref={questionActionsDropdownRef}>
                 <button
                   type="button"
                   className="inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-blue hover:text-blue"
@@ -318,6 +409,30 @@ const ForumQuestionDetailsPage = () => {
                 {answers.length} {answers.length === 1 ? 'odgovor' : 'odgovora'}
               </h2>
             </div>
+            {answers.length > 1 && (
+              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-600 sm:min-w-48">
+                Sortiraj
+                <Select
+                  options={answerSortOptions}
+                  value={answerSortOptions.find((option) => option.value === answerSort) ?? null}
+                  onChange={(option) => {
+                    setAnswerSort((option?.value ?? 'newest') as AnswerSortOption);
+                    setAnswerPage(1);
+                  }}
+                  styles={answerSortSelectStyles}
+                  theme={(theme) => ({
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      primary25: '#f0f4ff',
+                      primary50: '#dce4ff',
+                      primary: '#2D46B9',
+                    },
+                  })}
+                  classNamePrefix="react-select"
+                />
+              </label>
+            )}
           </div>
 
           {answers.length === 0 && (
@@ -337,11 +452,13 @@ const ForumQuestionDetailsPage = () => {
                     hasAcceptedAnswer={hasAcceptedAnswer}
                     currentUserId={currentUserData?.id}
                     isAccepting={acceptAnswerMutation.isPending}
+                    isDeletingImage={deleteAnswerImageMutation.isPending}
                     isDeleting={deleteAnswerMutation.isPending}
                     isUpdating={updateAnswerMutation.isPending}
                     isVotePending={isAnswerVotePending}
                     onAccept={(answerId) => acceptAnswerMutation.mutate(answerId)}
                     onDelete={(answerId) => deleteAnswerMutation.mutate(answerId)}
+                    onDeleteImage={(answerId) => deleteAnswerImageMutation.mutate(answerId)}
                     onUpdate={(answerId, payload) =>
                       updateAnswerMutation.mutate({ id: answerId, payload })
                     }

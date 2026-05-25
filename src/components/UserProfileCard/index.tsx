@@ -73,14 +73,24 @@ const ProfileDetail = ({
   </div>
 );
 
-const BooleanDetail = ({ label, value }: { label: string; value: boolean }) => (
-  <div className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-800">
-    <span>{label}</span>
-    {value ? (
-      <BiCheckCircle fontSize={24} color="#34D399" />
-    ) : (
-      <BiX fontSize={24} color="#DC2626" />
-    )}
+const BooleanDetail = ({
+  negativeLabel,
+  positiveLabel,
+  value,
+}: {
+  negativeLabel: string;
+  positiveLabel: string;
+  value: boolean;
+}) => (
+  <div
+    className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${
+      value
+        ? 'bg-green/10 text-green'
+        : 'bg-red/10 text-red line-through decoration-red/70 decoration-2'
+    }`}
+  >
+    {value ? <BiCheckCircle fontSize={20} /> : <BiX fontSize={20} />}
+    <span>{value ? positiveLabel : negativeLabel}</span>
   </div>
 );
 
@@ -257,9 +267,13 @@ const UserProfileCard = ({
         )}
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <BooleanDetail label="Cigarete" value={user.cigarettes} />
-          <BooleanDetail label="Alkohol" value={user.alcohol} />
-          <BooleanDetail label="Sport" value={user.sport} />
+          <BooleanDetail negativeLabel="Ne puši" positiveLabel="Puši" value={user.cigarettes} />
+          <BooleanDetail negativeLabel="Ne pije" positiveLabel="Pije" value={user.alcohol} />
+          <BooleanDetail
+            negativeLabel="Ne bavi se sportom"
+            positiveLabel="Bavi se sportom"
+            value={user.sport}
+          />
         </div>
       </div>
 

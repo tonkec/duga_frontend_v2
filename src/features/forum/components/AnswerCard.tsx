@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BiCheckCircle,
@@ -19,6 +19,8 @@ import type { Answer, UpdateAnswerPayload } from '../types/forum.types';
 import VoteControls, { getVoteScore } from './VoteControls';
 import ContentFormatter from '@app/components/ContentFormatter';
 import ForumImageGallery from './ForumImageGallery';
+import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
+import { getForumImageItems } from '../utils/forumImages';
 
 interface AnswerCardProps {
   answer: Answer;
@@ -26,18 +28,20 @@ interface AnswerCardProps {
   hasAcceptedAnswer: boolean;
   currentUserId?: number;
   isAccepting: boolean;
+  isDeletingImage: boolean;
   isDeleting: boolean;
   isUpdating: boolean;
   isVotePending: boolean;
   onAccept: (answerId: number) => void;
   onDelete: (answerId: number) => void;
+  onDeleteImage: (answerId: number) => void;
   onUpdate: (answerId: number, payload: UpdateAnswerPayload) => void;
   onVote: (answerId: number, value: 1 | -1) => void;
   onClearVote: (answerId: number) => void;
 }
 
 const ANSWER_MIN_LENGTH = 2;
-const ANSWER_MAX_LENGTH = 2000;
+const ANSWER_MAX_LENGTH = FORUM_MAX_BODY_LENGTH;
 
 const getAuthorName = (answer: Answer) => answer.User?.name || answer.User?.username || 'Korisnik';
 
@@ -49,11 +53,13 @@ const AnswerCard = ({
   hasAcceptedAnswer,
   currentUserId,
   isAccepting,
+  isDeletingImage,
   isDeleting,
   isUpdating,
   isVotePending,
   onAccept,
   onDelete,
+  onDeleteImage,
   onUpdate,
   onVote,
   onClearVote,
@@ -62,6 +68,7 @@ const AnswerCard = ({
   const authorId = getAuthorId(answer);
   const authorName = getAuthorName(answer);
   const voteScore = getVoteScore(answer);
+  const actionsDropdownRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -78,6 +85,23 @@ const AnswerCard = ({
   );
   const shouldShowExistingImage =
     hasExistingImage && draftImagePreviewUrls.length === 0 && !removeExistingImage;
+  const existingImageCount = removeExistingImage ? 0 : getForumImageItems(answer).length;
+
+  useEffect(() => {
+    if (!isActionsOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        actionsDropdownRef.current &&
+        !actionsDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsActionsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isActionsOpen]);
 
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -100,11 +124,16 @@ const AnswerCard = ({
       return;
     }
 
+    const imageError = validateForumImages(draftImages, existingImageCount);
+    if (imageError) {
+      setEditError(imageError);
+      return;
+    }
+
     setEditError(null);
     onUpdate(answer.id, {
       body: trimmedDraftBody,
       images: draftImages,
-      removeImage: removeExistingImage || undefined,
     });
     setIsEditing(false);
     setDraftImages([]);
@@ -163,7 +192,7 @@ const AnswerCard = ({
           <span className="rounded-full bg-[#f7f9ff] px-2.5 py-1 text-xs font-semibold text-blue-dark">
             {voteScore} glasova
           </span>
-          <div className="relative">
+          <div className="relative" ref={actionsDropdownRef}>
             <button
               type="button"
               className="inline-flex items-center gap-1.5 rounded-full border border-[#dce4ff] bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm shadow-blue-dark/5 transition-colors hover:border-blue hover:text-blue"
@@ -266,6 +295,12 @@ const AnswerCard = ({
             maxLength={ANSWER_MAX_LENGTH}
             className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm leading-6 outline-none transition-colors focus:border-blue"
           />
+          <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            {editError && <p className="text-sm font-medium text-red">{editError}</p>}
+            <p className="text-xs text-gray-400">
+              {draftBody.length}/{ANSWER_MAX_LENGTH}
+            </p>
+          </div>
           <div className="mt-4">
             <label
               htmlFor={`answer-edit-image-${answer.id}`}
@@ -278,11 +313,16 @@ const AnswerCard = ({
               id={`answer-edit-image-${answer.id}`}
               accept="image/*"
               multiple
-              label="Odaberi sliku"
+              label="Odaberi slike"
               helperText="Odaberi nove slike ako želiš zamijeniti postojeće. Maksimalno 5 slika, do 1 MB po slici."
               onChange={(event) => {
-                setDraftImages(Array.from(event.target.files ?? []));
+                const selectedImages = Array.from(event.target.files ?? []);
+                const currentExistingImageCount = getForumImageItems(answer).length;
+                setDraftImages(selectedImages);
                 setRemoveExistingImage(false);
+                setEditError(
+                  validateForumImages(selectedImages, currentExistingImageCount) || null
+                );
               }}
             />
           </div>
@@ -325,26 +365,23 @@ const AnswerCard = ({
                 <Button
                   type="danger"
                   htmlType="button"
-                  onClick={() => setRemoveExistingImage(true)}
-                  disabled={isUpdating}
+                  onClick={() => {
+                    onDeleteImage(answer.id);
+                    setRemoveExistingImage(true);
+                  }}
+                  disabled={isUpdating || isDeletingImage}
                 >
-                  Makni postojeću
+                  {isDeletingImage ? 'Miči...' : 'Makni postojeću'}
                 </Button>
               )}
             </div>
           )}
           {removeExistingImage && (
             <p className="mt-4 rounded-2xl bg-red/10 px-4 py-3 text-sm font-medium text-red">
-              Postojeća slika bit će uklonjena nakon spremanja.
+              Postojeća slika se uklanja.
             </p>
           )}
-          <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              {editError && <p className="text-sm font-medium text-red">{editError}</p>}
-              <p className="text-xs text-gray-400">
-                {draftBody.length}/{ANSWER_MAX_LENGTH}
-              </p>
-            </div>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             <div className="flex gap-2">
               <Button
                 type="secondary"

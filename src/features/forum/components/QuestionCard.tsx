@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ContentFormatter from '@app/components/ContentFormatter';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import UserAvatar from '@app/components/UserAvatar';
+import { BiFlag } from 'react-icons/bi';
 import type { Question } from '../types/forum.types';
 import { getVoteScore } from './VoteControls';
 
@@ -52,26 +53,31 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           navigate(`/forum/questions/${question.id}`);
         }
       }}
-      className="group block cursor-pointer rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-colors hover:border-blue/40"
+      className="group block cursor-pointer rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:border-blue/40 hover:shadow-md"
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="text-xl font-bold text-gray-950 transition-colors group-hover:text-blue">
+      <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_9rem] md:items-start">
+        <div className="min-w-0 space-y-4">
+          <h2 className="text-2xl font-bold text-gray-950 transition-colors group-hover:text-blue">
             {question.title}
           </h2>
-          <div className="mt-3 text-sm leading-6 text-gray-600">
+          <div className="text-sm leading-6 text-gray-600">
             <ContentFormatter text={getBodyPreview(question.body)} renderRichContent={false} />
           </div>
         </div>
 
-        <div className="shrink-0 text-right text-sm font-semibold text-blue-dark">
-          <span>{voteScore} glasova</span>
-          <span className="mx-2 text-gray-300">•</span>
-          <span>{answerCount} odgovora</span>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
+          <div className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 text-center">
+            <span className="block text-lg font-black text-blue-dark">{voteScore}</span>
+            <span className="text-xs font-semibold text-gray-500">glasova</span>
+          </div>
+          <div className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 text-center">
+            <span className="block text-lg font-black text-blue-dark">{answerCount}</span>
+            <span className="text-xs font-semibold text-gray-500">odgovora</span>
+          </div>
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500">
+      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#eef3ff] pt-4 text-xs font-medium text-gray-500">
         <Link
           to={`/user/${authorId}`}
           onClick={(event) => event.stopPropagation()}
@@ -92,8 +98,9 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         <Link
           to="/report"
           onClick={(event) => event.stopPropagation()}
-          className="font-semibold text-gray-400 transition-colors hover:text-red"
+          className="inline-flex items-center gap-1.5 font-semibold text-red transition-colors hover:text-red"
         >
+          <BiFlag size={16} />
           Prijavi
         </Link>
       </div>

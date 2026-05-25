@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { useMarkAsReadNotification } from '../../hooks';
 import { INotification } from '../Notifications';
-import { BiBell, BiCheckCircle, BiMessageRoundedDots } from 'react-icons/bi';
+import { BiBell, BiCheckCircle, BiMessageRoundedDots, BiUpvote } from 'react-icons/bi';
 
 interface INotificationProps {
   n: INotification;
@@ -11,8 +11,15 @@ interface INotificationProps {
 const Notification = ({ n, setNotifications }: INotificationProps) => {
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const navigate = useNavigate();
+  const isForumNotification = n.actionType === 'forum_question' || n.actionType === 'forum_answer';
   const Icon =
-    n.actionType === 'message' ? BiMessageRoundedDots : n.isRead ? BiCheckCircle : BiBell;
+    n.actionType === 'message'
+      ? BiMessageRoundedDots
+      : isForumNotification
+        ? BiUpvote
+        : n.isRead
+          ? BiCheckCircle
+          : BiBell;
 
   return (
     <button
@@ -45,6 +52,12 @@ const Notification = ({ n, setNotifications }: INotificationProps) => {
               if (chatId) navigate(`/chat/${chatId}`);
               break;
             }
+            case 'forum_question':
+              if (n.actionId) navigate(`/forum/questions/${n.actionId}`);
+              break;
+            case 'forum_answer':
+              navigate('/forum');
+              break;
             default:
               break;
           }

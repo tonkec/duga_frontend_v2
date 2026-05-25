@@ -14,13 +14,14 @@ import {
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
+import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
 
 interface AnswerFormProps {
   isSubmitting: boolean;
   onSubmit: (payload: CreateAnswerPayload) => void;
 }
 
-const ANSWER_MAX_LENGTH = 2000;
+const ANSWER_MAX_LENGTH = FORUM_MAX_BODY_LENGTH;
 
 const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
   init({ data });
@@ -63,6 +64,12 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
 
     if (trimmedBody.length > ANSWER_MAX_LENGTH) {
       setError(`Odgovor može imati najviše ${ANSWER_MAX_LENGTH} znakova.`);
+      return;
+    }
+
+    const imageError = validateForumImages(images);
+    if (imageError) {
+      setError(imageError);
       return;
     }
 
@@ -123,9 +130,13 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
           id="answer-image"
           accept="image/*"
           multiple
-          label="Odaberi sliku"
+          label="Odaberi slike"
           helperText="Možeš dodati više slika uz odgovor. Maksimalno 5 slika, do 1 MB po slici."
-          onChange={(event) => setImages(Array.from(event.target.files ?? []))}
+          onChange={(event) => {
+            const selectedImages = Array.from(event.target.files ?? []);
+            setImages(selectedImages);
+            setError(validateForumImages(selectedImages) || null);
+          }}
         />
       </div>
 

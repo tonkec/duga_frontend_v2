@@ -17,11 +17,11 @@ type WrappedResponse<T> = {
 };
 type SingleResponse<T> = T | WrappedResponse<T>;
 
-const isWrappedResponse = <T,>(response: SingleResponse<T>): response is WrappedResponse<T> => {
+const isWrappedResponse = <T>(response: SingleResponse<T>): response is WrappedResponse<T> => {
   return typeof response === 'object' && response !== null && 'data' in response;
 };
 
-const unwrapResponse = <T,>(response: SingleResponse<T>): T => {
+const unwrapResponse = <T>(response: SingleResponse<T>): T => {
   if (isWrappedResponse(response)) {
     return response.data;
   }
@@ -182,6 +182,13 @@ export const deleteQuestion = async (id: number): Promise<void> => {
   });
 };
 
+export const deleteQuestionImage = async (id: number): Promise<void> => {
+  const client = apiClient();
+  await client.delete(`/forum/questions/${id}/image`, {
+    skipGlobalErrorHandler: true,
+  });
+};
+
 export const createAnswer = async (
   questionId: number,
   payload: CreateAnswerPayload
@@ -220,6 +227,13 @@ export const deleteAnswer = async (id: number): Promise<void> => {
   });
 };
 
+export const deleteAnswerImage = async (id: number): Promise<void> => {
+  const client = apiClient();
+  await client.delete(`/forum/answers/${id}/image`, {
+    skipGlobalErrorHandler: true,
+  });
+};
+
 export const acceptAnswer = async (questionId: number, answerId: number): Promise<Question> => {
   const client = apiClient();
   const response = await client.patch<SingleResponse<Question>>(
@@ -233,9 +247,13 @@ export const acceptAnswer = async (questionId: number, answerId: number): Promis
 
 export const voteQuestion = async (id: number, payload: VotePayload): Promise<Question> => {
   const client = apiClient();
-  const response = await client.post<SingleResponse<Question>>(`/forum/questions/${id}/votes`, payload, {
-    skipGlobalErrorHandler: true,
-  });
+  const response = await client.post<SingleResponse<Question>>(
+    `/forum/questions/${id}/votes`,
+    payload,
+    {
+      skipGlobalErrorHandler: true,
+    }
+  );
 
   return normalizeQuestion(unwrapResponse(response.data));
 };
@@ -249,9 +267,13 @@ export const deleteQuestionVote = async (id: number): Promise<void> => {
 
 export const voteAnswer = async (id: number, payload: VotePayload): Promise<Answer> => {
   const client = apiClient();
-  const response = await client.post<SingleResponse<Answer>>(`/forum/answers/${id}/votes`, payload, {
-    skipGlobalErrorHandler: true,
-  });
+  const response = await client.post<SingleResponse<Answer>>(
+    `/forum/answers/${id}/votes`,
+    payload,
+    {
+      skipGlobalErrorHandler: true,
+    }
+  );
 
   return normalizeAnswer(unwrapResponse(response.data));
 };

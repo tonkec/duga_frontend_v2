@@ -1,7 +1,13 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { BiHelpCircle, BiMessageRoundedDots, BiSolidCamera, BiSolidFile } from 'react-icons/bi';
+import {
+  BiFlag,
+  BiHelpCircle,
+  BiMessageRoundedDots,
+  BiSolidCamera,
+  BiSolidFile,
+} from 'react-icons/bi';
 import UserProfileCard from '@app/components/UserProfileCard';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import Cta from '@app/components/Cta';
@@ -90,12 +96,23 @@ const OtherUserPage = () => {
                 existingChatId={existingChat?.id}
               />
             </Cta>
-            <Cta
-              buttonText="Prijavi problem"
-              subtitle="Ako primijetiš bilo kakav problem s ovim profilom, slobodno ga prijavi putem forme."
-              title="Postoji li problem?"
-              onClick={() => navigate(`/report/`)}
-            />
+            <div className="rounded-3xl border border-red/20 bg-red/10 p-5 shadow-sm">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-red shadow-sm">
+                <BiFlag size={22} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-950">Postoji li problem?</h2>
+              <p className="mt-2 text-sm leading-6 text-gray-700">
+                Ako primijetiš uznemiravanje, lažan profil ili drugi sigurnosni problem, prijavi ga
+                administratorima.
+              </p>
+              <Button
+                type="danger"
+                className="mt-5 rounded-full border border-red/30 bg-white px-5 py-3 font-semibold text-red transition-colors hover:bg-red hover:text-white"
+                onClick={() => navigate('/report/')}
+              >
+                Prijavi problem
+              </Button>
+            </div>
           </aside>
         </div>
       ),

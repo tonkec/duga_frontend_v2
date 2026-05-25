@@ -25,6 +25,17 @@ const Navigation = () => {
     }
   }, [isMobile]);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMobileMenuOpen]);
+
   const onLogout = async () => {
     if (socket) {
       await setOfflineStatus(socket);

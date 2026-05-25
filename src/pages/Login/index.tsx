@@ -71,6 +71,24 @@ const statItems = [
   },
 ];
 
+const forumItems = [
+  {
+    value: 'Pitanja',
+    title: 'Postavi pitanje zajednici',
+    text: 'Otvori temu kad trebaš savjet, iskustvo ili samo prostor za razgovor.',
+  },
+  {
+    value: 'Odgovori',
+    title: 'Dobij konkretne odgovore',
+    text: 'Članovi_ce mogu odgovoriti, dodati slike i pomoći iz vlastitog iskustva.',
+  },
+  {
+    value: 'Glasovi',
+    title: 'Najkorisnije ispliva gore',
+    text: 'Glasanje i prihvaćeni odgovori pomažu da se brzo nađe najkorisniji odgovor.',
+  },
+];
+
 const priceFeatures = [
   'Kreiranje profila',
   'Pretraživanje profila',
@@ -151,7 +169,7 @@ const LoginPage = () => {
     <div className="bg-[#f7f8ff] text-gray-900">
       <header className="gradient relative overflow-hidden">
         <CookieBanner />
-        <nav className="fixed left-0 top-0 z-10 flex w-full items-center justify-between bg-blue-dark/20 px-5 py-4 backdrop-blur-md md:px-8">
+        <nav className="fixed left-0 right-0 top-0 z-50 flex w-full items-center justify-between bg-blue-dark/85 px-5 py-4 shadow-lg shadow-blue-dark/10 backdrop-blur-md md:bg-blue-dark/20 md:px-8">
           <Link to="/" className="text-2xl font-black tracking-tight text-white">
             Duga
           </Link>
@@ -205,7 +223,10 @@ const LoginPage = () => {
                   <p className="text-sm text-white/80">samo odrasli</p>
                 </div>
                 <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
-                  <p className="text-xl font-black">Besplatno</p>
+                  <p className="text-xl font-black">
+                    <span className="sm:hidden">Free</span>
+                    <span className="hidden sm:inline">Besplatno</span>
+                  </p>
                   <p className="text-sm text-white/80">osnovni plan</p>
                 </div>
                 <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
@@ -288,6 +309,46 @@ const LoginPage = () => {
                       <p className="mt-3 text-lg leading-8 text-gray-600">{item.text}</p>
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <FadeInSection>
+        <section className="bg-white px-5 py-20 md:px-8">
+          <div className="container mx-auto grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+            <div className="max-w-xl">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Forum</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
+                Pitaj zajednicu prije nego zapneš sam_a
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-gray-600">
+                Forum je mjesto za pitanja, preporuke, tehničke probleme i razgovore koji trebaju
+                više prostora od chata. Odgovori se mogu glasati, prihvatiti i lakše pronaći
+                kasnije.
+              </p>
+              <Button
+                type="blue"
+                className="mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
+                onClick={onLogin}
+              >
+                Pridruži se forumu
+              </Button>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+              {forumItems.map((item) => (
+                <div
+                  key={item.value}
+                  className="rounded-[1.5rem] border border-blue/10 bg-[#f7f9ff] p-6 shadow-sm"
+                >
+                  <p className="text-sm font-black uppercase tracking-[0.18em] text-blue">
+                    {item.value}
+                  </p>
+                  <h3 className="mt-3 text-2xl font-bold text-blue-dark">{item.title}</h3>
+                  <p className="mt-3 leading-7 text-gray-600">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -400,7 +461,8 @@ const LoginPage = () => {
                   <p className="mt-2 text-gray-600">Sve što trebaš za početak upoznavanja.</p>
                 </div>
                 <p className="rounded-full bg-blue/10 px-4 py-2 text-xl font-black text-blue">
-                  Besplatno
+                  <span className="sm:hidden">Free</span>
+                  <span className="hidden sm:inline">Besplatno</span>
                 </p>
               </div>
 
