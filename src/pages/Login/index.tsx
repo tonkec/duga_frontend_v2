@@ -96,19 +96,6 @@ const priceFeatures = [
   'Do ukupno 5 fotografija',
 ];
 
-const getDomainPath = () => {
-  const { hostname } = window.location;
-  if (hostname.includes('staging--dugaprod.netlify.app')) {
-    return 'https://staging--dugaprod.netlify.app';
-  } else if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
-    return 'https://duga.chat/';
-  } else {
-    return 'http://localhost:5173';
-  }
-};
-
-const URL = getDomainPath();
-
 const faqItems = [
   {
     question: 'Mogu li izbrisati svoj profil kad god poželim?',
@@ -156,7 +143,7 @@ const LoginPage = () => {
         returnTo: '/post-login',
       },
       authorizationParams: {
-        redirect_uri: URL,
+        redirect_uri: window.location.origin,
       },
     });
   };

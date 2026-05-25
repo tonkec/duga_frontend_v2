@@ -80,7 +80,7 @@ describe('LoginPage redirects', () => {
     } as unknown as ReturnType<typeof useAuth0>);
   });
 
-  it('redirects to Auth0 with the local app callback URL', () => {
+  it('redirects to Auth0 with the current app origin', () => {
     renderLoginPage();
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Prijavi se' })[0]);
@@ -90,7 +90,7 @@ describe('LoginPage redirects', () => {
         returnTo: '/post-login',
       },
       authorizationParams: {
-        redirect_uri: 'http://localhost:5173',
+        redirect_uri: window.location.origin,
       },
     });
   });
