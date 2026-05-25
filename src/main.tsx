@@ -51,9 +51,8 @@ createRoot(document.getElementById('root')!).render(
             pauseOnHover
             closeButton
             toastClassName={() =>
-              'relative flex min-h-16 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 text-gray-950 shadow-xl shadow-blue-dark/10'
+              'relative flex min-h-16 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 text-sm font-semibold leading-6 text-gray-950 shadow-xl shadow-blue-dark/10'
             }
-            bodyClassName={() => 'm-0 flex flex-1 items-center text-sm font-semibold leading-6'}
             progressClassName={() => '!bg-blue'}
           />
         </QueryClientProvider>

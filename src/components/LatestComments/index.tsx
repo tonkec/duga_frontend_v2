@@ -101,10 +101,6 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
               src={URL.createObjectURL(imageBlob)}
               alt="Slika iz komentara"
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              onClick={(event) => {
-                event.stopPropagation();
-                navigate(`/photo/${comment.uploadId}`);
-              }}
             />
           ) : (
             <BiImage size={28} className="text-blue" />
