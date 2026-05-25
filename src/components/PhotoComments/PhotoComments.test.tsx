@@ -249,6 +249,8 @@ describe('PhotoComments integration', () => {
     expect(screen.queryByText('Original comment')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Obriši' }));
+    expect(screen.getByRole('heading', { name: 'Obrisati komentar?' })).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Potvrđujem' }));
 
     await waitFor(() => expect(mutateDeleteUploadComment).toHaveBeenCalledWith(101));
     expect(screen.queryByText('Updated comment')).not.toBeInTheDocument();

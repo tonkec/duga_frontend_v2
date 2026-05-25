@@ -70,25 +70,25 @@ const MyProfilePage = () => {
 
             <div className="grid content-start items-start gap-4 md:grid-cols-3 xl:grid-cols-1">
               <Cta
-                buttonText="Uredi profil"
-                subtitle="Dodaj detalje i fotografije."
-                title="Uredi profil"
+                buttonText="Dopuni profil"
+                subtitle="Dodaj detalje, interese i fotografije kako bi te drugi lakše upoznali."
+                title="Predstavi se"
                 onClick={() => {
                   navigate('/edit');
                 }}
               />
               <Cta
-                buttonText="Nova poruka"
-                subtitle="Započni razgovor s nekim."
-                title="Poruke"
+                buttonText="Započni razgovor"
+                subtitle="Pronađi nekoga zanimljivog i pošalji prvu poruku."
+                title="Vrijeme je za razgovor"
                 onClick={() => {
                   navigate('/new-chat');
                 }}
               />
               <Cta
-                buttonText="Korisnici"
-                subtitle="Pogledaj tko je online."
-                title="Istraži"
+                buttonText="Istraži korisnike"
+                subtitle="Pregledaj profile i pronađi osobe s kojima želiš kliknuti."
+                title="Upoznaj zajednicu"
                 onClick={() => {
                   navigate('/users');
                 }}

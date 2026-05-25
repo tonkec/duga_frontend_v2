@@ -83,7 +83,7 @@ const PhotoPage = () => {
 
   return (
     <AppLayout>
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-6">
         <Card className="rounded-2xl p-4 md:p-5">
           <div>
             {imageBlob ? (
@@ -117,7 +117,7 @@ const PhotoPage = () => {
           </div>
         </Card>
 
-        <Card className="self-start rounded-2xl p-4 md:p-5">
+        <Card className="rounded-2xl p-4 md:p-5">
           <PhotoComments />
         </Card>
       </div>

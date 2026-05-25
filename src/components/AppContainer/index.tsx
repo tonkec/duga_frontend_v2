@@ -13,7 +13,7 @@ const AppContainer = ({ children, onScroll }: IAppContainerProps) => {
 
   return (
     <div
-      className="max-w-[1200px] mx-auto h-screen px-4"
+      className="mx-auto min-h-screen max-w-[1200px] px-4"
       style={!isMobile ? { display: 'grid', gridTemplateRows: 'auto 1fr auto' } : undefined}
       onScroll={(e) => onScroll?.(e)}
     >

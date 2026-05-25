@@ -7,7 +7,7 @@ export const useGetLatestComments = () => {
     error: allCommentsError,
     isPending: isAllCommentsLoading,
   } = useQuery({
-    queryKey: ['comments'],
+    queryKey: ['comments', 'latest'],
     queryFn: getLatestUploadComments,
   });
 

@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import { BiCog, BiExit, BiGroup, BiHomeAlt, BiMessageRounded, BiUser } from 'react-icons/bi';
+import { BiCog, BiGroup, BiHomeAlt, BiMessageRounded, BiUser } from 'react-icons/bi';
+import { FiLogOut } from 'react-icons/fi';
 import NotificationDropdown from '../Navigation/components/Notifications';
 
 interface NavigationItemsProps {
@@ -25,22 +26,22 @@ export const NavigationItems = ({
 }: NavigationItemsProps) => {
   const numericUserId = userId ? Number(userId) : null;
   const linkBase = isMobile
-    ? 'flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold transition-colors'
-    : 'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors';
+    ? 'flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold transition-all'
+    : 'flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold transition-all';
   const getLinkClassName = ({ isActive }: { isActive: boolean }) =>
     `${linkBase} ${
       isActive
         ? isMobile
           ? 'bg-white text-blue shadow-sm'
-          : 'bg-white text-blue shadow-sm'
+          : 'bg-white text-blue shadow-md shadow-blue-dark/10'
         : isMobile
           ? 'text-white/90 hover:bg-white/10 hover:text-white'
-          : 'text-white/90 hover:bg-white/15 hover:text-white'
+          : 'text-white/90 hover:bg-white/15 hover:text-white hover:-translate-y-0.5'
     }`;
 
   return (
     <>
-      <div className={isMobile ? 'w-full space-y-2' : 'flex items-center gap-2'}>
+      <div className={isMobile ? 'w-full space-y-2' : 'flex items-center gap-1.5'}>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -63,13 +64,14 @@ export const NavigationItems = ({
         <button
           onClick={onLogout}
           aria-label="Odjava"
+          title="Odjava"
           className={
             isMobile
               ? 'flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-4 py-3 font-semibold text-white transition-colors hover:bg-white hover:text-blue'
-              : 'flex items-center gap-2 rounded-full px-3 py-2 text-white/90 transition-colors hover:bg-white/15 hover:text-white'
+              : 'flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-white hover:text-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80'
           }
         >
-          <BiExit fontSize={22} />
+          <FiLogOut size={20} strokeWidth={2.4} />
           {isMobile && <span>Odjava</span>}
         </button>
       </div>

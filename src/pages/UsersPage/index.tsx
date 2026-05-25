@@ -17,8 +17,8 @@ const UsersPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [selectValue, setSelectValue] = useState({
-    value: '',
-    label: '',
+    value: 'username',
+    label: 'Ime',
   });
 
   if (isAllUsersLoading || isUserLoading) {

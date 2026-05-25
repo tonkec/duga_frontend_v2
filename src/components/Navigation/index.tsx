@@ -43,24 +43,30 @@ const Navigation = () => {
   return (
     <>
       {!isMobile && (
-        <nav className="gradient sticky top-0 z-40 py-3 text-white shadow-sm">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-4 px-4">
-            <div className="mr-2 text-xl font-bold tracking-tight">Duga</div>
+        <nav className="gradient sticky top-0 z-40 px-4 py-3 text-white shadow-sm">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-4 rounded-full border border-white/15 bg-white/10 px-3 py-2 shadow-lg shadow-blue-dark/10 backdrop-blur-md">
+            <div className="mr-1 rounded-full bg-white px-4 py-2 text-lg font-bold tracking-tight text-blue shadow-sm">
+              Duga
+            </div>
             <NavigationItems userId={userId} onLogout={onLogout} />
           </div>
         </nav>
       )}
 
       {isMobile && (
-        <div className="gradient sticky top-0 z-40 flex items-center justify-between p-4 text-white shadow-sm">
-          <div className="text-xl font-bold tracking-tight">Duga</div>
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25"
-            aria-label="Otvori navigaciju"
-          >
-            <FiMenu size={24} />
-          </button>
+        <div className="gradient sticky top-0 z-40 p-3 text-white shadow-sm">
+          <div className="flex items-center justify-between rounded-3xl border border-white/15 bg-white/10 px-4 py-3 shadow-lg shadow-blue-dark/10 backdrop-blur-md">
+            <div className="rounded-full bg-white px-4 py-2 text-lg font-bold tracking-tight text-blue shadow-sm">
+              Duga
+            </div>
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="rounded-full bg-white/15 p-2.5 text-white transition-colors hover:bg-white/25"
+              aria-label="Otvori navigaciju"
+            >
+              <FiMenu size={24} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -71,19 +77,21 @@ const Navigation = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          <aside className="gradient relative flex h-full w-[min(86vw,340px)] flex-col p-5 text-white shadow-2xl">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-white/70">Navigacija</p>
-                <h2 className="text-2xl font-bold">Duga</h2>
+          <aside className="gradient relative flex h-full w-[min(86vw,360px)] flex-col p-5 text-white shadow-2xl">
+            <div className="mb-8 rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.2em] text-white/70">Navigacija</p>
+                  <h2 className="text-2xl font-bold">Duga</h2>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="rounded-full bg-white/15 p-2.5 text-white transition-colors hover:bg-white/25"
+                  aria-label="Zatvori navigaciju"
+                >
+                  <FiX size={22} />
+                </button>
               </div>
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25"
-                aria-label="Zatvori navigaciju"
-              >
-                <FiX size={22} />
-              </button>
             </div>
 
             <nav className="flex min-h-0 flex-1 flex-col">

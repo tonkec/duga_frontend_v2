@@ -1,14 +1,13 @@
 import Input from '@app/components/Input';
 import { BiSearch } from 'react-icons/bi';
-import Select from 'react-select';
 import { IUser } from '@app/components/UserCard';
 import { SyntheticEvent } from 'react';
 
 const selectOptions: { value: keyof IUser; label: string }[] = [
+  { value: 'username', label: 'Ime' },
   { value: 'gender', label: 'Rod' },
   { value: 'sexuality', label: 'Seksualnost' },
   { value: 'location', label: 'Lokacija' },
-  { value: 'username', label: 'Ime' },
 ];
 
 interface IUserFiltersProps {
@@ -32,55 +31,79 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
     case 'location':
       return 'Pretraži prema lokaciji...';
     default:
-      return 'Odaberite kriterij pretrage...';
+      return 'Odaberi kriterij pretrage...';
   }
 };
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
   return (
-    <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm sm:flex gap-3 justify-between">
-      <div className="w-full mb-3 sm:mb-0">
+    <section className="relative isolate overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue/10 blur-3xl" />
+
+      <div className="relative z-10 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Pretraga</p>
+        <h1 className="mt-1 text-2xl font-bold text-gray-950">Pronađi korisnike</h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Odaberi kriterij pa upiši pojam koji želiš pretražiti.
+        </p>
+      </div>
+
+      <div className="relative z-10 grid gap-3">
         <Input
           type="text"
           placeholder={getPlaceholder(selectValue)}
-          icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
+          icon={<BiSearch color="#6b7280" fontSize="20px" className="mt-[1.5px]" />}
           value={search}
           onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
-          className="w-full py-[6px] pl-[40px]"
+          className="h-12 w-full rounded-2xl border-[#dce4ff] bg-white pl-11 text-sm shadow-sm disabled:bg-gray-50"
           disabled={!selectValue.value}
         />
-      </div>
-      <div className="w-full sm:max-w-[220px]">
-        <Select
-          options={selectOptions}
-          isClearable
-          placeholder="Odaberite kriterij"
-          theme={(theme) => ({
-            ...theme,
-            colors: {
-              ...theme.colors,
-              primary25: '#dce4ff',
-              primary: '#2D46B9',
-            },
+
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Kriterij pretrage">
+          {selectOptions.map((option) => {
+            const isSelected = selectValue.value === option.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                  isSelected
+                    ? 'border-blue bg-blue text-white shadow-sm shadow-blue/20'
+                    : 'border-[#dce4ff] bg-white text-gray-700 hover:bg-[#f0f4ff] hover:text-blue-dark'
+                }`}
+                aria-pressed={isSelected}
+                onClick={() => {
+                  setSelectValue({
+                    value: option.value,
+                    label: option.label,
+                  });
+                  setSearch('');
+                }}
+              >
+                {option.label}
+              </button>
+            );
           })}
-          value={selectValue.value ? selectValue : null}
-          onChange={(e) => {
-            if (!e) {
-              setSelectValue({
-                value: '',
-                label: '',
-              });
-              setSearch('');
-              return;
-            }
-            setSelectValue({
-              value: e.value,
-              label: e.label,
-            });
-          }}
-        />
+
+          {selectValue.value && (
+            <button
+              type="button"
+              className="rounded-xl border border-red/30 bg-red/10 px-4 py-2 text-sm font-semibold text-red shadow-sm transition-colors hover:bg-red hover:text-white"
+              onClick={() => {
+                setSelectValue({
+                  value: '',
+                  label: '',
+                });
+                setSearch('');
+              }}
+            >
+              Očisti
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

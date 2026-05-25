@@ -93,6 +93,9 @@ const ProfileSection = ({ title, children }: { title: string; children: React.Re
   </section>
 );
 
+const hasDisplayValue = (value: string | number | null | undefined) =>
+  value !== undefined && value !== null && String(value).trim() !== '' && String(value) !== 'N/A';
+
 const UserProfileCard = ({
   user,
   allImagesLoading,
@@ -133,6 +136,50 @@ const UserProfileCard = ({
 
   const locationLabel =
     cityOptions.find((cityOption) => cityOption.value === user.location)?.label || 'N/A';
+  const lookingForLabel = getLookingForTranslation(user.lookingFor);
+  const relationshipStatusLabel = getRelationshipStatusTranslation(user.relationshipStatus);
+  const profileSummary = [
+    hasDisplayValue(locationLabel) ? locationLabel : null,
+    hasDisplayValue(user.age) ? `${user.age} godina` : null,
+  ].filter(Boolean);
+  const primaryDetails = [
+    {
+      icon: <BiSolidMap />,
+      label: 'Lokacija',
+      value: locationLabel,
+      shouldRender: hasDisplayValue(locationLabel),
+    },
+    {
+      icon: <BiBody />,
+      label: 'Rod',
+      value: user.gender,
+      shouldRender: hasDisplayValue(user.gender),
+    },
+    {
+      icon: <BiBoltCircle />,
+      label: 'Seksualnost',
+      value: user.sexuality,
+      shouldRender: hasDisplayValue(user.sexuality),
+    },
+    {
+      icon: <BiStopwatch />,
+      label: 'Godine',
+      value: user.age,
+      shouldRender: hasDisplayValue(user.age),
+    },
+  ].filter((detail) => detail.shouldRender);
+  const relationshipDetails = [
+    {
+      label: 'Tražim',
+      value: lookingForLabel,
+      shouldRender: hasDisplayValue(lookingForLabel),
+    },
+    {
+      label: 'Trenutno sam',
+      value: relationshipStatusLabel,
+      shouldRender: hasDisplayValue(relationshipStatusLabel),
+    },
+  ].filter((detail) => detail.shouldRender);
 
   return (
     <Card className="rounded-2xl p-5 md:p-7">
@@ -154,9 +201,9 @@ const UserProfileCard = ({
                 {isOnlineState ? 'Online' : 'Offline'}
               </span>
             </div>
-            <p className="mt-2 text-gray-600">
-              {locationLabel} {user.age ? `, ${user.age} godina` : ''}
-            </p>
+            {profileSummary.length > 0 && (
+              <p className="mt-2 text-gray-600">{profileSummary.join(', ')}</p>
+            )}
             {shouldRenderField(user.bio) && (
               <div className="mt-4 max-w-3xl text-gray-700">
                 <ContentFormatter text={user.bio} />
@@ -165,24 +212,26 @@ const UserProfileCard = ({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <ProfileDetail icon={<BiSolidMap />} label="Lokacija" value={locationLabel} />
-          <ProfileDetail icon={<BiBody />} label="Rod" value={user.gender || 'N/A'} />
-          <ProfileDetail
-            icon={<BiBoltCircle />}
-            label="Seksualnost"
-            value={user.sexuality || 'N/A'}
-          />
-          <ProfileDetail icon={<BiStopwatch />} label="Godine" value={user.age || 'N/A'} />
-        </div>
+        {primaryDetails.length > 0 && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {primaryDetails.map((detail) => (
+              <ProfileDetail
+                key={detail.label}
+                icon={detail.icon}
+                label={detail.label}
+                value={detail.value}
+              />
+            ))}
+          </div>
+        )}
 
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <ProfileDetail label="Tražim" value={getLookingForTranslation(user.lookingFor)} />
-          <ProfileDetail
-            label="Trenutno sam"
-            value={getRelationshipStatusTranslation(user.relationshipStatus)}
-          />
-        </div>
+        {relationshipDetails.length > 0 && (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {relationshipDetails.map((detail) => (
+              <ProfileDetail key={detail.label} label={detail.label} value={detail.value} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           <BooleanDetail label="Cigarete" value={user.cigarettes} />

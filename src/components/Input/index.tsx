@@ -56,7 +56,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           name={name}
           disabled={disabled}
         />
-        {icon && <span className="absolute left-3 top-[8px]">{icon}</span>}
+        {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>}
         {error && <span className="text-red text-xs inline-block mb-4">{error}</span>}
       </div>
     ) : (

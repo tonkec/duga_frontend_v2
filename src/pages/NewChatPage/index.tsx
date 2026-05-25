@@ -32,8 +32,8 @@ const EmptyChats = () => {
             Nema razgovora
           </h1>
           <p className="mt-4 max-w-lg text-sm leading-7 text-gray-600 sm:text-base">
-            Započni novu konverzaciju s nekim od korisnika. Pretraži profile, odaberi osobu i
-            razgovor će se odmah pojaviti ovdje.
+            Započni novi razgovor s nekim od korisnika. Pretraži profile, odaberi osobu i razgovor
+            će se odmah pojaviti ovdje.
           </p>
 
           <div className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">

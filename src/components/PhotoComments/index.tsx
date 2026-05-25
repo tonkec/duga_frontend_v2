@@ -294,10 +294,10 @@ const PhotoComments = () => {
         </div>
 
         <form
-          className="mb-5 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+          className="mb-5 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="flex w-full items-center gap-2">
+          <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[auto_minmax(24rem,1fr)_auto_auto]">
             <Controller
               name="image"
               control={control}
@@ -330,7 +330,7 @@ const PhotoComments = () => {
                     />
                     <button
                       type="button"
-                      className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                       onClick={handleIconClick}
                       disabled={isAddingUploadComment}
                       aria-label="Dodaj sliku"
@@ -370,7 +370,7 @@ const PhotoComments = () => {
                     }}
                     onTagUsersChange={setTaggedUsers}
                     placeholder="Dodaj komentar"
-                    className="flex-grow"
+                    className="min-w-0"
                   />
                 );
               }}
@@ -388,7 +388,7 @@ const PhotoComments = () => {
 
             <button
               type="button"
-              className="rounded-full bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+              className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => setShowGiphySearch((isOpen) => !isOpen)}
               disabled={isAddingUploadComment}
               aria-label="Dodaj GIF"
@@ -396,7 +396,11 @@ const PhotoComments = () => {
               <BiSolidFileGif fontSize={20} />
             </button>
 
-            <Button type="blue" disabled={isAddingUploadComment}>
+            <Button
+              type="blue"
+              className="col-span-3 rounded-2xl py-4 text-base font-semibold md:col-span-1"
+              disabled={isAddingUploadComment}
+            >
               {isAddingUploadComment ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
