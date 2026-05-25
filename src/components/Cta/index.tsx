@@ -32,10 +32,10 @@ const Cta = ({
   const subtitleClassName = compact
     ? 'mb-4 text-sm leading-6 text-gray-700'
     : 'mb-5 text-sm leading-6 text-gray-700';
-  const cardClassName = `relative isolate flex h-full overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] ${cardPadding} text-gray-950 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${className ?? ''}`;
+  const cardClassName = `cta-card relative isolate flex h-full overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] ${cardPadding} text-gray-950 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${className ?? ''}`;
   const content = (
     <>
-      <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue/10 blur-2xl" />
+      <div className="cta-card-glow pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue/10 blur-2xl" />
       <div className="relative z-10 flex h-full flex-col">
         {icon && (
           <div

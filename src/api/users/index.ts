@@ -30,6 +30,31 @@ export interface IPostLoginProps {
   acceptTerms: boolean;
 }
 
+export interface ProfileView {
+  id: number;
+  viewerId: number;
+  viewedUserId: number;
+  createdAt: string;
+  updatedAt: string;
+  viewer: {
+    id: number;
+    username: string;
+    firstName?: string;
+    lastName?: string;
+    avatar?: string;
+  };
+}
+
+export interface ProfileViewsResponse {
+  data: ProfileView[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export const getAllUsers = async () => {
   const client = apiClient();
   return client.get(`/users/get-users/`);
@@ -46,6 +71,19 @@ export const getUserById = async (id: string) => {
   const client = apiClient();
   return client.get(`/users/${id}`, {
     skipGlobalErrorHandler: true,
+  });
+};
+
+export const getProfileViews = async ({
+  page = 1,
+  limit = 20,
+}: {
+  page?: number;
+  limit?: number;
+}) => {
+  const client = apiClient();
+  return client.get<ProfileViewsResponse>(`/users/profile-views`, {
+    params: { page, limit },
   });
 };
 

@@ -3,10 +3,12 @@ import Card from '@app/components/Card';
 import Cta from '@app/components/Cta';
 import Photos from '@app/components/Photos';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Select from 'react-select';
 import {
   BiGlobe,
   BiHelpCircle,
   BiMessageRoundedDots,
+  BiShow,
   BiSolidCamera,
   BiSolidFile,
 } from 'react-icons/bi';
@@ -23,10 +25,52 @@ import UserForumActivity, {
   getUserForumQuestions,
 } from '@app/features/forum/components/UserForumActivity';
 import { useQuestionDetails, useQuestions } from '@app/features/forum/hooks/useForum';
+import ProfileViews from './components/ProfileViews';
 
 const tabClassName =
-  'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
+  'shrink-0 cursor-pointer whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
 const selectedTabClassName = 'bg-blue text-white shadow-sm';
+const profileTabSelectStyles = {
+  control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
+    ...base,
+    minHeight: '3rem',
+    borderRadius: '1rem',
+    borderColor: state.isFocused ? '#2D46B9' : '#dce4ff',
+    boxShadow: state.isFocused ? '0 0 0 1px #2D46B9' : '0 1px 2px rgba(15, 23, 42, 0.05)',
+    '&:hover': {
+      borderColor: '#2D46B9',
+    },
+  }),
+  valueContainer: (base: Record<string, unknown>) => ({
+    ...base,
+    padding: '0 0.875rem',
+  }),
+  menu: (base: Record<string, unknown>) => ({
+    ...base,
+    borderRadius: '1rem',
+    overflow: 'hidden',
+    border: '1px solid #dce4ff',
+    boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
+    zIndex: 20,
+  }),
+  option: (base: Record<string, unknown>, state: { isSelected: boolean; isFocused: boolean }) => ({
+    ...base,
+    backgroundColor: state.isSelected ? '#2D46B9' : state.isFocused ? '#f0f4ff' : 'white',
+    color: state.isSelected ? 'white' : '#111827',
+  }),
+};
+const getProfileTabLabel = (tabId: string) => {
+  const labels: Record<string, string> = {
+    general: 'Općenito',
+    'profile-photos': 'Profilne fotografije',
+    'all-photos': 'Sve fotografije',
+    'profile-views': 'Pregledi',
+    questions: 'Pitanja',
+    answers: 'Odgovori',
+  };
+
+  return labels[tabId] ?? tabId;
+};
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
@@ -176,6 +220,20 @@ const MyProfilePage = () => {
     });
   }
 
+  profileTabs.push({
+    id: 'profile-views',
+    tab: (
+      <div className="flex items-center gap-2">
+        Pregledi <BiShow fontSize={20} />
+      </div>
+    ),
+    panel: (
+      <Card className="rounded-2xl p-5">
+        <ProfileViews />
+      </Card>
+    ),
+  });
+
   if (!isForumActivityLoading && userForumQuestions.length > 0) {
     profileTabs.push({
       id: 'questions',
@@ -220,6 +278,10 @@ const MyProfilePage = () => {
     profileTabs.findIndex((tab) => tab.id === searchParams.get('tab')),
     0
   );
+  const profileTabOptions = profileTabs.map((tab, index) => ({
+    value: index,
+    label: getProfileTabLabel(tab.id),
+  }));
 
   const handleTabSelect = (index: number) => {
     const nextSearchParams = new URLSearchParams(searchParams);
@@ -242,12 +304,28 @@ const MyProfilePage = () => {
         onSelect={handleTabSelect}
         selectedTabClassName={selectedTabClassName}
       >
-        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Moj profil</h1>
           </div>
 
-          <TabList className="flex flex-wrap gap-2 rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm">
+          <label className="block lg:hidden">
+            <span className="sr-only">Odaberi sekciju profila</span>
+            <Select
+              value={profileTabOptions[selectedTabIndex]}
+              onChange={(option) => {
+                if (option) {
+                  handleTabSelect(option.value);
+                }
+              }}
+              options={profileTabOptions}
+              styles={profileTabSelectStyles}
+              classNamePrefix="react-select"
+              isSearchable={false}
+            />
+          </label>
+
+          <TabList className="hidden w-full max-w-full flex-nowrap gap-2 overflow-x-auto rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm lg:flex lg:w-auto lg:flex-wrap">
             {profileTabs.map((tab) => (
               <Tab key={tab.id} className={tabClassName}>
                 {tab.tab}

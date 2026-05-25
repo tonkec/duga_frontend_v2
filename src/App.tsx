@@ -1,4 +1,5 @@
 import './App.css';
+import { useState } from 'react';
 import AppLayout from './components/AppLayout';
 import UserCard, { IUser } from './components/UserCard';
 import { useGetAllUsers } from './hooks/useGetAllUsers';
@@ -16,17 +17,32 @@ import { useQuestion, useQuestions } from './features/forum/hooks/useForum';
 import type { Question } from './features/forum/types/forum.types';
 import { getVoteScore } from './features/forum/components/VoteControls';
 import RecordCreatedAt from './components/RecordCreatedAt';
+import { getVoteLabel } from './features/forum/utils/forumLabels';
 
 interface WelcomeHeroProps {
   onEditProfile: () => void;
   onFindUsers: () => void;
   onSendMessage: () => void;
+  onDismiss: () => void;
 }
 
-const WelcomeHero = ({ onEditProfile, onFindUsers, onSendMessage }: WelcomeHeroProps) => (
+const WelcomeHero = ({
+  onEditProfile,
+  onFindUsers,
+  onSendMessage,
+  onDismiss,
+}: WelcomeHeroProps) => (
   <section className="relative isolate mb-10 overflow-hidden rounded-3xl bg-blue px-5 py-8 text-white shadow-xl shadow-blue/20 sm:px-8 lg:px-10">
     <div className="absolute -left-20 top-4 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
     <div className="absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+    <button
+      type="button"
+      onClick={onDismiss}
+      className="absolute right-4 top-4 z-20 rounded-full bg-white/15 px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      aria-label="Zatvori početnu karticu"
+    >
+      ×
+    </button>
 
     <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center">
       <div className="max-w-3xl">
@@ -164,6 +180,7 @@ type UserWithCreatedAt = {
 
 const WELCOME_HERO_VISIBLE_DAYS = 3;
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
+const WELCOME_PROFILE_CARD_DISMISSED_KEY = 'duga:welcome-profile-card-dismissed';
 
 const isWithinWelcomePeriod = (user: UserWithCreatedAt | undefined) => {
   if (!user?.createdAt) return false;
@@ -336,7 +353,7 @@ const LatestForumQuestion = ({
               {getQuestionAnswerCount(latestQuestion)} odgovora
             </span>
             <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-blue-dark">
-              {getVoteScore(latestQuestion)} glasova
+              {getVoteScore(latestQuestion)} {getVoteLabel(getVoteScore(latestQuestion))}
             </span>
           </div>
         </div>
@@ -346,6 +363,9 @@ const LatestForumQuestion = ({
 };
 
 function App() {
+  const [isWelcomeHeroDismissed, setIsWelcomeHeroDismissed] = useState(
+    () => localStorage.getItem(WELCOME_PROFILE_CARD_DISMISSED_KEY) === 'true'
+  );
   const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
   const navigate = useNavigate();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
@@ -366,9 +386,14 @@ function App() {
       (total: number, chat: ChatWithMessages) => total + (chat.Messages?.length ?? 0),
       0
     ) ?? 0;
-  const shouldShowWelcomeHero = isWithinWelcomePeriod(currentUser);
+  const shouldShowWelcomeHero = !isWelcomeHeroDismissed && isWithinWelcomePeriod(currentUser);
   const shouldShowCommunityTips =
     !shouldShowWelcomeHero && !isUserChatsLoading && messageCount === 0;
+
+  const dismissWelcomeHero = () => {
+    localStorage.setItem(WELCOME_PROFILE_CARD_DISMISSED_KEY, 'true');
+    setIsWelcomeHeroDismissed(true);
+  };
 
   return (
     <AppLayout>
@@ -377,6 +402,7 @@ function App() {
           onEditProfile={() => navigate('/edit')}
           onFindUsers={() => navigate('/users')}
           onSendMessage={() => navigate('/new-chat')}
+          onDismiss={dismissWelcomeHero}
         />
       )}
 
@@ -424,16 +450,14 @@ function App() {
 
       <LatestComments />
 
-      <section className="relative isolate mt-12 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-blue/10 via-white to-[#eef3ff] p-4 shadow-sm sm:p-5">
-        <div className="pointer-events-none absolute -left-20 top-6 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
+      <section className="quick-actions-panel relative isolate mt-12 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-4 shadow-sm sm:p-5">
         <div className="relative z-10 mb-4">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Brze akcije</p>
           <h2 className="mt-1 text-2xl font-bold text-gray-900">Što želiš napraviti?</h2>
         </div>
         <div className="relative z-10 grid gap-4 sm:grid-cols-2">
           <Cta
-            className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
+            className="quick-actions-cta flex-1 !bg-white"
             title="Unaprijedi svoj profil"
             buttonText="Izmijeni profil"
             subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
@@ -441,7 +465,7 @@ function App() {
           />
 
           <Cta
-            className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
+            className="quick-actions-cta flex-1 !bg-white"
             title="Nemaš poruka?"
             subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu za čavrljanje 💬"
             buttonText="Nova poruka"
@@ -449,7 +473,7 @@ function App() {
           />
 
           <Cta
-            className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
+            className="quick-actions-cta flex-1 !bg-white"
             title="Imaš pitanje?"
             subtitle="Postavi pitanje na forumu i nađi odgovore od zajednice."
             buttonText="Postavi pitanje"

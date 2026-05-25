@@ -75,6 +75,11 @@ jest.mock('./components/AllUserPhotos', () => ({
   getForumPhotos: jest.fn(() => []),
 }));
 
+jest.mock('./components/ProfileViews', () => ({
+  __esModule: true,
+  default: () => <div>Profile views</div>,
+}));
+
 jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
 }));

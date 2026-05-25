@@ -16,23 +16,27 @@ import QuestionForm from '../components/QuestionForm';
 import VoteControls, { getVoteScore } from '../components/VoteControls';
 import {
   useAcceptAnswer,
+  useAddAnswerReaction,
   useCreateAnswer,
+  useCreateAnswerReply,
   useDeleteAnswer,
   useDeleteAnswerImage,
-  useDeleteAnswerVote,
+  useDeleteAnswerReply,
+  useDeleteAnswerReaction,
   useDeleteQuestion,
   useDeleteQuestionImage,
   useDeleteQuestionVote,
   useForumSocketEvents,
   useQuestion,
   useUpdateAnswer,
+  useUpdateAnswerReply,
   useUpdateQuestion,
-  useVoteAnswer,
   useVoteQuestion,
 } from '../hooks/useForum';
 import { getForumErrorMessage } from '../utils/forumErrors';
 import ForumImageGallery from '../components/ForumImageGallery';
 import type { Answer } from '../types/forum.types';
+import { getVoteLabel } from '../utils/forumLabels';
 
 interface CurrentUserData {
   id?: number;
@@ -42,12 +46,11 @@ interface CurrentUserData {
 }
 
 const ANSWERS_PER_PAGE = 5;
-type AnswerSortOption = 'newest' | 'oldest' | 'mostVotes' | 'accepted';
+type AnswerSortOption = 'newest' | 'oldest' | 'accepted';
 
 const answerSortOptions: { label: string; value: AnswerSortOption }[] = [
   { label: 'Najnoviji', value: 'newest' },
   { label: 'Najstariji', value: 'oldest' },
-  { label: 'Najviše glasova', value: 'mostVotes' },
   { label: 'Prihvaćeni prvo', value: 'accepted' },
 ];
 
@@ -88,11 +91,6 @@ const sortAnswers = (answers: Answer[], sortOption: AnswerSortOption) => {
     if (sortOption === 'accepted') {
       const acceptedDifference = Number(secondAnswer.isAccepted) - Number(firstAnswer.isAccepted);
       return acceptedDifference || secondCreatedAt - firstCreatedAt;
-    }
-
-    if (sortOption === 'mostVotes') {
-      const voteDifference = getVoteScore(secondAnswer) - getVoteScore(firstAnswer);
-      return voteDifference || secondCreatedAt - firstCreatedAt;
     }
 
     if (sortOption === 'oldest') {
@@ -137,11 +135,17 @@ const ForumQuestionDetailsPage = () => {
   const deleteQuestionImageMutation = useDeleteQuestionImage();
   const voteQuestionMutation = useVoteQuestion(isValidQuestionId ? questionId : 0);
   const deleteQuestionVoteMutation = useDeleteQuestionVote(isValidQuestionId ? questionId : 0);
-  const voteAnswerMutation = useVoteAnswer(isValidQuestionId ? questionId : 0);
-  const deleteAnswerVoteMutation = useDeleteAnswerVote(isValidQuestionId ? questionId : 0);
   const updateAnswerMutation = useUpdateAnswer();
   const deleteAnswerMutation = useDeleteAnswer(isValidQuestionId ? questionId : undefined);
   const deleteAnswerImageMutation = useDeleteAnswerImage(isValidQuestionId ? questionId : 0);
+  const addAnswerReactionMutation = useAddAnswerReaction(isValidQuestionId ? questionId : 0);
+  const deleteAnswerReactionMutation = useDeleteAnswerReaction(isValidQuestionId ? questionId : 0);
+  const createAnswerReplyMutation = useCreateAnswerReply(
+    isValidQuestionId ? questionId : 0,
+    forumCurrentUser
+  );
+  const updateAnswerReplyMutation = useUpdateAnswerReply(isValidQuestionId ? questionId : 0);
+  const deleteAnswerReplyMutation = useDeleteAnswerReply(isValidQuestionId ? questionId : 0);
   const question = questionQuery.data;
   const answers = sortAnswers(question?.Answers ?? [], answerSort);
   const hasAcceptedAnswer = answers.some((answer) => answer.isAccepted);
@@ -158,7 +162,12 @@ const ForumQuestionDetailsPage = () => {
   const authorId = question?.User?.id ?? question?.userId;
   const isQuestionVotePending =
     voteQuestionMutation.isPending || deleteQuestionVoteMutation.isPending;
-  const isAnswerVotePending = voteAnswerMutation.isPending || deleteAnswerVoteMutation.isPending;
+  const isAnswerReactionPending =
+    addAnswerReactionMutation.isPending || deleteAnswerReactionMutation.isPending;
+  const isAnswerReplyPending =
+    createAnswerReplyMutation.isPending ||
+    updateAnswerReplyMutation.isPending ||
+    deleteAnswerReplyMutation.isPending;
   const questionVoteScore = question ? getVoteScore(question) : 0;
 
   useEffect(() => {
@@ -383,7 +392,7 @@ const ForumQuestionDetailsPage = () => {
             )}
 
             <div className="mt-6 whitespace-pre-wrap text-base leading-8 text-gray-800">
-              <ContentFormatter text={question.body} />
+              <ContentFormatter text={question.body} taggedUsers={question.taggedUsers} />
             </div>
             <ForumImageGallery
               item={question}
@@ -393,7 +402,7 @@ const ForumQuestionDetailsPage = () => {
             />
             <div className="mt-5 flex justify-end">
               <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-sm font-semibold text-blue-dark">
-                {questionVoteScore} glasova
+                {questionVoteScore} {getVoteLabel(questionVoteScore)}
               </span>
             </div>
           </section>
@@ -455,17 +464,27 @@ const ForumQuestionDetailsPage = () => {
                     isDeletingImage={deleteAnswerImageMutation.isPending}
                     isDeleting={deleteAnswerMutation.isPending}
                     isUpdating={updateAnswerMutation.isPending}
-                    isVotePending={isAnswerVotePending}
+                    isReactionPending={isAnswerReactionPending}
+                    isReplyPending={isAnswerReplyPending}
                     onAccept={(answerId) => acceptAnswerMutation.mutate(answerId)}
                     onDelete={(answerId) => deleteAnswerMutation.mutate(answerId)}
                     onDeleteImage={(answerId) => deleteAnswerImageMutation.mutate(answerId)}
                     onUpdate={(answerId, payload) =>
                       updateAnswerMutation.mutate({ id: answerId, payload })
                     }
-                    onVote={(answerId, value) =>
-                      voteAnswerMutation.mutate({ answerId, payload: { value } })
+                    onAddReaction={(answerId, emoji) =>
+                      addAnswerReactionMutation.mutate({ answerId, payload: { emoji } })
                     }
-                    onClearVote={(answerId) => deleteAnswerVoteMutation.mutate(answerId)}
+                    onDeleteReaction={(answerId, emoji) =>
+                      deleteAnswerReactionMutation.mutate({ answerId, payload: { emoji } })
+                    }
+                    onCreateReply={(answerId, payload) =>
+                      createAnswerReplyMutation.mutate({ answerId, payload })
+                    }
+                    onUpdateReply={(replyId, payload) =>
+                      updateAnswerReplyMutation.mutate({ id: replyId, payload })
+                    }
+                    onDeleteReply={(replyId) => deleteAnswerReplyMutation.mutate(replyId)}
                   />
                 ))}
               </div>

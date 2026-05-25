@@ -32,15 +32,15 @@ interface IUserCardProps {
 const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return (
-      <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
-        <BiSolidMap className="text-blue" /> Lokacija nije unesena
+      <p className="user-card-meta flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
+        <BiSolidMap className="user-card-meta-icon text-blue" /> Lokacija nije unesena
       </p>
     );
   }
 
   return (
-    <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
-      <BiSolidMap className="text-blue" /> {location}
+    <p className="user-card-meta flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
+      <BiSolidMap className="user-card-meta-icon text-blue" /> {location}
     </p>
   );
 };
@@ -48,16 +48,16 @@ const getUserLocation = ({ location }: { location: string }) => {
 const getUserAge = ({ age }: { age: number }) => {
   if (!age) {
     return (
-      <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
-        <BiStopwatch className="text-blue" />
+      <p className="user-card-meta flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
+        <BiStopwatch className="user-card-meta-icon text-blue" />
         Godine nisu unesene
       </p>
     );
   }
 
   return (
-    <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
-      <BiStopwatch className="text-blue" /> {age} godina
+    <p className="user-card-meta flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
+      <BiStopwatch className="user-card-meta-icon text-blue" /> {age} godina
     </p>
   );
 };
@@ -86,13 +86,13 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
 
   return (
     <Card
-      className="group h-full rounded-3xl !bg-white p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+      className="user-card group h-full rounded-3xl !bg-white p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
       onClick={onButtonClick}
     >
-      <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-[#f7f9ff] to-[#eef3ff]">
+      <div className="user-card-avatar-wrap relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-[#f7f9ff] to-[#eef3ff]">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
-          color="#eef3ff"
+          color="#f7f9ff"
           userId={String(user.id)}
           className="aspect-[4/3] w-full transition-transform duration-300 group-hover:scale-105"
           fgColor="#1f2937"
@@ -102,7 +102,7 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
             'absolute right-3 top-3 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur',
             isOnlineState
               ? 'bg-green text-white'
-              : 'border border-[#dce4ff] bg-white/95 text-gray-600'
+              : 'user-card-status-offline border border-[#dce4ff] bg-white/95 text-gray-600'
           )}
         >
           {isOnlineState ? 'Online' : 'Offline'}
@@ -119,7 +119,7 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
           </div>
 
           <Button
-            className="mt-5 w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
+            className="user-card-button mt-5 w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
             onClick={onButtonClick}
             type="blue"
           >

@@ -1,11 +1,17 @@
 import Image from '@app/components/Image';
+import { Link } from 'react-router-dom';
 
 interface IContentFormatterProps {
   text: string;
   renderRichContent?: boolean;
+  taggedUsers?: { id: number; username?: string }[];
 }
 
-const ContentFormatter = ({ text, renderRichContent = true }: IContentFormatterProps) => {
+const ContentFormatter = ({
+  text,
+  renderRichContent = true,
+  taggedUsers = [],
+}: IContentFormatterProps) => {
   const parts = text.split(/(\s+)/);
 
   const youtubeRegex =
@@ -18,6 +24,22 @@ const ContentFormatter = ({ text, renderRichContent = true }: IContentFormatterP
   return (
     <>
       {parts.map((part, i) => {
+        const mentionMatch = part.match(/^@([\w\d_]+)$/);
+        if (mentionMatch) {
+          const username = mentionMatch[1];
+          const taggedUser = taggedUsers.find(
+            (user) => user.username?.toLowerCase() === username.toLowerCase()
+          );
+
+          if (taggedUser) {
+            return (
+              <Link key={i} to={`/user/${taggedUser.id}`} className="text-blue underline">
+                {part}
+              </Link>
+            );
+          }
+        }
+
         if (youtubeRegex.test(part)) {
           const match = part.match(youtubeRegex);
           if (match) {

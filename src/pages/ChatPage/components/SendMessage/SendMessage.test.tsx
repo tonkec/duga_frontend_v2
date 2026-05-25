@@ -2,7 +2,7 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import SendMessage from '.';
+import SendMessage, { getMessageImagePath } from '.';
 import { useSocket } from '@app/context/useSocket';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
@@ -185,5 +185,46 @@ describe('SendMessage integration', () => {
       })
     );
     expect(input).toHaveValue('');
+    expect(socketEmit).toHaveBeenCalledWith('stop-typing', {
+      chatId: '123',
+      userId: 1,
+      toUserId: [2],
+    });
+  });
+
+  it('emits typing while the draft changes and stops when it is cleared', () => {
+    renderSendMessage();
+
+    const input = screen.getByPlaceholderText('Napiši poruku… ( : za emoji )');
+
+    fireEvent.change(input, {
+      target: {
+        value: 'H',
+      },
+    });
+
+    expect(socketEmit).toHaveBeenCalledWith('typing', {
+      chatId: '123',
+      userId: 1,
+      toUserId: [2],
+    });
+
+    fireEvent.change(input, {
+      target: {
+        value: '',
+      },
+    });
+
+    expect(socketEmit).toHaveBeenCalledWith('stop-typing', {
+      chatId: '123',
+      userId: 1,
+      toUserId: [2],
+    });
+  });
+
+  it('builds uploaded image message paths with the cleaned uploaded filename', () => {
+    expect(getMessageImagePath('123', '987654321', 'My Chat-Photo.PNG')).toBe(
+      'chat/123/987654321/mychatphoto.png'
+    );
   });
 });

@@ -5,6 +5,7 @@ import EmojiSearch from '@app/components/EmojiSearch';
 import FileUploadInput from '@app/components/FileUploadInput';
 import GiphySearch from '@app/components/GiphySearch';
 import Image from '@app/components/Image';
+import MentionInput from '@app/components/MentionInput';
 import { BiSmile, BiSolidFileGif } from 'react-icons/bi';
 import data from '@emoji-mart/data';
 import { init } from 'emoji-mart';
@@ -83,6 +84,11 @@ const QuestionForm = ({
 
   const [title, setTitle] = useState(initialQuestion?.title ?? '');
   const [body, setBody] = useState(initialQuestion?.body ?? '');
+  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>(
+    initialQuestion?.taggedUsers
+      ?.filter((user) => user.username)
+      .map((user) => ({ id: user.id, username: user.username as string })) ?? []
+  );
   const [images, setImages] = useState<File[]>([]);
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
@@ -134,6 +140,7 @@ const QuestionForm = ({
       title: trimmedTitle,
       body: bodyWithGif,
       images,
+      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
     });
     setSelectedGifUrl('');
     setCurrentEmojis([]);
@@ -165,16 +172,16 @@ const QuestionForm = ({
         <label htmlFor="question-body" className="text-sm font-bold text-gray-950">
           Opis
         </label>
-        <textarea
-          id="question-body"
+        <MentionInput
           value={body}
-          onChange={(event) => {
-            updateBody(event.target.value);
-          }}
+          onChange={updateBody}
+          onTagUsersChange={setTaggedUsers}
+          initialTaggedUsers={taggedUsers}
           rows={8}
           maxLength={FORUM_MAX_BODY_LENGTH}
-          className="mt-2 w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm leading-6 outline-none transition-colors focus:border-blue"
-          placeholder="Dodaj kontekst, što si već pokušao_la i kakvu pomoć trebaš. Upiši : za brzi emoji."
+          className="mt-2"
+          textareaClassName="text-sm"
+          placeholder="Dodaj kontekst, što si već pokušao_la i kakvu pomoć trebaš. Upiši @ za označavanje osobe ili : za brzi emoji."
         />
         <p className="mt-1 text-right text-xs text-gray-400">
           {body.length}/{FORUM_MAX_BODY_LENGTH}

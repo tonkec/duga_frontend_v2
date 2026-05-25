@@ -41,7 +41,7 @@ const getBackgroundColor = (type: IButtonProps['type']) => {
     case 'blue-dark':
       return 'py-2 px-4 bg-blue-dark text-white';
     case 'transparent':
-      return 'py-2 px-4 bg-transparent text-black hover:bg-gray-200 underline hover:text-black';
+      return 'duga-transparent-button py-2 px-4 bg-transparent text-black hover:bg-gray-200 underline hover:text-black';
     default:
       return 'bg-blue';
   }
