@@ -13,10 +13,10 @@ const VerifyEmailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuth0();
   const [isSending, setIsSending] = useState(false);
-  const isUserVerified = user?.email_verified;
   const { data: currentUser, isLoading: isBackendUserLoading } = useEnsureBackendUser({
-    enabled: Boolean(user && !isUserVerified),
+    enabled: Boolean(user && !user.email_verified),
   });
+  const isUserVerified = Boolean(user?.email_verified || currentUser?.isVerified);
 
   const resendVerificationEmail = async () => {
     if (!currentUser?.id) {
@@ -36,7 +36,7 @@ const VerifyEmailPage = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || (user && !user.email_verified && isBackendUserLoading)) {
     return <Loader />;
   }
 

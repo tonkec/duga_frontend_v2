@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import Loader from '@app/components/Loader';
 import { useAppSessionStatus } from '@app/context/AppSessionContext';
+import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
 
 interface IAuthGuardProps {
   children: React.ReactNode;
@@ -10,7 +11,11 @@ interface IAuthGuardProps {
 export const AuthGuard = ({ children }: IAuthGuardProps) => {
   const { isAuthenticated, isLoading, user } = useAuth0();
   const appSessionStatus = useAppSessionStatus();
-  const isUserVerified = user?.email_verified;
+  const shouldLoadBackendUser = isAuthenticated && appSessionStatus === 'active';
+  const { data: backendUser, isLoading: isBackendUserLoading } = useEnsureBackendUser({
+    enabled: shouldLoadBackendUser,
+  });
+  const isUserVerified = Boolean(user?.email_verified || backendUser?.isVerified);
 
   if (isLoading) return <Loader />;
 
@@ -23,6 +28,8 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
+
+  if (shouldLoadBackendUser && isBackendUserLoading) return <Loader />;
 
   if (!isUserVerified) {
     return <Navigate to="/verify-email" replace />;
