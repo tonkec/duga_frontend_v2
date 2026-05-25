@@ -126,14 +126,16 @@ export default function ReportPage() {
               {errors.message && <FieldError message={errors.message.message || 'Unesi poruku.'} />}
             </div>
 
-            <Button
-              type="blue"
-              htmlType="submit"
-              disabled={isPending || isSubmitting}
-              className="w-full"
-            >
-              {isPending ? 'Slanje...' : 'Pošalji prijavu'}
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                type="blue"
+                htmlType="submit"
+                disabled={isPending || isSubmitting}
+                className="w-full rounded-full px-8 py-3 font-semibold shadow-md shadow-blue/15 sm:w-fit"
+              >
+                {isPending ? 'Slanje...' : 'Pošalji prijavu'}
+              </Button>
+            </div>
 
             <div role="status" aria-live="polite" className="text-sm">
               {isSuccess && (

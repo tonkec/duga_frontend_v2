@@ -16,6 +16,7 @@ import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import UserAvatar from '@app/components/UserAvatar';
+import ConfirmModal from '@app/components/ConfirmModal';
 
 interface Inputs {
   comment: string;
@@ -32,6 +33,7 @@ const CommentWithUser: React.FC<{
 }> = ({ comment, onCommentUpdated, onCommentDeleted }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>(
     comment.taggedUsers ?? []
   );
@@ -143,19 +145,25 @@ const CommentWithUser: React.FC<{
             <Image
               src={URL.createObjectURL(imageBlob)}
               alt="Slika"
-              className="mt-3 max-h-64 w-full rounded-xl object-cover"
+              className="mt-3 max-h-48 w-full max-w-sm rounded-xl object-cover"
             />
           )}
         </div>
         {String(currentUserId) === String(comment.userId) && (
-          <div className="flex gap-2">
-            <Button type="transparent" htmlType="button" onClick={() => setIsEditing(true)}>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="blue"
+              htmlType="button"
+              className="rounded-full px-4 py-2 font-semibold shadow-sm shadow-blue/15"
+              onClick={() => setIsEditing(true)}
+            >
               Izmijeni
             </Button>
             <Button
-              type="transparent"
+              type="danger"
               htmlType="button"
-              onClick={() => mutateDeleteUploadComment(Number(comment.id))}
+              className="rounded-full px-4 py-2 font-semibold"
+              onClick={() => setIsDeleteModalOpen(true)}
             >
               Obriši
             </Button>
@@ -169,31 +177,47 @@ const CommentWithUser: React.FC<{
   const isOwnComment = String(currentUserId) === String(comment.userId);
 
   return (
-    <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <button
-          type="button"
-          className="flex min-w-0 items-center gap-2 text-left"
-          onClick={() => !isOwnComment && navigate(`/user/${comment.userId}`)}
-          disabled={isOwnComment}
-        >
-          <UserAvatar
-            color="#F037A5"
-            userId={String(comment.userId)}
-            avatarFallbackName={username}
-            className="h-9 w-9 shrink-0 rounded-full"
-          />
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-gray-900">
-              {isOwnComment ? 'Tvoj komentar' : username}
-            </p>
-            {!isUserLoading && <RecordCreatedAt createdAt={comment.createdAt} />}
-          </div>
-        </button>
-      </div>
+    <>
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          setIsDeleteModalOpen(false);
+          mutateDeleteUploadComment(Number(comment.id));
+        }}
+      >
+        <div>
+          <h2 className="mb-2 text-2xl font-bold text-gray-950">Obrisati komentar?</h2>
+          <p className="text-gray-600">Ova radnja trajno uklanja komentar.</p>
+        </div>
+      </ConfirmModal>
 
-      {renderContent()}
-    </div>
+      <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            className="flex min-w-0 items-center gap-2 text-left"
+            onClick={() => !isOwnComment && navigate(`/user/${comment.userId}`)}
+            disabled={isOwnComment}
+          >
+            <UserAvatar
+              color="#F037A5"
+              userId={String(comment.userId)}
+              avatarFallbackName={username}
+              className="h-9 w-9 shrink-0 rounded-full"
+            />
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-gray-900">
+                {isOwnComment ? 'Tvoj komentar' : username}
+              </p>
+              {!isUserLoading && <RecordCreatedAt createdAt={comment.createdAt} />}
+            </div>
+          </button>
+        </div>
+
+        {renderContent()}
+      </div>
+    </>
   );
 };
 

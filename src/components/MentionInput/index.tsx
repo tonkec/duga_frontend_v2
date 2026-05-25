@@ -124,12 +124,12 @@ const MentionInput = ({
         value={value}
         onChange={handleInputChange}
         onFocus={handleFocus}
-        className="w-full p-2 border border-gray-300 rounded"
+        className="h-14 w-full rounded-2xl border border-[#dce4ff] bg-white px-4 text-base shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
         placeholder={placeholder}
       />
 
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-10 top-full left-0 right-0 bg-white shadow-lg border rounded max-h-48 overflow-y-auto">
+        <ul className="absolute left-0 right-0 top-full z-10 mt-2 max-h-48 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white shadow-lg">
           {suggestions.map((user) => (
             <li
               key={user.id}

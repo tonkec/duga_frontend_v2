@@ -217,7 +217,7 @@ describe('UsersPage dating flow integration', () => {
 
     renderUsersPage();
 
-    expect(screen.getByRole('heading', { name: 'Nema korisnika 😢' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Nema dostupnih korisnika' })).toBeVisible();
   });
 
   it('updates visible users when filter and search change', () => {
@@ -243,11 +243,7 @@ describe('UsersPage dating flow integration', () => {
     expect(screen.getByRole('heading', { name: 'alpha_match' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'beta_match' })).toBeVisible();
 
-    fireEvent.keyDown(screen.getByText('Odaberite kriterij'), {
-      key: 'ArrowDown',
-      code: 'ArrowDown',
-    });
-    fireEvent.click(screen.getByText('Ime'));
+    fireEvent.click(screen.getByRole('button', { name: 'Ime' }));
     fireEvent.change(screen.getByPlaceholderText('Pretraži prema imenu...'), {
       target: {
         value: 'alpha',

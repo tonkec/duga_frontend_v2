@@ -28,6 +28,13 @@ const isYouTubeUrl = (url: string) => {
   }
 };
 
+const hasEmbeddableContent = (value: string) =>
+  /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/.test(value) ||
+  /(?:https?:\/\/)?(?:(?:www\.)?giphy\.com\/(?:gifs|embed)\/[\w-]+|media[0-9]?\.giphy\.com\/media\/[\w-]+\/giphy\.gif)/.test(
+    value
+  ) ||
+  /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i.test(value);
+
 export interface IUserProfileCardProps {
   bio: string;
   sexuality: string;
@@ -86,12 +93,27 @@ const BooleanDetail = ({ label, value }: { label: string; value: boolean }) => (
   </div>
 );
 
-const ProfileSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="rounded-2xl border border-[#dce4ff] bg-white p-5 shadow-sm">
+const ProfileSection = ({
+  title,
+  children,
+  compact = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  compact?: boolean;
+}) => (
+  <section
+    className={`rounded-2xl border border-[#dce4ff] bg-white p-5 shadow-sm ${
+      compact ? 'w-fit max-w-full' : ''
+    }`}
+  >
     <h2 className="mb-3 font-bold text-gray-900">{title}</h2>
     <div className="text-gray-700">{children}</div>
   </section>
 );
+
+const hasDisplayValue = (value: string | number | null | undefined) =>
+  value !== undefined && value !== null && String(value).trim() !== '' && String(value) !== 'N/A';
 
 const UserProfileCard = ({
   user,
@@ -133,6 +155,50 @@ const UserProfileCard = ({
 
   const locationLabel =
     cityOptions.find((cityOption) => cityOption.value === user.location)?.label || 'N/A';
+  const lookingForLabel = getLookingForTranslation(user.lookingFor);
+  const relationshipStatusLabel = getRelationshipStatusTranslation(user.relationshipStatus);
+  const profileSummary = [
+    hasDisplayValue(locationLabel) ? locationLabel : null,
+    hasDisplayValue(user.age) ? `${user.age} godina` : null,
+  ].filter(Boolean);
+  const primaryDetails = [
+    {
+      icon: <BiSolidMap />,
+      label: 'Lokacija',
+      value: locationLabel,
+      shouldRender: hasDisplayValue(locationLabel),
+    },
+    {
+      icon: <BiBody />,
+      label: 'Rod',
+      value: user.gender,
+      shouldRender: hasDisplayValue(user.gender),
+    },
+    {
+      icon: <BiBoltCircle />,
+      label: 'Seksualnost',
+      value: user.sexuality,
+      shouldRender: hasDisplayValue(user.sexuality),
+    },
+    {
+      icon: <BiStopwatch />,
+      label: 'Godine',
+      value: user.age,
+      shouldRender: hasDisplayValue(user.age),
+    },
+  ].filter((detail) => detail.shouldRender);
+  const relationshipDetails = [
+    {
+      label: 'Tražim',
+      value: lookingForLabel,
+      shouldRender: hasDisplayValue(lookingForLabel),
+    },
+    {
+      label: 'Trenutno sam',
+      value: relationshipStatusLabel,
+      shouldRender: hasDisplayValue(relationshipStatusLabel),
+    },
+  ].filter((detail) => detail.shouldRender);
 
   return (
     <Card className="rounded-2xl p-5 md:p-7">
@@ -154,9 +220,9 @@ const UserProfileCard = ({
                 {isOnlineState ? 'Online' : 'Offline'}
               </span>
             </div>
-            <p className="mt-2 text-gray-600">
-              {locationLabel} {user.age ? `, ${user.age} godina` : ''}
-            </p>
+            {profileSummary.length > 0 && (
+              <p className="mt-2 text-gray-600">{profileSummary.join(', ')}</p>
+            )}
             {shouldRenderField(user.bio) && (
               <div className="mt-4 max-w-3xl text-gray-700">
                 <ContentFormatter text={user.bio} />
@@ -165,24 +231,26 @@ const UserProfileCard = ({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <ProfileDetail icon={<BiSolidMap />} label="Lokacija" value={locationLabel} />
-          <ProfileDetail icon={<BiBody />} label="Rod" value={user.gender || 'N/A'} />
-          <ProfileDetail
-            icon={<BiBoltCircle />}
-            label="Seksualnost"
-            value={user.sexuality || 'N/A'}
-          />
-          <ProfileDetail icon={<BiStopwatch />} label="Godine" value={user.age || 'N/A'} />
-        </div>
+        {primaryDetails.length > 0 && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {primaryDetails.map((detail) => (
+              <ProfileDetail
+                key={detail.label}
+                icon={detail.icon}
+                label={detail.label}
+                value={detail.value}
+              />
+            ))}
+          </div>
+        )}
 
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <ProfileDetail label="Tražim" value={getLookingForTranslation(user.lookingFor)} />
-          <ProfileDetail
-            label="Trenutno sam"
-            value={getRelationshipStatusTranslation(user.relationshipStatus)}
-          />
-        </div>
+        {relationshipDetails.length > 0 && (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {relationshipDetails.map((detail) => (
+              <ProfileDetail key={detail.label} label={detail.label} value={detail.value} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           <BooleanDetail label="Cigarete" value={user.cigarettes} />
@@ -199,45 +267,60 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.embarasement) && (
-          <ProfileSection title="Najsramotnija stvar koja mi se dogodila">
+          <ProfileSection
+            title="Najsramotnija stvar koja mi se dogodila"
+            compact={hasEmbeddableContent(user.embarasement)}
+          >
             <ContentFormatter text={user.embarasement} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.tooOldFor) && (
-          <ProfileSection title="Imam previše godina za...">
+          <ProfileSection
+            title="Imam previše godina za..."
+            compact={hasEmbeddableContent(user.tooOldFor)}
+          >
             <ContentFormatter text={user.tooOldFor} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.makesMyDay) && (
-          <ProfileSection title="Dan mi je ljepši ako...">
+          <ProfileSection
+            title="Dan mi je ljepši ako..."
+            compact={hasEmbeddableContent(user.makesMyDay)}
+          >
             <ContentFormatter text={user.makesMyDay} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.spirituality) && (
-          <ProfileSection title="Duhovnost/religioznost">
+          <ProfileSection
+            title="Duhovnost/religioznost"
+            compact={hasEmbeddableContent(user.spirituality)}
+          >
             <ContentFormatter text={user.spirituality} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.interests) && (
-          <ProfileSection title="Interesi">
+          <ProfileSection title="Interesi" compact={hasEmbeddableContent(user.interests)}>
             <ContentFormatter text={user.interests} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.languages) && (
-          <ProfileSection title="Jezici koje govorim">
+          <ProfileSection
+            title="Jezici koje govorim"
+            compact={hasEmbeddableContent(user.languages)}
+          >
             <ContentFormatter text={user.languages} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.favoriteSong) && (
-          <ProfileSection title="Najdraža YouTube pjesma">
+          <ProfileSection title="Najdraža YouTube pjesma" compact>
             {isYouTubeUrl(user.favoriteSong) ? (
-              <Iframe url={user.favoriteSong} width="100%" height="360" />
+              <Iframe url={user.favoriteSong} width="360" height="200" />
             ) : (
               <p className="text-red-500">Neispravan YouTube URL</p>
             )}
@@ -245,9 +328,9 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.favoriteMovie) && (
-          <ProfileSection title="Najdraži YouTube video">
+          <ProfileSection title="Najdraži YouTube video" compact>
             {isYouTubeUrl(user.favoriteMovie) ? (
-              <Iframe url={user.favoriteMovie} width="100%" height="360" />
+              <Iframe url={user.favoriteMovie} width="360" height="200" />
             ) : (
               <p className="text-red-500">Neispravan YouTube URL</p>
             )}
@@ -255,7 +338,7 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.ending) && (
-          <ProfileSection title="Za kraj ću reći još">
+          <ProfileSection title="Za kraj ću reći još" compact={hasEmbeddableContent(user.ending)}>
             <ContentFormatter text={user.ending} />
           </ProfileSection>
         )}

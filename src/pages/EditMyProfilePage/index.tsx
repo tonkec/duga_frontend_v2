@@ -103,6 +103,35 @@ type EmojiFieldName =
 
 const EMOJI_SHORTCODE_REGEX = /(?:\s|^):([^\s:]+)/;
 
+const selectStyles = {
+  control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
+    ...base,
+    minHeight: '3rem',
+    borderRadius: '1rem',
+    borderColor: state.isFocused ? '#2D46B9' : '#dce4ff',
+    boxShadow: state.isFocused ? '0 0 0 1px #2D46B9' : '0 1px 2px rgba(15, 23, 42, 0.05)',
+    '&:hover': {
+      borderColor: '#2D46B9',
+    },
+  }),
+  valueContainer: (base: Record<string, unknown>) => ({
+    ...base,
+    padding: '0 0.875rem',
+  }),
+  menu: (base: Record<string, unknown>) => ({
+    ...base,
+    borderRadius: '1rem',
+    overflow: 'hidden',
+    border: '1px solid #dce4ff',
+    boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
+  }),
+  option: (base: Record<string, unknown>, state: { isSelected: boolean; isFocused: boolean }) => ({
+    ...base,
+    backgroundColor: state.isSelected ? '#2D46B9' : state.isFocused ? '#f0f4ff' : 'white',
+    color: state.isSelected ? 'white' : '#111827',
+  }),
+};
+
 const searchEmojis = async (value: string) => {
   const emojis = await SearchIndex.search(value);
   return emojis.map((emoji: IEmoji) => emoji.skins[0].native);
@@ -289,7 +318,7 @@ const EditMyProfilePage = () => {
           <div className="relative">
             <Input
               type="text"
-              className={className}
+              className={`h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm ${className ?? ''}`}
               placeholder={placeholder}
               label={label}
               name={field.name}
@@ -326,7 +355,7 @@ const EditMyProfilePage = () => {
         return (
           <div className="relative">
             <TextArea
-              className={className}
+              className={`rounded-2xl border-[#dce4ff] bg-white text-base shadow-sm focus:border-blue ${className ?? ''}`}
               placeholder={placeholder}
               name={field.name}
               value={value}
@@ -375,7 +404,7 @@ const EditMyProfilePage = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <Input
                     type="text"
-                    className="!bg-gray-100"
+                    className="h-12 rounded-2xl border-[#dce4ff] !bg-gray-100 px-4 text-base"
                     placeholder="Korisničko ime"
                     value={currentUser?.data.username}
                     label="Korisničko ime"
@@ -383,7 +412,7 @@ const EditMyProfilePage = () => {
                   />
                   <Input
                     type="text"
-                    className="!bg-gray-100"
+                    className="h-12 rounded-2xl border-[#dce4ff] !bg-gray-100 px-4 text-base"
                     placeholder="Godine"
                     value={currentUser?.data?.age}
                     label="Dob"
@@ -401,6 +430,7 @@ const EditMyProfilePage = () => {
                         <Select
                           isClearable
                           {...field}
+                          styles={selectStyles}
                           options={cityOptions}
                           placeholder="Tvoja lokacija otprilike..."
                           theme={(theme) => ({
@@ -450,6 +480,7 @@ const EditMyProfilePage = () => {
                         <Select
                           isClearable
                           {...field}
+                          styles={selectStyles}
                           options={lookingForOptions}
                           placeholder="Trenutno tražim..."
                           theme={(theme) => ({
@@ -483,6 +514,7 @@ const EditMyProfilePage = () => {
                         <Select
                           isClearable
                           {...field}
+                          styles={selectStyles}
                           options={relationshipStatusOptions}
                           placeholder="Trenutno sam..."
                           theme={(theme) => ({
@@ -577,6 +609,7 @@ const EditMyProfilePage = () => {
                       <Select
                         isClearable
                         {...field}
+                        styles={selectStyles}
                         options={daysOfWeek}
                         placeholder="Najdraži dan u tjednu"
                         theme={(theme) => ({
@@ -711,8 +744,11 @@ const EditMyProfilePage = () => {
                 {errors.ending?.message && <FieldError message={errors.ending.message} />}
               </div>
 
-              <div className="max-w-3xl">
-                <Button type="blue" className="w-full">
+              <div className="flex max-w-3xl justify-end">
+                <Button
+                  type="blue"
+                  className="w-full rounded-full px-8 py-3 font-semibold shadow-md shadow-blue/20 md:w-auto"
+                >
                   Spremi
                 </Button>
               </div>

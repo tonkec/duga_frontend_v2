@@ -32,14 +32,14 @@ interface IUserCardProps {
 const getUserLocation = ({ location }: { location: string }) => {
   if (!location) {
     return (
-      <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+      <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
         <BiSolidMap className="text-blue" /> Lokacija nije unesena
       </p>
     );
   }
 
   return (
-    <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+    <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
       <BiSolidMap className="text-blue" /> {location}
     </p>
   );
@@ -48,7 +48,7 @@ const getUserLocation = ({ location }: { location: string }) => {
 const getUserAge = ({ age }: { age: number }) => {
   if (!age) {
     return (
-      <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+      <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
         <BiStopwatch className="text-blue" />
         Godine nisu unesene
       </p>
@@ -56,7 +56,7 @@ const getUserAge = ({ age }: { age: number }) => {
   }
 
   return (
-    <p className="text-gray-600 gap-1.5 flex items-center justify-center">
+    <p className="flex items-center gap-1.5 rounded-full bg-[#f7f9ff] px-3 py-1.5 text-gray-600">
       <BiStopwatch className="text-blue" /> {age} godina
     </p>
   );
@@ -86,35 +86,43 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
 
   return (
     <Card
-      className="group h-full rounded-2xl p-3 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer"
+      className="group h-full rounded-3xl !bg-white p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
       onClick={onButtonClick}
     >
-      <div className="relative w-full overflow-hidden rounded-xl bg-[#f7f9ff]">
+      <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-[#f7f9ff] to-[#eef3ff]">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
-          color="#f7f9ff"
+          color="#eef3ff"
           userId={String(user.id)}
           className="aspect-[4/3] w-full transition-transform duration-300 group-hover:scale-105"
           fgColor="#1f2937"
         />
         <span
           className={clsx(
-            'absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-semibold shadow-sm backdrop-blur',
-            isOnlineState ? 'bg-green text-white' : 'bg-white/90 text-gray-600'
+            'absolute right-3 top-3 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur',
+            isOnlineState
+              ? 'bg-green text-white'
+              : 'border border-[#dce4ff] bg-white/95 text-gray-600'
           )}
         >
           {isOnlineState ? 'Online' : 'Offline'}
         </span>
       </div>
-      <div className="flex flex-col justify-between text-center px-2 py-4">
-        <div className="min-h-[116px]">
-          <h3 className="text-xl font-bold text-gray-900">{user.username}</h3>
-          <div className="mt-3 space-y-1.5 text-sm">
+      <div className="flex flex-1 flex-col px-1 pb-1 pt-5 text-center">
+        <div className="flex flex-1 flex-col">
+          <h3 className="truncate text-2xl font-bold tracking-tight text-gray-950">
+            {user.username}
+          </h3>
+          <div className="mx-auto mt-4 flex flex-col items-center gap-2 text-sm">
             {getUserLocation(user)}
             {getUserAge(user)}
           </div>
 
-          <Button className="mt-5 w-full" onClick={onButtonClick} type="blue">
+          <Button
+            className="mt-5 w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
+            onClick={onButtonClick}
+            type="blue"
+          >
             Pogledaj profil
           </Button>
         </div>

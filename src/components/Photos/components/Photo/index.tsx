@@ -16,7 +16,9 @@ const Photo = ({ image, onClick }: IPhotoProps) => {
       src={imageBlob ? URL.createObjectURL(imageBlob) : getImageUrl(image)}
       alt="fotografija"
       onClick={onClick}
-      className={`rounded-md ${onClick ? 'cursor-pointer' : ''}`}
+      className={`h-full w-full rounded-2xl object-cover transition-transform duration-300 ${
+        onClick ? 'cursor-pointer group-hover:scale-[1.02]' : ''
+      }`}
     />
   );
 };
