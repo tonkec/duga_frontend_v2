@@ -28,6 +28,18 @@ const isYouTubeUrl = (url: string) => {
   }
 };
 
+const isImdbTitleUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return (
+      (parsed.hostname === 'www.imdb.com' || parsed.hostname === 'imdb.com') &&
+      /^\/title\/tt\d+\/?$/.test(parsed.pathname)
+    );
+  } catch {
+    return false;
+  }
+};
+
 const hasEmbeddableContent = (value: string) =>
   /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/.test(value) ||
   /(?:https?:\/\/)?(?:(?:www\.)?giphy\.com\/(?:gifs|embed)\/[\w-]+|media[0-9]?\.giphy\.com\/media\/[\w-]+\/giphy\.gif)/.test(
@@ -328,11 +340,18 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.favoriteMovie) && (
-          <ProfileSection title="Najdraži YouTube video" compact>
-            {isYouTubeUrl(user.favoriteMovie) ? (
-              <Iframe url={user.favoriteMovie} width="360" height="200" />
+          <ProfileSection title="Najdraži film" compact>
+            {isImdbTitleUrl(user.favoriteMovie) ? (
+              <a
+                href={user.favoriteMovie}
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-blue hover:underline"
+              >
+                Otvori na IMDb-u
+              </a>
             ) : (
-              <p className="text-red-500">Neispravan YouTube URL</p>
+              <p className="text-red-500">Neispravan IMDb film</p>
             )}
           </ProfileSection>
         )}

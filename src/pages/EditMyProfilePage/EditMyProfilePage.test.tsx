@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import EditMyProfilePage from '.';
 import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
@@ -49,18 +50,29 @@ const currentUser = {
   tooOldFor: 'Existing too old for answer',
   makesMyDay: 'Existing day-maker answer',
   favoriteSong: 'https://www.youtube.com/embed/song',
-  favoriteMovie: 'https://www.youtube.com/embed/movie',
+  favoriteMovie: 'https://www.imdb.com/title/tt0111161/',
   interests: 'music, testing',
   languages: 'hrvatski, english',
   ending: 'Existing ending text',
 };
 
-const renderEditPage = () =>
-  render(
+const renderEditPage = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  return render(
     <MemoryRouter>
-      <EditMyProfilePage />
+      <QueryClientProvider client={queryClient}>
+        <EditMyProfilePage />
+      </QueryClientProvider>
     </MemoryRouter>
   );
+};
 
 describe('EditMyProfilePage integration', () => {
   beforeEach(() => {
@@ -108,9 +120,7 @@ describe('EditMyProfilePage integration', () => {
     expect(
       screen.getByPlaceholderText('Najdraža youtube pjesma (https://www.youtube.com/embed/)')
     ).toHaveValue(currentUser.favoriteSong);
-    expect(
-      screen.getByPlaceholderText('Trailer za najdraži film (https://www.youtube.com/embed/)')
-    ).toHaveValue(currentUser.favoriteMovie);
+    expect(screen.getByText(currentUser.favoriteMovie)).toBeVisible();
     expect(
       screen.getByPlaceholderText('Reci nam nešto o svojoj duhovnosti/religioznosti')
     ).toHaveValue(currentUser.spirituality);
