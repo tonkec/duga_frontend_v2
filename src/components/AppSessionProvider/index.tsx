@@ -81,12 +81,6 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!user.email_verified) {
-      startedSessionKeyRef.current = null;
-      setStatus('active');
-      return;
-    }
-
     const sessionKey = `${user.sub}:${getAppSessionId()}`;
     if (startedSessionKeyRef.current === sessionKey) {
       setStatus('active');

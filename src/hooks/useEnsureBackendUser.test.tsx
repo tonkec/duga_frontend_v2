@@ -60,7 +60,7 @@ describe('useEnsureBackendUser', () => {
     get.mockResolvedValue({ data: { id: 1, username: 'current-user' } });
   });
 
-  it('uses the backend API token flow for verified users after registration', async () => {
+  it('uses the fresh Auth0 token for verified users after registration', async () => {
     mockUseAuth0.mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -81,7 +81,7 @@ describe('useEnsureBackendUser', () => {
       true,
       'auth0-access-token'
     );
-    expect(mockApiClient).toHaveBeenCalledWith();
+    expect(mockApiClient).toHaveBeenCalledWith('auth0-access-token');
     expect(get).toHaveBeenCalledWith('/users/current-user', {
       skipGlobalErrorHandler: true,
     });
