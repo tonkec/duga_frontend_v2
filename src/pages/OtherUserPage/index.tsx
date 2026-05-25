@@ -16,6 +16,7 @@ import Photos from '@app/components/Photos';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Loader from '@app/components/Loader';
 import SendMessageButton from '@app/components/SendMessageButton';
+import Button from '@app/components/Button';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { IChat } from '@app/pages/NewChatPage/hooks';
 import UserForumActivity, {

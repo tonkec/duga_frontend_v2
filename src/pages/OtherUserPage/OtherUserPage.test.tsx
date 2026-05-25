@@ -6,6 +6,7 @@ import OtherUserPage from '.';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
 import { useGetUserById } from '../../hooks/useGetUserById';
+import { useQuestionDetails, useQuestions } from '../../features/forum/hooks/useForum';
 
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
@@ -40,9 +41,16 @@ jest.mock('@app/pages/NewChatPage/hooks', () => ({
   }),
 }));
 
+jest.mock('@app/features/forum/hooks/useForum', () => ({
+  useQuestionDetails: jest.fn(),
+  useQuestions: jest.fn(),
+}));
+
 const mockUseGetAllImages = jest.mocked(useGetAllImages);
 const mockUseGetAllUserChats = jest.mocked(useGetAllUserChats);
 const mockUseGetUserById = jest.mocked(useGetUserById);
+const mockUseQuestions = jest.mocked(useQuestions);
+const mockUseQuestionDetails = jest.mocked(useQuestionDetails);
 
 const LocationProbe = () => {
   const location = useLocation();
@@ -92,6 +100,12 @@ describe('OtherUserPage existing chat integration', () => {
       userError: null,
       isUserLoading: false,
     } as ReturnType<typeof useGetUserById>);
+    mockUseQuestions.mockReturnValue({
+      data: { data: [], total: 0, page: 1, limit: 100, totalPages: 0 },
+      isError: false,
+      isPending: false,
+    } as unknown as ReturnType<typeof useQuestions>);
+    mockUseQuestionDetails.mockReturnValue([] as ReturnType<typeof useQuestionDetails>);
   });
 
   it('shows Nastavi razgovor when chat already exists with the user', () => {
