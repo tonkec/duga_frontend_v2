@@ -344,9 +344,9 @@ const UserProfileCard = ({
                 href={favoriteMovieUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex w-full items-stretch overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10"
+                className="group grid w-full overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10 sm:grid-cols-2"
               >
-                <span className="flex h-40 w-28 shrink-0 items-center justify-center bg-[#f5c518] text-xl font-black tracking-tight text-black sm:w-32">
+                <span className="flex min-h-[260px] w-full items-center justify-center bg-[#f5c518] text-xl font-black tracking-tight text-black">
                   {favoriteMoviePreview?.imageUrl ? (
                     <Image
                       src={favoriteMoviePreview.imageUrl}
@@ -357,7 +357,7 @@ const UserProfileCard = ({
                     'IMDb'
                   )}
                 </span>
-                <span className="flex min-w-0 flex-1 flex-col justify-center p-4">
+                <span className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
                   <span className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
                     IMDb preview
                   </span>

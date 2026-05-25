@@ -2,6 +2,7 @@ import { IImage } from '@app/components/Photos';
 import { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '@app/components/Button';
+import FileUploadInput from '@app/components/FileUploadInput';
 import Input from '@app/components/Input';
 import { BiTrash } from 'react-icons/bi';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
@@ -548,13 +549,14 @@ const PhotoUploader = () => {
               })}
           </div>
 
-          <div className="my-4 rounded-2xl border border-dashed border-[#b9c6ff] bg-[#f7f9ff] p-5">
-            <input
+          <div className="my-4">
+            <FileUploadInput
               ref={fileInputRef}
-              type="file"
               name="avatars"
               multiple
               accept={ALLOWED_FILE_TYPES}
+              label="Odaberi fotografije"
+              helperText={`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}. Maksimalno ${MAXIMUM_NUMBER_OF_IMAGES} fotografija.`}
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
@@ -591,7 +593,6 @@ const PhotoUploader = () => {
                   setNewImages((prev) => [...(prev || []), ...(images as IImage[])]);
                 }
               }}
-              className="w-full cursor-pointer rounded-xl bg-white p-3 text-sm text-gray-700"
               disabled={isUploadingPhotos}
             />
           </div>

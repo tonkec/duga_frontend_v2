@@ -12,7 +12,7 @@ import { clearAppSessionId, clearAppSessionRevoked } from '@app/api/appSession';
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { width } = useWindowSize();
-  const isMobile = width! < 768;
+  const isMobile = width! < 1000;
   const { logout } = useAuth0();
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;

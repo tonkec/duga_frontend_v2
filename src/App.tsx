@@ -12,6 +12,10 @@ import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 import Button from './components/Button';
 import { getLastOnlineUsers, getVisibleVerifiedUsers } from './utils/userDirectory';
 import { BiHeart, BiMessageRoundedDots, BiSearch, BiUserPlus } from 'react-icons/bi';
+import { useQuestion, useQuestions } from './features/forum/hooks/useForum';
+import type { Question } from './features/forum/types/forum.types';
+import { getVoteScore } from './features/forum/components/VoteControls';
+import RecordCreatedAt from './components/RecordCreatedAt';
 
 interface WelcomeHeroProps {
   onEditProfile: () => void;
@@ -239,6 +243,105 @@ const EmptyHomepageUsers = ({ onEditProfile, onBrowseUsers }: EmptyHomepageUsers
   </div>
 );
 
+const getQuestionAnswerCount = (question: Question) =>
+  Math.max(question.answerCount ?? 0, question.Answers?.length ?? 0);
+
+const getQuestionAuthorName = (question: Question) =>
+  question.User?.name || question.User?.username || 'Korisnik';
+
+const getLatestQuestion = (questions: Question[]) => {
+  return [...questions].sort(
+    (firstQuestion, secondQuestion) =>
+      new Date(secondQuestion.createdAt).getTime() - new Date(firstQuestion.createdAt).getTime()
+  )[0];
+};
+
+const LatestForumQuestion = ({ onOpenQuestion, onAskQuestion }: {
+  onOpenQuestion: (questionId: number) => void;
+  onAskQuestion: () => void;
+}) => {
+  const questionsQuery = useQuestions({ page: 1, limit: 10 });
+  const latestQuestionFromList = getLatestQuestion(questionsQuery.data?.data ?? []);
+  const questionQuery = useQuestion(latestQuestionFromList?.id);
+  const latestQuestion = questionQuery.data ?? latestQuestionFromList;
+
+  if (questionsQuery.isPending) {
+    return (
+      <section className="mt-12 rounded-3xl border border-[#dce4ff] bg-white py-10 shadow-sm">
+        <Loader variant="inline" label="Učitavanje zadnjeg pitanja..." />
+      </section>
+    );
+  }
+
+  if (!latestQuestion) {
+    return (
+      <section className="mt-12 rounded-3xl border border-[#dce4ff] bg-white p-6 shadow-sm">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Forum</p>
+        <h2 className="mt-1 text-2xl font-bold text-gray-900">Još nema pitanja</h2>
+        <p className="mt-2 text-sm leading-6 text-gray-600">
+          Budi prvi_a koji_a će otvoriti temu na forumu.
+        </p>
+        <Button type="blue" className="mt-5 rounded-full px-6 py-3" onClick={onAskQuestion}>
+          Postavi pitanje
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mt-12">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Forum</p>
+          <h2 className="mt-1 text-2xl font-bold text-gray-900">Zadnje pitanje s foruma</h2>
+        </div>
+        <Button type="transparent" onClick={() => onOpenQuestion(latestQuestion.id)}>
+          Otvori pitanje
+        </Button>
+      </div>
+
+      <article
+        role="button"
+        tabIndex={0}
+        onClick={() => onOpenQuestion(latestQuestion.id)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            onOpenQuestion(latestQuestion.id);
+          }
+        }}
+        className="cursor-pointer rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0">
+            <h3 className="text-xl font-bold text-gray-950">{latestQuestion.title}</h3>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500">
+              <span>
+                Autor:{' '}
+                <span className="font-semibold text-blue">
+                  {getQuestionAuthorName(latestQuestion)}
+                </span>
+              </span>
+              <RecordCreatedAt
+                createdAt={latestQuestion.createdAt}
+                className="!text-xs !text-gray-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-blue-dark">
+              {getQuestionAnswerCount(latestQuestion)} odgovora
+            </span>
+            <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-blue-dark">
+              {getVoteScore(latestQuestion)} glasova
+            </span>
+          </div>
+        </div>
+      </article>
+    </section>
+  );
+};
+
 function App() {
   const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
   const navigate = useNavigate();
@@ -309,13 +412,25 @@ function App() {
         )}
       </section>
 
+      <LatestForumQuestion
+        onOpenQuestion={(questionId) => navigate(`/forum/questions/${questionId}`)}
+        onAskQuestion={() => navigate('/forum/ask')}
+      />
+
       <LatestUploads />
 
       <LatestComments />
 
-      <div className="grid xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-12">
+      <section className="relative isolate mt-12 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-blue/10 via-white to-[#eef3ff] p-4 shadow-sm sm:p-5">
+        <div className="pointer-events-none absolute -left-20 top-6 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
+        <div className="relative z-10 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Brze akcije</p>
+          <h2 className="mt-1 text-2xl font-bold text-gray-900">Što želiš napraviti?</h2>
+        </div>
+        <div className="relative z-10 grid gap-4 sm:grid-cols-2">
         <Cta
-          className="flex-1"
+          className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
           title="Unaprijedi svoj profil"
           buttonText="Izmijeni profil"
           subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
@@ -323,7 +438,7 @@ function App() {
         />
 
         <Cta
-          className="flex-1"
+          className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
           title="Nemaš poruka?"
           subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu za čavrljanje 💬"
           buttonText="Nova poruka"
@@ -331,7 +446,15 @@ function App() {
         />
 
         <Cta
-          className="flex-1"
+          className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
+          title="Imaš pitanje?"
+          subtitle="Postavi pitanje na forumu i nađi odgovore od zajednice."
+          buttonText="Postavi pitanje"
+          onClick={() => navigate('/forum/ask')}
+        />
+
+        <Cta
+          className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
           title="Želiš li nam pomoći?"
           subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike. Piši nam na admin@duga.chat 🙏"
         >
@@ -342,7 +465,8 @@ function App() {
             Javi nam se
           </a>
         </Cta>
-      </div>
+        </div>
+      </section>
     </AppLayout>
   );
 }
