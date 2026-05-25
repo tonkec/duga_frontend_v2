@@ -28,7 +28,13 @@ jest.mock('./hooks', () => ({
   }),
 }));
 
+jest.mock('@app/api/youtube', () => ({
+  searchYouTubeVideos: jest.fn(),
+}));
+
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
+const mockSearchYouTubeVideos = jest.requireMock('@app/api/youtube')
+  .searchYouTubeVideos as jest.Mock;
 
 const currentUser = {
   id: 1,
@@ -117,9 +123,7 @@ describe('EditMyProfilePage integration', () => {
     expect(screen.getByPlaceholderText('Dan mi je ljepši ako...')).toHaveValue(
       currentUser.makesMyDay
     );
-    expect(
-      screen.getByPlaceholderText('Najdraža youtube pjesma (https://www.youtube.com/embed/)')
-    ).toHaveValue(currentUser.favoriteSong);
+    expect(screen.getByText(currentUser.favoriteSong)).toBeVisible();
     expect(screen.getByText(currentUser.favoriteMovie)).toBeVisible();
     expect(
       screen.getByPlaceholderText('Reci nam nešto o svojoj duhovnosti/religioznosti')
@@ -209,14 +213,6 @@ describe('EditMyProfilePage integration', () => {
         value: 'x'.repeat(101),
       },
     });
-    fireEvent.change(
-      screen.getByPlaceholderText('Najdraža youtube pjesma (https://www.youtube.com/embed/)'),
-      {
-        target: {
-          value: 'not-a-youtube-link',
-        },
-      }
-    );
     fireEvent.change(screen.getByPlaceholderText('Interesi (odvojeni zarezom)'), {
       target: {
         value: 'x'.repeat(201),
@@ -226,8 +222,44 @@ describe('EditMyProfilePage integration', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Spremi' }));
 
     expect(await screen.findAllByText('Polje ne smije biti dulje od 100 znakova.')).toHaveLength(1);
-    expect(screen.getByText('Mora biti YouTube link (youtube.com ili youtu.be)')).toBeVisible();
     expect(screen.getByText('Polje ne smije biti dulje od 200 znakova.')).toBeVisible();
     expect(updateUserMutation).not.toHaveBeenCalled();
+  });
+
+  it('searches YouTube songs and saves the selected video URL', async () => {
+    mockSearchYouTubeVideos.mockResolvedValue([
+      {
+        id: 'dQw4w9WgXcQ',
+        title: 'Favorite Song',
+        channelTitle: 'Favorite Channel',
+        thumbnailUrl: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
+        url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      },
+    ]);
+
+    renderEditPage();
+
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Korisničko ime')).toHaveValue(currentUser.username)
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Pretraži YouTube pjesmu...'), {
+      target: {
+        value: 'favorite song',
+      },
+    });
+
+    expect(await screen.findByText('Favorite Song')).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: /Favorite Song/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Spremi' }));
+
+    await waitFor(() =>
+      expect(updateUserMutation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          favoriteSong: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        })
+      )
+    );
   });
 });

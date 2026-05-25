@@ -1,5 +1,5 @@
 import { IImage } from '@app/components/Photos';
-import { SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '@app/components/Button';
 import Input from '@app/components/Input';
@@ -156,18 +156,22 @@ const PhotoUploader = () => {
   const { deletePhoto } = useDeletePhoto();
   const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos();
   const [newImages, setNewImages] = useState<IImage[]>();
+  const existingImages = useMemo<IImage[]>(
+    () => allExistingImages?.data?.images || [],
+    [allExistingImages]
+  );
   const [allCheckboxes, setAllCheckboxes] = useState<{ index: number; isProfilePhoto: boolean }[]>(
     []
   );
 
   useEffect(() => {
-    if (allExistingImages && allExistingImages.data.images.length > 0) {
-      const checkboxes = allExistingImages.data.images.map((image: IImage, index: number) => {
+    if (existingImages.length > 0) {
+      const checkboxes = existingImages.map((image: IImage, index: number) => {
         return { index, isProfilePhoto: image.isProfilePhoto || false };
       });
       setAllCheckboxes(checkboxes);
     }
-  }, [allExistingImages]);
+  }, [existingImages]);
 
   const handleEmojiSearch = async (descriptionId: string, value: string) => {
     const searchTerm = getEmojiSearchQueryFromText(value);
@@ -303,7 +307,7 @@ const PhotoUploader = () => {
     const changedDescriptionsById = new Map(
       updatedImageDescriptions.map((image) => [removeSpacesAndDashes(image.imageId), image])
     );
-    const imagesPayload = allExistingImages.data.images.map((image: IImage, index: number) => {
+    const imagesPayload = existingImages.map((image: IImage, index: number) => {
       const imageId = removeSpacesAndDashes(image.name);
       const changedDescription = changedDescriptionsById.get(imageId)?.description;
       const currentDescription = normalizeDescription(
@@ -325,7 +329,7 @@ const PhotoUploader = () => {
     onUploadPhotos(formData);
   };
 
-  const shouldShowEditable = allExistingImages && allExistingImages.data.images.length > 0;
+  const shouldShowEditable = existingImages.length > 0;
 
   if (isCurrentUserLoading) {
     return (
@@ -360,7 +364,7 @@ const PhotoUploader = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {allExistingImages.data.images.map((image: IImage, index: number) => {
+              {existingImages.map((image: IImage, index: number) => {
                 const imageId = removeSpacesAndDashes(image.name);
                 const inputValue = getDescriptionInputValue(imageId, image.description);
 

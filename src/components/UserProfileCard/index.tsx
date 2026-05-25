@@ -6,7 +6,6 @@ import {
   getRelationshipStatusTranslation,
   shouldRenderField,
 } from './utils';
-import Iframe from 'react-iframe';
 import { IImage } from '@app/components/Photos';
 import Loader from '@app/components/Loader';
 import { useSocket } from '@app/context/useSocket';
@@ -14,31 +13,8 @@ import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
 import ContentFormatter from '../ContentFormatter';
 import { cityOptions } from '@app/consts/cityOptions';
-
-const isYouTubeUrl = (url: string) => {
-  try {
-    const parsed = new URL(url);
-    return (
-      parsed.hostname === 'www.youtube.com' ||
-      parsed.hostname === 'youtube.com' ||
-      parsed.hostname === 'youtu.be'
-    );
-  } catch {
-    return false;
-  }
-};
-
-const isImdbTitleUrl = (url: string) => {
-  try {
-    const parsed = new URL(url);
-    return (
-      (parsed.hostname === 'www.imdb.com' || parsed.hostname === 'imdb.com') &&
-      /^\/title\/tt\d+\/?$/.test(parsed.pathname)
-    );
-  } catch {
-    return false;
-  }
-};
+import { getImdbTitleId, getImdbTitleUrl } from '@app/utils/imdb';
+import { getYouTubeEmbedUrl, isYouTubeUrl } from '@app/utils/youtube';
 
 const hasEmbeddableContent = (value: string) =>
   /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/.test(value) ||
@@ -211,6 +187,9 @@ const UserProfileCard = ({
       shouldRender: hasDisplayValue(relationshipStatusLabel),
     },
   ].filter((detail) => detail.shouldRender);
+  const favoriteSongEmbedUrl = getYouTubeEmbedUrl(user.favoriteSong);
+  const favoriteMovieUrl = getImdbTitleUrl(user.favoriteMovie);
+  const favoriteMovieId = getImdbTitleId(user.favoriteMovie);
 
   return (
     <Card className="rounded-2xl p-5 md:p-7">
@@ -331,8 +310,15 @@ const UserProfileCard = ({
 
         {shouldRenderField(user.favoriteSong) && (
           <ProfileSection title="Najdraža YouTube pjesma" compact>
-            {isYouTubeUrl(user.favoriteSong) ? (
-              <Iframe url={user.favoriteSong} width="360" height="200" />
+            {isYouTubeUrl(user.favoriteSong) && favoriteSongEmbedUrl ? (
+              <iframe
+                src={favoriteSongEmbedUrl}
+                width="360"
+                height="200"
+                title="Najdraža YouTube pjesma"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             ) : (
               <p className="text-red-500">Neispravan YouTube URL</p>
             )}
@@ -341,14 +327,29 @@ const UserProfileCard = ({
 
         {shouldRenderField(user.favoriteMovie) && (
           <ProfileSection title="Najdraži film" compact>
-            {isImdbTitleUrl(user.favoriteMovie) ? (
+            {favoriteMovieUrl ? (
               <a
-                href={user.favoriteMovie}
+                href={favoriteMovieUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="font-semibold text-blue hover:underline"
+                className="group flex w-72 max-w-full items-stretch overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10"
               >
-                Otvori na IMDb-u
+                <span className="flex w-20 shrink-0 items-center justify-center bg-[#f5c518] px-3 text-xl font-black tracking-tight text-black">
+                  IMDb
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col justify-center p-4">
+                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
+                    IMDb preview
+                  </span>
+                  <span className="mt-1 font-bold text-gray-950 group-hover:text-blue">
+                    Otvori najdraži film
+                  </span>
+                  {favoriteMovieId && (
+                    <span className="mt-1 text-sm font-semibold text-gray-500">
+                      {favoriteMovieId}
+                    </span>
+                  )}
+                </span>
               </a>
             ) : (
               <p className="text-red-500">Neispravan IMDb film</p>

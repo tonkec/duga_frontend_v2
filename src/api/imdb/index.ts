@@ -1,3 +1,5 @@
+import { formatImdbTitleUrl } from '@app/utils/imdb';
+
 export interface ImdbTitle {
   id: string;
   title: string;
@@ -75,7 +77,7 @@ const normalizeImdbTitle = (item: ImdbSearchItem): ImdbTitle | null => {
     title,
     year: year ? String(year) : undefined,
     imageUrl: item.i?.imageUrl || item.imageUrl || item.image?.url,
-    url: item.url || `https://www.imdb.com/title/${id}/`,
+    url: formatImdbTitleUrl(id),
   };
 };
 

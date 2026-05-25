@@ -24,11 +24,14 @@ import data from '@emoji-mart/data';
 import { init } from 'emoji-mart';
 import { useQuery } from '@tanstack/react-query';
 import { searchImdbTitles, ImdbTitle } from '@app/api/imdb';
+import { searchYouTubeVideos, YouTubeVideo } from '@app/api/youtube';
 import {
   getEmojiSearchQueryFromText,
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
+import { getImdbTitleUrl, isImdbTitleUrl } from '@app/utils/imdb';
+import { getYouTubeEmbedUrl } from '@app/utils/youtube';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -139,18 +142,6 @@ const maxProfileTextLength = (maxLength: number) =>
       message: `Polje ne smije biti dulje od ${maxLength} znakova.`,
     })
     .optional();
-
-const isImdbTitleUrl = (value: string) => {
-  try {
-    const url = new URL(value);
-    return (
-      (url.hostname === 'www.imdb.com' || url.hostname === 'imdb.com') &&
-      /^\/title\/tt\d+\/?$/.test(url.pathname)
-    );
-  } catch {
-    return false;
-  }
-};
 
 const schema = z.object({
   bio: maxProfileTextLength(100),
@@ -312,6 +303,127 @@ const ImdbMovieSearch = ({
   );
 };
 
+const YouTubeSongSearch = ({
+  value,
+  error,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  onChange: (value: string) => void;
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setDebouncedSearchTerm(searchTerm.trim()), 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const {
+    data: youtubeVideos = [],
+    error: youtubeError,
+    isPending: isYouTubeLoading,
+  } = useQuery({
+    queryKey: ['youtubeVideos', debouncedSearchTerm],
+    queryFn: () => searchYouTubeVideos(debouncedSearchTerm),
+    enabled: debouncedSearchTerm.length >= 2,
+    retry: false,
+  });
+
+  const handleSongSelect = (video: YouTubeVideo) => {
+    onChange(video.url);
+    setSearchTerm(video.channelTitle ? `${video.title} - ${video.channelTitle}` : video.title);
+  };
+
+  const handleSongClear = () => {
+    onChange('');
+    setSearchTerm('');
+  };
+
+  return (
+    <div className="mb-4">
+      <div className="mb-2 flex items-center gap-1">
+        <Label>Unesi svoju najdražu pjesmu sa Youtube-a</Label>
+        <span data-tooltip-id="youtubesong">
+          <BiInfoCircle fontSize={20} />
+        </span>
+        <Tooltip
+          id="youtubesong"
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+          }}
+        >
+          Pretraži YouTube i odaberi pjesmu iz rezultata.
+        </Tooltip>
+      </div>
+
+      <Input
+        type="text"
+        className="h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
+        placeholder="Pretraži YouTube pjesmu..."
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+
+      {error && <FieldError message={error} />}
+
+      {value && (
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#dce4ff] bg-white px-3 py-2 text-sm text-gray-700">
+          <span>
+            Odabrana YouTube pjesma:{' '}
+            <a href={value} target="_blank" rel="noreferrer" className="font-semibold text-blue">
+              {value}
+            </a>
+          </span>
+          <button type="button" onClick={handleSongClear} className="font-semibold text-red-500">
+            Ukloni
+          </button>
+        </div>
+      )}
+
+      {debouncedSearchTerm.length >= 2 && (
+        <div className="mt-2 rounded-2xl border border-[#dce4ff] bg-white p-3 shadow-sm">
+          {isYouTubeLoading ? (
+            <div className="py-4 text-center text-gray-500">Pretražujem YouTube...</div>
+          ) : youtubeError ? (
+            <div className="py-4 text-center text-red-500">{youtubeError.message}</div>
+          ) : youtubeVideos.length > 0 ? (
+            <div className="grid max-h-72 gap-2 overflow-y-auto">
+              {youtubeVideos.map((video) => (
+                <button
+                  key={video.id}
+                  type="button"
+                  onClick={() => handleSongSelect(video)}
+                  className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-[#f0f4ff]"
+                >
+                  {video.thumbnailUrl && (
+                    <Image
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      className="h-16 w-24 rounded object-cover"
+                    />
+                  )}
+                  <span>
+                    <span className="block font-semibold text-gray-900">{video.title}</span>
+                    {video.channelTitle && (
+                      <span className="text-sm text-gray-500">{video.channelTitle}</span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="py-4 text-center text-gray-500">Nema pronađenih pjesama</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const EditMyProfilePage = () => {
   init({ data });
 
@@ -331,6 +443,7 @@ const EditMyProfilePage = () => {
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
+  const favoriteSong = watch('favoriteSong') || '';
   const favoriteMovie = watch('favoriteMovie') || '';
 
   useEffect(() => {
@@ -368,6 +481,10 @@ const EditMyProfilePage = () => {
     if (isValid) {
       updateUserMutation({
         ...data,
+        age: data.age || currentUser?.data?.age || '',
+        favoriteDay: data.favoriteDay || currentUser?.data?.favoriteDayOfWeek || '',
+        favoriteSong: data.favoriteSong ? getYouTubeEmbedUrl(data.favoriteSong) || '' : '',
+        favoriteMovie: data.favoriteMovie ? getImdbTitleUrl(data.favoriteMovie) || '' : '',
       });
     }
   };
@@ -761,30 +878,17 @@ const EditMyProfilePage = () => {
                 })}
                 {errors.makesMyDay?.message && <FieldError message={errors.makesMyDay.message} />}
 
-                <Input
-                  label={
-                    <div className="flex items-center gap-1">
-                      <span>Unesi svoju najdražu pjesmu sa Youtube-a</span>
-                      <span data-tooltip-id="youtubesong">
-                        <BiInfoCircle fontSize={20} />
-                      </span>
-                      <Tooltip
-                        id="youtubesong"
-                        style={{
-                          backgroundColor: 'black',
-                          color: 'white',
-                        }}
-                      >
-                        Unesi link u formatu <code>https://www.youtube.com/embed/</code>
-                      </Tooltip>
-                    </div>
-                  }
-                  type="text"
-                  className="mb-4 h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
-                  placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
-                  {...register('favoriteSong')}
+                <YouTubeSongSearch
+                  value={favoriteSong}
                   error={errors.favoriteSong?.message}
+                  onChange={(songUrl) =>
+                    setValue('favoriteSong', songUrl, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
                 />
+                <input type="hidden" {...register('favoriteSong')} />
 
                 <ImdbMovieSearch
                   value={favoriteMovie}

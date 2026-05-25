@@ -106,6 +106,7 @@ NODE_ENV=development
 
 ```env
 VITE_BASE_URL=http://localhost:8080
+VITE_YOUTUBE_API_KEY=your-youtube-data-api-key
 
 ```
 
