@@ -1,9 +1,13 @@
 import { apiClient } from '@app/api';
 import {
+  addAnswerReaction,
   createAnswer,
+  createAnswerReply,
   createQuestion,
   deleteAnswer,
   deleteAnswerImage,
+  deleteAnswerReply,
+  deleteAnswerReaction,
   deleteAnswerVote,
   deleteQuestion,
   deleteQuestionImage,
@@ -11,11 +15,12 @@ import {
   getQuestion,
   getQuestions,
   updateAnswer,
+  updateAnswerReply,
   updateQuestion,
   voteAnswer,
   voteQuestion,
 } from './forumApi';
-import type { Answer, Question } from '../types/forum.types';
+import type { Answer, AnswerReply, Question } from '../types/forum.types';
 
 jest.mock('@app/api', () => ({
   apiClient: jest.fn(),
@@ -80,6 +85,23 @@ const answerResponse = (overrides: Partial<Answer> = {}): Answer => ({
   ...overrides,
 });
 
+const answerReplyResponse = (overrides: Partial<AnswerReply> = {}): AnswerReply => ({
+  id: 101,
+  answerId: 11,
+  userId: 7,
+  body: 'Reply text',
+  createdAt: '2026-05-25T10:10:00.000Z',
+  updatedAt: '2026-05-25T10:10:00.000Z',
+  User: {
+    id: 7,
+    username: 'ana',
+    firstName: 'Ana',
+    lastName: 'Test',
+    avatar: 'ana.png',
+  },
+  ...overrides,
+});
+
 describe('forumApi CRUD', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -137,6 +159,7 @@ describe('forumApi CRUD', () => {
         body: 'Opis pitanja',
         categoryId: 5,
         images: [firstImage, secondImage],
+        taggedUserIds: [7, 8],
       });
 
       expect(post).toHaveBeenCalledWith('/forum/questions', expect.any(FormData), {
@@ -149,6 +172,7 @@ describe('forumApi CRUD', () => {
       expect(formData.get('body')).toBe('Opis pitanja');
       expect(formData.get('categoryId')).toBe('5');
       expect(formData.getAll('questionImage')).toEqual([firstImage, secondImage]);
+      expect(formData.get('taggedUserIds')).toBe('[7,8]');
       expect(result.id).toBe(101);
     });
 
@@ -247,6 +271,7 @@ describe('forumApi CRUD', () => {
       const result = await createAnswer(1, {
         body: 'Novi odgovor',
         images: [firstImage, secondImage],
+        taggedUserIds: [7, 8],
       });
 
       expect(post).toHaveBeenCalledWith('/forum/questions/1/answers', expect.any(FormData), {
@@ -257,6 +282,7 @@ describe('forumApi CRUD', () => {
       const formData = post.mock.calls[0][1] as FormData;
       expect(formData.get('body')).toBe('Novi odgovor');
       expect(formData.getAll('answerImage')).toEqual([firstImage, secondImage]);
+      expect(formData.get('taggedUserIds')).toBe('[7,8]');
       expect(result.id).toBe(55);
       expect(result.User?.name).toBe('Ivo Test');
     });
@@ -299,6 +325,104 @@ describe('forumApi CRUD', () => {
       await deleteAnswerImage(11);
 
       expect(deleteRequest).toHaveBeenCalledWith('/forum/answers/11/image', {
+        skipGlobalErrorHandler: true,
+      });
+    });
+
+    it('creates, updates and deletes answer replies', async () => {
+      post.mockResolvedValueOnce({ data: { data: answerReplyResponse({ id: 101 }) } });
+      patch.mockResolvedValueOnce({
+        data: { data: answerReplyResponse({ id: 101, body: 'Updated reply text' }) },
+      });
+      deleteRequest.mockResolvedValueOnce({});
+
+      const createdReply = await createAnswerReply(11, { body: 'Reply text' });
+      const updatedReply = await updateAnswerReply(101, { body: 'Updated reply text' });
+      await deleteAnswerReply(101);
+
+      expect(post).toHaveBeenCalledWith(
+        '/forum/answers/11/replies',
+        { body: 'Reply text' },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(patch).toHaveBeenCalledWith(
+        '/forum/answer-replies/101',
+        { body: 'Updated reply text' },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(deleteRequest).toHaveBeenCalledWith('/forum/answer-replies/101', {
+        skipGlobalErrorHandler: true,
+      });
+      expect(createdReply?.User?.name).toBe('Ana Test');
+      expect(updatedReply?.body).toBe('Updated reply text');
+    });
+
+    it('adds an answer reaction', async () => {
+      post.mockResolvedValue({
+        data: {
+          data: answerResponse({
+            reactions: [{ emoji: '👍', count: 1, reactedByCurrentUser: true }],
+          }),
+        },
+      });
+
+      const result = await addAnswerReaction(11, { emoji: '👍' });
+
+      expect(post).toHaveBeenCalledWith(
+        '/forum/answers/11/reactions',
+        { emoji: '👍' },
+        {
+          skipGlobalErrorHandler: true,
+        }
+      );
+      expect(result?.reactions).toEqual([
+        {
+          emoji: '👍',
+          count: 1,
+          reactedByCurrentUser: true,
+          userIds: [],
+        },
+      ]);
+    });
+
+    it('normalizes current user answer reactions from userReactions', async () => {
+      post.mockResolvedValue({
+        data: {
+          data: answerResponse({
+            reactions: [{ emoji: '👍', count: 2 }],
+            userReactions: ['👍'],
+          }),
+        },
+      });
+
+      const result = await addAnswerReaction(11, { emoji: '👍' });
+
+      expect(result?.reactions?.[0]).toEqual({
+        emoji: '👍',
+        count: 2,
+        reactedByCurrentUser: true,
+        userIds: [],
+      });
+    });
+
+    it('deletes an answer reaction with a request body', async () => {
+      deleteRequest.mockResolvedValue({
+        data: {
+          data: answerResponse({
+            reactions: [],
+          }),
+        },
+      });
+
+      await deleteAnswerReaction(11, { emoji: '👍' });
+
+      expect(deleteRequest).toHaveBeenCalledWith('/forum/answers/11/reactions', {
+        data: { emoji: '👍' },
+        params: { emoji: '👍' },
         skipGlobalErrorHandler: true,
       });
     });

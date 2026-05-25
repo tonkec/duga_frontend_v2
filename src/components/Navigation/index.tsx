@@ -8,6 +8,11 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useSocket } from '@app/context/useSocket';
 import { setOfflineStatus } from '@app/utils/setOfflineStatus';
 import { clearAppSessionId, clearAppSessionRevoked } from '@app/api/appSession';
+import { useGetAllNotifcations } from './hooks';
+
+type NotificationSummary = {
+  isRead: boolean;
+};
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,6 +21,27 @@ const Navigation = () => {
   const { logout } = useAuth0();
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
+  const { allNotifications } = useGetAllNotifcations();
+  const unreadNotificationsCount = ((allNotifications?.data ?? []) as NotificationSummary[]).filter(
+    (notification) => !notification.isRead
+  ).length;
+  const hasUnreadNotifications = unreadNotificationsCount > 0;
+
+  useEffect(() => {
+    const notificationTitlePrefix = /^\(\d+\)\s+/;
+    const titleWithoutNotificationCount = document.title.replace(notificationTitlePrefix, '');
+
+    document.title = hasUnreadNotifications
+      ? `(${unreadNotificationsCount}) ${titleWithoutNotificationCount}`
+      : titleWithoutNotificationCount;
+  }, [hasUnreadNotifications, unreadNotificationsCount]);
+
+  useEffect(
+    () => () => {
+      document.title = document.title.replace(/^\(\d+\)\s+/, '');
+    },
+    []
+  );
 
   const socket = useSocket();
 
@@ -66,10 +92,17 @@ const Navigation = () => {
           <div className="flex items-center justify-end rounded-3xl border border-white/15 bg-white/10 px-4 py-3 shadow-lg shadow-blue-dark/10 backdrop-blur-md">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="rounded-full bg-white/15 p-2.5 text-white transition-colors hover:bg-white/25"
+              className="relative rounded-full bg-white/15 p-2.5 text-white transition-colors hover:bg-white/25"
               aria-label="Otvori navigaciju"
             >
               <FiMenu size={24} />
+              {hasUnreadNotifications && (
+                <span
+                  role="status"
+                  aria-label="Nove obavijesti"
+                  className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white/80"
+                />
+              )}
             </button>
           </div>
         </div>

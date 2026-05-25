@@ -6,6 +6,7 @@ import EmojiSearch from '@app/components/EmojiSearch';
 import FileUploadInput from '@app/components/FileUploadInput';
 import GiphySearch from '@app/components/GiphySearch';
 import Image from '@app/components/Image';
+import MentionInput from '@app/components/MentionInput';
 import { BiImageAdd, BiSmile, BiSolidFileGif } from 'react-icons/bi';
 import data from '@emoji-mart/data';
 import { init } from 'emoji-mart';
@@ -27,6 +28,7 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
   init({ data });
 
   const [body, setBody] = useState('');
+  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
@@ -78,8 +80,13 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
       : trimmedBody;
 
     setError(null);
-    onSubmit({ body: bodyWithGif, images });
+    onSubmit({
+      body: bodyWithGif,
+      images,
+      taggedUserIds: taggedUsers.map((user) => Number(user.id)),
+    });
     setBody('');
+    setTaggedUsers([]);
     setImages([]);
     setSelectedGifUrl('');
     setCurrentEmojis([]);
@@ -95,16 +102,16 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
       <label htmlFor="answer-body" className="text-sm font-bold text-gray-950">
         Tvoj odgovor
       </label>
-      <textarea
-        id="answer-body"
+      <MentionInput
         value={body}
-        onChange={(event) => {
-          updateBody(event.target.value);
-        }}
+        onChange={updateBody}
+        onTagUsersChange={setTaggedUsers}
+        initialTaggedUsers={taggedUsers}
         rows={5}
         maxLength={ANSWER_MAX_LENGTH}
-        className="mt-2 w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm leading-6 outline-none transition-colors focus:border-blue"
-        placeholder="Napiši odgovor... Upiši : za brzi emoji."
+        className="mt-2"
+        textareaClassName="text-sm"
+        placeholder="Napiši odgovor... Upiši @ za označavanje osobe ili : za brzi emoji."
       />
       <p className="mt-1 text-right text-xs text-gray-400">
         {body.length}/{ANSWER_MAX_LENGTH}

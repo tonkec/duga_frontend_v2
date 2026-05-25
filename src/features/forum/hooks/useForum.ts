@@ -3,16 +3,21 @@ import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/rea
 import { useSocket } from '@app/context/useSocket';
 import {
   acceptAnswer,
+  addAnswerReaction,
+  createAnswerReply,
   createAnswer,
   createQuestion,
   deleteAnswer,
   deleteAnswerImage,
+  deleteAnswerReply,
+  deleteAnswerReaction,
   deleteAnswerVote,
   deleteQuestion,
   deleteQuestionImage,
   deleteQuestionVote,
   getQuestion,
   getQuestions,
+  updateAnswerReply,
   updateAnswer,
   updateQuestion,
   voteAnswer,
@@ -20,11 +25,14 @@ import {
 } from '../api/forumApi';
 import type {
   Answer,
+  AnswerReply,
+  AnswerReplyPayload,
   CreateAnswerPayload,
   CreateQuestionPayload,
   ForumUser,
   GetQuestionsParams,
   Question,
+  ReactionPayload,
   UpdateAnswerPayload,
   UpdateQuestionPayload,
   VoteMetadata,
@@ -46,6 +54,7 @@ const FORUM_SOCKET_EVENTS = [
   'forum-answer-updated',
   'forum-answer-deleted',
   'forum-answer-accepted',
+  'forum-answer-reaction-updated',
   'forum-question-vote-updated',
   'forum-answer-vote-updated',
 ] as const;
@@ -223,6 +232,91 @@ const updateCachedAnswerVoteFromSocket = (
   };
 };
 
+const getReactionEmojiFromPayload = (payload: ForumSocketEnvelope) => {
+  if (!isRecord(payload.data)) return undefined;
+  return typeof payload.data.emoji === 'string' ? payload.data.emoji : undefined;
+};
+
+const getAnswerReactionsFromPayload = (
+  payload: ForumSocketEnvelope,
+  cachedAnswer: Answer
+): Answer['reactions'] => {
+  if (!isRecord(payload.data) || !Array.isArray(payload.data.reactions)) return undefined;
+
+  return payload.data.reactions
+    .filter((reaction): reaction is Record<string, unknown> => isRecord(reaction))
+    .map((reaction) => {
+      const emoji = typeof reaction.emoji === 'string' ? reaction.emoji : '';
+      const count = toNumber(reaction.count) ?? 0;
+      const existingReaction = cachedAnswer.reactions?.find(
+        (currentReaction) => currentReaction.emoji === emoji
+      );
+
+      return {
+        emoji,
+        count,
+        reactedByCurrentUser: existingReaction?.reactedByCurrentUser,
+      };
+    })
+    .filter((reaction) => reaction.emoji && reaction.count > 0);
+};
+
+const updateCachedAnswerReactionFromSocket = (
+  question: Question | undefined,
+  payload: ForumSocketEnvelope
+): Question | undefined => {
+  if (!question?.Answers || !isRecord(payload.data)) return question;
+
+  const answer = getAnswerFromPayload(payload);
+  if (answer) return mergeCachedAnswer(question, answer);
+
+  const answerId = getAnswerIdFromPayload(payload);
+  if (!answerId) return question;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((cachedAnswer) => {
+      if (cachedAnswer.id !== answerId) return cachedAnswer;
+
+      const reactionData = payload.data as Record<string, unknown>;
+      const reactionsFromPayload = getAnswerReactionsFromPayload(payload, cachedAnswer);
+      const reactionCount = toNumber(reactionData.reactionCount);
+
+      if (reactionsFromPayload) {
+        return {
+          ...cachedAnswer,
+          reactions: reactionsFromPayload,
+          reactionCount,
+        };
+      }
+
+      const emoji = getReactionEmojiFromPayload(payload);
+      if (!emoji) return cachedAnswer;
+
+      const reactions = cachedAnswer.reactions ?? [];
+      const nextCount = toNumber(reactionData.count) ?? toNumber(reactionData.reactionCount);
+      const reactedByCurrentUser =
+        typeof reactionData.reactedByCurrentUser === 'boolean'
+          ? reactionData.reactedByCurrentUser
+          : undefined;
+      const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
+      const nextReaction = {
+        emoji,
+        count: nextCount ?? existingReaction?.count ?? 0,
+        reactedByCurrentUser: reactedByCurrentUser ?? existingReaction?.reactedByCurrentUser,
+      };
+      const nextReactions = reactions.some((reaction) => reaction.emoji === emoji)
+        ? reactions.map((reaction) => (reaction.emoji === emoji ? nextReaction : reaction))
+        : [...reactions, nextReaction];
+
+      return {
+        ...cachedAnswer,
+        reactions: nextReactions.filter((reaction) => reaction.count > 0),
+      };
+    }),
+  };
+};
+
 const updateCachedQuestionFromSocket = (
   question: Question | undefined,
   event: ForumSocketEvent,
@@ -243,6 +337,8 @@ const updateCachedQuestionFromSocket = (
     }
     case 'forum-answer-accepted':
       return applyAcceptedAnswer(question, payload);
+    case 'forum-answer-reaction-updated':
+      return updateCachedAnswerReactionFromSocket(question, payload);
     case 'forum-question-vote-updated':
       return updateCachedQuestionVote(question, payload);
     case 'forum-answer-vote-updated':
@@ -362,6 +458,101 @@ const updateCachedAnswerVote = (
     Answers: question.Answers.map((answer) =>
       answer.id === answerId ? applyCachedVote(answer, vote) : answer
     ),
+  };
+};
+
+const updateCachedAnswerReaction = (
+  question: Question | undefined,
+  answerId: number,
+  emoji: string,
+  reactedByCurrentUser: boolean
+) => {
+  if (!question?.Answers) return question;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((answer) => {
+      if (answer.id !== answerId) return answer;
+
+      const reactions = answer.reactions ?? [];
+      const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
+      const nextCount = reactedByCurrentUser
+        ? (existingReaction?.count ?? 0) + (existingReaction?.reactedByCurrentUser ? 0 : 1)
+        : Math.max(
+            0,
+            (existingReaction?.count ?? 0) - (existingReaction?.reactedByCurrentUser ? 1 : 0)
+          );
+      const nextReaction = {
+        emoji,
+        count: nextCount,
+        reactedByCurrentUser,
+      };
+      const nextReactions = existingReaction
+        ? reactions.map((reaction) => (reaction.emoji === emoji ? nextReaction : reaction))
+        : [...reactions, nextReaction];
+
+      return {
+        ...answer,
+        reactions: nextReactions.filter((reaction) => reaction.count > 0),
+      };
+    }),
+  };
+};
+
+const addCachedAnswerReply = (
+  question: Question | undefined,
+  answerId: number,
+  reply: AnswerReply
+): Question | undefined => {
+  if (!question?.Answers) return question;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((answer) => {
+      if (answer.id !== answerId) return answer;
+      const replies = answer.replies ?? [];
+      const nextReplies = replies.some((cachedReply) => cachedReply.id === reply.id)
+        ? replies.map((cachedReply) => (cachedReply.id === reply.id ? reply : cachedReply))
+        : [...replies, reply];
+
+      return {
+        ...answer,
+        replies: nextReplies,
+      };
+    }),
+  };
+};
+
+const updateCachedAnswerReply = (
+  question: Question | undefined,
+  replyId: number,
+  payload: Partial<AnswerReply>
+): Question | undefined => {
+  if (!question?.Answers) return question;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((answer) => ({
+      ...answer,
+      replies: answer.replies?.map((reply) =>
+        reply.id === replyId ? { ...reply, ...payload } : reply
+      ),
+    })),
+  };
+};
+
+const removeCachedAnswerReply = (
+  question: Question | undefined,
+  replyId: number
+): Question | undefined => {
+  if (!question?.Answers) return question;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((answer) => ({
+      ...answer,
+      replies: answer.replies?.filter((reply) => reply.id !== replyId),
+    })),
   };
 };
 
@@ -654,6 +845,192 @@ export const useDeleteAnswerVote = (questionId: number) => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: questionQueryKey });
       queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
+    },
+  });
+};
+
+export const useAddAnswerReaction = (questionId: number) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: ({ answerId, payload }: { answerId: number; payload: ReactionPayload }) =>
+      addAnswerReaction(answerId, payload),
+    onMutate: async ({ answerId, payload }) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        updateCachedAnswerReaction(currentQuestion, answerId, payload.emoji, true)
+      );
+
+      return { previousQuestion };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSuccess: (answer) => {
+      if (answer) {
+        queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+          mergeCachedAnswer(currentQuestion, answer)
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
+    },
+  });
+};
+
+export const useDeleteAnswerReaction = (questionId: number) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: ({ answerId, payload }: { answerId: number; payload: ReactionPayload }) =>
+      deleteAnswerReaction(answerId, payload),
+    onMutate: async ({ answerId, payload }) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        updateCachedAnswerReaction(currentQuestion, answerId, payload.emoji, false)
+      );
+
+      return { previousQuestion };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSuccess: (answer) => {
+      if (answer) {
+        queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+          mergeCachedAnswer(currentQuestion, answer)
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
+    },
+  });
+};
+
+export const useCreateAnswerReply = (questionId: number, currentUser?: ForumUser) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: ({ answerId, payload }: { answerId: number; payload: AnswerReplyPayload }) =>
+      createAnswerReply(answerId, payload),
+    onMutate: async ({ answerId, payload }) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+      const tempReplyId = -Date.now();
+      const now = new Date().toISOString();
+      const optimisticReply: AnswerReply = {
+        id: tempReplyId,
+        answerId,
+        userId: currentUser?.id ?? 0,
+        body: payload.body,
+        createdAt: now,
+        updatedAt: now,
+        User: currentUser,
+      };
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        addCachedAnswerReply(currentQuestion, answerId, optimisticReply)
+      );
+
+      return { previousQuestion, answerId, tempReplyId };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSuccess: (reply, _variables, context) => {
+      if (reply && context?.tempReplyId) {
+        queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+          updateCachedAnswerReply(currentQuestion, context.tempReplyId, reply)
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      invalidateForumQuestionLists(queryClient);
+    },
+  });
+};
+
+export const useUpdateAnswerReply = (questionId: number) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: AnswerReplyPayload }) =>
+      updateAnswerReply(id, payload),
+    onMutate: async ({ id, payload }) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        updateCachedAnswerReply(currentQuestion, id, {
+          body: payload.body,
+          updatedAt: new Date().toISOString(),
+        })
+      );
+
+      return { previousQuestion };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSuccess: (reply) => {
+      if (reply) {
+        queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+          updateCachedAnswerReply(currentQuestion, reply.id, reply)
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      invalidateForumQuestionLists(queryClient);
+    },
+  });
+};
+
+export const useDeleteAnswerReply = (questionId: number) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: (replyId: number) => deleteAnswerReply(replyId),
+    onMutate: async (replyId) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        removeCachedAnswerReply(currentQuestion, replyId)
+      );
+
+      return { previousQuestion };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      invalidateForumQuestionLists(queryClient);
     },
   });
 };

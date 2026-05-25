@@ -92,6 +92,11 @@ interface INotification {
   isRead: boolean;
 }
 
+export const getMessageImagePath = (chatId: string, timestamp: string, fileName: string) => {
+  const cleanedName = removeSpacesAndDashes(fileName.toLowerCase().trim());
+  return `chat/${chatId}/${timestamp}/${cleanedName}`;
+};
+
 const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
 
@@ -108,6 +113,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
+  const currentUploadableImageRef = useRef<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
@@ -170,26 +176,29 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   });
 
   const emitImageToSockets = () => {
-    if (currentUploadableImage) {
-      Array.from(currentUploadableImage).forEach((file: File) => {
+    const uploadableImages = currentUploadableImageRef.current;
+    if (uploadableImages) {
+      uploadableImages.forEach((file: File) => {
         socket?.emit('message', {
           type: 'file',
           fromUserId: currentUserId,
           fromUser: currentUser?.data,
           toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
           chatId,
-          messagePhotoUrl: `chat/${chatId}/${imageTimestamp}/${file.name}`,
+          messagePhotoUrl: getMessageImagePath(chatId, imageTimestamp, file.name),
           message: null,
         });
       });
       refreshUserChatsList();
     }
 
+    currentUploadableImageRef.current = null;
     setCurrentUploadableImage(null);
     reset({ content: '', files: null });
   };
 
   const clearSelectedFiles = () => {
+    currentUploadableImageRef.current = null;
     setCurrentUploadableImage(null);
     setValue('files', null);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -201,13 +210,11 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     clearSelectedFiles
   );
 
-  const onImageSubmit = (e: SyntheticEvent) => {
-    e.preventDefault();
-
-    if (!currentUploadableImage?.length) return;
-
-    const files = (e.target as HTMLFormElement).avatars.files as FileList;
-    if (!files || files.length === 0) return;
+  const onImageSubmit = () => {
+    const files =
+      currentUploadableImageRef.current ?? Array.from(fileInputRef.current?.files ?? []);
+    if (!files?.length) return;
+    currentUploadableImageRef.current = files;
 
     if (files.length + (allUserImages?.data?.length || 0) > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Maksimalan broj svih slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
@@ -219,7 +226,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     formData.append('fromUserId', currentUserId as string);
     formData.append('timestamp', imageTimestamp);
 
-    Array.from(files).forEach((file: File) => {
+    files.forEach((file: File) => {
       const cleanedName = removeSpacesAndDashes(file.name.toLowerCase().trim());
       const cleanedFile = new File([file], cleanedName, { type: file.type });
       formData.append('avatars', cleanedFile);
@@ -247,12 +254,25 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       refreshUserChatsList();
     }
 
+    emitStopTyping();
     reset();
   };
 
   const onSubmit = (e: SyntheticEvent) => {
-    handleSubmit(onMessageSubmit)();
-    onImageSubmit(e);
+    e.preventDefault();
+
+    const hasMessageContent = Boolean(getValues('content')?.trim());
+    const hasSelectedImages = Boolean(
+      currentUploadableImageRef.current?.length || fileInputRef.current?.files?.length
+    );
+
+    if (hasSelectedImages) {
+      onImageSubmit();
+    }
+
+    if (hasMessageContent || !hasSelectedImages) {
+      handleSubmit(onMessageSubmit)(e);
+    }
   };
 
   const handleIconClick = () => {
@@ -291,10 +311,9 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
             setValue('files', files);
             setCurrentUploadableImage((prev) => {
-              if (prev) {
-                return [...prev, ...Array.from(files)];
-              }
-              return Array.from(files);
+              const nextImages = prev ? [...prev, ...Array.from(files)] : Array.from(files);
+              currentUploadableImageRef.current = nextImages;
+              return nextImages;
             });
           }}
         />
@@ -361,6 +380,11 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                 onChange={(e: SyntheticEvent) => {
                   const value = (e.target as HTMLInputElement).value;
                   debouncedSearch(value);
+                  if (value.trim()) {
+                    emitTyping();
+                  } else {
+                    emitStopTyping();
+                  }
                   field.onChange(e);
                 }}
                 onFocus={() => {
@@ -446,9 +470,11 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
                   type="danger"
                   onClick={() => {
                     if (currentUploadableImage) {
-                      setCurrentUploadableImage(
-                        currentUploadableImage.filter((img) => img.name !== image.name)
+                      const nextImages = currentUploadableImage.filter(
+                        (img) => img.name !== image.name
                       );
+                      currentUploadableImageRef.current = nextImages.length ? nextImages : null;
+                      setCurrentUploadableImage(nextImages.length ? nextImages : null);
                     }
                   }}
                   className="mt-2"

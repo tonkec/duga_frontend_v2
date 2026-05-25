@@ -20,6 +20,10 @@ export interface VotePayload {
   value: VoteValue;
 }
 
+export interface ReactionPayload {
+  emoji: string;
+}
+
 export interface VoteMetadata {
   voteScore?: number;
   voteCount?: number;
@@ -30,6 +34,30 @@ export interface VoteMetadata {
   userVote?: VoteValue | null;
   currentUserVote?: VoteValue | null;
   myVote?: VoteValue | null;
+}
+
+export interface AnswerReaction {
+  emoji: string;
+  count: number;
+  reactedByCurrentUser?: boolean;
+  currentUserReacted?: boolean;
+  currentUserHasReacted?: boolean;
+  hasReacted?: boolean;
+  isMine?: boolean;
+  userId?: number;
+  userIds?: number[];
+  users?: ForumUser[];
+}
+
+export interface AnswerReply {
+  id: number;
+  answerId: number;
+  userId: number;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  User?: ForumUser;
+  user?: ForumUser;
 }
 
 export interface Answer extends VoteMetadata {
@@ -46,6 +74,15 @@ export interface Answer extends VoteMetadata {
   updatedAt: string;
   User?: ForumUser;
   user?: ForumUser;
+  taggedUsers?: ForumUser[];
+  reactions?: AnswerReaction[];
+  Reactions?: AnswerReaction[];
+  reactionCount?: number;
+  currentUserReactions?: string[];
+  myReactions?: string[];
+  userReactions?: string[];
+  replies?: AnswerReply[];
+  Replies?: AnswerReply[];
 }
 
 export interface Question extends VoteMetadata {
@@ -63,6 +100,7 @@ export interface Question extends VoteMetadata {
   updatedAt: string;
   User?: ForumUser;
   user?: ForumUser;
+  taggedUsers?: ForumUser[];
   Category?: Category;
   category?: Category | null;
   Answers?: Answer[];
@@ -91,12 +129,18 @@ export interface CreateQuestionPayload {
   categoryId?: number | null;
   image?: File | null;
   images?: File[];
+  taggedUserIds?: number[];
 }
 
 export interface CreateAnswerPayload {
   body: string;
   image?: File | null;
   images?: File[];
+  taggedUserIds?: number[];
+}
+
+export interface AnswerReplyPayload {
+  body: string;
 }
 
 export type UpdateQuestionPayload = Partial<CreateQuestionPayload> & {

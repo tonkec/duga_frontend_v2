@@ -12,6 +12,7 @@ import { useGetUserById } from '@app/hooks/useGetUserById';
 import UserAvatar from '@app/components/UserAvatar';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
+import ContentFormatter from '@app/components/ContentFormatter';
 
 const PhotoPage = () => {
   const navigate = useNavigate();
@@ -119,6 +120,9 @@ const PhotoPage = () => {
                             setProfilePhoto({
                               imageName: singleImage.data.name,
                               description: singleImage.data.description,
+                              taggedUserIds: singleImage.data.taggedUsers?.map(
+                                (user: { id: number }) => Number(user.id)
+                              ),
                               photoId: photoId as string,
                               userId: String(currentUser?.data?.id),
                             })
@@ -129,7 +133,12 @@ const PhotoPage = () => {
                       ))}
                   </div>
                   {singleImage?.data?.description && (
-                    <p className="mt-3 text-gray-700">{singleImage?.data.description}</p>
+                    <p className="mt-3 text-gray-700">
+                      <ContentFormatter
+                        text={singleImage.data.description}
+                        taggedUsers={singleImage.data.taggedUsers}
+                      />
+                    </p>
                   )}
                 </div>
               </>
