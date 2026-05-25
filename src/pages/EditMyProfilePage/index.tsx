@@ -19,8 +19,19 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { cityOptions } from '@app/consts/cityOptions';
 import FieldError from '@app/components/FieldError';
 import EmojiPicker from '@app/components/EmojiPicker';
+import Image from '@app/components/Image';
 import data from '@emoji-mart/data';
-import { init, SearchIndex } from 'emoji-mart';
+import { init } from 'emoji-mart';
+import { useQuery } from '@tanstack/react-query';
+import { searchImdbTitles, ImdbTitle } from '@app/api/imdb';
+import { searchYouTubeVideos, YouTubeVideo } from '@app/api/youtube';
+import {
+  getEmojiSearchQueryFromText,
+  replaceEmojiToken,
+  searchEmojiNatives,
+} from '@app/utils/emojis';
+import { getImdbTitleUrl, isImdbTitleUrl } from '@app/utils/imdb';
+import { getYouTubeEmbedUrl } from '@app/utils/youtube';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -83,12 +94,6 @@ type Inputs = {
   ending: string;
 };
 
-interface IEmoji {
-  skins: {
-    native: string;
-  }[];
-}
-
 type EmojiFieldName =
   | 'gender'
   | 'sexuality'
@@ -100,8 +105,6 @@ type EmojiFieldName =
   | 'interests'
   | 'languages'
   | 'ending';
-
-const EMOJI_SHORTCODE_REGEX = /(?:\s|^):([^\s:]+)/;
 
 const selectStyles = {
   control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
@@ -130,11 +133,6 @@ const selectStyles = {
     backgroundColor: state.isSelected ? '#2D46B9' : state.isFocused ? '#f0f4ff' : 'white',
     color: state.isSelected ? 'white' : '#111827',
   }),
-};
-
-const searchEmojis = async (value: string) => {
-  const emojis = await SearchIndex.search(value);
-  return emojis.map((emoji: IEmoji) => emoji.skins[0].native);
 };
 
 const maxProfileTextLength = (maxLength: number) =>
@@ -183,24 +181,9 @@ const schema = z.object({
     .optional(),
   favoriteMovie: z
     .string()
-    .refine(
-      (val) => {
-        if (val === '') return true;
-        try {
-          const url = new URL(val);
-          return (
-            url.hostname === 'www.youtube.com' ||
-            url.hostname === 'youtube.com' ||
-            url.hostname === 'youtu.be'
-          );
-        } catch {
-          return false;
-        }
-      },
-      {
-        message: 'Mora biti YouTube link (youtube.com ili youtu.be)',
-      }
-    )
+    .refine((val) => val === '' || isImdbTitleUrl(val), {
+      message: 'Odaberi film iz IMDb pretrage',
+    })
     .optional(),
   interests: maxProfileTextLength(200),
   languages: maxProfileTextLength(200),
@@ -210,6 +193,236 @@ const schema = z.object({
 const tabClassName =
   'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
 const selectedTabClassName = 'bg-blue text-white shadow-sm';
+
+const ImdbMovieSearch = ({
+  value,
+  error,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  onChange: (value: string) => void;
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setDebouncedSearchTerm(searchTerm.trim()), 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const {
+    data: imdbTitles = [],
+    error: imdbError,
+    isPending: isImdbLoading,
+  } = useQuery({
+    queryKey: ['imdbTitles', debouncedSearchTerm],
+    queryFn: () => searchImdbTitles(debouncedSearchTerm),
+    enabled: debouncedSearchTerm.length >= 2,
+    retry: false,
+  });
+
+  const handleMovieSelect = (movie: ImdbTitle) => {
+    onChange(movie.url);
+    setSearchTerm(movie.year ? `${movie.title} (${movie.year})` : movie.title);
+  };
+
+  return (
+    <div className="mb-2">
+      <div className="mb-2 flex items-center gap-1">
+        <Label>Pretraži svoj najdraži film na IMDb-u</Label>
+        <span data-tooltip-id="imdbmovie">
+          <BiInfoCircle fontSize={20} />
+        </span>
+        <Tooltip
+          id="imdbmovie"
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+          }}
+        >
+          Odaberi film iz IMDb rezultata pretrage.
+        </Tooltip>
+      </div>
+
+      <Input
+        type="text"
+        className="h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
+        placeholder="Pretraži IMDb film..."
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+
+      {error && <FieldError message={error} />}
+
+      {value && (
+        <div className="mt-2 rounded-xl border border-[#dce4ff] bg-white px-3 py-2 text-sm text-gray-700">
+          Odabrani IMDb film:{' '}
+          <a href={value} target="_blank" rel="noreferrer" className="font-semibold text-blue">
+            {value}
+          </a>
+        </div>
+      )}
+
+      {debouncedSearchTerm.length >= 2 && (
+        <div className="mt-2 rounded-2xl border border-[#dce4ff] bg-white p-3 shadow-sm">
+          {isImdbLoading ? (
+            <div className="py-4 text-center text-gray-500">Pretražujem IMDb...</div>
+          ) : imdbError ? (
+            <div className="py-4 text-center text-red-500">{imdbError.message}</div>
+          ) : imdbTitles.length > 0 ? (
+            <div className="grid max-h-72 gap-2 overflow-y-auto">
+              {imdbTitles.map((movie) => (
+                <button
+                  key={movie.id}
+                  type="button"
+                  onClick={() => handleMovieSelect(movie)}
+                  className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-[#f0f4ff]"
+                >
+                  {movie.imageUrl && (
+                    <Image
+                      src={movie.imageUrl}
+                      alt={movie.title}
+                      className="h-16 w-12 rounded object-cover"
+                    />
+                  )}
+                  <span>
+                    <span className="block font-semibold text-gray-900">{movie.title}</span>
+                    {movie.year && <span className="text-sm text-gray-500">{movie.year}</span>}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="py-4 text-center text-gray-500">Nema pronađenih filmova</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const YouTubeSongSearch = ({
+  value,
+  error,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  onChange: (value: string) => void;
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setDebouncedSearchTerm(searchTerm.trim()), 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const {
+    data: youtubeVideos = [],
+    error: youtubeError,
+    isPending: isYouTubeLoading,
+  } = useQuery({
+    queryKey: ['youtubeVideos', debouncedSearchTerm],
+    queryFn: () => searchYouTubeVideos(debouncedSearchTerm),
+    enabled: debouncedSearchTerm.length >= 2,
+    retry: false,
+  });
+
+  const handleSongSelect = (video: YouTubeVideo) => {
+    onChange(video.url);
+    setSearchTerm(video.channelTitle ? `${video.title} - ${video.channelTitle}` : video.title);
+  };
+
+  const handleSongClear = () => {
+    onChange('');
+    setSearchTerm('');
+  };
+
+  return (
+    <div className="mb-4">
+      <div className="mb-2 flex items-center gap-1">
+        <Label>Unesi svoju najdražu pjesmu sa Youtube-a</Label>
+        <span data-tooltip-id="youtubesong">
+          <BiInfoCircle fontSize={20} />
+        </span>
+        <Tooltip
+          id="youtubesong"
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+          }}
+        >
+          Pretraži YouTube i odaberi pjesmu iz rezultata.
+        </Tooltip>
+      </div>
+
+      <Input
+        type="text"
+        className="h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
+        placeholder="Pretraži YouTube pjesmu..."
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+
+      {error && <FieldError message={error} />}
+
+      {value && (
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#dce4ff] bg-white px-3 py-2 text-sm text-gray-700">
+          <span>
+            Odabrana YouTube pjesma:{' '}
+            <a href={value} target="_blank" rel="noreferrer" className="font-semibold text-blue">
+              {value}
+            </a>
+          </span>
+          <button type="button" onClick={handleSongClear} className="font-semibold text-red-500">
+            Ukloni
+          </button>
+        </div>
+      )}
+
+      {debouncedSearchTerm.length >= 2 && (
+        <div className="mt-2 rounded-2xl border border-[#dce4ff] bg-white p-3 shadow-sm">
+          {isYouTubeLoading ? (
+            <div className="py-4 text-center text-gray-500">Pretražujem YouTube...</div>
+          ) : youtubeError ? (
+            <div className="py-4 text-center text-red-500">{youtubeError.message}</div>
+          ) : youtubeVideos.length > 0 ? (
+            <div className="grid max-h-72 gap-2 overflow-y-auto">
+              {youtubeVideos.map((video) => (
+                <button
+                  key={video.id}
+                  type="button"
+                  onClick={() => handleSongSelect(video)}
+                  className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-[#f0f4ff]"
+                >
+                  {video.thumbnailUrl && (
+                    <Image
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      className="h-16 w-24 rounded object-cover"
+                    />
+                  )}
+                  <span>
+                    <span className="block font-semibold text-gray-900">{video.title}</span>
+                    {video.channelTitle && (
+                      <span className="text-sm text-gray-500">{video.channelTitle}</span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="py-4 text-center text-gray-500">Nema pronađenih pjesama</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const EditMyProfilePage = () => {
   init({ data });
@@ -224,10 +437,14 @@ const EditMyProfilePage = () => {
     formState: { isValid },
     reset,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
+  const favoriteSong = watch('favoriteSong') || '';
+  const favoriteMovie = watch('favoriteMovie') || '';
 
   useEffect(() => {
     if (currentUser) {
@@ -264,15 +481,19 @@ const EditMyProfilePage = () => {
     if (isValid) {
       updateUserMutation({
         ...data,
+        age: data.age || currentUser?.data?.age || '',
+        favoriteDay: data.favoriteDay || currentUser?.data?.favoriteDayOfWeek || '',
+        favoriteSong: data.favoriteSong ? getYouTubeEmbedUrl(data.favoriteSong) || '' : '',
+        favoriteMovie: data.favoriteMovie ? getImdbTitleUrl(data.favoriteMovie) || '' : '',
       });
     }
   };
 
   const handleEmojiSearch = async (fieldName: EmojiFieldName, value: string) => {
-    const match = value.match(EMOJI_SHORTCODE_REGEX);
+    const searchTerm = getEmojiSearchQueryFromText(value);
 
-    if (match) {
-      const emojis = await searchEmojis(match[1]);
+    if (searchTerm) {
+      const emojis = await searchEmojiNatives(searchTerm);
       setActiveEmojiField(fieldName);
       setCurrentEmojis(emojis);
       return;
@@ -291,7 +512,7 @@ const EditMyProfilePage = () => {
       <EmojiPicker
         emojis={currentEmojis}
         onEmojiSelect={(emoji: string) => {
-          onChange(value.replace(EMOJI_SHORTCODE_REGEX, emoji));
+          onChange(replaceEmojiToken(value, emoji));
           setActiveEmojiField(null);
           setCurrentEmojis([]);
         }}
@@ -657,55 +878,29 @@ const EditMyProfilePage = () => {
                 })}
                 {errors.makesMyDay?.message && <FieldError message={errors.makesMyDay.message} />}
 
-                <Input
-                  label={
-                    <div className="flex items-center gap-1">
-                      <span>Unesi svoju najdražu pjesmu sa Youtube-a</span>
-                      <span data-tooltip-id="youtubesong">
-                        <BiInfoCircle fontSize={20} />
-                      </span>
-                      <Tooltip
-                        id="youtubesong"
-                        style={{
-                          backgroundColor: 'black',
-                          color: 'white',
-                        }}
-                      >
-                        Unesi link u formatu <code>https://www.youtube.com/embed/</code>
-                      </Tooltip>
-                    </div>
-                  }
-                  type="text"
-                  className="mb-2"
-                  placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
-                  {...register('favoriteSong')}
+                <YouTubeSongSearch
+                  value={favoriteSong}
                   error={errors.favoriteSong?.message}
-                />
-
-                <Input
-                  label={
-                    <div className="flex items-center gap-1">
-                      <span>Unesi svoju najdraži film sa Youtube-a</span>
-                      <span data-tooltip-id="youtubetrailer">
-                        <BiInfoCircle fontSize={20} />
-                      </span>
-                      <Tooltip
-                        id="youtubetrailer"
-                        style={{
-                          backgroundColor: 'black',
-                          color: 'white',
-                        }}
-                      >
-                        Unesi link u formatu <code>https://www.youtube.com/embed/</code>
-                      </Tooltip>
-                    </div>
+                  onChange={(songUrl) =>
+                    setValue('favoriteSong', songUrl, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
                   }
-                  type="text"
-                  className="mb-2"
-                  placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
-                  {...register('favoriteMovie')}
-                  error={errors.favoriteMovie?.message}
                 />
+                <input type="hidden" {...register('favoriteSong')} />
+
+                <ImdbMovieSearch
+                  value={favoriteMovie}
+                  error={errors.favoriteMovie?.message}
+                  onChange={(movieUrl) =>
+                    setValue('favoriteMovie', movieUrl, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
+                <input type="hidden" {...register('favoriteMovie')} />
               </div>
 
               <div className="max-w-3xl rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">

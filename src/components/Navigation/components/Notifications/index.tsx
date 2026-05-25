@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useGetAllNotifcations,
   useMarkAllAsReadNotifications,
@@ -6,6 +6,8 @@ import {
 import { useSocket } from '@app/context/useSocket';
 import Notification from './../Notification';
 import { BiBell, BiCheckDouble } from 'react-icons/bi';
+
+const AUTO_HIDE_DELAY_MS = 3000;
 
 export type INotification = {
   id: number;
@@ -28,10 +30,44 @@ const NotificationDropdown = ({
 }) => {
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const autoHideTimeoutRef = useRef<number | null>(null);
   const { allNotifications } = useGetAllNotifcations();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [open, setOpen] = useState(false);
   const { mutateMarkAllAsRead } = useMarkAllAsReadNotifications();
+
+  const clearAutoHideTimeout = useCallback(() => {
+    if (autoHideTimeoutRef.current) {
+      window.clearTimeout(autoHideTimeoutRef.current);
+      autoHideTimeoutRef.current = null;
+    }
+  }, []);
+
+  const closeDropdown = useCallback(() => {
+    clearAutoHideTimeout();
+    setOpen(false);
+  }, [clearAutoHideTimeout]);
+
+  const scheduleAutoHide = useCallback(() => {
+    clearAutoHideTimeout();
+    autoHideTimeoutRef.current = window.setTimeout(() => {
+      closeDropdown();
+    }, AUTO_HIDE_DELAY_MS);
+  }, [clearAutoHideTimeout, closeDropdown]);
+
+  const toggleDropdown = () => {
+    setOpen((isOpen) => {
+      const nextOpen = !isOpen;
+
+      if (nextOpen) {
+        scheduleAutoHide();
+      } else {
+        clearAutoHideTimeout();
+      }
+
+      return nextOpen;
+    });
+  };
 
   useEffect(() => {
     if (allNotifications) {
@@ -70,19 +106,28 @@ const NotificationDropdown = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
+        closeDropdown();
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [closeDropdown]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    scheduleAutoHide();
+
+    return clearAutoHideTimeout;
+  }, [clearAutoHideTimeout, open, scheduleAutoHide]);
 
   if (!userId || !socket) return null;
 
   return (
     <div className="relative inline-block w-full" ref={dropdownRef}>
       <button
-        onClick={() => setOpen((prev) => !prev)}
+        type="button"
+        onClick={toggleDropdown}
         className={
           isMobile
             ? 'relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white'

@@ -46,9 +46,10 @@ createRoot(document.getElementById('root')!).render(
           <ReactQueryDevtools />
           <ToastContainer
             position="top-right"
-            autoClose={4000}
+            autoClose={3000}
             closeOnClick
-            pauseOnHover
+            pauseOnHover={false}
+            pauseOnFocusLoss={false}
             closeButton
             toastClassName={() =>
               'relative flex min-h-16 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 text-sm font-semibold leading-6 text-gray-950 shadow-xl shadow-blue-dark/10'

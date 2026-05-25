@@ -24,7 +24,7 @@ const LatestUploads = () => {
     return (
       <section className="mt-8">
         <div className="mb-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">
+          <p className="pl-0.5 text-sm font-semibold uppercase tracking-[0.18em] text-blue">
             Zadnje fotografije
           </p>
           <h2 className="mt-1 text-2xl font-bold text-gray-900">Nedavno dodane fotke</h2>
@@ -81,7 +81,7 @@ const LatestUploads = () => {
     <section className="mt-8">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">
+          <p className="pl-0.5 text-sm font-semibold uppercase tracking-[0.18em] text-blue">
             Zadnje fotografije
           </p>
           <h2 className="mt-1 text-2xl font-bold text-gray-900">Nedavno dodane fotke</h2>

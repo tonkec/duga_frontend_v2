@@ -10,13 +10,14 @@ import { IUser } from '@app/components/UserCard';
 import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
 import { SyntheticEvent, useState, useRef, useEffect, useCallback } from 'react';
-import { init, SearchIndex } from 'emoji-mart';
+import { init } from 'emoji-mart';
 import EmojiPicker from '@app/components/EmojiPicker';
 import { debounce } from 'lodash';
 import Input from '@app/components/Input';
-import { BiPaperclip, BiSend, BiSolidFileGif } from 'react-icons/bi';
+import { BiPaperclip, BiSend, BiSmile, BiSolidFileGif } from 'react-icons/bi';
 import { useUploadMessageImage } from './hooks';
 import GiphySearch from '@app/components/GiphySearch';
+import EmojiSearch from '@app/components/EmojiSearch';
 import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { toast } from 'react-toastify';
@@ -26,6 +27,11 @@ import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 import Image from '@app/components/Image';
+import {
+  getEmojiSearchQueryFromText,
+  replaceEmojiToken,
+  searchEmojiNatives,
+} from '@app/utils/emojis';
 
 type Inputs = {
   content: string;
@@ -79,12 +85,6 @@ interface ISendMessageProps {
   otherUserId: number | undefined | null;
 }
 
-export interface IEmoji {
-  skins: {
-    native: string;
-  }[];
-}
-
 interface INotification {
   id: number;
   type: string;
@@ -96,7 +96,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   init({ data });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [currentEmojis, setCurrentEmojis] = useState([]);
+  const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
   const socket = useSocket();
   const queryClient = useQueryClient();
   const { user: currentUser } = useGetCurrentUser();
@@ -110,6 +110,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
+  const [showEmojiSearch, setShowEmojiSearch] = useState(false);
   const { allNotifications } = useGetAllNotifcations();
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const { allUserImages } = useGetAllUserImages();
@@ -150,6 +151,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
     socket?.emit('message', msg);
     refreshUserChatsList();
     setShowGiphySearch(false);
+    setShowEmojiSearch(false);
   };
 
   const {
@@ -166,15 +168,6 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       files: null,
     },
   });
-
-  async function search(value: string) {
-    const emojis = await SearchIndex.search(value);
-    const results = emojis.map((emoji: IEmoji) => {
-      return emoji.skins[0].native;
-    });
-
-    return results;
-  }
 
   const emitImageToSockets = () => {
     if (currentUploadableImage) {
@@ -318,11 +311,28 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         <button
           type="button"
           className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={() => setShowGiphySearch(!showGiphySearch)}
+          onClick={() => {
+            setShowGiphySearch((isOpen) => !isOpen);
+            setShowEmojiSearch(false);
+          }}
           disabled={isUploadingMessageImage}
           aria-label="Odaberi GIF"
         >
           <BiSolidFileGif fontSize={20} />
+        </button>
+
+        <button
+          type="button"
+          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => {
+            setShowEmojiSearch((isOpen) => !isOpen);
+            setShowGiphySearch(false);
+            setCurrentEmojis([]);
+          }}
+          disabled={isUploadingMessageImage}
+          aria-label="Odaberi emoji"
+        >
+          <BiSmile fontSize={20} />
         </button>
 
         <Controller
@@ -330,12 +340,10 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           control={control}
           render={({ field }) => {
             const handleSearch = async (value: string) => {
-              const emojiRegex = /(?:\s|^):([^\s:]+)/;
-              const match = value.match(emojiRegex);
+              const searchTerm = getEmojiSearchQueryFromText(value);
 
-              if (match) {
-                const searchTerm = match[1];
-                const emojis = await search(searchTerm);
+              if (searchTerm) {
+                const emojis = await searchEmojiNatives(searchTerm);
                 setCurrentEmojis(emojis);
               } else {
                 setCurrentEmojis([]);
@@ -398,13 +406,21 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
         isOpen={showGiphySearch}
         onClose={() => setShowGiphySearch(false)}
       />
+      <EmojiSearch
+        isOpen={showEmojiSearch}
+        onClose={() => setShowEmojiSearch(false)}
+        onEmojiSelect={(emoji) => {
+          const currentValue = getValues('content') ?? '';
+          setValue('content', `${currentValue}${emoji}`, { shouldValidate: true });
+        }}
+      />
       {errors.content && <FieldError message="Poruka je obavezna." />}
 
       <EmojiPicker
         emojis={currentEmojis}
         onEmojiSelect={(emoji: string) => {
           const currentValue = getValues('content');
-          const updatedValue = currentValue.replace(/(?:\s|^):([^\s:]+)/, emoji);
+          const updatedValue = replaceEmojiToken(currentValue, emoji);
           setValue('content', updatedValue, { shouldValidate: true });
           setCurrentEmojis([]);
         }}
