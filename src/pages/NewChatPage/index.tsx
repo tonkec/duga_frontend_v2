@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import { useMemo, useState } from 'react';
 import AppLayout from '@app/components/AppLayout';
 import Loader from '@app/components/Loader';
 import Button from '@app/components/Button';
@@ -8,23 +7,53 @@ import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { filterChatsWithMessages } from '@app/utils/filterChatsWithMessages';
 import AllUserChats, { IChat } from './components/AllUserChats';
 import { useCookies } from 'react-cookie';
+import NewMessageModal from './components/NewMessageModal';
 
 const EmptyChats = () => {
-  const navigate = useNavigate();
+  const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
 
   return (
-    <div className="flex w-full flex-col items-center py-16 text-center">
-      <span className="mb-4 text-5xl" role="img" aria-hidden>
-        💬
-      </span>
-      <h1 className="text-2xl font-bold text-gray-900">Nema razgovora</h1>
-      <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-500">
-        Započni novu konverzaciju s nekim od korisnika — tvoji razgovori će se pojaviti ovdje.
-      </p>
-      <Button type="blue" className="mt-8 w-full sm:w-auto" onClick={() => navigate('/')}>
-        Pronađi korisnike
-      </Button>
-    </div>
+    <>
+      <section className="relative isolate mx-auto mt-8 flex min-h-[28rem] w-full max-w-4xl items-center justify-center overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-14 text-center shadow-sm">
+        <div className="absolute -left-16 top-10 h-40 w-40 rounded-full bg-blue/10 blur-3xl" />
+        <div className="absolute -right-16 bottom-6 h-48 w-48 rounded-full bg-pink/10 blur-3xl" />
+
+        <div className="relative z-10 flex max-w-xl flex-col items-center">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-4xl shadow-md shadow-blue/10">
+            <span role="img" aria-hidden>
+              💬
+            </span>
+          </div>
+
+          <span className="mb-3 rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-dark">
+            Poruke
+          </span>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">
+            Nema razgovora
+          </h1>
+          <p className="mt-4 max-w-lg text-sm leading-7 text-gray-600 sm:text-base">
+            Započni novu konverzaciju s nekim od korisnika. Pretraži profile, odaberi osobu i
+            razgovor će se odmah pojaviti ovdje.
+          </p>
+
+          <div className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+            <Button
+              type="blue"
+              className="w-full rounded-full px-6 py-3 font-semibold shadow-lg shadow-blue/20 sm:w-auto"
+              onClick={() => setIsNewMessageModalOpen(true)}
+            >
+              Pronađi korisnike
+            </Button>
+            <span className="text-xs text-gray-500">Sigurno i privatno dopisivanje</span>
+          </div>
+        </div>
+      </section>
+
+      <NewMessageModal
+        isOpen={isNewMessageModalOpen}
+        onClose={() => setIsNewMessageModalOpen(false)}
+      />
+    </>
   );
 };
 

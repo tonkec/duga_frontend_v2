@@ -23,14 +23,19 @@ const modalStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-    width: 'min(100vw - 2rem, 28rem)',
-    maxHeight: 'min(85vh, 32rem)',
-    padding: '1.25rem',
-    borderRadius: '0.75rem',
+    width: 'min(100vw - 2rem, 34rem)',
+    maxHeight: 'min(88vh, 38rem)',
+    padding: 0,
+    borderRadius: '1.5rem',
     border: '1px solid #dce4ff',
+    background: '#ffffff',
+    overflow: 'hidden',
+    boxShadow: '0 24px 80px rgba(15, 23, 42, 0.22)',
   },
   overlay: {
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    backdropFilter: 'blur(6px)',
+    zIndex: 1000,
   },
 };
 
@@ -93,66 +98,87 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
       style={modalStyles}
       contentLabel="Nova poruka"
     >
-      <div className="flex flex-col gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold text-gray-900">Nova poruka</h2>
-            <p className="mt-0.5 text-sm text-gray-500">Odaberi korisnika po korisničkom imenu</p>
+      <div className="flex max-h-[inherit] flex-col bg-white">
+        <div className="border-b border-[#e8eeff] bg-gradient-to-br from-[#f7f9ff] to-white px-5 py-5 sm:px-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <span className="mb-2 inline-flex rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
+                Nova poruka
+              </span>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-950">Pronađi korisnika</h2>
+              <p className="mt-1 text-sm leading-6 text-gray-600">
+                Pretraži verificirane korisnike i započni razgovor.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="shrink-0 rounded-full border border-[#dce4ff] bg-white px-3 py-1.5 text-gray-400 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-700"
+              aria-label="Zatvori"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="shrink-0 rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-            aria-label="Zatvori"
-          >
-            ✕
-          </button>
         </div>
 
-        <Input
-          type="text"
-          placeholder="Pretraži po korisničkom imenu..."
-          icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          className="w-full py-2 pl-10"
-        />
+        <div className="flex flex-1 flex-col gap-4 px-5 py-5 sm:px-6">
+          <Input
+            type="text"
+            placeholder="Pretraži po korisničkom imenu..."
+            icon={<BiSearch color="grey" fontSize="20px" className="mt-[1.5px]" />}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            className="w-full rounded-xl border-[#dce4ff] bg-[#f7f9ff] py-3 pl-10"
+          />
 
-        <ul className="-mx-1 max-h-64 overflow-y-auto" role="listbox" aria-label="Korisnici">
-          {isLoading ? (
-            <li className="flex justify-center py-8">
-              <Loader variant="inline" label="Učitavanje korisnika..." />
-            </li>
-          ) : selectableUsers.length === 0 ? (
-            <li className="py-8 text-center text-sm text-gray-500">
-              {search.trim() ? 'Nema korisnika za taj upit' : 'Nema dostupnih korisnika'}
-            </li>
-          ) : (
-            selectableUsers.map((user: IUser) => (
-              <li key={user.id}>
-                <button
-                  type="button"
-                  role="option"
-                  disabled={isCreatingChat}
-                  onClick={() => handleSelectUser(user.id)}
-                  className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-[#f0f4ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:opacity-50"
-                >
-                  <UserAvatar
-                    color="#F037A5"
-                    avatarFallbackName={user.username}
-                    userId={String(user.id)}
-                    className="h-10 w-10 rounded-full"
-                  />
-                  <span className="truncate font-medium text-gray-900">{user.username}</span>
-                </button>
+          <ul
+            className="max-h-72 space-y-2 overflow-y-auto pr-1"
+            role="listbox"
+            aria-label="Korisnici"
+          >
+            {isLoading ? (
+              <li className="flex justify-center rounded-2xl border border-dashed border-[#dce4ff] py-10">
+                <Loader variant="inline" label="Učitavanje korisnika..." />
               </li>
-            ))
-          )}
-        </ul>
+            ) : selectableUsers.length === 0 ? (
+              <li className="rounded-2xl border border-dashed border-[#dce4ff] bg-[#f7f9ff] px-4 py-10 text-center text-sm text-gray-500">
+                {search.trim() ? 'Nema korisnika za taj upit' : 'Nema dostupnih korisnika'}
+              </li>
+            ) : (
+              selectableUsers.map((user: IUser) => (
+                <li key={user.id}>
+                  <button
+                    type="button"
+                    role="option"
+                    disabled={isCreatingChat}
+                    onClick={() => handleSelectUser(user.id)}
+                    className="group flex w-full items-center gap-3 rounded-2xl border border-transparent bg-white px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:opacity-50"
+                  >
+                    <UserAvatar
+                      color="#F037A5"
+                      avatarFallbackName={user.username}
+                      userId={String(user.id)}
+                      className="h-11 w-11 rounded-full"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold text-gray-950">
+                        {user.username}
+                      </span>
+                      <span className="text-xs text-gray-500">Klikni za početak razgovora</span>
+                    </div>
+                    <span className="rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark opacity-0 transition-opacity group-hover:opacity-100">
+                      Odaberi
+                    </span>
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
 
-        <Button type="black" className="w-full" onClick={handleClose}>
-          Odustani
-        </Button>
+          <Button type="black" className="w-full rounded-full py-3" onClick={handleClose}>
+            Odustani
+          </Button>
+        </div>
       </div>
     </Modal>
   );
