@@ -123,6 +123,25 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
   });
 
+  it('does not register or start a backend app session for unverified Auth0 users', async () => {
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|unverified-user',
+          email: 'unverified@example.com',
+          email_verified: false,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).not.toHaveBeenCalled();
+  });
+
   it('starts only one backend app session when React StrictMode replays effects', async () => {
     mockUseAuth0.mockReturnValue(
       auth0State({
