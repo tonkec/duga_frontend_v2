@@ -7,7 +7,7 @@ const BrokenPage = () => {
     <AppLayout>
       <section className="relative isolate mx-auto flex min-h-[calc(100vh-18rem)] max-w-2xl items-center justify-center overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#eef3ff] px-6 py-12 text-center shadow-sm">
         <div className="pointer-events-none absolute -left-20 top-8 h-56 w-56 rounded-full bg-blue/10 blur-3xl" />
-        <div className="pointer-events-none absolute -right-16 bottom-8 h-60 w-60 rounded-full bg-pink/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 bottom-8 h-60 w-60 rounded-full bg-blue/10 blur-3xl" />
 
         <div className="relative z-10 flex max-w-lg flex-col items-center">
           <div className="mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-white text-blue shadow-lg shadow-blue/10">

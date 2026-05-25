@@ -16,7 +16,7 @@ const EmptyChats = () => {
     <>
       <section className="relative isolate mx-auto mt-8 flex min-h-[28rem] w-full max-w-4xl items-center justify-center overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-14 text-center shadow-sm">
         <div className="absolute -left-16 top-10 h-40 w-40 rounded-full bg-blue/10 blur-3xl" />
-        <div className="absolute -right-16 bottom-6 h-48 w-48 rounded-full bg-pink/10 blur-3xl" />
+        <div className="absolute -right-16 bottom-6 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
 
         <div className="relative z-10 flex max-w-xl flex-col items-center">
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-4xl shadow-md shadow-blue/10">
@@ -90,7 +90,7 @@ const NewChatPage = () => {
     return (
       <PageTitle title="Poruke">
         <AppLayout>
-          <div className="mt-10 w-full rounded-xl border border-red/30 bg-rose px-6 py-5 text-center text-sm font-medium text-gray-800">
+          <div className="mt-10 w-full rounded-xl border border-red/30 bg-red/10 px-6 py-5 text-center text-sm font-medium text-gray-800">
             Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da
             prihvatiš kolačiće u postavkama.
           </div>

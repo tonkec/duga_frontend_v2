@@ -22,6 +22,9 @@ import PostLoginFormGuard from './guards/PostLoginFormGuard';
 import RecordNotFound from '@app/pages/RecordNotFound';
 import BrokenPage from '@app/pages/BrokenPage';
 import NetworkErrorPage from '@app/pages/NetworkErrorPage';
+import ForumQuestionsPage from '@app/features/forum/pages/ForumQuestionsPage';
+import ForumQuestionDetailsPage from '@app/features/forum/pages/ForumQuestionDetailsPage';
+import CreateQuestionPage from '@app/features/forum/pages/CreateQuestionPage';
 
 export const publicRoutes = [
   {
@@ -175,6 +178,30 @@ export const onboardedRoutes = [
     element: (
       <PageTitle title="Prijavi problem">
         <ReportPage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/forum',
+    element: (
+      <PageTitle title="Forum">
+        <ForumQuestionsPage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/forum/questions/:id',
+    element: (
+      <PageTitle title="Forum pitanje">
+        <ForumQuestionDetailsPage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/forum/ask',
+    element: (
+      <PageTitle title="Postavi pitanje">
+        <CreateQuestionPage />
       </PageTitle>
     ),
   },

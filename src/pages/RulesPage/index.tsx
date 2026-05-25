@@ -33,7 +33,7 @@ export default function TermsOfUsePage() {
     <main className="mx-auto max-w-5xl px-4 py-12 text-gray-900">
       <header className="relative isolate mb-8 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-10 shadow-sm md:px-8">
         <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-        <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-pink/10 blur-3xl" />
+        <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
 
         <a
           href="/"

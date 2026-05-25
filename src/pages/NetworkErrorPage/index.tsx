@@ -5,7 +5,7 @@ const NetworkErrorPage = () => {
   return (
     <div className="gradient relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 text-white">
       <div className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-pink/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-blue/10 blur-3xl" />
 
       <section className="relative z-10 w-full max-w-2xl overflow-hidden rounded-3xl border border-white/20 bg-white/95 p-6 text-center text-gray-950 shadow-2xl shadow-blue-dark/20 backdrop-blur-md sm:p-8">
         <div className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-blue/10 text-blue shadow-lg shadow-blue/10">

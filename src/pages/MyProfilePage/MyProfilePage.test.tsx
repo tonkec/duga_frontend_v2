@@ -6,6 +6,8 @@ import MyProfilePage from '.';
 import { useSocket } from '@app/context/useSocket';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
+import { useQuestionDetails, useQuestions } from '@app/features/forum/hooks/useForum';
 
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
@@ -70,6 +72,7 @@ jest.mock('@app/components/ContentFormatter', () => ({
 jest.mock('./components/AllUserPhotos', () => ({
   __esModule: true,
   default: () => <div>All user photos</div>,
+  getForumPhotos: jest.fn(() => []),
 }));
 
 jest.mock('@app/hooks/useGetCurrentUser', () => ({
@@ -80,13 +83,25 @@ jest.mock('@app/hooks/useGetAllImages', () => ({
   useGetAllImages: jest.fn(),
 }));
 
+jest.mock('@app/hooks/useGetAllUserImages', () => ({
+  useGetAllUserImages: jest.fn(),
+}));
+
 jest.mock('@app/context/useSocket', () => ({
   useSocket: jest.fn(),
 }));
 
+jest.mock('@app/features/forum/hooks/useForum', () => ({
+  useQuestionDetails: jest.fn(),
+  useQuestions: jest.fn(),
+}));
+
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
 const mockUseGetAllImages = jest.mocked(useGetAllImages);
+const mockUseGetAllUserImages = jest.mocked(useGetAllUserImages);
 const mockUseSocket = jest.mocked(useSocket);
+const mockUseQuestions = jest.mocked(useQuestions);
+const mockUseQuestionDetails = jest.mocked(useQuestionDetails);
 
 const profileUser = {
   id: 1,
@@ -144,6 +159,21 @@ describe('MyProfilePage integration', () => {
       allImagesError: null,
       allImagesLoading: false,
     } as ReturnType<typeof useGetAllImages>);
+    mockUseGetAllUserImages.mockReturnValue({
+      allUserImages: {
+        data: {
+          images: [],
+        },
+      },
+      allUserImagesError: null,
+      allUserImagesLoading: false,
+    } as ReturnType<typeof useGetAllUserImages>);
+    mockUseQuestions.mockReturnValue({
+      data: { data: [], total: 0, page: 1, limit: 100, totalPages: 0 },
+      isError: false,
+      isPending: false,
+    } as unknown as ReturnType<typeof useQuestions>);
+    mockUseQuestionDetails.mockReturnValue([] as ReturnType<typeof useQuestionDetails>);
   });
 
   it('loads and renders current user profile data', () => {
@@ -161,9 +191,10 @@ describe('MyProfilePage integration', () => {
     expect(screen.getByText('Petak')).toBeVisible();
     expect(screen.getByText(profileUser.interests)).toBeVisible();
     expect(screen.getByText(profileUser.languages)).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Uredi profil' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Nova poruka' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Korisnici' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Dopuni profil' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Započni razgovor' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Istraži korisnike' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Postavi pitanje' })).toBeVisible();
   });
 
   it('renders the loading state while profile images are loading', () => {

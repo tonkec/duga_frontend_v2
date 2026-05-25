@@ -5,7 +5,7 @@ interface ITextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   className?: string;
 }
 
-const defaultStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-2 px-4 pr-8 block w-full appearance-none leading-normal focus:border-pink`;
+const defaultStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded py-2 px-4 pr-8 block w-full appearance-none leading-normal focus:border-blue`;
 
 const TextArea = forwardRef<HTMLTextAreaElement, ITextAreaProps>(
   ({ placeholder, className, ...props }, ref) => {

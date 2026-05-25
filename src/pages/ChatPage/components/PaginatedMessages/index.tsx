@@ -1,8 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
-import { useParams } from 'react-router';
 import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
 import { debounceScroll } from '@app/utils/debounceScroll';
-import { useGetAllMessages } from '@app/pages/ChatPage/hooks';
 
 const PaginatedMessages = ({
   otherUserName,
@@ -11,16 +9,18 @@ const PaginatedMessages = ({
   receivedMessages,
   currentUserId,
   isCurrentUserLoading,
+  messages,
+  fetchNextPage,
 }: {
   otherUserName: string;
   currentUserName: string;
   otherUserId: number | undefined;
   receivedMessages: IMessage[];
+  messages: IMessage[];
+  fetchNextPage: () => void;
   currentUserId: number;
   isCurrentUserLoading: boolean;
 }) => {
-  const { chatId } = useParams();
-  const { messages, fetchNextPage } = useGetAllMessages(chatId!);
   const allMessages = [...receivedMessages, ...messages];
   const sortedMessages = allMessages.sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -53,10 +53,6 @@ const PaginatedMessages = ({
         <p className="text-center text-sm text-gray-500">Nema poruka u ovom razgovoru</p>
       </div>
     );
-  }
-
-  if (!chatId) {
-    return null;
   }
 
   if (currentUserId == null) {
