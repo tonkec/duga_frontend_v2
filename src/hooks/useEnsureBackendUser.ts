@@ -20,6 +20,7 @@ export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } =
     queryKey: ['current-user'],
     queryFn: async () => {
       if (!auth0User) throw new Error('Auth0 user not available');
+      if (!auth0User.sub) throw new Error('Auth0 user id not available');
       if (!auth0User.email) throw new Error('Auth0 email not available');
 
       const auth0AccessToken = await resolveAuth0AccessToken();
