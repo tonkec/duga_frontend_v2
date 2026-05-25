@@ -32,9 +32,7 @@ export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } =
         Boolean(auth0User.email_verified),
         auth0AccessToken
       );
-      const client = auth0User.email_verified
-        ? apiClient()
-        : apiClient(auth0AccessToken ?? undefined);
+      const client = apiClient(auth0AccessToken ?? undefined);
       const res = await client.get('/users/current-user', {
         skipGlobalErrorHandler: true,
       });
