@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import ChatPage from '.';
 import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
@@ -74,6 +74,10 @@ const mockUseSocket = jest.mocked(useSocket);
 const mockUseDeleteCurrentChat = jest.mocked(useDeleteCurrentChat);
 const mockUseGetAllMessages = jest.mocked(useGetAllMessages);
 const mockUseGetCurrentChat = jest.mocked(useGetCurrentChat);
+const socketHandlers = new Map<string, (payload: unknown) => void>();
+const socketOn = jest.fn();
+const socketOff = jest.fn();
+const socketEmit = jest.fn();
 
 const currentUser = {
   id: 1,
@@ -113,11 +117,18 @@ const renderChatPage = () =>
 describe('ChatPage integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    socketHandlers.clear();
+    socketOn.mockImplementation((event: string, handler: (payload: unknown) => void) => {
+      socketHandlers.set(event, handler);
+    });
+    socketOff.mockImplementation((event: string) => {
+      socketHandlers.delete(event);
+    });
 
     mockUseSocket.mockReturnValue({
-      on: jest.fn(),
-      off: jest.fn(),
-      emit: jest.fn(),
+      on: socketOn,
+      off: socketOff,
+      emit: socketEmit,
     } as unknown as ReturnType<typeof useSocket>);
 
     mockUseGetCurrentUser.mockReturnValue({
@@ -176,6 +187,30 @@ describe('ChatPage integration', () => {
     expect(screen.queryByText('Nema poruka u ovom razgovoru')).not.toBeInTheDocument();
   });
 
+  it('renders gif messages from their gif URL', () => {
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [
+        {
+          ...message(1, otherUser.id, '', '2026-05-23T08:00:00.000Z'),
+          type: 'gif',
+          securePhotoUrl: 'chat/123/not-the-gif.gif',
+          messagePhotoUrl: 'https://media.giphy.com/media/example/giphy.gif',
+        },
+      ],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    expect(screen.getByAltText('gif')).toHaveAttribute(
+      'src',
+      'https://media.giphy.com/media/example/giphy.gif'
+    );
+  });
+
   it('renders the empty message state when the chat has no messages', () => {
     mockUseGetAllMessages.mockReturnValue({
       messages: [],
@@ -189,6 +224,30 @@ describe('ChatPage integration', () => {
 
     expect(screen.getByRole('heading', { name: otherUser.username })).toBeVisible();
     expect(screen.getByText('Nema poruka u ovom razgovoru')).toBeVisible();
+  });
+
+  it('shows the typing indicator for the other chat participant', () => {
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    act(() => {
+      socketHandlers.get('typing')?.({ userId: otherUser.id });
+    });
+
+    expect(screen.getByRole('status', { name: 'Druga osoba piše' })).toBeVisible();
+
+    act(() => {
+      socketHandlers.get('stop-typing')?.({ userId: otherUser.id });
+    });
+
+    expect(screen.queryByRole('status', { name: 'Druga osoba piše' })).not.toBeInTheDocument();
   });
 
   it('renders a loading state while the chat is loading', () => {

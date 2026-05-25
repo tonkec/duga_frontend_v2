@@ -9,6 +9,7 @@ import { useCookies } from 'react-cookie';
 import { useCookieConsent } from '@app/hooks/useCookieConsent';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import UserAvatar from '@app/components/UserAvatar';
+import { useThemePreference } from '@app/hooks/useThemePreference';
 
 interface IDeleteProfileModalProp {
   isOpen: boolean;
@@ -59,6 +60,7 @@ const SettingsPage = () => {
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { isDarkMode, toggleTheme } = useThemePreference();
   const { deleteUserMutation } = useDeleteUser();
   const { acceptCookies, rejectCookies } = useCookieConsent();
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
@@ -127,6 +129,37 @@ const SettingsPage = () => {
           subtitle="Upravljaj vidljivošću svog online statusa drugim korisnicima."
         >
           {String(userId) && <OnlineStatus />}
+        </SettingsSection>
+
+        <SettingsSection
+          title="Tamni način"
+          subtitle="Promijeni izgled aplikacije. Odabir se sprema na ovom uređaju."
+        >
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isDarkMode}
+            onClick={toggleTheme}
+            className="inline-flex items-center gap-3 rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 text-sm font-bold text-gray-700 shadow-sm transition-colors hover:border-blue hover:text-blue"
+          >
+            <span>{isDarkMode ? 'Tamni način' : 'Svijetli način'}</span>
+            <span
+              className="relative h-7 w-12 shrink-0 rounded-full border transition-colors"
+              style={{
+                backgroundColor: isDarkMode ? '#393E46' : '#dce4ff',
+                borderColor: isDarkMode ? '#00ADB5' : '#dce4ff',
+              }}
+              aria-hidden="true"
+            >
+              <span
+                className="absolute left-1 top-1 h-5 w-5 rounded-full shadow-sm transition-transform"
+                style={{
+                  backgroundColor: '#ffffff',
+                  transform: isDarkMode ? 'translateX(20px)' : 'translateX(0)',
+                }}
+              />
+            </span>
+          </button>
         </SettingsSection>
 
         <SettingsSection

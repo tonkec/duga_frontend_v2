@@ -191,8 +191,12 @@ const schema = z.object({
 });
 
 const tabClassName =
-  'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
+  'shrink-0 cursor-pointer whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
 const selectedTabClassName = 'bg-blue text-white shadow-sm';
+const editProfileTabs = [
+  { label: 'Općenito', icon: <BiSolidFile fontSize={20} /> },
+  { label: 'Fotografije', icon: <BiSolidCamera fontSize={20} /> },
+];
 
 const ImdbMovieSearch = ({
   value,
@@ -431,6 +435,7 @@ const EditMyProfilePage = () => {
   const { updateUserMutation } = useUpdateUser();
   const [activeEmojiField, setActiveEmojiField] = useState<EmojiFieldName | null>(null);
   const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const {
     register,
     handleSubmit,
@@ -597,24 +602,41 @@ const EditMyProfilePage = () => {
 
   return (
     <AppLayout>
-      <Tabs selectedTabClassName={selectedTabClassName}>
-        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <Tabs
+        selectedIndex={selectedTabIndex}
+        onSelect={(index) => setSelectedTabIndex(index)}
+        selectedTabClassName={selectedTabClassName}
+      >
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Uredi profil</h1>
           </div>
 
-          <TabList className="flex flex-wrap gap-2 rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm">
-            <Tab className={tabClassName}>
-              <div className="flex items-center gap-2">
-                Općenito <BiSolidFile fontSize={20} />
-              </div>
-            </Tab>
+          <label className="block lg:hidden">
+            <span className="sr-only">Odaberi sekciju uređivanja profila</span>
+            <Select
+              value={editProfileTabs[selectedTabIndex]}
+              onChange={(option) => {
+                const nextIndex = editProfileTabs.findIndex((tab) => tab.label === option?.label);
+                if (nextIndex >= 0) {
+                  setSelectedTabIndex(nextIndex);
+                }
+              }}
+              options={editProfileTabs}
+              styles={selectStyles}
+              classNamePrefix="react-select"
+              isSearchable={false}
+            />
+          </label>
 
-            <Tab className={tabClassName}>
-              <div className="flex items-center gap-2">
-                Fotografije <BiSolidCamera fontSize={20} />
-              </div>
-            </Tab>
+          <TabList className="hidden w-full max-w-full flex-nowrap gap-2 overflow-x-auto rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm lg:flex lg:w-auto lg:flex-wrap">
+            {editProfileTabs.map((tab) => (
+              <Tab key={tab.label} className={tabClassName}>
+                <div className="flex items-center gap-2">
+                  {tab.label} {tab.icon}
+                </div>
+              </Tab>
+            ))}
           </TabList>
         </div>
 

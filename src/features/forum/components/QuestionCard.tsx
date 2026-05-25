@@ -5,6 +5,7 @@ import UserAvatar from '@app/components/UserAvatar';
 import { BiFlag } from 'react-icons/bi';
 import type { Question } from '../types/forum.types';
 import { getVoteScore } from './VoteControls';
+import { getVoteLabel } from '../utils/forumLabels';
 
 interface QuestionCardProps {
   question: Question;
@@ -68,7 +69,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
           <div className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 text-center">
             <span className="block text-lg font-black text-blue-dark">{voteScore}</span>
-            <span className="text-xs font-semibold text-gray-500">glasova</span>
+            <span className="text-xs font-semibold text-gray-500">{getVoteLabel(voteScore)}</span>
           </div>
           <div className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 text-center">
             <span className="block text-lg font-black text-blue-dark">{answerCount}</span>

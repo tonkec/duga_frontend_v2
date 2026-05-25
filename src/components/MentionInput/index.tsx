@@ -13,7 +13,11 @@ interface MentionInputProps {
   onTagUsersChange?: (users: TaggedUser[]) => void;
   placeholder?: string;
   className?: string;
+  textareaClassName?: string;
   initialTaggedUsers?: TaggedUser[];
+  rows?: number;
+  maxLength?: number;
+  disabled?: boolean;
 }
 
 const MentionInput = ({
@@ -22,7 +26,11 @@ const MentionInput = ({
   onTagUsersChange,
   placeholder = 'Napiši komentar...',
   className = '',
+  textareaClassName = '',
   initialTaggedUsers = [],
+  rows = 3,
+  maxLength,
+  disabled = false,
 }: MentionInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
@@ -123,8 +131,10 @@ const MentionInput = ({
         value={value}
         onChange={handleInputChange}
         onFocus={handleFocus}
-        rows={3}
-        className="min-h-28 w-full resize-y rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 text-base leading-6 shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
+        rows={rows}
+        maxLength={maxLength}
+        disabled={disabled}
+        className={`min-h-28 w-full resize-y rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 text-base leading-6 shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue ${textareaClassName}`}
         placeholder={placeholder}
       />
 

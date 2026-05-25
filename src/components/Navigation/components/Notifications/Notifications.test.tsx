@@ -51,7 +51,8 @@ const notification = (overrides: Partial<INotification> = {}): INotification => 
   ...overrides,
 });
 
-const renderNotifications = () => render(<NotificationDropdown userId={7} isMobile={false} />);
+const renderNotifications = (isMobile = false) =>
+  render(<NotificationDropdown userId={7} isMobile={isMobile} />);
 
 describe('NotificationDropdown', () => {
   beforeEach(() => {
@@ -90,6 +91,10 @@ describe('NotificationDropdown', () => {
       isMarkAsReadError: false,
       isMarkAsReadSuccess: false,
     } as ReturnType<typeof useMarkAsReadNotification>);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('renders fetched notifications and marks all as read locally', async () => {
@@ -153,5 +158,19 @@ describe('NotificationDropdown', () => {
     expect(mutateMarkAsRead).toHaveBeenCalledWith('1');
     expect(navigate).toHaveBeenCalledWith('/forum/questions/42');
     expect(within(unreadNotification).getByText('Pročitano')).toBeVisible();
+  });
+
+  it('keeps the mobile dropdown open until the user closes it', async () => {
+    jest.useFakeTimers();
+    renderNotifications(true);
+
+    fireEvent.click(screen.getByRole('button', { name: /obavijesti/i }));
+    expect(await screen.findByText('Novo pitanje na forumu')).toBeVisible();
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(screen.getByText('Novo pitanje na forumu')).toBeVisible();
   });
 });

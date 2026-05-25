@@ -39,7 +39,7 @@ const UserAvatar = ({
   const renderAvatar = () => {
     const placeholderUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       avatarFallbackName
-    )}&background=f7f9ff`;
+    )}&background=f7f9ff&color=1f2937`;
 
     if (imageBlob) {
       return (

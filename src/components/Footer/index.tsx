@@ -20,7 +20,7 @@ const Footer = () => {
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  className="rounded-full px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-white hover:text-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2"
+                  className="footer-link rounded-full px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-white hover:text-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2"
                 >
                   {link.label}
                 </Link>

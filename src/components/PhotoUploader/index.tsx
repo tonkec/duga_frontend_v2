@@ -3,7 +3,6 @@ import { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useUploadPhotos } from './hooks';
 import Button from '@app/components/Button';
 import FileUploadInput from '@app/components/FileUploadInput';
-import Input from '@app/components/Input';
 import { BiTrash } from 'react-icons/bi';
 import { removeSpacesAndDashes } from '@app/utils/removeSpacesAndDashes';
 import Card from '@app/components/Card';
@@ -26,17 +25,23 @@ import {
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
+import MentionInput from '@app/components/MentionInput';
+
+type TaggedUser = { id: number; username: string };
 
 export interface ImageDescription {
   description: string;
   imageId: string;
   isProfilePhoto?: boolean;
+  taggedUserIds?: number[];
 }
 
 interface IPhotoActionButtonsProps {
   onInputChange: (value: string) => void;
+  onTagUsersChange: (users: TaggedUser[]) => void;
   onDelete: () => void;
   inputValue: string;
+  initialTaggedUsers?: TaggedUser[];
   isChecked?: boolean;
   onCheckboxChange?: (e: SyntheticEvent) => void;
   hasCheckbox?: boolean;
@@ -74,8 +79,10 @@ const getDescriptionLength = (description: string) => Array.from(description).le
 
 const PhotoActionButtons = ({
   onInputChange,
+  onTagUsersChange,
   onDelete,
   inputValue,
+  initialTaggedUsers = [],
   isChecked,
   onCheckboxChange,
   hasCheckbox,
@@ -89,12 +96,16 @@ const PhotoActionButtons = ({
         onClose={() => setIsDeleteModalOpen(false)}
         onDelete={onDelete}
       />
-      <Input
+      <MentionInput
         value={inputValue}
-        className="mt-4 h-12 rounded-2xl border-[#dce4ff] bg-white px-4 text-sm shadow-sm"
+        className="mt-4"
+        textareaClassName="h-12 min-h-12 resize-none px-4 py-3 text-sm"
         placeholder="Napiši nešto o fotografiji ( : za emoji )"
-        onChange={(e) => onInputChange(e.target.value)}
-        type="text"
+        onChange={onInputChange}
+        onTagUsersChange={onTagUsersChange}
+        initialTaggedUsers={initialTaggedUsers}
+        rows={1}
+        maxLength={DESCRIPTION_MAX_LENGTH}
         disabled={disabled}
       />
       {hasCheckbox && (
@@ -151,6 +162,9 @@ const PhotoUploader = () => {
   const [newImageDescriptions, setNewImageDescriptions] = useState<ImageDescription[]>([]);
   const [hasDescriptionError, setHasDescriptionError] = useState<boolean>(false);
   const [descriptionInputValues, setDescriptionInputValues] = useState<Record<string, string>>({});
+  const [descriptionTaggedUsers, setDescriptionTaggedUsers] = useState<
+    Record<string, TaggedUser[]>
+  >({});
   const [activeDescriptionId, setActiveDescriptionId] = useState<string | null>(null);
   const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
@@ -210,6 +224,16 @@ const PhotoUploader = () => {
   const getDescriptionInputValue = (imageId: string, defaultValue: string) =>
     descriptionInputValues[imageId] ?? defaultValue;
 
+  const getDescriptionTaggedUsers = (imageId: string, defaultValue: TaggedUser[] = []) =>
+    descriptionTaggedUsers[imageId] ?? defaultValue;
+
+  const getTaggedUserIds = (imageId: string, defaultValue: TaggedUser[] = []) =>
+    getDescriptionTaggedUsers(imageId, defaultValue).map((user) => Number(user.id));
+
+  const setDescriptionTaggedUsersForImage = (imageId: string, users: TaggedUser[]) => {
+    setDescriptionTaggedUsers((prev) => ({ ...prev, [imageId]: users }));
+  };
+
   const applyEmojiToDescriptionInput = (
     descriptionId: string,
     currentValue: string,
@@ -240,7 +264,15 @@ const PhotoUploader = () => {
     }
 
     const formData = new FormData();
-    formData.append('text', JSON.stringify(newImageDescriptions));
+    formData.append(
+      'text',
+      JSON.stringify(
+        newImageDescriptions.map((image) => ({
+          ...image,
+          taggedUserIds: getTaggedUserIds(image.imageId),
+        }))
+      )
+    );
     formData.append('userId', userId as string);
 
     for (let i = 0; i < files.length; i++) {
@@ -268,6 +300,7 @@ const PhotoUploader = () => {
   const onDescriptionChange = (value: string, file: IImage) => {
     const imageId = removeSpacesAndDashes(file.name);
     const description = normalizeDescription(value);
+    const taggedUserIds = getTaggedUserIds(imageId);
 
     if (!isValidDescriptionLength(description)) {
       return;
@@ -275,7 +308,7 @@ const PhotoUploader = () => {
 
     setDescriptionInputValue(imageId, value);
     setNewImageDescriptions((prevState) => {
-      const image = { description, imageId };
+      const image = { description, imageId, taggedUserIds };
       const newState = prevState.filter(
         (item) => removeSpacesAndDashes(item.imageId) !== removeSpacesAndDashes(imageId)
       );
@@ -290,6 +323,11 @@ const PhotoUploader = () => {
     }
     const imageId = removeSpacesAndDashes(image.name);
     setDescriptionInputValues((prev) => {
+      const next = { ...prev };
+      delete next[imageId];
+      return next;
+    });
+    setDescriptionTaggedUsers((prev) => {
       const next = { ...prev };
       delete next[imageId];
       return next;
@@ -314,6 +352,7 @@ const PhotoUploader = () => {
       const currentDescription = normalizeDescription(
         getDescriptionInputValue(imageId, image.description || '')
       );
+      const taggedUserIds = getTaggedUserIds(imageId, image.taggedUsers);
       const isProfilePhoto =
         allCheckboxes.find((checkbox) => checkbox.index === index)?.isProfilePhoto || false;
 
@@ -321,6 +360,7 @@ const PhotoUploader = () => {
         description: changedDescription ?? currentDescription,
         imageId,
         isProfilePhoto,
+        taggedUserIds,
       };
     });
 
@@ -391,13 +431,14 @@ const PhotoUploader = () => {
                       <PhotoActionButtons
                         onInputChange={(value: string) => {
                           const description = normalizeDescription(value);
+                          const taggedUserIds = getTaggedUserIds(imageId, image.taggedUsers);
                           if (!isValidDescriptionLength(description)) {
                             return;
                           }
 
                           setDescriptionInputValue(imageId, value);
                           setUpdatedImageDescriptions((prev) => {
-                            const newImage = { description, imageId };
+                            const newImage = { description, imageId, taggedUserIds };
                             const newState = prev.filter(
                               (item) =>
                                 removeSpacesAndDashes(item.imageId) !==
@@ -407,8 +448,12 @@ const PhotoUploader = () => {
                             return newState;
                           });
                         }}
+                        onTagUsersChange={(users) =>
+                          setDescriptionTaggedUsersForImage(imageId, users)
+                        }
                         onDelete={() => onDeleteFromS3(image)}
                         inputValue={inputValue}
+                        initialTaggedUsers={getDescriptionTaggedUsers(imageId, image.taggedUsers)}
                         isChecked={
                           allCheckboxes.find((checkbox) => checkbox.index === index)
                             ?.isProfilePhoto || false
@@ -430,6 +475,7 @@ const PhotoUploader = () => {
                                   description: image.description,
                                   imageId,
                                   isProfilePhoto: (e.target as HTMLInputElement).checked,
+                                  taggedUserIds: getTaggedUserIds(imageId, image.taggedUsers),
                                 },
                               ];
                             }
@@ -461,7 +507,11 @@ const PhotoUploader = () => {
                             }
 
                             setUpdatedImageDescriptions((prev) => {
-                              const newImage = { description, imageId };
+                              const newImage = {
+                                description,
+                                imageId,
+                                taggedUserIds: getTaggedUserIds(imageId, image.taggedUsers),
+                              };
                               const newState = prev.filter(
                                 (item) =>
                                   removeSpacesAndDashes(item.imageId) !==
@@ -526,8 +576,12 @@ const PhotoUploader = () => {
                     <div className="relative">
                       <PhotoActionButtons
                         onInputChange={(value: string) => onDescriptionChange(value, image)}
+                        onTagUsersChange={(users) =>
+                          setDescriptionTaggedUsersForImage(imageId, users)
+                        }
                         onDelete={() => onDeleteFromState(image)}
                         inputValue={inputValue}
+                        initialTaggedUsers={getDescriptionTaggedUsers(imageId)}
                         disabled={isUploadingPhotos}
                       />
                       {activeDescriptionId === imageId && (

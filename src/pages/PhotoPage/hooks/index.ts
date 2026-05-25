@@ -25,6 +25,7 @@ export const useGetSingleImage = (id: string) => {
 interface ISetProfilePhotoProps {
   imageName: string;
   description?: string;
+  taggedUserIds?: number[];
   photoId: string;
   userId: string;
 }
@@ -33,7 +34,12 @@ export const useSetProfilePhoto = () => {
   const queryClient = useQueryClient();
 
   const { mutate: setProfilePhoto, isPending: isSettingProfilePhoto } = useMutation({
-    mutationFn: ({ imageName, description = '', userId }: ISetProfilePhotoProps) => {
+    mutationFn: ({
+      imageName,
+      description = '',
+      taggedUserIds = [],
+      userId,
+    }: ISetProfilePhotoProps) => {
       const formData = new FormData();
       formData.append(
         'text',
@@ -42,6 +48,7 @@ export const useSetProfilePhoto = () => {
             description,
             imageId: removeSpacesAndDashes(imageName),
             isProfilePhoto: true,
+            taggedUserIds,
           },
         ])
       );

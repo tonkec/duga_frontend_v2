@@ -53,7 +53,7 @@ describe('UserAvatar integration', () => {
 
     expect(screen.getByRole('img', { name: 'profile placeholder' })).toHaveAttribute(
       'src',
-      'https://ui-avatars.com/api/?name=No%20Image%20User&background=f7f9ff'
+      'https://ui-avatars.com/api/?name=No%20Image%20User&background=f7f9ff&color=1f2937'
     );
   });
 
@@ -110,7 +110,7 @@ describe('UserAvatar integration', () => {
     expect(createObjectURLMock).not.toHaveBeenCalled();
     expect(screen.getByRole('img', { name: 'profile placeholder' })).toHaveAttribute(
       'src',
-      'https://ui-avatars.com/api/?name=Broken%20Image%20User&background=f7f9ff'
+      'https://ui-avatars.com/api/?name=Broken%20Image%20User&background=f7f9ff&color=1f2937'
     );
   });
 });

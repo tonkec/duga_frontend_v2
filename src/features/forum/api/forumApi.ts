@@ -1,11 +1,15 @@
 import { apiClient } from '@app/api';
 import type {
   Answer,
+  AnswerReply,
+  AnswerReaction,
+  AnswerReplyPayload,
   CreateAnswerPayload,
   CreateQuestionPayload,
   GetQuestionsParams,
   PaginatedResponse,
   Question,
+  ReactionPayload,
   UpdateAnswerPayload,
   UpdateQuestionPayload,
   VotePayload,
@@ -48,8 +52,75 @@ const normalizeUser = (user: Question['User'] | Question['user']) => {
   };
 };
 
+const getReactionUserIds = (reaction: AnswerReaction) => {
+  const userIds = reaction.userIds ?? reaction.users?.map((user) => user.id) ?? [];
+  return userIds.filter((userId) => Number.isFinite(Number(userId))).map(Number);
+};
+
+const isCurrentUserReaction = (reaction: AnswerReaction) =>
+  Boolean(
+    reaction.reactedByCurrentUser ??
+      reaction.currentUserReacted ??
+      reaction.currentUserHasReacted ??
+      reaction.hasReacted ??
+      reaction.isMine
+  );
+
+const normalizeAnswerReactions = (answer: Answer): AnswerReaction[] | undefined => {
+  const sourceReactions = answer.reactions ?? answer.Reactions ?? [];
+  const currentUserReactionEmojis = new Set([
+    ...(answer.currentUserReactions ?? []),
+    ...(answer.myReactions ?? []),
+    ...(answer.userReactions ?? []),
+  ]);
+  const reactionMap = new Map<string, AnswerReaction>();
+
+  sourceReactions.forEach((reaction) => {
+    if (!reaction?.emoji) return;
+
+    const existingReaction = reactionMap.get(reaction.emoji);
+    const reactionCount = toOptionalNumber(reaction.count) ?? 1;
+    const userIds = getReactionUserIds(reaction);
+
+    reactionMap.set(reaction.emoji, {
+      emoji: reaction.emoji,
+      count: (existingReaction?.count ?? 0) + reactionCount,
+      reactedByCurrentUser:
+        Boolean(existingReaction?.reactedByCurrentUser) ||
+        isCurrentUserReaction(reaction) ||
+        currentUserReactionEmojis.has(reaction.emoji),
+      userIds: [...new Set([...(existingReaction?.userIds ?? []), ...userIds])],
+    });
+  });
+
+  currentUserReactionEmojis.forEach((emoji) => {
+    const existingReaction = reactionMap.get(emoji);
+    reactionMap.set(emoji, {
+      emoji,
+      count: Math.max(existingReaction?.count ?? 0, 1),
+      reactedByCurrentUser: true,
+      userIds: existingReaction?.userIds ?? [],
+    });
+  });
+
+  return reactionMap.size ? Array.from(reactionMap.values()) : undefined;
+};
+
+const normalizeAnswerReply = (reply: AnswerReply): AnswerReply => {
+  const user = normalizeUser(reply.User || reply.user);
+
+  return {
+    ...reply,
+    answerId: toOptionalNumber(reply.answerId) ?? reply.answerId,
+    userId: toOptionalNumber(reply.userId) ?? user?.id ?? reply.userId,
+    User: user,
+  };
+};
+
 const normalizeAnswer = (answer: Answer): Answer => {
   const user = normalizeUser(answer.User || answer.user);
+  const reactions = normalizeAnswerReactions(answer);
+  const replies = answer.replies ?? answer.Replies ?? [];
 
   return {
     ...answer,
@@ -57,6 +128,9 @@ const normalizeAnswer = (answer: Answer): Answer => {
     voteScore: toOptionalNumber(answer.voteScore),
     voteCount: toOptionalNumber(answer.voteCount),
     User: user,
+    taggedUsers: answer.taggedUsers?.map(normalizeUser).filter(Boolean) as Answer['taggedUsers'],
+    reactions,
+    replies: replies.map(normalizeAnswerReply),
   };
 };
 
@@ -71,6 +145,9 @@ const normalizeQuestion = (question: Question): Question => {
     voteScore: toOptionalNumber(question.voteScore),
     voteCount: toOptionalNumber(question.voteCount),
     User: user,
+    taggedUsers: question.taggedUsers
+      ?.map(normalizeUser)
+      .filter(Boolean) as Question['taggedUsers'],
     Category: question.Category || question.category || undefined,
     Answers: answers.map(normalizeAnswer),
     answerCount: Math.max(answerCount ?? 0, answers.length),
@@ -85,6 +162,9 @@ const createQuestionFormData = (payload: CreateQuestionPayload | UpdateQuestionP
   if (payload.categoryId !== undefined && payload.categoryId !== null) {
     formData.append('categoryId', String(payload.categoryId));
   }
+  if (payload.taggedUserIds?.length) {
+    formData.append('taggedUserIds', JSON.stringify(payload.taggedUserIds));
+  }
   if (payload.image) formData.append('questionImage', payload.image);
   payload.images?.forEach((image) => formData.append('questionImage', image));
   if ('removeImage' in payload && payload.removeImage) formData.append('removeImage', 'true');
@@ -96,6 +176,9 @@ const createAnswerFormData = (payload: CreateAnswerPayload | UpdateAnswerPayload
   const formData = new FormData();
 
   if (payload.body !== undefined) formData.append('body', payload.body);
+  if (payload.taggedUserIds?.length) {
+    formData.append('taggedUserIds', JSON.stringify(payload.taggedUserIds));
+  }
   if (payload.image) formData.append('answerImage', payload.image);
   payload.images?.forEach((image) => formData.append('answerImage', image));
   if ('removeImage' in payload && payload.removeImage) formData.append('removeImage', 'true');
@@ -281,6 +364,75 @@ export const voteAnswer = async (id: number, payload: VotePayload): Promise<Answ
 export const deleteAnswerVote = async (id: number): Promise<void> => {
   const client = apiClient();
   await client.delete(`/forum/answers/${id}/votes`, {
+    skipGlobalErrorHandler: true,
+  });
+};
+
+export const addAnswerReaction = async (
+  id: number,
+  payload: ReactionPayload
+): Promise<Answer | undefined> => {
+  const client = apiClient();
+  const response = await client.post<SingleResponse<Answer>>(
+    `/forum/answers/${id}/reactions`,
+    payload,
+    {
+      skipGlobalErrorHandler: true,
+    }
+  );
+
+  return response.data ? normalizeAnswer(unwrapResponse(response.data)) : undefined;
+};
+
+export const deleteAnswerReaction = async (
+  id: number,
+  payload: ReactionPayload
+): Promise<Answer | undefined> => {
+  const client = apiClient();
+  const response = await client.delete<SingleResponse<Answer>>(`/forum/answers/${id}/reactions`, {
+    data: payload,
+    params: payload,
+    skipGlobalErrorHandler: true,
+  });
+
+  return response.data ? normalizeAnswer(unwrapResponse(response.data)) : undefined;
+};
+
+export const createAnswerReply = async (
+  answerId: number,
+  payload: AnswerReplyPayload
+): Promise<AnswerReply | undefined> => {
+  const client = apiClient();
+  const response = await client.post<SingleResponse<AnswerReply>>(
+    `/forum/answers/${answerId}/replies`,
+    payload,
+    {
+      skipGlobalErrorHandler: true,
+    }
+  );
+
+  return response.data ? normalizeAnswerReply(unwrapResponse(response.data)) : undefined;
+};
+
+export const updateAnswerReply = async (
+  id: number,
+  payload: AnswerReplyPayload
+): Promise<AnswerReply | undefined> => {
+  const client = apiClient();
+  const response = await client.patch<SingleResponse<AnswerReply>>(
+    `/forum/answer-replies/${id}`,
+    payload,
+    {
+      skipGlobalErrorHandler: true,
+    }
+  );
+
+  return response.data ? normalizeAnswerReply(unwrapResponse(response.data)) : undefined;
+};
+
+export const deleteAnswerReply = async (id: number): Promise<void> => {
+  const client = apiClient();
+  await client.delete(`/forum/answer-replies/${id}`, {
     skipGlobalErrorHandler: true,
   });
 };

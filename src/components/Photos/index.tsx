@@ -4,6 +4,7 @@ import PhotoLikes from '@app/components/PhotoLikes';
 import Photo from './components/Photo';
 import { useNavigate } from 'react-router';
 import { BiImages, BiSolidCamera } from 'react-icons/bi';
+import ContentFormatter from '@app/components/ContentFormatter';
 
 export interface IImage {
   createdAt: string;
@@ -27,6 +28,7 @@ export interface IImage {
   url: string;
   userId: string;
   securePhotoUrl: string;
+  taggedUsers?: { id: number; username: string }[];
 }
 
 interface IPhotosProps {
@@ -93,7 +95,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
               <div className="mt-3 rounded-2xl bg-[#f7f9ff] px-3 py-2">
                 {image.description && (
                   <p className="mb-2 line-clamp-2 text-sm leading-6 text-gray-700">
-                    {image.description}
+                    <ContentFormatter text={image.description} taggedUsers={image.taggedUsers} />
                   </p>
                 )}
                 <PhotoLikes photoId={String(image.id)} />
