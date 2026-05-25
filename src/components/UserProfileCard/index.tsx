@@ -28,6 +28,13 @@ const isYouTubeUrl = (url: string) => {
   }
 };
 
+const hasEmbeddableContent = (value: string) =>
+  /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/.test(value) ||
+  /(?:https?:\/\/)?(?:(?:www\.)?giphy\.com\/(?:gifs|embed)\/[\w-]+|media[0-9]?\.giphy\.com\/media\/[\w-]+\/giphy\.gif)/.test(
+    value
+  ) ||
+  /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i.test(value);
+
 export interface IUserProfileCardProps {
   bio: string;
   sexuality: string;
@@ -86,8 +93,20 @@ const BooleanDetail = ({ label, value }: { label: string; value: boolean }) => (
   </div>
 );
 
-const ProfileSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="rounded-2xl border border-[#dce4ff] bg-white p-5 shadow-sm">
+const ProfileSection = ({
+  title,
+  children,
+  compact = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  compact?: boolean;
+}) => (
+  <section
+    className={`rounded-2xl border border-[#dce4ff] bg-white p-5 shadow-sm ${
+      compact ? 'w-fit max-w-full' : ''
+    }`}
+  >
     <h2 className="mb-3 font-bold text-gray-900">{title}</h2>
     <div className="text-gray-700">{children}</div>
   </section>
@@ -248,45 +267,60 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.embarasement) && (
-          <ProfileSection title="Najsramotnija stvar koja mi se dogodila">
+          <ProfileSection
+            title="Najsramotnija stvar koja mi se dogodila"
+            compact={hasEmbeddableContent(user.embarasement)}
+          >
             <ContentFormatter text={user.embarasement} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.tooOldFor) && (
-          <ProfileSection title="Imam previše godina za...">
+          <ProfileSection
+            title="Imam previše godina za..."
+            compact={hasEmbeddableContent(user.tooOldFor)}
+          >
             <ContentFormatter text={user.tooOldFor} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.makesMyDay) && (
-          <ProfileSection title="Dan mi je ljepši ako...">
+          <ProfileSection
+            title="Dan mi je ljepši ako..."
+            compact={hasEmbeddableContent(user.makesMyDay)}
+          >
             <ContentFormatter text={user.makesMyDay} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.spirituality) && (
-          <ProfileSection title="Duhovnost/religioznost">
+          <ProfileSection
+            title="Duhovnost/religioznost"
+            compact={hasEmbeddableContent(user.spirituality)}
+          >
             <ContentFormatter text={user.spirituality} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.interests) && (
-          <ProfileSection title="Interesi">
+          <ProfileSection title="Interesi" compact={hasEmbeddableContent(user.interests)}>
             <ContentFormatter text={user.interests} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.languages) && (
-          <ProfileSection title="Jezici koje govorim">
+          <ProfileSection
+            title="Jezici koje govorim"
+            compact={hasEmbeddableContent(user.languages)}
+          >
             <ContentFormatter text={user.languages} />
           </ProfileSection>
         )}
 
         {shouldRenderField(user.favoriteSong) && (
-          <ProfileSection title="Najdraža YouTube pjesma">
+          <ProfileSection title="Najdraža YouTube pjesma" compact>
             {isYouTubeUrl(user.favoriteSong) ? (
-              <Iframe url={user.favoriteSong} width="100%" height="360" />
+              <Iframe url={user.favoriteSong} width="360" height="200" />
             ) : (
               <p className="text-red-500">Neispravan YouTube URL</p>
             )}
@@ -294,9 +328,9 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.favoriteMovie) && (
-          <ProfileSection title="Najdraži YouTube video">
+          <ProfileSection title="Najdraži YouTube video" compact>
             {isYouTubeUrl(user.favoriteMovie) ? (
-              <Iframe url={user.favoriteMovie} width="100%" height="360" />
+              <Iframe url={user.favoriteMovie} width="360" height="200" />
             ) : (
               <p className="text-red-500">Neispravan YouTube URL</p>
             )}
@@ -304,7 +338,7 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.ending) && (
-          <ProfileSection title="Za kraj ću reći još">
+          <ProfileSection title="Za kraj ću reći još" compact={hasEmbeddableContent(user.ending)}>
             <ContentFormatter text={user.ending} />
           </ProfileSection>
         )}
