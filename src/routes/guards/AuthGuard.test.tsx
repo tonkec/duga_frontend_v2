@@ -80,6 +80,23 @@ describe('AuthGuard protected route redirects', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/settings');
   });
 
+  it('redirects authenticated unverified users to verify email', async () => {
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          email_verified: false,
+        },
+      })
+    );
+
+    renderProtectedRoute();
+
+    expect(await screen.findByText('Verify email')).toBeVisible();
+    expect(screen.queryByText('Protected settings')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/verify-email'));
+  });
+
   it('redirects authenticated users to login when the app session is not active', async () => {
     mockUseAuth0.mockReturnValue(
       auth0State({

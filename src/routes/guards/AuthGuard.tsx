@@ -25,7 +25,7 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
   }
 
   if (!isUserVerified) {
-    return <Navigate to="/verify-email " />;
+    return <Navigate to="/verify-email" replace />;
   }
 
   return children;
