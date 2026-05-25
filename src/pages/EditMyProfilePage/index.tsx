@@ -20,7 +20,12 @@ import { cityOptions } from '@app/consts/cityOptions';
 import FieldError from '@app/components/FieldError';
 import EmojiPicker from '@app/components/EmojiPicker';
 import data from '@emoji-mart/data';
-import { init, SearchIndex } from 'emoji-mart';
+import { init } from 'emoji-mart';
+import {
+  getEmojiSearchQueryFromText,
+  replaceEmojiToken,
+  searchEmojiNatives,
+} from '@app/utils/emojis';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -83,12 +88,6 @@ type Inputs = {
   ending: string;
 };
 
-interface IEmoji {
-  skins: {
-    native: string;
-  }[];
-}
-
 type EmojiFieldName =
   | 'gender'
   | 'sexuality'
@@ -100,8 +99,6 @@ type EmojiFieldName =
   | 'interests'
   | 'languages'
   | 'ending';
-
-const EMOJI_SHORTCODE_REGEX = /(?:\s|^):([^\s:]+)/;
 
 const selectStyles = {
   control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
@@ -130,11 +127,6 @@ const selectStyles = {
     backgroundColor: state.isSelected ? '#2D46B9' : state.isFocused ? '#f0f4ff' : 'white',
     color: state.isSelected ? 'white' : '#111827',
   }),
-};
-
-const searchEmojis = async (value: string) => {
-  const emojis = await SearchIndex.search(value);
-  return emojis.map((emoji: IEmoji) => emoji.skins[0].native);
 };
 
 const maxProfileTextLength = (maxLength: number) =>
@@ -269,10 +261,10 @@ const EditMyProfilePage = () => {
   };
 
   const handleEmojiSearch = async (fieldName: EmojiFieldName, value: string) => {
-    const match = value.match(EMOJI_SHORTCODE_REGEX);
+    const searchTerm = getEmojiSearchQueryFromText(value);
 
-    if (match) {
-      const emojis = await searchEmojis(match[1]);
+    if (searchTerm) {
+      const emojis = await searchEmojiNatives(searchTerm);
       setActiveEmojiField(fieldName);
       setCurrentEmojis(emojis);
       return;
@@ -291,7 +283,7 @@ const EditMyProfilePage = () => {
       <EmojiPicker
         emojis={currentEmojis}
         onEmojiSelect={(emoji: string) => {
-          onChange(value.replace(EMOJI_SHORTCODE_REGEX, emoji));
+          onChange(replaceEmojiToken(value, emoji));
           setActiveEmojiField(null);
           setCurrentEmojis([]);
         }}
@@ -676,7 +668,7 @@ const EditMyProfilePage = () => {
                     </div>
                   }
                   type="text"
-                  className="mb-2"
+                  className="mb-4 h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
                   placeholder="Najdraža youtube pjesma (https://www.youtube.com/embed/)"
                   {...register('favoriteSong')}
                   error={errors.favoriteSong?.message}
@@ -701,7 +693,7 @@ const EditMyProfilePage = () => {
                     </div>
                   }
                   type="text"
-                  className="mb-2"
+                  className="mb-2 h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
                   placeholder="Trailer za najdraži film (https://www.youtube.com/embed/)"
                   {...register('favoriteMovie')}
                   error={errors.favoriteMovie?.message}

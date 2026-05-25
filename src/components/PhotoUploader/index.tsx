@@ -19,18 +19,17 @@ import Image from '../Image';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import EmojiPicker from '@app/components/EmojiPicker';
 import data from '@emoji-mart/data';
-import { init, SearchIndex } from 'emoji-mart';
+import { init } from 'emoji-mart';
+import {
+  getEmojiSearchQueryFromText,
+  replaceEmojiToken,
+  searchEmojiNatives,
+} from '@app/utils/emojis';
 
 export interface ImageDescription {
   description: string;
   imageId: string;
   isProfilePhoto?: boolean;
-}
-
-interface IEmoji {
-  skins: {
-    native: string;
-  }[];
 }
 
 interface IPhotoActionButtonsProps {
@@ -44,7 +43,6 @@ interface IPhotoActionButtonsProps {
 }
 
 const DESCRIPTION_MAX_LENGTH = 100;
-const EMOJI_SHORTCODE_REGEX = /(?:\s|^):([^\s:]+)/;
 
 const DeleteButtonModal = ({
   onDelete,
@@ -73,11 +71,6 @@ const normalizeDescription = (raw: string) =>
 
 const getDescriptionLength = (description: string) => Array.from(description).length;
 
-const searchEmojis = async (value: string) => {
-  const emojis = await SearchIndex.search(value);
-  return emojis.map((emoji: IEmoji) => emoji.skins[0].native);
-};
-
 const PhotoActionButtons = ({
   onInputChange,
   onDelete,
@@ -97,14 +90,20 @@ const PhotoActionButtons = ({
       />
       <Input
         value={inputValue}
-        className="mt-4"
+        className="mt-4 h-12 rounded-2xl border-[#dce4ff] bg-white px-4 text-sm shadow-sm"
         placeholder="Napiši nešto o fotografiji ( : za emoji )"
         onChange={(e) => onInputChange(e.target.value)}
         type="text"
         disabled={disabled}
       />
       {hasCheckbox && (
-        <div className="flex gap-1 items-center mt-4">
+        <label
+          className={`mt-3 flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors ${
+            isChecked
+              ? 'border-blue bg-blue/10 text-blue'
+              : 'border-[#dce4ff] bg-white text-gray-700 hover:bg-[#f0f4ff]'
+          } ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
+        >
           <input
             type="checkbox"
             disabled={disabled}
@@ -116,15 +115,16 @@ const PhotoActionButtons = ({
                   }
             }
             checked={isChecked}
+            className="h-4 w-4 rounded border-[#b9c6ff] accent-blue"
           />
-          <span>Postavi kao profilnu</span>
-        </div>
+          <span>{isChecked ? 'Odabrana profilna fotografija' : 'Postavi kao profilnu'}</span>
+        </label>
       )}
       <div className="mt-4 flex gap-2">
         <Button
-          type="black"
+          type="danger"
           htmlType="button"
-          className="flex gap-1 items-center"
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold"
           onClick={(e: SyntheticEvent | undefined) => {
             e?.preventDefault();
             setIsDeleteModalOpen(true);
@@ -170,10 +170,10 @@ const PhotoUploader = () => {
   }, [allExistingImages]);
 
   const handleEmojiSearch = async (descriptionId: string, value: string) => {
-    const match = value.match(EMOJI_SHORTCODE_REGEX);
+    const searchTerm = getEmojiSearchQueryFromText(value);
 
-    if (match) {
-      const emojis = await searchEmojis(match[1]);
+    if (searchTerm) {
+      const emojis = await searchEmojiNatives(searchTerm);
       setActiveDescriptionId(descriptionId);
       setCurrentEmojis(emojis);
       return;
@@ -210,7 +210,7 @@ const PhotoUploader = () => {
     currentValue: string,
     emoji: string
   ) => {
-    const updatedValue = currentValue.replace(EMOJI_SHORTCODE_REGEX, emoji);
+    const updatedValue = replaceEmojiToken(currentValue, emoji);
     setDescriptionInputValues((prev) => ({ ...prev, [descriptionId]: updatedValue }));
     setActiveDescriptionId(null);
     setCurrentEmojis([]);
@@ -300,8 +300,27 @@ const PhotoUploader = () => {
 
   const onSubmitUpdatePhotos = (e: SyntheticEvent) => {
     e.preventDefault();
+    const changedDescriptionsById = new Map(
+      updatedImageDescriptions.map((image) => [removeSpacesAndDashes(image.imageId), image])
+    );
+    const imagesPayload = allExistingImages.data.images.map((image: IImage, index: number) => {
+      const imageId = removeSpacesAndDashes(image.name);
+      const changedDescription = changedDescriptionsById.get(imageId)?.description;
+      const currentDescription = normalizeDescription(
+        getDescriptionInputValue(imageId, image.description || '')
+      );
+      const isProfilePhoto =
+        allCheckboxes.find((checkbox) => checkbox.index === index)?.isProfilePhoto || false;
+
+      return {
+        description: changedDescription ?? currentDescription,
+        imageId,
+        isProfilePhoto,
+      };
+    });
+
     const formData = new FormData();
-    formData.append('text', JSON.stringify(updatedImageDescriptions));
+    formData.append('text', JSON.stringify(imagesPayload));
     formData.append('userId', userId as string);
     onUploadPhotos(formData);
   };
@@ -335,7 +354,7 @@ const PhotoUploader = () => {
       {shouldShowEditable && (
         <Card className="mb-6 rounded-2xl p-5 md:p-6">
           <form onSubmit={onSubmitUpdatePhotos}>
-            <div className="mb-4">
+            <div className="mb-5">
               <h2 className="text-2xl font-bold text-gray-900">Tvoje fotografije</h2>
               <p className="mt-1 text-gray-600">Uredi opise i odaberi profilnu fotografiju.</p>
             </div>
@@ -348,9 +367,21 @@ const PhotoUploader = () => {
                 return (
                   <div
                     key={`${image.name}-editable`}
-                    className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3"
+                    className="overflow-hidden rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3 shadow-sm transition-shadow hover:shadow-lg hover:shadow-blue/10"
                   >
-                    <BlobImage imageUrl={image.securePhotoUrl} name={image.name} />
+                    <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
+                      <BlobImage
+                        imageUrl={image.securePhotoUrl}
+                        name={image.name}
+                        className="h-full w-full object-cover"
+                      />
+                      {allCheckboxes.find((checkbox) => checkbox.index === index)
+                        ?.isProfilePhoto && (
+                        <span className="absolute left-3 top-3 rounded-full bg-blue px-3 py-1 text-xs font-bold text-white shadow-md">
+                          Profilna
+                        </span>
+                      )}
+                    </div>
                     <div className="relative">
                       <PhotoActionButtons
                         onInputChange={(value: string) => {
@@ -443,13 +474,15 @@ const PhotoUploader = () => {
               })}
             </div>
 
-            <Button
-              type="blue"
-              className="mt-4 w-full md:w-auto"
-              disabled={hasDescriptionError || isUploadingPhotos}
-            >
-              <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi'}</span>
-            </Button>
+            <div className="mt-5 flex justify-end border-t border-[#dce4ff] pt-4">
+              <Button
+                type="blue"
+                className="w-full rounded-full px-6 py-3 font-semibold shadow-md shadow-blue/15 md:w-auto"
+                disabled={hasDescriptionError || isUploadingPhotos}
+              >
+                <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi promjene'}</span>
+              </Button>
+            </div>
           </form>
         </Card>
       )}

@@ -54,6 +54,30 @@ describe('PostLoginForm integration', () => {
     await waitFor(() => expect(updatePostLoginMutation).not.toHaveBeenCalled());
   });
 
+  it('rejects ages above 110', async () => {
+    render(<PostLoginForm />);
+
+    fireEvent.change(screen.getByPlaceholderText('npr. jazavac123'), {
+      target: {
+        value: 'valid_user',
+      },
+    });
+    fireEvent.change(screen.getByPlaceholderText('18+'), {
+      target: {
+        value: '350',
+      },
+    });
+    fireEvent.click(screen.getByLabelText(/Politiku privatnosti/));
+    fireEvent.click(screen.getByLabelText(/Pravila upotrebe/));
+
+    expect(await screen.findByText('Dob ne može biti veća od 110 godina.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Nastavi' })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Nastavi' }));
+
+    await waitFor(() => expect(updatePostLoginMutation).not.toHaveBeenCalled());
+  });
+
   it('enables submit and sends signup values when the form is valid', async () => {
     render(<PostLoginForm />);
 
