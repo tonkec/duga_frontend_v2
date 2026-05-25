@@ -5,12 +5,18 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { AuthGuard } from './AuthGuard';
 import { AppSessionContext, AppSessionStatus } from '../../context/AppSessionContext';
+import { useEnsureBackendUser } from '../../hooks/useEnsureBackendUser';
 
 jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
 }));
 
+jest.mock('@app/hooks/useEnsureBackendUser', () => ({
+  useEnsureBackendUser: jest.fn(),
+}));
+
 const mockUseAuth0 = jest.mocked(useAuth0);
+const mockUseEnsureBackendUser = jest.mocked(useEnsureBackendUser);
 const getAccessTokenSilently = jest.fn();
 
 const auth0State = (overrides: Record<string, unknown>) =>
@@ -52,6 +58,10 @@ describe('AuthGuard protected route redirects', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     getAccessTokenSilently.mockResolvedValue('test-token');
+    mockUseEnsureBackendUser.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as ReturnType<typeof useEnsureBackendUser>);
   });
 
   it('redirects unauthenticated users from protected pages to login', async () => {
@@ -95,6 +105,28 @@ describe('AuthGuard protected route redirects', () => {
     expect(await screen.findByText('Verify email')).toBeVisible();
     expect(screen.queryByText('Protected settings')).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/verify-email'));
+  });
+
+  it('allows users verified by the backend when Auth0 email verification is stale', async () => {
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          email_verified: false,
+        },
+      })
+    );
+    mockUseEnsureBackendUser.mockReturnValue({
+      data: {
+        isVerified: true,
+      },
+      isLoading: false,
+    } as ReturnType<typeof useEnsureBackendUser>);
+
+    renderProtectedRoute();
+
+    expect(await screen.findByText('Protected settings')).toBeVisible();
+    expect(screen.getByTestId('location')).toHaveTextContent('/settings');
   });
 
   it('redirects authenticated users to login when the app session is not active', async () => {
