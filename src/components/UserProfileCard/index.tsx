@@ -1,5 +1,5 @@
 import Card from '@app/components/Card';
-import { BiBody, BiBoltCircle, BiCheckCircle, BiSolidMap, BiStopwatch } from 'react-icons/bi';
+import { BiBody, BiBoltCircle, BiCheckCircle, BiSolidMap, BiStopwatch, BiX } from 'react-icons/bi';
 import {
   getFavoriteDayOfWeekTranslation,
   getLookingForTranslation,
@@ -73,10 +73,24 @@ const ProfileDetail = ({
   </div>
 );
 
-const LifestyleDetail = ({ label }: { label: string }) => (
-  <div className="inline-flex items-center gap-2 rounded-xl bg-green/10 px-3 py-2 text-sm font-semibold text-green">
-    <BiCheckCircle fontSize={20} />
-    <span>{label}</span>
+const BooleanDetail = ({
+  negativeLabel,
+  positiveLabel,
+  value,
+}: {
+  negativeLabel: string;
+  positiveLabel: string;
+  value: boolean;
+}) => (
+  <div
+    className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${
+      value
+        ? 'bg-green/10 text-green'
+        : 'bg-red/10 text-red line-through decoration-red/70 decoration-2'
+    }`}
+  >
+    {value ? <BiCheckCircle fontSize={20} /> : <BiX fontSize={20} />}
+    <span>{value ? positiveLabel : negativeLabel}</span>
   </div>
 );
 
@@ -197,20 +211,6 @@ const UserProfileCard = ({
       shouldRender: hasDisplayValue(relationshipStatusLabel),
     },
   ].filter((detail) => detail.shouldRender);
-  const lifestyleDetails = [
-    {
-      label: 'Puši',
-      shouldRender: user.cigarettes,
-    },
-    {
-      label: 'Pije',
-      shouldRender: user.alcohol,
-    },
-    {
-      label: 'Bavi se sportom',
-      shouldRender: user.sport,
-    },
-  ].filter((detail) => detail.shouldRender);
   const favoriteSongEmbedUrl = getYouTubeEmbedUrl(user.favoriteSong);
   const favoriteMovieUrl = getImdbTitleUrl(user.favoriteMovie);
 
@@ -266,13 +266,15 @@ const UserProfileCard = ({
           </div>
         )}
 
-        {lifestyleDetails.length > 0 && (
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
-            {lifestyleDetails.map((detail) => (
-              <LifestyleDetail key={detail.label} label={detail.label} />
-            ))}
-          </div>
-        )}
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <BooleanDetail negativeLabel="Ne puši" positiveLabel="Puši" value={user.cigarettes} />
+          <BooleanDetail negativeLabel="Ne pije" positiveLabel="Pije" value={user.alcohol} />
+          <BooleanDetail
+            negativeLabel="Ne bavi se sportom"
+            positiveLabel="Bavi se sportom"
+            value={user.sport}
+          />
+        </div>
       </div>
 
       <div className="mt-5 grid gap-4">
