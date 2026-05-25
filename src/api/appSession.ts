@@ -27,6 +27,10 @@ export const getAppSessionId = () => {
   return sessionId;
 };
 
+export const setAppSessionId = (sessionId: string) => {
+  localStorage.setItem(SESSION_ID_KEY, sessionId);
+};
+
 export const clearAppSessionId = () => {
   localStorage.removeItem(SESSION_ID_KEY);
   clearDugaApiToken();
