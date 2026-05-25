@@ -58,7 +58,7 @@ const PhotoPage = () => {
         <div className="inline-flex items-center gap-3 rounded-full border border-[#dce4ff] bg-white px-3 py-2 shadow-sm">
           <UserAvatar
             className="h-10 w-10 rounded-full"
-            color="#F037A5"
+            color="#2D46B9"
             avatarFallbackName={`${username}`}
             userId={String(userId)}
           />
@@ -74,7 +74,7 @@ const PhotoPage = () => {
       >
         <UserAvatar
           className="h-10 w-10 rounded-full"
-          color="#F037A5"
+          color="#2D46B9"
           avatarFallbackName={`${username}`}
           userId={String(userId)}
         />

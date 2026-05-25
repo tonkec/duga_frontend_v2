@@ -17,6 +17,35 @@ const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string;
 
 type Option = { value: string; label: string };
 
+const reportSelectStyles = {
+  control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
+    ...base,
+    minHeight: '3rem',
+    borderRadius: '0.75rem',
+    borderColor: state.isFocused ? '#2D46B9' : '#dce4ff',
+    boxShadow: state.isFocused ? '0 0 0 1px #2D46B9' : '0 1px 2px rgba(15, 23, 42, 0.05)',
+    '&:hover': {
+      borderColor: '#2D46B9',
+    },
+  }),
+  menu: (base: Record<string, unknown>) => ({
+    ...base,
+    borderRadius: '1rem',
+    overflow: 'hidden',
+    border: '1px solid #dce4ff',
+    boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
+  }),
+  option: (base: Record<string, unknown>, state: { isSelected: boolean; isFocused: boolean }) => ({
+    ...base,
+    backgroundColor: state.isSelected ? '#2D46B9' : state.isFocused ? '#f0f4ff' : 'white',
+    color: state.isSelected ? 'white' : '#111827',
+    ':active': {
+      backgroundColor: '#2D46B9',
+      color: 'white',
+    },
+  }),
+};
+
 const problemOptions: Option[] = [
   { value: 'bug', label: 'Bug / tehnički problem' },
   { value: 'abuse', label: 'Zlouporaba / uznemiravanje' },
@@ -95,6 +124,7 @@ export default function ReportPage() {
                       onChange={(opt) => field.onChange((opt as Option | null)?.value ?? '')}
                       onBlur={field.onBlur}
                       isClearable
+                      styles={reportSelectStyles}
                       classNamePrefix="react-select"
                       placeholder="Odaberi vrstu problema"
                       theme={(theme) => ({

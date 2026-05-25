@@ -38,6 +38,9 @@ const getPlaceholder = (selectValue: { value: string; label: string }) => {
 };
 
 const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFiltersProps) => {
+  const hasActiveFilters =
+    search.trim().length > 0 || selectValue.value !== defaultSelectValue.value;
+
   return (
     <section className="relative isolate overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm">
       <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue/10 blur-3xl" />
@@ -87,7 +90,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
             );
           })}
 
-          {selectValue.value && (
+          {hasActiveFilters && (
             <button
               type="button"
               className="rounded-xl border border-red/30 bg-red/10 px-4 py-2 text-sm font-semibold text-red shadow-sm transition-colors hover:bg-red hover:text-white"

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { BiCog, BiGroup, BiHomeAlt, BiMessageRounded, BiUser } from 'react-icons/bi';
+import { BiCog, BiGroup, BiHelpCircle, BiHomeAlt, BiMessageRounded, BiUser } from 'react-icons/bi';
 import { FiLogOut } from 'react-icons/fi';
 import NotificationDropdown from '../Navigation/components/Notifications';
 
@@ -15,6 +15,7 @@ const navItems = [
   { to: '/new-chat', label: 'Poruke', icon: <BiMessageRounded fontSize={20} /> },
   { to: '/profile', label: 'Profil', icon: <BiUser fontSize={20} /> },
   { to: '/users', label: 'Korisnici', icon: <BiGroup fontSize={20} /> },
+  { to: '/forum', label: 'Forum', icon: <BiHelpCircle fontSize={20} /> },
   { to: '/settings', label: 'Postavke', icon: <BiCog fontSize={20} /> },
 ];
 

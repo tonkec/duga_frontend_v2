@@ -201,7 +201,7 @@ const CommentWithUser: React.FC<{
             disabled={isOwnComment}
           >
             <UserAvatar
-              color="#F037A5"
+              color="#2D46B9"
               userId={String(comment.userId)}
               avatarFallbackName={username}
               className="h-9 w-9 shrink-0 rounded-full"

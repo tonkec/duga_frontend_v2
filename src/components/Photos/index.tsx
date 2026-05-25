@@ -41,7 +41,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
     return (
       <div className="relative isolate overflow-hidden rounded-3xl border border-dashed border-[#b9c6ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-14 text-center">
         <div className="absolute -left-16 top-8 h-40 w-40 rounded-full bg-blue/10 blur-3xl" />
-        <div className="absolute -right-16 bottom-4 h-44 w-44 rounded-full bg-pink/10 blur-3xl" />
+        <div className="absolute -right-16 bottom-4 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
 
         <div className="relative z-10 mx-auto flex max-w-lg flex-col items-center">
           <div className="mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-white text-blue-dark shadow-lg shadow-blue/10">

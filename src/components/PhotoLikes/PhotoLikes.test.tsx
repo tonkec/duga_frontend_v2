@@ -100,7 +100,13 @@ describe('PhotoLikes integration', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Lajkaj fotografiju' }));
 
-    expect(mutateUpvoteUpload).toHaveBeenCalledWith({ uploadId: '42' });
+    expect(mutateUpvoteUpload).toHaveBeenCalledWith(
+      { uploadId: '42' },
+      expect.objectContaining({
+        onError: expect.any(Function),
+        onSettled: expect.any(Function),
+      })
+    );
 
     act(() => {
       socketHandlers['upvote-upload']({
@@ -113,7 +119,13 @@ describe('PhotoLikes integration', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Ukloni lajk' }));
 
-    expect(mutateDownvoteUpload).toHaveBeenCalledWith({ uploadId: '42' });
+    expect(mutateDownvoteUpload).toHaveBeenCalledWith(
+      { uploadId: '42' },
+      expect.objectContaining({
+        onError: expect.any(Function),
+        onSettled: expect.any(Function),
+      })
+    );
 
     act(() => {
       socketHandlers['downvote-upload']({
@@ -124,5 +136,16 @@ describe('PhotoLikes integration', () => {
 
     expect(screen.getByText('Nema lajkova')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Lajkaj fotografiju' })).toBeVisible();
+  });
+
+  it('prevents duplicate like requests while the local like state is optimistic', () => {
+    renderPhotoLikes();
+
+    const likeButton = screen.getByRole('button', { name: 'Lajkaj fotografiju' });
+    fireEvent.click(likeButton);
+    fireEvent.click(likeButton);
+
+    expect(mutateUpvoteUpload).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Ukloni lajk' })).toBeVisible();
   });
 });

@@ -149,7 +149,7 @@ const OtherUserMessageTemplate = ({
           onClick={() => navigate(`/user/${otherUserId}`)}
         >
           <UserAvatar
-            color="#F037A5"
+            color="#2D46B9"
             avatarFallbackName={userName}
             userId={String(otherUserId)}
             className="h-9 w-9 rounded-full"

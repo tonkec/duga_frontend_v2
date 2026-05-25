@@ -155,7 +155,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
                     className="group flex w-full items-center gap-3 rounded-2xl border border-transparent bg-white px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:opacity-50"
                   >
                     <UserAvatar
-                      color="#F037A5"
+                      color="#2D46B9"
                       avatarFallbackName={user.username}
                       userId={String(user.id)}
                       className="h-11 w-11 rounded-full"

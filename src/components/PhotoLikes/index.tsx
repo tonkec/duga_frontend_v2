@@ -1,6 +1,6 @@
 import { BiHeart, BiSolidHeart } from 'react-icons/bi';
 import { useDownvoteUpload, useGetUploadUpvotes, useUpvoteUpload } from './hooks';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSocket } from '@app/context/useSocket';
 import PhotoLikeDropdown from './components/LikesList';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
@@ -17,27 +17,73 @@ interface ILike {
 const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
   const socket = useSocket();
   const { user: currentUser } = useGetCurrentUser();
-  const { mutateUpvoteUpload } = useUpvoteUpload();
-  const { mutateDownvoteUpload } = useDownvoteUpload();
+  const { mutateUpvoteUpload, isUpvotingUpload } = useUpvoteUpload();
+  const { mutateDownvoteUpload, isDownvotingUpload } = useDownvoteUpload();
   const { allUploadUpvotes, areUploadUpvotesLoading } = useGetUploadUpvotes(photoId as string);
   const [allLikes, setAllLikes] = useState<ILike[]>([]);
+  const [optimisticUserLiked, setOptimisticUserLikedState] = useState<boolean | null>(null);
+  const [isLocalLikePending, setIsLocalLikePending] = useState(false);
+  const optimisticUserLikedRef = useRef<boolean | null>(null);
+  const isLocalLikePendingRef = useRef(false);
+  const isLikeMutationPending = isUpvotingUpload || isDownvotingUpload || isLocalLikePending;
 
-  const hasUserLiked = useMemo(() => {
+  const hasUserLikedFromServer = useMemo(() => {
     return allLikes.some((like) => Number(like.userId) === Number(currentUser?.data?.id));
   }, [allLikes, currentUser]);
+  const hasUserLiked = optimisticUserLiked ?? hasUserLikedFromServer;
+
+  const setOptimisticUserLiked = (value: boolean | null) => {
+    optimisticUserLikedRef.current = value;
+    setOptimisticUserLikedState(value);
+  };
+
+  const setLocalLikePending = (value: boolean) => {
+    isLocalLikePendingRef.current = value;
+    setIsLocalLikePending(value);
+  };
 
   const onUpvote = () => {
-    if (!currentUser || !photoId) return;
-    mutateUpvoteUpload({ uploadId: photoId });
+    if (!currentUser || !photoId || hasUserLiked || isLocalLikePendingRef.current) return;
+    setLocalLikePending(true);
+    setOptimisticUserLiked(true);
+    setAllLikes((currentLikes) => [
+      ...currentLikes,
+      {
+        id: -Number(currentUser.data.id),
+        userId: String(currentUser.data.id),
+      },
+    ]);
+    mutateUpvoteUpload(
+      { uploadId: photoId },
+      {
+        onError: () => setOptimisticUserLiked(null),
+        onSettled: () => setLocalLikePending(false),
+      }
+    );
   };
 
   const onDownvote = () => {
-    if (!currentUser || !photoId) return;
-    mutateDownvoteUpload({ uploadId: photoId });
+    if (!currentUser || !photoId || !hasUserLiked || isLocalLikePendingRef.current) return;
+    setLocalLikePending(true);
+    setOptimisticUserLiked(false);
+    setAllLikes((currentLikes) =>
+      currentLikes.filter((like) => Number(like.userId) !== Number(currentUser.data.id))
+    );
+    mutateDownvoteUpload(
+      { uploadId: photoId },
+      {
+        onError: () => setOptimisticUserLiked(null),
+        onSettled: () => setLocalLikePending(false),
+      }
+    );
   };
 
   useEffect(() => {
-    if (!areUploadUpvotesLoading && Array.isArray(allUploadUpvotes?.data)) {
+    if (
+      !areUploadUpvotesLoading &&
+      Array.isArray(allUploadUpvotes?.data) &&
+      optimisticUserLikedRef.current === null
+    ) {
       setAllLikes(allUploadUpvotes.data);
     }
   }, [allUploadUpvotes?.data, areUploadUpvotesLoading]);
@@ -48,6 +94,8 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
     const handleUpdate = (data: { uploadId: number; likes: ILike[] }) => {
       if (String(data.uploadId) === String(photoId)) {
         setAllLikes(data.likes);
+        setOptimisticUserLiked(null);
+        setLocalLikePending(false);
       }
     };
 
@@ -69,7 +117,8 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
           type="button"
           aria-label="Ukloni lajk"
           onClick={onDownvote}
-          className="grid h-9 w-9 place-items-center rounded-full bg-red text-white shadow-sm shadow-red/20 transition-transform hover:scale-105"
+          disabled={isLikeMutationPending}
+          className="grid h-9 w-9 place-items-center rounded-full bg-red text-white shadow-sm shadow-red/20 transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <BiSolidHeart fontSize={22} />
         </button>
@@ -78,7 +127,8 @@ const PhotoLikes = ({ photoId }: IPhotoLikesProps) => {
           type="button"
           aria-label="Lajkaj fotografiju"
           onClick={onUpvote}
-          className="grid h-9 w-9 place-items-center rounded-full bg-red/10 text-red transition-all hover:scale-105 hover:bg-red hover:text-white"
+          disabled={isLikeMutationPending}
+          className="grid h-9 w-9 place-items-center rounded-full bg-red/10 text-red transition-all hover:scale-105 hover:bg-red hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           <BiHeart fontSize={22} />
         </button>

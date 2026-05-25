@@ -25,11 +25,11 @@ const defaultStyles = `rounded text-sm disabled:opacity-50 disabled:cursor-not-a
 const getBackgroundColor = (type: IButtonProps['type']) => {
   switch (type) {
     case 'primary':
-      return 'py-2 px-4 bg-pink hover:bg-pink-dark text-white';
+      return 'py-2 px-4 bg-blue hover:bg-blue-dark text-white';
     case 'secondary':
       return 'py-2 px-4 bg-white hover:bg-blue-dark text-black hover:text-white';
     case 'tertiary':
-      return 'py-2 px-4 bg-rose hover:bg-[rgb(245,200,230)] text-black hover:text-black';
+      return 'py-2 px-4 bg-[#f0f4ff] hover:bg-[#dce4ff] text-black hover:text-black';
     case 'icon':
       return 'px-0';
     case 'black':

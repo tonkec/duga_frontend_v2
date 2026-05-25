@@ -73,14 +73,24 @@ const ProfileDetail = ({
   </div>
 );
 
-const BooleanDetail = ({ label, value }: { label: string; value: boolean }) => (
-  <div className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-800">
-    <span>{label}</span>
-    {value ? (
-      <BiCheckCircle fontSize={24} color="#34D399" />
-    ) : (
-      <BiX fontSize={24} color="#FF748B" />
-    )}
+const BooleanDetail = ({
+  negativeLabel,
+  positiveLabel,
+  value,
+}: {
+  negativeLabel: string;
+  positiveLabel: string;
+  value: boolean;
+}) => (
+  <div
+    className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${
+      value
+        ? 'bg-green/10 text-green'
+        : 'bg-red/10 text-red line-through decoration-red/70 decoration-2'
+    }`}
+  >
+    {value ? <BiCheckCircle fontSize={20} /> : <BiX fontSize={20} />}
+    <span>{value ? positiveLabel : negativeLabel}</span>
   </div>
 );
 
@@ -257,9 +267,13 @@ const UserProfileCard = ({
         )}
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <BooleanDetail label="Cigarete" value={user.cigarettes} />
-          <BooleanDetail label="Alkohol" value={user.alcohol} />
-          <BooleanDetail label="Sport" value={user.sport} />
+          <BooleanDetail negativeLabel="Ne puši" positiveLabel="Puši" value={user.cigarettes} />
+          <BooleanDetail negativeLabel="Ne pije" positiveLabel="Pije" value={user.alcohol} />
+          <BooleanDetail
+            negativeLabel="Ne bavi se sportom"
+            positiveLabel="Bavi se sportom"
+            value={user.sport}
+          />
         </div>
       </div>
 
@@ -344,9 +358,9 @@ const UserProfileCard = ({
                 href={favoriteMovieUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex w-full items-stretch overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10"
+                className="group grid w-full overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10 sm:grid-cols-2"
               >
-                <span className="flex h-40 w-28 shrink-0 items-center justify-center bg-[#f5c518] text-xl font-black tracking-tight text-black sm:w-32">
+                <span className="flex min-h-[260px] w-full items-center justify-center bg-[#f5c518] text-xl font-black tracking-tight text-black">
                   {favoriteMoviePreview?.imageUrl ? (
                     <Image
                       src={favoriteMoviePreview.imageUrl}
@@ -357,7 +371,7 @@ const UserProfileCard = ({
                     'IMDb'
                   )}
                 </span>
-                <span className="flex min-w-0 flex-1 flex-col justify-center p-4">
+                <span className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
                   <span className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
                     IMDb preview
                   </span>

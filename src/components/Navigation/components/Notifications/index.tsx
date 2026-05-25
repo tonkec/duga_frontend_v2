@@ -16,9 +16,10 @@ export type INotification = {
   content: string;
   isRead: boolean;
   createdAt: string;
+  updatedAt?: string;
   chatId?: number | null;
   actionId: number | null;
-  actionType: 'upload' | 'comment' | 'message' | null;
+  actionType: 'upload' | 'comment' | 'message' | 'forum_question' | 'forum_answer' | null;
 };
 
 const NotificationDropdown = ({
