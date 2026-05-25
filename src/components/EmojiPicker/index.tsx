@@ -1,15 +1,21 @@
 interface IEmojiPickerProps {
   emojis: string[];
   onEmojiSelect: (emoji: string) => void;
+  variant?: 'floating' | 'static';
 }
 
-const EmojiPicker = ({ emojis, onEmojiSelect }: IEmojiPickerProps) => {
+const EmojiPicker = ({ emojis, onEmojiSelect, variant = 'floating' }: IEmojiPickerProps) => {
   if (!emojis.length) {
     return null;
   }
 
+  const wrapperClassName =
+    variant === 'floating'
+      ? 'absolute z-50 mt-2 grid max-h-44 w-72 grid-cols-8 gap-1 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white/95 p-2 shadow-xl shadow-blue-dark/10 backdrop-blur sm:w-80'
+      : 'grid max-h-60 grid-cols-8 gap-1 overflow-y-auto rounded-2xl bg-[#f7f9ff] p-2';
+
   return (
-    <div className="absolute z-50 mt-2 grid max-h-44 w-72 grid-cols-8 gap-1 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white/95 p-2 shadow-xl shadow-blue-dark/10 backdrop-blur sm:w-80">
+    <div className={wrapperClassName}>
       {emojis.map((emoji, index) => {
         return (
           <button

@@ -6,7 +6,6 @@ import {
   getRelationshipStatusTranslation,
   shouldRenderField,
 } from './utils';
-import Iframe from 'react-iframe';
 import { IImage } from '@app/components/Photos';
 import Loader from '@app/components/Loader';
 import { useSocket } from '@app/context/useSocket';
@@ -14,19 +13,11 @@ import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
 import ContentFormatter from '../ContentFormatter';
 import { cityOptions } from '@app/consts/cityOptions';
-
-const isYouTubeUrl = (url: string) => {
-  try {
-    const parsed = new URL(url);
-    return (
-      parsed.hostname === 'www.youtube.com' ||
-      parsed.hostname === 'youtube.com' ||
-      parsed.hostname === 'youtu.be'
-    );
-  } catch {
-    return false;
-  }
-};
+import { getImdbTitleId, getImdbTitleUrl } from '@app/utils/imdb';
+import { getYouTubeEmbedUrl, isYouTubeUrl } from '@app/utils/youtube';
+import { useQuery } from '@tanstack/react-query';
+import { searchImdbTitles } from '@app/api/imdb';
+import Image from '../Image';
 
 const hasEmbeddableContent = (value: string) =>
   /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/.test(value) ||
@@ -104,11 +95,11 @@ const ProfileSection = ({
 }) => (
   <section
     className={`rounded-2xl border border-[#dce4ff] bg-white p-5 shadow-sm ${
-      compact ? 'w-fit max-w-full' : ''
+      compact ? 'max-w-full' : ''
     }`}
   >
     <h2 className="mb-3 font-bold text-gray-900">{title}</h2>
-    <div className="text-gray-700">{children}</div>
+    <div className="w-full text-gray-700">{children}</div>
   </section>
 );
 
@@ -144,6 +135,17 @@ const UserProfileCard = ({
       setIsOnlineState(user.status === 'online');
     }
   }, [socket, user?.id, user?.status]);
+
+  const favoriteMovieId = getImdbTitleId(user?.favoriteMovie);
+  const { data: imdbPreviewResults = [], isPending: isImdbPreviewLoading } = useQuery({
+    queryKey: ['imdbTitlePreview', favoriteMovieId],
+    queryFn: () => searchImdbTitles(favoriteMovieId || ''),
+    enabled: Boolean(favoriteMovieId),
+    retry: false,
+    staleTime: 1000 * 60 * 60,
+  });
+  const favoriteMoviePreview =
+    imdbPreviewResults.find((movie) => movie.id === favoriteMovieId) || imdbPreviewResults[0];
 
   if (allImagesLoading) {
     return <Loader />;
@@ -199,6 +201,8 @@ const UserProfileCard = ({
       shouldRender: hasDisplayValue(relationshipStatusLabel),
     },
   ].filter((detail) => detail.shouldRender);
+  const favoriteSongEmbedUrl = getYouTubeEmbedUrl(user.favoriteSong);
+  const favoriteMovieUrl = getImdbTitleUrl(user.favoriteMovie);
 
   return (
     <Card className="rounded-2xl p-5 md:p-7">
@@ -319,8 +323,14 @@ const UserProfileCard = ({
 
         {shouldRenderField(user.favoriteSong) && (
           <ProfileSection title="Najdraža YouTube pjesma" compact>
-            {isYouTubeUrl(user.favoriteSong) ? (
-              <Iframe url={user.favoriteSong} width="360" height="200" />
+            {isYouTubeUrl(user.favoriteSong) && favoriteSongEmbedUrl ? (
+              <iframe
+                src={favoriteSongEmbedUrl}
+                className="aspect-video w-full rounded-xl"
+                title="Najdraža YouTube pjesma"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             ) : (
               <p className="text-red-500">Neispravan YouTube URL</p>
             )}
@@ -328,11 +338,51 @@ const UserProfileCard = ({
         )}
 
         {shouldRenderField(user.favoriteMovie) && (
-          <ProfileSection title="Najdraži YouTube video" compact>
-            {isYouTubeUrl(user.favoriteMovie) ? (
-              <Iframe url={user.favoriteMovie} width="360" height="200" />
+          <ProfileSection title="Najdraži film" compact>
+            {favoriteMovieUrl ? (
+              <a
+                href={favoriteMovieUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex w-full items-stretch overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10"
+              >
+                <span className="flex h-40 w-28 shrink-0 items-center justify-center bg-[#f5c518] text-xl font-black tracking-tight text-black sm:w-32">
+                  {favoriteMoviePreview?.imageUrl ? (
+                    <Image
+                      src={favoriteMoviePreview.imageUrl}
+                      alt={favoriteMoviePreview.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    'IMDb'
+                  )}
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col justify-center p-4">
+                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
+                    IMDb preview
+                  </span>
+                  <span className="mt-1 font-bold text-gray-950 group-hover:text-blue">
+                    {isImdbPreviewLoading
+                      ? 'Učitavam film...'
+                      : favoriteMoviePreview?.title || 'Otvori najdraži film'}
+                  </span>
+                  {favoriteMoviePreview?.year && (
+                    <span className="mt-1 text-sm font-semibold text-gray-500">
+                      {favoriteMoviePreview.year}
+                    </span>
+                  )}
+                  {!favoriteMoviePreview?.year && favoriteMovieId && (
+                    <span className="mt-1 text-sm font-semibold text-gray-500">
+                      {favoriteMovieId}
+                    </span>
+                  )}
+                  <span className="mt-3 inline-flex w-fit rounded-md bg-[#f5c518] px-2 py-1 text-xs font-black text-black">
+                    IMDb
+                  </span>
+                </span>
+              </a>
             ) : (
-              <p className="text-red-500">Neispravan YouTube URL</p>
+              <p className="text-red-500">Neispravan IMDb film</p>
             )}
           </ProfileSection>
         )}

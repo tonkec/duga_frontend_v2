@@ -24,46 +24,85 @@ const WelcomeHero = ({ onEditProfile, onFindUsers, onSendMessage }: WelcomeHeroP
     <div className="absolute -left-20 top-4 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
     <div className="absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-pink/20 blur-3xl" />
 
-    <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-      <div className="max-w-2xl">
+    <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center">
+      <div className="max-w-3xl">
         <span className="mb-4 inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-          Duga chat
+          Prvi korak
         </span>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Dobrodošao_la u Dugu</h1>
-        <p className="mt-4 max-w-xl text-sm leading-7 text-white/85 sm:text-base">
-          Uredi profil, pronađi nove korisnike i započni razgovor kad god si spreman_na.
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          Dobrodošao_la. Kreni od profila.
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
+          Dodaj par detalja i profilnu fotografiju kako bi drugi odmah znali tko si. Nakon toga
+          možeš pregledati ljudeke ili otvoriti razgovore.
         </p>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Button
+            type="secondary"
+            className="rounded-full px-6 py-3 font-bold shadow-lg shadow-black/10"
+            onClick={onEditProfile}
+          >
+            Uredi profil
+          </Button>
+          <Button
+            type="transparent"
+            className="rounded-full px-6 py-3 font-semibold text-white hover:bg-white/15 hover:text-white"
+            onClick={onFindUsers}
+          >
+            Preskoči na ljudeke
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[34rem]">
+      <div className="rounded-3xl border border-white/15 bg-white/95 p-4 text-gray-950 shadow-lg shadow-black/10">
+        <p className="mb-3 text-sm font-bold text-gray-900">Što sad?</p>
         <button
           type="button"
           onClick={onEditProfile}
-          className="rounded-2xl border border-white/15 bg-white/95 px-4 py-4 text-left text-gray-950 shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5 hover:bg-white"
+          className="flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
-          <BiUserPlus className="mb-3 text-blue" size={26} />
-          <span className="block text-sm font-bold">Uredi profil</span>
-          <span className="mt-1 block text-xs leading-5 text-gray-500">Dodaj detalje o sebi.</span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue text-sm font-bold text-white">
+            1
+          </span>
+          <span>
+            <span className="block text-sm font-bold">Uredi profil</span>
+            <span className="mt-1 block text-xs leading-5 text-gray-500">
+              Dodaj sliku, lokaciju i kratki opis.
+            </span>
+          </span>
         </button>
 
         <button
           type="button"
           onClick={onFindUsers}
-          className="rounded-2xl border border-white/15 bg-white/95 px-4 py-4 text-left text-gray-950 shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5 hover:bg-white"
+          className="mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
-          <BiSearch className="mb-3 text-blue" size={26} />
-          <span className="block text-sm font-bold">Pronađi korisnike</span>
-          <span className="mt-1 block text-xs leading-5 text-gray-500">Pregledaj zajednicu.</span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue/10 text-sm font-bold text-blue">
+            2
+          </span>
+          <span>
+            <span className="block text-sm font-bold">Pogledaj ljudeke</span>
+            <span className="mt-1 block text-xs leading-5 text-gray-500">
+              Pronađi nekoga tko ti je zanimljiv.
+            </span>
+          </span>
         </button>
 
         <button
           type="button"
           onClick={onSendMessage}
-          className="rounded-2xl border border-white/15 bg-white/95 px-4 py-4 text-left text-gray-950 shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5 hover:bg-white"
+          className="mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
-          <BiMessageRoundedDots className="mb-3 text-pink" size={26} />
-          <span className="block text-sm font-bold">Pošalji poruku</span>
-          <span className="mt-1 block text-xs leading-5 text-gray-500">Otvori razgovore.</span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-pink/10 text-sm font-bold text-pink">
+            3
+          </span>
+          <span>
+            <span className="block text-sm font-bold">Pošalji poruku</span>
+            <span className="mt-1 block text-xs leading-5 text-gray-500">
+              Razgovor može krenuti običnim bok.
+            </span>
+          </span>
         </button>
       </div>
     </div>
@@ -221,8 +260,9 @@ function App() {
       (total: number, chat: ChatWithMessages) => total + (chat.Messages?.length ?? 0),
       0
     ) ?? 0;
-  const shouldShowCommunityTips = !isUserChatsLoading && messageCount === 0;
   const shouldShowWelcomeHero = isWithinWelcomePeriod(currentUser);
+  const shouldShowCommunityTips =
+    !shouldShowWelcomeHero && !isUserChatsLoading && messageCount === 0;
 
   return (
     <AppLayout>

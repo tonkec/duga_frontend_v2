@@ -118,16 +118,26 @@ const AllUserPhotos = () => {
         setIsDeleteModalVisible={setIsDeleteModalVisible}
       />
       <p className="mb-4">
-        Trenutno imaš {photos.length} od maximalno {MAXIMUM_NUMBER_OF_IMAGES} fotografija.
+        Trenutno imaš {photos.length} od maksimalno {MAXIMUM_NUMBER_OF_IMAGES} fotografija.
       </p>
-      <div className="lg:grid grid-cols-3 gap-4 ">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {photos.map((image: IImage) => (
-          <div key={image.id} className="relative mb-6 lg:mb-0 max-w-[400px]">
-            <Photo image={image} />
-            <div className="mt-3">
+          <div
+            key={image.id}
+            className="relative overflow-hidden rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3 shadow-sm"
+          >
+            <div className="aspect-square overflow-hidden rounded-2xl bg-white">
+              <Photo image={image} />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className="inline-flex rounded-full bg-[#dce4ff] px-3 py-1 text-sm font-semibold text-blue">
                 {getPhotoTypeLabel(image)}
               </span>
+              {image.isProfilePhoto && (
+                <span className="inline-flex rounded-full bg-blue px-3 py-1 text-sm font-semibold text-white">
+                  Trenutna profilna
+                </span>
+              )}
             </div>
             <Button
               onClick={() => {
@@ -138,7 +148,7 @@ const AllUserPhotos = () => {
               type="danger"
               className="mt-4"
             >
-              Delete
+              Obriši
             </Button>
           </div>
         ))}

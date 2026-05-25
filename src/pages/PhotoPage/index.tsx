@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
-import { useGetSingleImage } from './hooks';
+import { useGetSingleImage, useSetProfilePhoto } from './hooks';
 import Card from '@app/components/Card';
 import PhotoComments from '@app/components/PhotoComments';
 import PhotoLikes from '@app/components/PhotoLikes';
@@ -11,6 +11,7 @@ import Image from '@app/components/Image';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import UserAvatar from '@app/components/UserAvatar';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import Button from '@app/components/Button';
 
 const PhotoPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const PhotoPage = () => {
 
   const { user: userData } = useGetUserById(singleImage?.data?.userId || '');
   const { user: currentUser } = useGetCurrentUser();
+  const { setProfilePhoto, isSettingProfilePhoto } = useSetProfilePhoto();
 
   if (singleImageLoading) {
     return (
@@ -81,6 +83,9 @@ const PhotoPage = () => {
     );
   };
 
+  const isOwnPhoto = Number(currentUser?.data?.id) === Number(singleImage.data.userId);
+  const canSetProfilePhoto = isOwnPhoto && singleImage.data.name;
+
   return (
     <AppLayout>
       <div className="grid gap-6">
@@ -100,6 +105,28 @@ const PhotoPage = () => {
                   <div className="flex flex-wrap items-center gap-3">
                     {showAvatar()}
                     <PhotoLikes photoId={photoId} />
+                    {canSetProfilePhoto &&
+                      (singleImage.data.isProfilePhoto ? (
+                        <span className="rounded-full border border-blue/20 bg-blue/10 px-4 py-2 text-sm font-bold text-blue">
+                          Trenutna profilna
+                        </span>
+                      ) : (
+                        <Button
+                          type="blue"
+                          className="rounded-full px-4 py-2 text-sm font-bold"
+                          disabled={isSettingProfilePhoto}
+                          onClick={() =>
+                            setProfilePhoto({
+                              imageName: singleImage.data.name,
+                              description: singleImage.data.description,
+                              photoId: photoId as string,
+                              userId: String(currentUser?.data?.id),
+                            })
+                          }
+                        >
+                          {isSettingProfilePhoto ? 'Spremam...' : 'Postavi kao profilnu'}
+                        </Button>
+                      ))}
                   </div>
                   {singleImage?.data?.description && (
                     <p className="mt-3 text-gray-700">{singleImage?.data.description}</p>

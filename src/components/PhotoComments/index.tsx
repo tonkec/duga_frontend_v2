@@ -7,15 +7,21 @@ import { useParams } from 'react-router';
 import CommentWithUser from './components/CommentWithUser';
 import FieldError from '@app/components/FieldError';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { BiAt, BiHeart, BiMessageRoundedDots, BiPaperclip, BiSolidFileGif } from 'react-icons/bi';
+import {
+  BiAt,
+  BiHeart,
+  BiMessageRoundedDots,
+  BiPaperclip,
+  BiSmile,
+  BiSolidFileGif,
+} from 'react-icons/bi';
 import { useRef } from 'react';
 import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { toast } from 'react-toastify';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
-import { init, SearchIndex } from 'emoji-mart';
-import { IEmoji } from '@app/pages/ChatPage/components/SendMessage';
+import { init } from 'emoji-mart';
 import { debounce } from 'lodash';
 import EmojiPicker from '../EmojiPicker';
 import data from '@emoji-mart/data';
@@ -27,6 +33,12 @@ import Image from '../Image';
 import { parseCommentUpdatePayload } from './utils/parseCommentUpdate';
 import Loader from '../Loader';
 import GiphySearch from '../GiphySearch';
+import EmojiSearch from '../EmojiSearch';
+import {
+  getEmojiSearchQueryFromText,
+  replaceEmojiToken,
+  searchEmojiNatives,
+} from '@app/utils/emojis';
 
 const schema = z
   .object({
@@ -88,7 +100,7 @@ const PaginatedComment = ({ singleEntry }: { singleEntry: IComment }) => {
 const PhotoComments = () => {
   init({ data });
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [currentEmojis, setCurrentEmojis] = useState([]);
+  const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
   const socket = useSocket();
   const { mutateAddUploadComment, isAddingUploadComment } = useAddUploadComment();
   const { photoId } = useParams();
@@ -100,6 +112,7 @@ const PhotoComments = () => {
   const [allComments, setAllComments] = useState<IComment[]>([]);
   const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>([]);
   const [showGiphySearch, setShowGiphySearch] = useState(false);
+  const [showEmojiSearch, setShowEmojiSearch] = useState(false);
 
   const applyCommentUpdate = useCallback(
     (payload: unknown) => {
@@ -190,6 +203,7 @@ const PhotoComments = () => {
         setTaggedUsers([]);
         setCurrentEmojis([]);
         setShowGiphySearch(false);
+        setShowEmojiSearch(false);
         reset({ comment: '', content: '', image: undefined, gifUrl: '' });
       },
     });
@@ -272,15 +286,6 @@ const PhotoComments = () => {
     [allComments]
   );
 
-  async function search(value: string) {
-    const emojis = await SearchIndex.search(value);
-    const results = emojis.map((emoji: IEmoji) => {
-      return emoji.skins[0].native;
-    });
-
-    return results;
-  }
-
   return (
     <CommentUpdateContext.Provider value={applyCommentUpdate}>
       <CommentDeleteContext.Provider value={removeComment}>
@@ -307,7 +312,7 @@ const PhotoComments = () => {
               className="mb-5 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3 shadow-sm"
               onSubmit={handleSubmit(onSubmit)}
             >
-              <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[auto_minmax(24rem,1fr)_auto_auto]">
+              <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[auto_minmax(24rem,1fr)_auto_auto_auto]">
                 <Controller
                   name="image"
                   control={control}
@@ -360,12 +365,10 @@ const PhotoComments = () => {
                   control={control}
                   render={({ field }) => {
                     const handleSearch = async (value: string) => {
-                      const emojiRegex = /(?:\s|^):([^\s:]+)/;
-                      const match = value.match(emojiRegex);
+                      const searchTerm = getEmojiSearchQueryFromText(value);
 
-                      if (match) {
-                        const searchTerm = match[1];
-                        const emojis = await search(searchTerm);
+                      if (searchTerm) {
+                        const emojis = await searchEmojiNatives(searchTerm);
                         setCurrentEmojis(emojis);
                       } else {
                         setCurrentEmojis([]);
@@ -393,7 +396,7 @@ const PhotoComments = () => {
                   emojis={currentEmojis}
                   onEmojiSelect={(emoji: string) => {
                     const currentComment = getValues('comment');
-                    const updatedComment = currentComment?.replace(/(?:\s|^):([^\s:]+)?/, emoji);
+                    const updatedComment = replaceEmojiToken(currentComment, emoji);
                     setValue('comment', updatedComment, { shouldValidate: true });
                     setCurrentEmojis([]);
                   }}
@@ -402,11 +405,28 @@ const PhotoComments = () => {
                 <button
                   type="button"
                   className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-                  onClick={() => setShowGiphySearch((isOpen) => !isOpen)}
+                  onClick={() => {
+                    setShowGiphySearch((isOpen) => !isOpen);
+                    setShowEmojiSearch(false);
+                  }}
                   disabled={isAddingUploadComment}
                   aria-label="Dodaj GIF"
                 >
                   <BiSolidFileGif fontSize={20} />
+                </button>
+
+                <button
+                  type="button"
+                  className="grid h-14 w-14 place-items-center rounded-full bg-white text-gray-600 shadow-sm transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={() => {
+                    setShowEmojiSearch((isOpen) => !isOpen);
+                    setShowGiphySearch(false);
+                    setCurrentEmojis([]);
+                  }}
+                  disabled={isAddingUploadComment}
+                  aria-label="Dodaj emoji"
+                >
+                  <BiSmile fontSize={20} />
                 </button>
 
                 <Button
@@ -431,6 +451,14 @@ const PhotoComments = () => {
                 }}
                 isOpen={showGiphySearch}
                 onClose={() => setShowGiphySearch(false)}
+              />
+              <EmojiSearch
+                isOpen={showEmojiSearch}
+                onClose={() => setShowEmojiSearch(false)}
+                onEmojiSelect={(emoji) => {
+                  const currentComment = getValues('comment') ?? '';
+                  setValue('comment', `${currentComment}${emoji}`, { shouldValidate: true });
+                }}
               />
 
               {previewUrl && (

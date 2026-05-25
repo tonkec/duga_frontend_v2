@@ -6,6 +6,8 @@ import { useUpdateUser } from '../hooks/useUpdatePostLogin';
 import Button from '@app/components/Button';
 import FieldError from '@app/components/FieldError';
 
+const MAX_AGE = 110;
+
 const Schema = z.object({
   username: z
     .string()
@@ -15,7 +17,8 @@ const Schema = z.object({
   age: z.coerce
     .number({ invalid_type_error: 'Unesi svoju dob brojem.' })
     .int('Dob mora biti cijeli broj.')
-    .min(18, 'Moraš imati najmanje 18 godina.'),
+    .min(18, 'Moraš imati najmanje 18 godina.')
+    .max(MAX_AGE, `Dob ne može biti veća od ${MAX_AGE} godina.`),
   acceptPrivacy: z.literal(true, {
     errorMap: () => ({ message: 'Moraš prihvatiti Politiku privatnosti.' }),
   }),
@@ -72,6 +75,7 @@ export default function PostLoginForm() {
         <Input
           type="number"
           min={18}
+          max={MAX_AGE}
           className="!rounded-2xl !border-[#dce4ff] px-4 py-3 text-base shadow-sm focus:!border-blue"
           placeholder="18+"
           {...register('age')}

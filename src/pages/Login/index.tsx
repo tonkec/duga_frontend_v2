@@ -205,7 +205,7 @@ const LoginPage = () => {
                   <p className="text-sm text-white/80">samo odrasli</p>
                 </div>
                 <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
-                  <p className="text-2xl font-black">0€</p>
+                  <p className="text-xl font-black">Besplatno</p>
                   <p className="text-sm text-white/80">osnovni plan</p>
                 </div>
                 <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
@@ -399,7 +399,9 @@ const LoginPage = () => {
                   <h3 className="text-3xl font-black text-blue-dark">Besplatni plan</h3>
                   <p className="mt-2 text-gray-600">Sve što trebaš za početak upoznavanja.</p>
                 </div>
-                <p className="rounded-full bg-rose px-4 py-2 text-2xl font-black text-pink">0€</p>
+                <p className="rounded-full bg-rose px-4 py-2 text-xl font-black text-pink">
+                  Besplatno
+                </p>
               </div>
 
               <ul className="mt-8 space-y-4">

@@ -61,7 +61,7 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
         type="text"
         placeholder="Pretraži GIPHY..."
         onChange={handleSearchChange}
-        className="mb-2"
+        className="mb-3 h-12 rounded-2xl border-[#dce4ff] px-4 text-base shadow-sm"
       />
 
       {isGIFSLoading ? (
