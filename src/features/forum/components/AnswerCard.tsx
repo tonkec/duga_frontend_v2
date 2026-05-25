@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BiDotsVerticalRounded, BiEdit, BiFlag, BiTrash } from 'react-icons/bi';
+import {
+  BiCheckCircle,
+  BiDotsVerticalRounded,
+  BiEdit,
+  BiFlag,
+  BiImageAdd,
+  BiTrash,
+  BiXCircle,
+} from 'react-icons/bi';
 import Button from '@app/components/Button';
 import ConfirmModal from '@app/components/ConfirmModal';
 import FileUploadInput from '@app/components/FileUploadInput';
@@ -10,7 +18,7 @@ import UserAvatar from '@app/components/UserAvatar';
 import type { Answer, UpdateAnswerPayload } from '../types/forum.types';
 import VoteControls, { getVoteScore } from './VoteControls';
 import ContentFormatter from '@app/components/ContentFormatter';
-import ForumImage from './ForumImage';
+import ForumImageGallery from './ForumImageGallery';
 
 interface AnswerCardProps {
   answer: Answer;
@@ -58,17 +66,23 @@ const AnswerCard = ({
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [draftBody, setDraftBody] = useState(answer.body);
-  const [draftImage, setDraftImage] = useState<File | null>(null);
+  const [draftImages, setDraftImages] = useState<File[]>([]);
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const draftImagePreviewUrl = draftImage ? URL.createObjectURL(draftImage) : '';
-  const hasExistingImage = Boolean(answer.securePhotoUrl || answer.imageUrl);
-  const shouldShowExistingImage = hasExistingImage && !draftImagePreviewUrl && !removeExistingImage;
+  const draftImagePreviewUrls = draftImages.map((image) => URL.createObjectURL(image));
+  const hasExistingImage = Boolean(
+    answer.securePhotoUrl ||
+      answer.imageUrl ||
+      answer.securePhotoUrls?.length ||
+      answer.imageUrls?.length
+  );
+  const shouldShowExistingImage =
+    hasExistingImage && draftImagePreviewUrls.length === 0 && !removeExistingImage;
 
   const handleCancelEdit = () => {
     setIsEditing(false);
     setDraftBody(answer.body);
-    setDraftImage(null);
+    setDraftImages([]);
     setRemoveExistingImage(false);
     setEditError(null);
   };
@@ -89,11 +103,11 @@ const AnswerCard = ({
     setEditError(null);
     onUpdate(answer.id, {
       body: trimmedDraftBody,
-      image: draftImage,
+      images: draftImages,
       removeImage: removeExistingImage || undefined,
     });
     setIsEditing(false);
-    setDraftImage(null);
+    setDraftImages([]);
     setRemoveExistingImage(false);
   };
 
@@ -140,25 +154,25 @@ const AnswerCard = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {answer.isAccepted && (
             <span className="rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
               Prihvaćen odgovor
             </span>
           )}
-          <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-xs font-semibold text-blue-dark">
+          <span className="rounded-full bg-[#f7f9ff] px-2.5 py-1 text-xs font-semibold text-blue-dark">
             {voteScore} glasova
           </span>
           <div className="relative">
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-blue hover:text-blue"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#dce4ff] bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm shadow-blue-dark/5 transition-colors hover:border-blue hover:text-blue"
               onClick={() => setIsActionsOpen((isOpen) => !isOpen)}
               aria-expanded={isActionsOpen}
               aria-haspopup="menu"
             >
               Akcije
-              <BiDotsVerticalRounded size={18} />
+              <BiDotsVerticalRounded size={16} />
             </button>
 
             {isActionsOpen && (
@@ -191,6 +205,7 @@ const AnswerCard = ({
                       onAccept(answer.id);
                     }}
                   >
+                    {answer.isAccepted ? <BiXCircle size={20} /> : <BiCheckCircle size={20} />}
                     {answer.isAccepted ? 'Odbaci odgovor' : 'Prihvati odgovor'}
                   </button>
                 )}
@@ -211,7 +226,7 @@ const AnswerCard = ({
                     </button>
                     <button
                       type="button"
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-rose disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10 disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={isDeleting}
                       onClick={() => {
                         setIsActionsOpen(false);
@@ -227,7 +242,7 @@ const AnswerCard = ({
                 <Link
                   to="/report"
                   role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-rose"
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
                   onClick={() => setIsActionsOpen(false)}
                 >
                   <BiFlag size={20} />
@@ -252,46 +267,55 @@ const AnswerCard = ({
             className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm leading-6 outline-none transition-colors focus:border-blue"
           />
           <div className="mt-4">
-            <label htmlFor={`answer-edit-image-${answer.id}`} className="text-sm font-bold text-gray-950">
+            <label
+              htmlFor={`answer-edit-image-${answer.id}`}
+              className="inline-flex items-center gap-2 text-sm font-bold text-gray-950"
+            >
+              <BiImageAdd size={18} className="text-blue" />
               Slika (opcionalno)
             </label>
             <FileUploadInput
               id={`answer-edit-image-${answer.id}`}
               accept="image/*"
+              multiple
               label="Odaberi sliku"
-              helperText="Odaberi novu sliku ako želiš zamijeniti postojeću."
+              helperText="Odaberi nove slike ako želiš zamijeniti postojeće. Maksimalno 5 slika, do 1 MB po slici."
               onChange={(event) => {
-                setDraftImage(event.target.files?.[0] ?? null);
+                setDraftImages(Array.from(event.target.files ?? []));
                 setRemoveExistingImage(false);
               }}
             />
           </div>
-          {(shouldShowExistingImage || draftImagePreviewUrl) && (
+          {(shouldShowExistingImage || draftImagePreviewUrls.length > 0) && (
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
-                  {draftImagePreviewUrl ? 'Nova slika' : 'Trenutna slika'}
+                  {draftImagePreviewUrls.length > 0 ? 'Nove slike' : 'Trenutne slike'}
                 </p>
-                {draftImagePreviewUrl ? (
-                  <Image
-                    src={draftImagePreviewUrl}
-                    alt="Pregled nove slike odgovora"
-                    className="max-w-[180px] rounded-xl border border-[#dce4ff]"
-                  />
+                {draftImagePreviewUrls.length > 0 ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {draftImagePreviewUrls.map((previewUrl, index) => (
+                      <Image
+                        key={`${previewUrl}-${index}`}
+                        src={previewUrl}
+                        alt={`Pregled nove slike odgovora ${index + 1}`}
+                        className="max-w-[180px] rounded-xl border border-[#dce4ff]"
+                      />
+                    ))}
+                  </div>
                 ) : (
-                  <ForumImage
-                    securePhotoUrl={answer.securePhotoUrl}
-                    imageUrl={answer.imageUrl}
+                  <ForumImageGallery
+                    item={answer}
                     alt="Trenutna slika odgovora"
-                    className="max-w-[180px] rounded-xl border border-[#dce4ff]"
+                    imageClassName="max-w-[180px] rounded-xl border border-[#dce4ff]"
                   />
                 )}
               </div>
-              {draftImagePreviewUrl && (
+              {draftImagePreviewUrls.length > 0 && (
                 <Button
                   type="danger"
                   htmlType="button"
-                  onClick={() => setDraftImage(null)}
+                  onClick={() => setDraftImages([])}
                   disabled={isUpdating}
                 >
                   Makni
@@ -310,7 +334,7 @@ const AnswerCard = ({
             </div>
           )}
           {removeExistingImage && (
-            <p className="mt-4 rounded-2xl bg-rose px-4 py-3 text-sm font-medium text-red">
+            <p className="mt-4 rounded-2xl bg-red/10 px-4 py-3 text-sm font-medium text-red">
               Postojeća slika bit će uklonjena nakon spremanja.
             </p>
           )}
@@ -348,14 +372,12 @@ const AnswerCard = ({
           <div className="whitespace-pre-wrap text-base leading-8 text-gray-800">
             <ContentFormatter text={answer.body} />
           </div>
-          {(answer.securePhotoUrl || answer.imageUrl) && (
-            <ForumImage
-              securePhotoUrl={answer.securePhotoUrl}
-              imageUrl={answer.imageUrl}
-              alt="Slika odgovora"
-              className="mt-4 max-w-full rounded-2xl border border-[#dce4ff]"
-            />
-          )}
+          <ForumImageGallery
+            item={answer}
+            alt="Slika odgovora"
+            className="mt-4"
+            imageClassName="max-w-full rounded-2xl border border-[#dce4ff]"
+          />
         </>
       )}
     </article>

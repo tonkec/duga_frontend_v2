@@ -146,8 +146,7 @@ const sortQuestions = (questions: Question[], sort: SortOption) => {
     if (sort === 'answers-desc' || sort === 'answers-asc') {
       const direction = sort === 'answers-desc' ? -1 : 1;
       return (
-        (getQuestionAnswerCount(firstQuestion) - getQuestionAnswerCount(secondQuestion)) *
-        direction
+        (getQuestionAnswerCount(firstQuestion) - getQuestionAnswerCount(secondQuestion)) * direction
       );
     }
 
@@ -236,7 +235,9 @@ const ForumQuestionsPage = () => {
   const [sortInput, setSortInput] = useState<SortOption>(sortFilter);
   const [filterErrors, setFilterErrors] = useState<FilterErrors>({});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(
-    Boolean(titleFilter || authorFilter || minAnswersFilter || timeFilter || sortFilter !== 'newest')
+    Boolean(
+      titleFilter || authorFilter || minAnswersFilter || timeFilter || sortFilter !== 'newest'
+    )
   );
   const hasAdvancedFilters = Boolean(
     titleFilter || authorFilter || minAnswersFilter || timeFilter || sortFilter !== 'newest'
@@ -413,130 +414,132 @@ const ForumQuestionsPage = () => {
                 <p className="text-sm font-medium text-red">{filterErrors.search}</p>
               )}
 
-            <div className="flex justify-start">
-              <button
-                type="button"
-                className="text-sm font-semibold text-blue underline"
-                onClick={() => setShowAdvancedFilters((isOpen) => !isOpen)}
-              >
-                {showAdvancedFilters ? 'Sakrij napredne filtere' : 'Prikaži napredne filtere'}
-                {hasAdvancedFilters ? ' (aktivni)' : ''}
-              </button>
-            </div>
+              <div className="flex justify-start">
+                <button
+                  type="button"
+                  className="text-sm font-semibold text-blue underline"
+                  onClick={() => setShowAdvancedFilters((isOpen) => !isOpen)}
+                >
+                  {showAdvancedFilters ? 'Sakrij napredne filtere' : 'Prikaži napredne filtere'}
+                  {hasAdvancedFilters ? ' (aktivni)' : ''}
+                </button>
+              </div>
 
-            {showAdvancedFilters && (
-              <div className="grid gap-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3 md:grid-cols-2 lg:grid-cols-5">
-                <input
-                  value={titleInput}
-                  onChange={(event) => {
-                    setTitleInput(event.target.value);
-                    setFilterErrors((currentErrors) => ({ ...currentErrors, title: undefined }));
-                  }}
-                  maxLength={FILTER_TEXT_MAX_LENGTH}
-                  className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
-                  placeholder="Filtriraj po naslovu"
-                />
-                <input
-                  value={authorInput}
-                  onChange={(event) => {
-                    setAuthorInput(event.target.value);
-                    setFilterErrors((currentErrors) => ({ ...currentErrors, author: undefined }));
-                  }}
-                  maxLength={FILTER_TEXT_MAX_LENGTH}
-                  className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
-                  placeholder="Filtriraj po korisniku"
-                />
-                <input
-                  value={minAnswersInput}
-                  onChange={(event) => {
-                    setMinAnswersInput(event.target.value);
-                    setFilterErrors((currentErrors) => ({
-                      ...currentErrors,
-                      minAnswers: undefined,
-                    }));
-                  }}
-                  type="number"
-                  inputMode="numeric"
-                  min="0"
-                  max={MIN_ANSWERS_MAX_VALUE}
-                  className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
-                  placeholder="Min. broj odgovora"
-                />
-                <Select
-                  options={timeSelectOptions}
-                  value={timeSelectOptions.find((option) => option.value === timeInput) ?? null}
-                  onChange={(option) => {
-                    setTimeInput(((option as ForumSelectOption | null)?.value ?? '') as TimeFilter);
-                    setFilterErrors((currentErrors) => ({ ...currentErrors, time: undefined }));
-                  }}
-                  styles={forumSelectStyles}
-                  theme={forumSelectTheme}
-                  classNamePrefix="react-select"
-                  placeholder="Vrijeme"
-                  aria-label="Filtriraj po vremenu"
-                />
-                <Select
-                  options={sortSelectOptions}
-                  value={sortSelectOptions.find((option) => option.value === sortInput) ?? null}
-                  onChange={(option) => {
-                    setSortInput(
-                      ((option as ForumSelectOption | null)?.value ?? 'newest') as SortOption
-                    );
-                    setFilterErrors((currentErrors) => ({ ...currentErrors, sort: undefined }));
-                  }}
-                  styles={forumSelectStyles}
-                  theme={forumSelectTheme}
-                  classNamePrefix="react-select"
-                  placeholder="Sortiraj"
-                  aria-label="Sortiraj pitanja"
-                />
-                {(filterErrors.title ||
-                  filterErrors.author ||
-                  filterErrors.minAnswers ||
-                  filterErrors.time ||
-                  filterErrors.sort) && (
-                  <div className="md:col-span-2 lg:col-span-5">
-                    {filterErrors.title && (
-                      <p className="text-sm font-medium text-red">{filterErrors.title}</p>
-                    )}
-                    {filterErrors.author && (
-                      <p className="text-sm font-medium text-red">{filterErrors.author}</p>
-                    )}
-                    {filterErrors.minAnswers && (
-                      <p className="text-sm font-medium text-red">{filterErrors.minAnswers}</p>
-                    )}
-                    {filterErrors.time && (
-                      <p className="text-sm font-medium text-red">{filterErrors.time}</p>
-                    )}
-                    {filterErrors.sort && (
-                      <p className="text-sm font-medium text-red">{filterErrors.sort}</p>
-                    )}
-                  </div>
+              {showAdvancedFilters && (
+                <div className="grid gap-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-3 md:grid-cols-2 lg:grid-cols-5">
+                  <input
+                    value={titleInput}
+                    onChange={(event) => {
+                      setTitleInput(event.target.value);
+                      setFilterErrors((currentErrors) => ({ ...currentErrors, title: undefined }));
+                    }}
+                    maxLength={FILTER_TEXT_MAX_LENGTH}
+                    className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
+                    placeholder="Filtriraj po naslovu"
+                  />
+                  <input
+                    value={authorInput}
+                    onChange={(event) => {
+                      setAuthorInput(event.target.value);
+                      setFilterErrors((currentErrors) => ({ ...currentErrors, author: undefined }));
+                    }}
+                    maxLength={FILTER_TEXT_MAX_LENGTH}
+                    className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
+                    placeholder="Filtriraj po korisniku"
+                  />
+                  <input
+                    value={minAnswersInput}
+                    onChange={(event) => {
+                      setMinAnswersInput(event.target.value);
+                      setFilterErrors((currentErrors) => ({
+                        ...currentErrors,
+                        minAnswers: undefined,
+                      }));
+                    }}
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    max={MIN_ANSWERS_MAX_VALUE}
+                    className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
+                    placeholder="Min. broj odgovora"
+                  />
+                  <Select
+                    options={timeSelectOptions}
+                    value={timeSelectOptions.find((option) => option.value === timeInput) ?? null}
+                    onChange={(option) => {
+                      setTimeInput(
+                        ((option as ForumSelectOption | null)?.value ?? '') as TimeFilter
+                      );
+                      setFilterErrors((currentErrors) => ({ ...currentErrors, time: undefined }));
+                    }}
+                    styles={forumSelectStyles}
+                    theme={forumSelectTheme}
+                    classNamePrefix="react-select"
+                    placeholder="Vrijeme"
+                    aria-label="Filtriraj po vremenu"
+                  />
+                  <Select
+                    options={sortSelectOptions}
+                    value={sortSelectOptions.find((option) => option.value === sortInput) ?? null}
+                    onChange={(option) => {
+                      setSortInput(
+                        ((option as ForumSelectOption | null)?.value ?? 'newest') as SortOption
+                      );
+                      setFilterErrors((currentErrors) => ({ ...currentErrors, sort: undefined }));
+                    }}
+                    styles={forumSelectStyles}
+                    theme={forumSelectTheme}
+                    classNamePrefix="react-select"
+                    placeholder="Sortiraj"
+                    aria-label="Sortiraj pitanja"
+                  />
+                  {(filterErrors.title ||
+                    filterErrors.author ||
+                    filterErrors.minAnswers ||
+                    filterErrors.time ||
+                    filterErrors.sort) && (
+                    <div className="md:col-span-2 lg:col-span-5">
+                      {filterErrors.title && (
+                        <p className="text-sm font-medium text-red">{filterErrors.title}</p>
+                      )}
+                      {filterErrors.author && (
+                        <p className="text-sm font-medium text-red">{filterErrors.author}</p>
+                      )}
+                      {filterErrors.minAnswers && (
+                        <p className="text-sm font-medium text-red">{filterErrors.minAnswers}</p>
+                      )}
+                      {filterErrors.time && (
+                        <p className="text-sm font-medium text-red">{filterErrors.time}</p>
+                      )}
+                      {filterErrors.sort && (
+                        <p className="text-sm font-medium text-red">{filterErrors.sort}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                {hasActiveFilters && (
+                  <Button
+                    type="secondary"
+                    htmlType="button"
+                    className="rounded-full border border-[#dce4ff] px-6 py-3 font-semibold"
+                    onClick={clearFilters}
+                  >
+                    Očisti filtere
+                  </Button>
+                )}
+                {shouldShowApplyFiltersButton && (
+                  <Button
+                    type="blue"
+                    htmlType="submit"
+                    className="rounded-full px-6 py-3 font-semibold"
+                  >
+                    Primijeni filtere
+                  </Button>
                 )}
               </div>
-            )}
-
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              {hasActiveFilters && (
-                <Button
-                  type="secondary"
-                  htmlType="button"
-                  className="rounded-full border border-[#dce4ff] px-6 py-3 font-semibold"
-                  onClick={clearFilters}
-                >
-                  Očisti filtere
-                </Button>
-              )}
-              {shouldShowApplyFiltersButton && (
-                <Button
-                  type="blue"
-                  htmlType="submit"
-                  className="rounded-full px-6 py-3 font-semibold"
-                >
-                  Primijeni filtere
-                </Button>
-              )}
-            </div>
             </form>
 
             {categories.length > 0 && (
@@ -573,7 +576,7 @@ const ForumQuestionsPage = () => {
         )}
 
         {questionsQuery.isError && (
-          <div className="rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+          <div className="rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
             Nije moguće učitati forum pitanja. Pokušaj ponovno malo kasnije.
           </div>
         )}

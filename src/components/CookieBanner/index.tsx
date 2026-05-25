@@ -45,7 +45,7 @@ const CookieBanner = () => {
               acceptCookies();
               setShowBanner(false);
             }}
-            className="bg-pink text-white px-4 py-2 rounded"
+            className="bg-blue text-white px-4 py-2 rounded"
           >
             Prihvati
           </button>

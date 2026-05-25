@@ -26,7 +26,7 @@ interface WelcomeHeroProps {
 const WelcomeHero = ({ onEditProfile, onFindUsers, onSendMessage }: WelcomeHeroProps) => (
   <section className="relative isolate mb-10 overflow-hidden rounded-3xl bg-blue px-5 py-8 text-white shadow-xl shadow-blue/20 sm:px-8 lg:px-10">
     <div className="absolute -left-20 top-4 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-    <div className="absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-pink/20 blur-3xl" />
+    <div className="absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
 
     <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center">
       <div className="max-w-3xl">
@@ -98,7 +98,7 @@ const WelcomeHero = ({ onEditProfile, onFindUsers, onSendMessage }: WelcomeHeroP
           onClick={onSendMessage}
           className="mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-pink/10 text-sm font-bold text-pink">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue/10 text-sm font-bold text-blue">
             3
           </span>
           <span>
@@ -132,7 +132,7 @@ const CommunityTips = () => (
       </article>
 
       <article className="rounded-3xl border border-[#dce4ff] bg-white px-5 py-5 shadow-sm">
-        <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-pink/10 text-pink">
+        <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue">
           <BiHeart size={24} />
         </div>
         <h3 className="text-base font-bold text-gray-950">Napiši nešto osobno</h3>
@@ -183,7 +183,7 @@ interface EmptyHomepageUsersProps {
 const EmptyHomepageUsers = ({ onEditProfile, onBrowseUsers }: EmptyHomepageUsersProps) => (
   <div className="relative isolate mx-auto mt-6 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-5 py-10 text-center shadow-sm sm:px-8">
     <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-    <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-pink/10 blur-3xl" />
+    <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
 
     <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center">
       <div className="mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-white text-blue-dark shadow-lg shadow-blue/10">
@@ -208,7 +208,7 @@ const EmptyHomepageUsers = ({ onEditProfile, onBrowseUsers }: EmptyHomepageUsers
           <p className="mt-1 text-xs leading-5 text-gray-500">Novi profili pojavit će se ovdje.</p>
         </div>
         <div className="rounded-2xl border border-[#e8eeff] bg-white/80 px-4 py-4 text-left shadow-sm">
-          <BiHeart className="mb-2 text-pink" size={22} />
+          <BiHeart className="mb-2 text-blue" size={22} />
           <h3 className="text-sm font-bold text-gray-950">Duga zajednica</h3>
           <p className="mt-1 text-xs leading-5 text-gray-500">
             Prikazujemo samo verificirane osobe.
@@ -256,7 +256,10 @@ const getLatestQuestion = (questions: Question[]) => {
   )[0];
 };
 
-const LatestForumQuestion = ({ onOpenQuestion, onAskQuestion }: {
+const LatestForumQuestion = ({
+  onOpenQuestion,
+  onAskQuestion,
+}: {
   onOpenQuestion: (questionId: number) => void;
   onAskQuestion: () => void;
 }) => {
@@ -429,42 +432,42 @@ function App() {
           <h2 className="mt-1 text-2xl font-bold text-gray-900">Što želiš napraviti?</h2>
         </div>
         <div className="relative z-10 grid gap-4 sm:grid-cols-2">
-        <Cta
-          className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
-          title="Unaprijedi svoj profil"
-          buttonText="Izmijeni profil"
-          subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
-          onClick={() => navigate(`/edit`)}
-        />
+          <Cta
+            className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
+            title="Unaprijedi svoj profil"
+            buttonText="Izmijeni profil"
+            subtitle="Napiši nešto o sebi, dodaj fotografije i pronađi osobu svog života odmah ✍️"
+            onClick={() => navigate(`/edit`)}
+          />
 
-        <Cta
-          className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
-          title="Nemaš poruka?"
-          subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu za čavrljanje 💬"
-          buttonText="Nova poruka"
-          onClick={() => navigate(`/new-chat`)}
-        />
+          <Cta
+            className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
+            title="Nemaš poruka?"
+            subtitle="Započni razgovor s nekim od korisnika i pronađi srodnu dušu za čavrljanje 💬"
+            buttonText="Nova poruka"
+            onClick={() => navigate(`/new-chat`)}
+          />
 
-        <Cta
-          className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
-          title="Imaš pitanje?"
-          subtitle="Postavi pitanje na forumu i nađi odgovore od zajednice."
-          buttonText="Postavi pitanje"
-          onClick={() => navigate('/forum/ask')}
-        />
+          <Cta
+            className="flex-1 !from-white !via-[#f7f9ff] !to-blue/10"
+            title="Imaš pitanje?"
+            subtitle="Postavi pitanje na forumu i nađi odgovore od zajednice."
+            buttonText="Postavi pitanje"
+            onClick={() => navigate('/forum/ask')}
+          />
 
-        <Cta
-          className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
-          title="Želiš li nam pomoći?"
-          subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike. Piši nam na admin@duga.chat 🙏"
-        >
-          <a
-            className="block w-full rounded-full bg-blue px-4 py-3 text-center text-sm font-semibold text-white shadow-md shadow-blue/15 transition-all duration-200 hover:bg-blue-dark"
-            href="mailto:admin@duga.chat"
+          <Cta
+            className="flex-1 !from-white !via-[#f7f9ff] !to-[#eef3ff]"
+            title="Želiš li nam pomoći?"
+            subtitle="Pomozi nam da održimo ovu platformu besplatnom i sigurnom za sve korisnike. Piši nam na admin@duga.chat 🙏"
           >
-            Javi nam se
-          </a>
-        </Cta>
+            <a
+              className="block w-full rounded-full bg-blue px-4 py-3 text-center text-sm font-semibold text-white shadow-md shadow-blue/15 transition-all duration-200 hover:bg-blue-dark"
+              href="mailto:admin@duga.chat"
+            >
+              Javi nam se
+            </a>
+          </Cta>
         </div>
       </section>
     </AppLayout>

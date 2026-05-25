@@ -79,7 +79,7 @@ const BooleanDetail = ({ label, value }: { label: string; value: boolean }) => (
     {value ? (
       <BiCheckCircle fontSize={24} color="#34D399" />
     ) : (
-      <BiX fontSize={24} color="#FF748B" />
+      <BiX fontSize={24} color="#DC2626" />
     )}
   </div>
 );

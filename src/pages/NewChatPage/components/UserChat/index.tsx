@@ -65,7 +65,7 @@ const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProp
         )}
       >
         <UserAvatar
-          color="#F037A5"
+          color="#2D46B9"
           avatarFallbackName={user.username}
           userId={String(user.id)}
           className="h-12 w-12 rounded-full"

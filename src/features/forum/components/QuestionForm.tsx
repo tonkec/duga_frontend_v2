@@ -14,7 +14,7 @@ import {
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
-import ForumImage from './ForumImage';
+import ForumImageGallery from './ForumImageGallery';
 
 type QuestionFormPayload = CreateQuestionPayload & Pick<UpdateQuestionPayload, 'removeImage'>;
 
@@ -78,7 +78,8 @@ const QuestionForm = ({
       initialQuestion?.securePhotoUrls?.length ||
       initialQuestion?.imageUrls?.length
   );
-  const shouldShowExistingImage = hasExistingImage && imagePreviewUrls.length === 0 && !removeExistingImage;
+  const shouldShowExistingImage =
+    hasExistingImage && imagePreviewUrls.length === 0 && !removeExistingImage;
 
   const updateBody = async (value: string) => {
     setBody(value);
@@ -147,9 +148,10 @@ const QuestionForm = ({
         <FileUploadInput
           id="question-image"
           accept="image/*"
+          containerClassName="py-5"
           multiple
           label="Odaberi sliku"
-          helperText="Podržane su slikovne datoteke."
+          helperText="Podržane su slikovne datoteke. Maksimalno 5 slika, do 1 MB po slici."
           onChange={(event) => {
             setImages(Array.from(event.target.files ?? []));
             setRemoveExistingImage(false);
@@ -198,7 +200,7 @@ const QuestionForm = ({
           </div>
         )}
         {removeExistingImage && (
-          <p className="mt-3 rounded-2xl bg-rose px-4 py-3 text-sm font-medium text-red">
+          <p className="mt-3 rounded-2xl bg-red/10 px-4 py-3 text-sm font-medium text-red">
             Postojeća slika bit će uklonjena nakon spremanja.
           </p>
         )}

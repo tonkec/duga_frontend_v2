@@ -49,7 +49,7 @@ const UsersPage = () => {
         {!renderedUsers.length && (
           <section className="relative isolate mx-auto mt-8 max-w-2xl overflow-hidden rounded-3xl border border-dashed border-[#b9c6ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#eef3ff] px-6 py-10 text-center shadow-sm">
             <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-blue/10 blur-3xl" />
-            <div className="pointer-events-none absolute -right-16 bottom-2 h-40 w-40 rounded-full bg-pink/10 blur-3xl" />
+            <div className="pointer-events-none absolute -right-16 bottom-2 h-40 w-40 rounded-full bg-blue/10 blur-3xl" />
 
             <div className="relative z-10 mx-auto flex max-w-md flex-col items-center">
               <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue shadow-lg shadow-blue/10">

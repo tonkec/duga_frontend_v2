@@ -138,7 +138,7 @@ const MentionInput = ({
             >
               <UserAvatar
                 avatarFallbackName={user.username}
-                color="#F037A5"
+                color="#2D46B9"
                 userId={String(user.id)}
                 className="h-8 w-8 shrink-0 rounded-full"
               />

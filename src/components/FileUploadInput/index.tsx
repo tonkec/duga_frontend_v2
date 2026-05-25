@@ -10,6 +10,7 @@ import { BiUpload } from 'react-icons/bi';
 
 interface FileUploadInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type'> {
+  containerClassName?: string;
   helperText?: string;
   label?: string;
 }
@@ -27,7 +28,18 @@ const getSelectedFilesLabel = (files: FileList | null | undefined) => {
 };
 
 const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps>(
-  ({ disabled, helperText, id, label = 'Odaberi datoteku', onChange, ...inputProps }, forwardedRef) => {
+  (
+    {
+      containerClassName = '',
+      disabled,
+      helperText,
+      id,
+      label = 'Odaberi datoteku',
+      onChange,
+      ...inputProps
+    },
+    forwardedRef
+  ) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [selectedFilesLabel, setSelectedFilesLabel] = useState('Nijedna datoteka nije odabrana');
 
@@ -39,7 +51,9 @@ const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps>(
     };
 
     return (
-      <div className="rounded-2xl border border-dashed border-[#b9c6ff] bg-[#f7f9ff] p-3">
+      <div
+        className={`rounded-2xl border border-dashed border-[#b9c6ff] bg-[#f7f9ff] p-3 ${containerClassName}`}
+      >
         <input
           {...inputProps}
           id={id}

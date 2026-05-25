@@ -177,7 +177,7 @@ const ChatPage = () => {
               onClick={() => navigate(`/user/${otherUserId}`)}
             >
               <UserAvatar
-                color="#F037A5"
+                color="#2D46B9"
                 avatarFallbackName={otherUserName ?? ''}
                 userId={String(otherUserId ?? '')}
                 className="h-11 w-11 shrink-0 rounded-full"

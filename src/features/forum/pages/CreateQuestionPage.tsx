@@ -24,7 +24,7 @@ const CreateQuestionPage = () => {
         </div>
 
         {createQuestionMutation.isError && (
-          <div className="mb-5 rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+          <div className="mb-5 rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
             {getForumErrorMessage(
               createQuestionMutation.error,
               'Nije moguće objaviti pitanje. Provjeri podatke i pokušaj ponovno.'

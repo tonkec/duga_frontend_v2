@@ -45,7 +45,7 @@ const Loader = ({
         <div className="relative">
           <div
             className={clsx(
-              'rounded-full border-4 border-[#dce4ff] border-t-pink shadow-sm motion-safe:animate-spin',
+              'rounded-full border-4 border-[#dce4ff] border-t-blue shadow-sm motion-safe:animate-spin',
               sizeClasses[size]
             )}
           />

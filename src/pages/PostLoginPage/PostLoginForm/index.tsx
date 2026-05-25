@@ -89,7 +89,7 @@ export default function PostLoginForm() {
         <label className="flex items-start gap-3 text-sm text-gray-700">
           <input
             type="checkbox"
-            className="mt-0.5 h-5 w-5 rounded border-[#dce4ff] accent-pink"
+            className="mt-0.5 h-5 w-5 rounded border-[#dce4ff] accent-blue"
             {...register('acceptPrivacy')}
           />
           <span>
@@ -109,7 +109,7 @@ export default function PostLoginForm() {
         <label className="flex items-start gap-3 text-sm text-gray-700">
           <input
             type="checkbox"
-            className="mt-0.5 h-5 w-5 rounded border-[#dce4ff] accent-pink"
+            className="mt-0.5 h-5 w-5 rounded border-[#dce4ff] accent-blue"
             {...register('acceptTerms')}
           />
           <span>

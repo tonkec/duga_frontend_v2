@@ -50,12 +50,12 @@ const VerifyEmailPage = () => {
 
   return (
     <AuthLayout>
-      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-rose text-3xl shadow-sm">
+      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-blue/10 text-3xl shadow-sm">
         ✉️
       </div>
 
       <div className="text-center">
-        <p className="text-sm font-bold uppercase tracking-[0.22em] text-pink">Još jedan korak</p>
+        <p className="text-sm font-bold uppercase tracking-[0.22em] text-blue">Još jedan korak</p>
         <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-blue-dark">
           Potvrdi svoju e-mail adresu
         </h1>

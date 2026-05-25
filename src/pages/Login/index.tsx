@@ -192,7 +192,7 @@ const LoginPage = () => {
 
                 <Button
                   type="tertiary"
-                  className="w-full !rounded-full !bg-white/95 !px-7 !py-4 !text-lg font-bold shadow-xl hover:!bg-rose sm:w-auto"
+                  className="w-full !rounded-full !bg-white/95 !px-7 !py-4 !text-lg font-bold shadow-xl hover:!bg-[#f0f4ff] sm:w-auto"
                   onClick={scrollToLearnMore}
                 >
                   Saznaj više
@@ -216,7 +216,7 @@ const LoginPage = () => {
             </div>
 
             <div className="relative mx-auto hidden max-w-xl lg:block">
-              <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-pink/40 blur-3xl" />
+              <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
               <div className="absolute -right-8 bottom-8 h-48 w-48 rounded-full bg-white/20 blur-3xl" />
               <div className="relative rounded-[2rem] border border-white/20 bg-white/15 p-8 shadow-2xl backdrop-blur">
                 <Image src={Love1} alt="Dvije osobe sjede zajedno" className="w-full" />
@@ -230,7 +230,7 @@ const LoginPage = () => {
         <section className="bg-white px-5 py-20 md:px-8" ref={learnMoreRef}>
           <div className="container mx-auto">
             <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Kako radi</p>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Kako radi</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
                 Upoznavanje bez kompliciranja
               </h2>
@@ -247,7 +247,7 @@ const LoginPage = () => {
                     key={item.title}
                     className="rounded-[1.75rem] border border-blue/10 bg-[#f7f8ff] p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
                   >
-                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose text-pink">
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue/10 text-blue">
                       <Icon fontSize={34} />
                     </div>
                     <h3 className="text-2xl font-bold text-blue-dark">{item.title}</h3>
@@ -264,7 +264,7 @@ const LoginPage = () => {
         <section className="px-5 py-20 md:px-8">
           <div className="container mx-auto grid items-start gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="lg:sticky lg:top-28">
-              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Zašto Duga</p>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Zašto Duga</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
                 Manje dating aplikacija, više zajednice.
               </h2>
@@ -280,7 +280,7 @@ const LoginPage = () => {
                   className="group rounded-[1.75rem] border border-blue/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl md:p-8"
                 >
                   <div className="flex flex-col gap-5 sm:flex-row">
-                    <span className="text-5xl font-black leading-none text-pink/80">
+                    <span className="text-5xl font-black leading-none text-blue/80">
                       {item.number}
                     </span>
                     <div>
@@ -297,9 +297,9 @@ const LoginPage = () => {
 
       <FadeInSection>
         <section className="px-5 py-20 md:px-8">
-          <div className="container mx-auto overflow-hidden rounded-[2rem] bg-rose p-6 shadow-sm md:p-10 lg:p-14">
+          <div className="container mx-auto overflow-hidden rounded-[2rem] bg-[#f7f9ff] p-6 shadow-sm md:p-10 lg:p-14">
             <div className="mx-auto mb-12 max-w-2xl text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Zajednica</p>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Zajednica</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
                 Duga u brojkama
               </h2>
@@ -329,7 +329,7 @@ const LoginPage = () => {
         <section className="bg-white px-5 py-20 md:px-8">
           <div className="container mx-auto grid items-center gap-10 lg:grid-cols-2">
             <div className="max-w-xl">
-              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Sigurnost</p>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Sigurnost</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
                 AI pomaže održati prostor ugodnim
               </h2>
@@ -384,7 +384,7 @@ const LoginPage = () => {
         <section className="px-5 py-20 md:px-8">
           <div className="container mx-auto grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">Cijena</p>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Cijena</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
                 Kreni besplatno
               </h2>
@@ -399,7 +399,7 @@ const LoginPage = () => {
                   <h3 className="text-3xl font-black text-blue-dark">Besplatni plan</h3>
                   <p className="mt-2 text-gray-600">Sve što trebaš za početak upoznavanja.</p>
                 </div>
-                <p className="rounded-full bg-rose px-4 py-2 text-xl font-black text-pink">
+                <p className="rounded-full bg-blue/10 px-4 py-2 text-xl font-black text-blue">
                   Besplatno
                 </p>
               </div>
@@ -407,7 +407,7 @@ const LoginPage = () => {
               <ul className="mt-8 space-y-4">
                 {priceFeatures.map((feature) => (
                   <li key={feature} className="flex items-center gap-3 text-lg text-gray-700">
-                    <BiSolidCircle className="text-pink" fontSize={10} />
+                    <BiSolidCircle className="text-blue" fontSize={10} />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -429,7 +429,7 @@ const LoginPage = () => {
         <section className="bg-white px-5 py-20 md:px-8">
           <div className="container mx-auto max-w-4xl">
             <div className="mb-10 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.24em] text-pink">FAQ</p>
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">FAQ</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
                 Česta pitanja
               </h2>

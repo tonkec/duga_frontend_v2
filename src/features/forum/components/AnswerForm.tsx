@@ -6,7 +6,7 @@ import EmojiSearch from '@app/components/EmojiSearch';
 import FileUploadInput from '@app/components/FileUploadInput';
 import GiphySearch from '@app/components/GiphySearch';
 import Image from '@app/components/Image';
-import { BiSmile, BiSolidFileGif } from 'react-icons/bi';
+import { BiImageAdd, BiSmile, BiSolidFileGif } from 'react-icons/bi';
 import data from '@emoji-mart/data';
 import { init } from 'emoji-mart';
 import {
@@ -31,8 +31,8 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [selectedGifUrl, setSelectedGifUrl] = useState('');
-  const [image, setImage] = useState<File | null>(null);
-  const imagePreviewUrl = image ? URL.createObjectURL(image) : '';
+  const [images, setImages] = useState<File[]>([]);
+  const imagePreviewUrls = images.map((image) => URL.createObjectURL(image));
 
   const updateBody = async (value: string) => {
     setBody(value);
@@ -51,7 +51,7 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
     event.preventDefault();
 
     const trimmedBody = body.trim();
-    if (!trimmedBody && !selectedGifUrl && !image) {
+    if (!trimmedBody && !selectedGifUrl && images.length === 0) {
       setError('Odgovor je obavezan.');
       return;
     }
@@ -71,9 +71,9 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
       : trimmedBody;
 
     setError(null);
-    onSubmit({ body: bodyWithGif, image });
+    onSubmit({ body: bodyWithGif, images });
     setBody('');
-    setImage(null);
+    setImages([]);
     setSelectedGifUrl('');
     setCurrentEmojis([]);
     setShowEmojiSearch(false);
@@ -112,15 +112,20 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
       {error && <p className="mt-2 text-sm font-medium text-red">{error}</p>}
 
       <div className="mt-4">
-        <label htmlFor="answer-image" className="text-sm font-bold text-gray-950">
+        <label
+          htmlFor="answer-image"
+          className="inline-flex items-center gap-2 text-sm font-bold text-gray-950"
+        >
+          <BiImageAdd size={18} className="text-blue" />
           Slika (opcionalno)
         </label>
         <FileUploadInput
           id="answer-image"
           accept="image/*"
+          multiple
           label="Odaberi sliku"
-          helperText="Možeš dodati sliku uz odgovor."
-          onChange={(event) => setImage(event.target.files?.[0] ?? null)}
+          helperText="Možeš dodati više slika uz odgovor. Maksimalno 5 slika, do 1 MB po slici."
+          onChange={(event) => setImages(Array.from(event.target.files ?? []))}
         />
       </div>
 
@@ -193,17 +198,22 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
           </Button>
         </div>
       )}
-      {imagePreviewUrl && (
-        <div className="mt-4 flex items-end gap-3">
-          <Image
-            src={imagePreviewUrl}
-            alt="Pregled slike odgovora"
-            className="max-w-[180px] rounded-xl border border-[#dce4ff]"
-          />
+      {imagePreviewUrls.length > 0 && (
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {imagePreviewUrls.map((previewUrl, index) => (
+              <Image
+                key={`${previewUrl}-${index}`}
+                src={previewUrl}
+                alt={`Pregled slike odgovora ${index + 1}`}
+                className="max-w-[180px] rounded-xl border border-[#dce4ff]"
+              />
+            ))}
+          </div>
           <Button
             type="danger"
             htmlType="button"
-            onClick={() => setImage(null)}
+            onClick={() => setImages([])}
             disabled={isSubmitting}
           >
             Makni

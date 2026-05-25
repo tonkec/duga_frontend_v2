@@ -22,7 +22,9 @@ const getPreview = (text: string, length = 160) => {
 };
 
 export const getUserForumQuestions = (questions: Question[], userId: number) =>
-  questions.filter((question) => Number(question.userId ?? question.User?.id ?? question.user?.id) === userId);
+  questions.filter(
+    (question) => Number(question.userId ?? question.User?.id ?? question.user?.id) === userId
+  );
 
 export const getUserForumAnswers = (questions: Question[], userId: number) => {
   return questions.flatMap((question) =>
@@ -65,13 +67,7 @@ const QuestionActivityCard = ({ question }: { question: Question }) => (
   </Link>
 );
 
-const AnswerActivityCard = ({
-  answer,
-  question,
-}: {
-  answer: Answer;
-  question: Question;
-}) => (
+const AnswerActivityCard = ({ answer, question }: { answer: Answer; question: Question }) => (
   <Link
     to={`/forum/questions/${question.id}`}
     className="block rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
@@ -122,7 +118,7 @@ const UserForumActivity = ({
 
   if (shouldShowError) {
     return (
-      <div className="rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+      <div className="rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
         Nije moguće učitati forum aktivnost.
       </div>
     );

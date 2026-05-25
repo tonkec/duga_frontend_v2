@@ -57,7 +57,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, children }: IConfirmModalPro
           <FiX size={18} />
         </button>
 
-        <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-rose text-red shadow-sm">
+        <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-red/10 text-red shadow-sm">
           !
         </div>
 

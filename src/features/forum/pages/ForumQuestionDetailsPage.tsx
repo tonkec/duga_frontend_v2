@@ -28,7 +28,7 @@ import {
   useVoteQuestion,
 } from '../hooks/useForum';
 import { getForumErrorMessage } from '../utils/forumErrors';
-import ForumImage from '../components/ForumImage';
+import ForumImageGallery from '../components/ForumImageGallery';
 
 interface CurrentUserData {
   id?: number;
@@ -99,7 +99,7 @@ const ForumQuestionDetailsPage = () => {
   if (!isValidQuestionId) {
     return (
       <AppLayout>
-        <div className="rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+        <div className="rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
           Neispravan ID pitanja.
         </div>
       </AppLayout>
@@ -117,7 +117,7 @@ const ForumQuestionDetailsPage = () => {
   if (questionQuery.isError || !question) {
     return (
       <AppLayout>
-        <div className="rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+        <div className="rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
           Nije moguće učitati pitanje. Pokušaj ponovno malo kasnije.
         </div>
       </AppLayout>
@@ -143,15 +143,14 @@ const ForumQuestionDetailsPage = () => {
         >
           <h2 className="text-xl font-bold text-gray-950">Obrisati pitanje?</h2>
           <p className="mt-3 text-sm leading-6 text-gray-600">
-            Ova radnja će trajno ukloniti pitanje i sve povezane podatke: slike, odgovore i
-            glasove.
+            Ova radnja će trajno ukloniti pitanje i sve povezane podatke: slike, odgovore i glasove.
           </p>
         </ConfirmModal>
 
         {isEditingQuestion ? (
           <section>
             {updateQuestionMutation.isError && (
-              <div className="mb-4 rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+              <div className="mb-4 rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
                 {getForumErrorMessage(
                   updateQuestionMutation.error,
                   'Nije moguće urediti pitanje. Provjeri podatke i pokušaj ponovno.'
@@ -239,7 +238,7 @@ const ForumQuestionDetailsPage = () => {
                         </button>
                         <button
                           type="button"
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-rose disabled:cursor-not-allowed disabled:opacity-50"
+                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10 disabled:cursor-not-allowed disabled:opacity-50"
                           disabled={deleteQuestionMutation.isPending}
                           onClick={() => {
                             setIsQuestionActionsOpen(false);
@@ -255,7 +254,7 @@ const ForumQuestionDetailsPage = () => {
                     <Link
                       to="/report"
                       role="menuitem"
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-rose"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
                       onClick={() => setIsQuestionActionsOpen(false)}
                     >
                       <BiFlag size={20} />
@@ -281,13 +280,10 @@ const ForumQuestionDetailsPage = () => {
                 <span className="text-blue">{authorName}</span>
               </Link>
               <RecordCreatedAt createdAt={question.createdAt} className="!text-sm !text-gray-500" />
-              <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-sm font-semibold text-blue-dark">
-                {questionVoteScore} glasova
-              </span>
             </div>
 
             {deleteQuestionMutation.isError && (
-              <div className="mt-4 rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+              <div className="mt-4 rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
                 {getForumErrorMessage(
                   deleteQuestionMutation.error,
                   'Nije moguće obrisati pitanje. Pokušaj ponovno.'
@@ -298,14 +294,17 @@ const ForumQuestionDetailsPage = () => {
             <div className="mt-6 whitespace-pre-wrap text-base leading-8 text-gray-800">
               <ContentFormatter text={question.body} />
             </div>
-            {(question.securePhotoUrl || question.imageUrl) && (
-              <ForumImage
-                securePhotoUrl={question.securePhotoUrl}
-                imageUrl={question.imageUrl}
-                alt="Slika pitanja"
-                className="mt-5 max-w-full rounded-2xl border border-[#dce4ff]"
-              />
-            )}
+            <ForumImageGallery
+              item={question}
+              alt="Slika pitanja"
+              className="mt-5"
+              imageClassName="max-w-full rounded-2xl border border-[#dce4ff]"
+            />
+            <div className="mt-5 flex justify-end">
+              <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-sm font-semibold text-blue-dark">
+                {questionVoteScore} glasova
+              </span>
+            </div>
           </section>
         )}
 
@@ -386,7 +385,7 @@ const ForumQuestionDetailsPage = () => {
         {!isUserLoading && currentUserData?.id && (
           <section className="mt-8">
             {createAnswerMutation.isError && (
-              <div className="mb-4 rounded-3xl border border-red/30 bg-rose px-6 py-5 text-sm font-medium text-gray-800">
+              <div className="mb-4 rounded-3xl border border-red/30 bg-red/10 px-6 py-5 text-sm font-medium text-gray-800">
                 {getForumErrorMessage(
                   createAnswerMutation.error,
                   'Nije moguće poslati odgovor. Provjeri podatke i pokušaj ponovno.'

@@ -32,7 +32,7 @@ const LatestUploads = () => {
 
         <div className="relative isolate overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-5 py-10 shadow-sm sm:px-8">
           <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-          <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-pink/10 blur-3xl" />
+          <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
 
           <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-center">
             <div>
@@ -66,7 +66,7 @@ const LatestUploads = () => {
                 <p className="mt-1 text-xs leading-5 text-gray-500">Prvi dojam počinje ovdje.</p>
               </div>
               <div className="mt-8 rounded-3xl border border-[#e8eeff] bg-white/80 p-4 shadow-sm">
-                <BiUpload className="mb-3 text-pink" size={26} />
+                <BiUpload className="mb-3 text-blue" size={26} />
                 <p className="text-sm font-bold text-gray-950">Tvoji trenuci</p>
                 <p className="mt-1 text-xs leading-5 text-gray-500">Podijeli ono što voliš.</p>
               </div>

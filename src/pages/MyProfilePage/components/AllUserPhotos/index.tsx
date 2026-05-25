@@ -17,6 +17,7 @@ import {
   getUserForumQuestions,
 } from '@app/features/forum/components/UserForumActivity';
 import type { Answer, Question } from '@app/features/forum/types/forum.types';
+import { getForumImageItems } from '@app/features/forum/utils/forumImages';
 import { Link } from 'react-router-dom';
 
 const photoTypeLabels = {
@@ -112,42 +113,46 @@ const getPhotoTypeLabel = (image: IImage) => {
   return photoTypeLabels.profile;
 };
 
-const hasForumImage = (item: Question | Answer) => Boolean(item.securePhotoUrl || item.imageUrl);
+const hasForumImage = (item: Question | Answer) => getForumImageItems(item).length > 0;
 
 export const getForumPhotos = (questions: Question[], userId: number): AllUserPhoto[] => {
   const questionPhotos = getUserForumQuestions(questions, userId)
     .filter(hasForumImage)
-    .map((question) => ({
-      createdAt: question.createdAt,
-      description: question.title,
-      fileType: 'image',
-      id: -100000 - question.id,
-      isProfilePhoto: false,
-      name: question.title,
-      photoType: 'forum-question',
-      securePhotoUrl: question.securePhotoUrl ?? '',
-      updatedAt: question.updatedAt,
-      url: question.imageUrl ?? question.securePhotoUrl ?? '',
-      userId: String(question.userId),
-      forumQuestionId: question.id,
-    }));
+    .flatMap((question) =>
+      getForumImageItems(question).map((image, index) => ({
+        createdAt: question.createdAt,
+        description: question.title,
+        fileType: 'image',
+        id: -100000 - question.id * 100 - index,
+        isProfilePhoto: false,
+        name: question.title,
+        photoType: 'forum-question',
+        securePhotoUrl: image.securePhotoUrl ?? '',
+        updatedAt: question.updatedAt,
+        url: image.imageUrl ?? image.securePhotoUrl ?? '',
+        userId: String(question.userId),
+        forumQuestionId: question.id,
+      }))
+    );
 
   const answerPhotos = getUserForumAnswers(questions, userId)
     .filter(({ answer }) => hasForumImage(answer))
-    .map(({ answer, question }) => ({
-      createdAt: answer.createdAt,
-      description: question.title,
-      fileType: 'image',
-      id: -200000 - answer.id,
-      isProfilePhoto: false,
-      name: question.title,
-      photoType: 'forum-answer',
-      securePhotoUrl: answer.securePhotoUrl ?? '',
-      updatedAt: answer.updatedAt,
-      url: answer.imageUrl ?? answer.securePhotoUrl ?? '',
-      userId: String(answer.userId),
-      forumQuestionId: question.id,
-    }));
+    .flatMap(({ answer, question }) =>
+      getForumImageItems(answer).map((image, index) => ({
+        createdAt: answer.createdAt,
+        description: question.title,
+        fileType: 'image',
+        id: -200000 - answer.id * 100 - index,
+        isProfilePhoto: false,
+        name: question.title,
+        photoType: 'forum-answer',
+        securePhotoUrl: image.securePhotoUrl ?? '',
+        updatedAt: answer.updatedAt,
+        url: image.imageUrl ?? image.securePhotoUrl ?? '',
+        userId: String(answer.userId),
+        forumQuestionId: question.id,
+      }))
+    );
 
   return [...questionPhotos, ...answerPhotos];
 };
