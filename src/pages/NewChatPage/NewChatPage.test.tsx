@@ -183,13 +183,33 @@ describe('NewChatPage chat list integration', () => {
 
     renderNewChatPage();
 
-    expect(
-      screen.getByText(
-        'Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da prihvatiš kolačiće u postavkama.'
-      )
-    ).toBeVisible();
+    expect(screen.getByText(/Nije moguće slati poruke jer si odbio_la kolačiće/)).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Otvori postavke' })).toHaveAttribute(
+      'href',
+      '/settings'
+    );
     expect(screen.queryByText('cookie_blocked_friend')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Nova poruka' })).not.toBeInTheDocument();
+  });
+
+  it('shows settings link for rejected cookies even when there are no conversations', () => {
+    cookieState = { cookieRejectedAt: '2026-05-23T12:00:00.000Z' };
+    mockUseGetAllUserChats.mockReturnValue({
+      userChats: {
+        data: [],
+      },
+      userChatsError: null,
+      isUserChatsLoading: false,
+    } as ReturnType<typeof useGetAllUserChats>);
+
+    renderNewChatPage();
+
+    expect(screen.getByText(/Nije moguće slati poruke jer si odbio_la kolačiće/)).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Otvori postavke' })).toHaveAttribute(
+      'href',
+      '/settings'
+    );
+    expect(screen.queryByRole('heading', { name: 'Nema razgovora' })).not.toBeInTheDocument();
   });
 
   it('enables chat when cookies are accepted', () => {

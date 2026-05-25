@@ -5,6 +5,9 @@ interface ICtaProps {
   subtitle: string;
   onClick?: () => void;
   className?: string;
+  icon?: React.ReactNode;
+  iconClassName?: string;
+  buttonClassName?: string;
   buttonText?: string;
   children?: React.ReactNode;
   compact?: boolean;
@@ -15,6 +18,9 @@ const Cta = ({
   subtitle,
   onClick,
   className,
+  icon,
+  iconClassName,
+  buttonClassName,
   buttonText,
   children,
   compact = false,
@@ -31,12 +37,19 @@ const Cta = ({
     <>
       <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-blue/10 blur-2xl" />
       <div className="relative z-10 flex h-full flex-col">
+        {icon && (
+          <div
+            className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue/10 text-blue ${iconClassName ?? ''}`}
+          >
+            {icon}
+          </div>
+        )}
         <h2 className={titleClassName}>{title}</h2>
         <p className={subtitleClassName}>{subtitle}</p>
         <div className="mt-auto">
           {children ?? (
             <Button
-              className="inline-flex w-fit items-center justify-center rounded-full px-8 py-3 font-semibold shadow-md shadow-blue/15"
+              className={`inline-flex w-fit items-center justify-center rounded-full px-8 py-3 font-semibold shadow-md shadow-blue/15 ${buttonClassName ?? ''}`}
               onClick={onClick}
               type="blue"
             >

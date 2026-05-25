@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import AppLayout from '@app/components/AppLayout';
 import Loader from '@app/components/Loader';
 import Button from '@app/components/Button';
@@ -57,6 +58,21 @@ const EmptyChats = () => {
   );
 };
 
+const CookiesRejectedNotice = () => (
+  <div className="mt-10 w-full rounded-xl border border-red/30 bg-red/10 px-6 py-5 text-center text-sm font-medium text-gray-800">
+    <p>
+      Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da
+      prihvatiš kolačiće u postavkama.
+    </p>
+    <Link
+      to="/settings"
+      className="mt-4 inline-flex rounded-full bg-white px-5 py-2 font-semibold text-red shadow-sm transition-colors hover:bg-red hover:text-white"
+    >
+      Otvori postavke
+    </Link>
+  </div>
+);
+
 const NewChatPage = () => {
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const hasRejectedCookies = cookies.cookieRejectedAt;
@@ -76,24 +92,21 @@ const NewChatPage = () => {
     );
   }
 
-  if (visibleChats.length === 0) {
+  if (hasRejectedCookies) {
     return (
       <PageTitle title="Poruke">
         <AppLayout>
-          <EmptyChats />
+          <CookiesRejectedNotice />
         </AppLayout>
       </PageTitle>
     );
   }
 
-  if (hasRejectedCookies) {
+  if (visibleChats.length === 0) {
     return (
       <PageTitle title="Poruke">
         <AppLayout>
-          <div className="mt-10 w-full rounded-xl border border-red/30 bg-red/10 px-6 py-5 text-center text-sm font-medium text-gray-800">
-            Nije moguće slati poruke jer si odbio_la kolačiće. Ako želiš slati poruke, molimo te da
-            prihvatiš kolačiće u postavkama.
-          </div>
+          <EmptyChats />
         </AppLayout>
       </PageTitle>
     );
