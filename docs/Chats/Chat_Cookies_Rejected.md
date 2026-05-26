@@ -9,7 +9,7 @@
 **ST-026 Block deep links to chat**
 
 - **Given** consent is **rejected**
-- **When** I navigate directly to **/chat** (URL/deep link)
+- **When** I navigate directly to **/new-chat** or **/chat/:chatId** (URL/deep link)
 - **Then** I am **blocked** from accessing chat
 - **And** I see a banner/toast: “Za korištenje chata potrebno je prihvatiti kolačiće”
 - **And** I’m redirected to a **safe page** (e.g., /)
@@ -34,7 +34,7 @@
 - **Given** consent is **rejected** and chat is unavailable
 - **When** I change consent to **accepted** (flow in your app) and refresh
 - **Then** chat entry points **reappear** and are **clickable**
-- **And** navigating to **/chat** connects successfully
+- **And** navigating to **/new-chat** and opening **/chat/:chatId** connects successfully
 - **And** I see a **success toast** “Chat je ponovno omogućen”
 
 **ST-030 Analytics separation**

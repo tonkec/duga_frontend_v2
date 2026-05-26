@@ -26,6 +26,9 @@
 - As a **chat user**, I must be prevented from sending **empty** (whitespace-only) messages.
 - As a **chat user**, I must see **incoming messages in real time** without page reloads.
 - As a **chat user**, I must see **my messages** visually distinct from **others’ messages**.
+- As a **chat user**, I must be able to search messages inside the current conversation.
+- As a **chat user**, I must be able to add and remove reactions on messages.
+- As a **chat user**, I must be able to mention only users who are members of the current conversation.
 
 ---
 
@@ -90,6 +93,9 @@
 
 - As a **chat user**, I must be able to **delete the chat/conversation** **only if I’m a participant**
 - As a **chat user**, I must **not** be able to delete a chat I’m not a participant of.
+- As a **group chat member**, I must be able to leave a group conversation.
+- As a **group chat admin**, I must be able to add verified users to a group conversation.
+- As a **non-admin group member**, I must not be able to add users to or delete a group conversation.
 
 ---
 
@@ -117,3 +123,7 @@
 ## AWS Rekognition
 
 - See file `Chat_Uploads_Rekognition.md`
+
+## Group Chat
+
+- See file `Group_Chats.md`
