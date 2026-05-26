@@ -7,7 +7,8 @@ import { useGetProfilePhoto } from './hooks/useGetProfilePhoto';
 
 jest.mock('react-avatar', () => ({
   __esModule: true,
-  default: ({ src }: { src: string }) => <img src={src} alt="profile placeholder" />,
+  default: ({ name, src }: { name: string; src?: string }) =>
+    src ? <img src={src} alt="profile placeholder" /> : <span>{name}</span>,
 }));
 
 jest.mock('@app/components/LatestUploads/hooks', () => ({
@@ -51,10 +52,7 @@ describe('UserAvatar integration', () => {
       <UserAvatar avatarFallbackName="No Image User" color="#2D46B9" userId="123" size="160" />
     );
 
-    expect(screen.getByRole('img', { name: 'profile placeholder' })).toHaveAttribute(
-      'src',
-      'https://ui-avatars.com/api/?name=No%20Image%20User&background=f7f9ff&color=1f2937'
-    );
+    expect(screen.getByText('No Image User')).toBeVisible();
   });
 
   it('renders the uploaded profile image when it is available', () => {
@@ -108,9 +106,6 @@ describe('UserAvatar integration', () => {
 
     expect(mockUseGetImageBlob).toHaveBeenCalledWith('/uploads/missing-profile-image');
     expect(createObjectURLMock).not.toHaveBeenCalled();
-    expect(screen.getByRole('img', { name: 'profile placeholder' })).toHaveAttribute(
-      'src',
-      'https://ui-avatars.com/api/?name=Broken%20Image%20User&background=f7f9ff&color=1f2937'
-    );
+    expect(screen.getByText('Broken Image User')).toBeVisible();
   });
 });

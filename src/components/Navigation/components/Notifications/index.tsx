@@ -18,14 +18,20 @@ export type INotification = {
   chatId?: number | null;
   actionId: number | null;
   actionType: 'upload' | 'comment' | 'message' | 'forum_question' | 'forum_answer' | null;
+  questionId?: number | null;
+  answerId?: number | null;
 };
 
 const NotificationDropdown = ({
   userId,
   isMobile,
+  isSidebar = false,
+  isMobileTopbar = false,
 }: {
   userId: number | null;
   isMobile: boolean;
+  isSidebar?: boolean;
+  isMobileTopbar?: boolean;
 }) => {
   const socket = useSocket();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -88,6 +94,16 @@ const NotificationDropdown = ({
 
   if (!userId || !socket) return null;
 
+  const dropdownPositionClassName = `absolute mt-2 ${
+    isMobile
+      ? 'left-0 right-0'
+      : isMobileTopbar
+        ? 'right-0 w-96 max-w-[calc(100vw-1.5rem)] max-[999px]:fixed max-[999px]:left-3 max-[999px]:right-3 max-[999px]:top-20 max-[999px]:mt-0 max-[999px]:w-auto max-[999px]:max-h-[calc(100vh-6rem)]'
+        : isSidebar
+          ? 'left-full top-0 ml-3 mt-0 w-96'
+          : 'right-0 w-96'
+  }`;
+
   return (
     <div className="relative inline-block w-full" ref={dropdownRef}>
       <button
@@ -96,7 +112,11 @@ const NotificationDropdown = ({
         className={
           isMobile
             ? 'relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white'
-            : 'relative flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold text-white/90 transition-all hover:-translate-y-0.5 hover:bg-white/15 hover:text-white'
+            : isMobileTopbar
+              ? 'notification-topbar-trigger relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white'
+              : isSidebar
+                ? 'relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white'
+                : 'notification-topbar-trigger relative flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold text-gray-800 transition-all hover:-translate-y-0.5 hover:bg-[#eef3ff] hover:text-blue'
         }
       >
         <span>Obavijesti</span>
@@ -108,9 +128,7 @@ const NotificationDropdown = ({
 
       {open && (
         <div
-          className={`absolute z-50 mt-2 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white text-gray-900 shadow-2xl shadow-blue-dark/15 ${
-            isMobile ? 'left-0 right-0' : 'right-0 w-96'
-          }`}
+          className={`${dropdownPositionClassName} z-50 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white text-gray-900 shadow-2xl shadow-blue-dark/15`}
         >
           <div className="bg-gradient-to-br from-white via-[#fbfcff] to-[#f0f4ff] px-4 py-4">
             <div className="flex items-start justify-between gap-3">
@@ -126,7 +144,7 @@ const NotificationDropdown = ({
             </div>
             <button
               type="button"
-              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-3 py-2 text-xs font-semibold text-blue shadow-sm transition-colors hover:bg-blue hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="notification-mark-all-button mt-4 inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-3 py-2 text-xs font-semibold text-blue shadow-sm transition-colors hover:bg-blue hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => {
                 mutateMarkAllAsRead();
                 setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));

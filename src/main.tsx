@@ -46,18 +46,7 @@ createRoot(document.getElementById('root')!).render(
             </AuthTokenBridge>
           </Auth0ProviderWithNavigate>
           <ReactQueryDevtools />
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            closeOnClick
-            pauseOnHover={false}
-            pauseOnFocusLoss={false}
-            closeButton
-            toastClassName={() =>
-              'relative flex min-h-16 overflow-hidden rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 text-sm font-semibold leading-6 text-gray-950 shadow-xl shadow-blue-dark/10'
-            }
-            progressClassName={() => '!bg-blue'}
-          />
+          <ToastContainer position="top-right" autoClose={3000} />
         </QueryClientProvider>
       </BrowserRouter>
     </CookiesProvider>

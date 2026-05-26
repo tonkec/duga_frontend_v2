@@ -41,6 +41,11 @@ const VoteControls = ({
       return;
     }
 
+    if (currentVote !== null) {
+      onClearVote();
+      return;
+    }
+
     onVote(value);
   };
 

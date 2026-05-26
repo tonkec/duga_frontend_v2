@@ -17,13 +17,13 @@ const sectionClassName = 'rounded-3xl border border-[#dce4ff] bg-white p-5 shado
 export default function CookiePolicyPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 text-gray-900">
-      <header className="relative isolate mb-8 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-10 shadow-sm md:px-8">
-        <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-        <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
+      <header className="policy-header relative isolate mb-8 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-10 shadow-sm md:px-8">
+        <div className="policy-header-glow absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
+        <div className="policy-header-glow absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
 
         <a
           href="/"
-          className="relative z-10 mb-6 inline-flex rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm transition-colors hover:bg-blue hover:text-white"
+          className="policy-header-back relative z-10 mb-6 inline-flex rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm transition-colors hover:bg-blue hover:text-white"
         >
           ← Povratak na početnu
         </a>
@@ -32,7 +32,7 @@ export default function CookiePolicyPage() {
           <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue-dark shadow-lg shadow-blue/10">
             <BiCookie size={34} />
           </div>
-          <span className="mb-3 inline-flex rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-dark">
+          <span className="policy-header-label mb-3 inline-flex rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-dark">
             Duga pravila
           </span>
           <h1 className="text-4xl font-bold tracking-tight text-gray-950">Politika kolačića</h1>
@@ -46,7 +46,7 @@ export default function CookiePolicyPage() {
         </div>
       </header>
 
-      <nav className="sticky top-4 z-10 mb-8 rounded-3xl border border-[#dce4ff] bg-white/90 p-3 shadow-sm backdrop-blur">
+      <nav className="policy-section-nav sticky top-4 z-10 mb-8 rounded-3xl border border-[#dce4ff] bg-white/90 p-3 shadow-sm backdrop-blur">
         <ul className="flex flex-wrap gap-2">
           {navItems.map((item) => (
             <li key={item.href}>
@@ -61,7 +61,7 @@ export default function CookiePolicyPage() {
       <div className="space-y-6">
         <section id="sto-su-kolacici" className={sectionClassName}>
           <div className="mb-4 flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+            <div className="policy-section-icon grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
               <BiCookie size={24} />
             </div>
             <h2 className="text-2xl font-bold text-gray-950">Što su kolačići?</h2>
@@ -75,7 +75,7 @@ export default function CookiePolicyPage() {
 
         <section id="vrste-kolacica" className={sectionClassName}>
           <div className="mb-5 flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+            <div className="policy-section-icon grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
               <BiSlider size={24} />
             </div>
             <h2 className="text-2xl font-bold text-gray-950">Koje vrste kolačića koristimo?</h2>
@@ -159,7 +159,7 @@ export default function CookiePolicyPage() {
 
         <section id="trece-strane" className={sectionClassName}>
           <div className="mb-4 flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+            <div className="policy-section-icon grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
               <BiShieldQuarter size={24} />
             </div>
             <h2 className="text-2xl font-bold text-gray-950">Kolačići trećih strana</h2>
@@ -176,7 +176,7 @@ export default function CookiePolicyPage() {
 
         <section id="upravljanje" className={sectionClassName}>
           <div className="mb-4 flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+            <div className="policy-section-icon grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
               <BiLockAlt size={24} />
             </div>
             <h2 className="text-2xl font-bold text-gray-950">Upravljanje kolačićima</h2>
@@ -197,7 +197,7 @@ export default function CookiePolicyPage() {
 
         <section id="kontakt" className={sectionClassName}>
           <div className="mb-4 flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+            <div className="policy-section-icon grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
               <BiEnvelope size={24} />
             </div>
             <h2 className="text-2xl font-bold text-gray-950">Kontakt</h2>

@@ -60,6 +60,7 @@ const SettingsPage = () => {
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRejectCookiesModalOpen, setIsRejectCookiesModalOpen] = useState(false);
   const { isDarkMode, toggleTheme } = useThemePreference();
   const { deleteUserMutation } = useDeleteUser();
   const { acceptCookies, rejectCookies } = useCookieConsent();
@@ -100,6 +101,22 @@ const SettingsPage = () => {
           }
         }}
       />
+      <ConfirmModal
+        isOpen={isRejectCookiesModalOpen}
+        onClose={() => setIsRejectCookiesModalOpen(false)}
+        onConfirm={() => {
+          rejectCookies();
+          setIsRejectCookiesModalOpen(false);
+        }}
+      >
+        <div className="max-w-md text-center">
+          <h2 className="mb-2 text-2xl font-bold">Odbiti kolačiće?</h2>
+          <p className="text-gray-600">
+            Ako odbiješ kolačiće, neke funkcije aplikacije neće raditi ispravno, uključujući slanje
+            poruka.
+          </p>
+        </div>
+      </ConfirmModal>
 
       <div className="mb-5">
         <h1 className="text-3xl font-bold text-gray-900">Postavke</h1>
@@ -107,13 +124,13 @@ const SettingsPage = () => {
 
       <div className="grid gap-5">
         <Card className="rounded-2xl p-5 md:p-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <UserAvatar
               color="#2D46B9"
               userId={String(userId)}
               avatarFallbackName={currentUser.data.username}
-              className="h-16 w-16 rounded-2xl"
-              fgColor="#1f2937"
+              className="h-[88px] w-[88px] rounded-2xl"
+              fgColor="#ffffff"
             />
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">
@@ -175,7 +192,7 @@ const SettingsPage = () => {
               Prihvati kolačiće
             </Button>
           ) : (
-            <Button type="transparent" onClick={rejectCookies}>
+            <Button type="transparent" onClick={() => setIsRejectCookiesModalOpen(true)}>
               Odbij kolačiće
             </Button>
           )}

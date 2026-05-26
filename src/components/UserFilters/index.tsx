@@ -42,9 +42,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
     search.trim().length > 0 || selectValue.value !== defaultSelectValue.value;
 
   return (
-    <section className="relative isolate overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm">
-      <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue/10 blur-3xl" />
-
+    <section className="user-filters-panel relative isolate overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-4 shadow-sm">
       <div className="relative z-10 mb-4">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Pretraga</p>
         <h1 className="mt-1 text-2xl font-bold text-gray-950">Pronađi korisnike</h1>

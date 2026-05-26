@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import NotificationDropdown, { INotification } from '.';
 import { useSocket } from '@app/context/useSocket';
 import {
@@ -8,6 +8,7 @@ import {
   useMarkAllAsReadNotifications,
   useMarkAsReadNotification,
 } from '@app/components/Navigation/hooks';
+import { getQuestions } from '@app/features/forum/api/forumApi';
 
 const navigate = jest.fn();
 
@@ -26,10 +27,16 @@ jest.mock('@app/components/Navigation/hooks', () => ({
   useMarkAsReadNotification: jest.fn(),
 }));
 
+jest.mock('@app/features/forum/api/forumApi', () => ({
+  getQuestion: jest.fn(),
+  getQuestions: jest.fn(),
+}));
+
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseGetAllNotifications = jest.mocked(useGetAllNotifcations);
 const mockUseMarkAllAsReadNotifications = jest.mocked(useMarkAllAsReadNotifications);
 const mockUseMarkAsReadNotification = jest.mocked(useMarkAsReadNotification);
+const mockGetQuestions = jest.mocked(getQuestions);
 
 const mutateMarkAllAsRead = jest.fn();
 const mutateMarkAsRead = jest.fn();
@@ -91,6 +98,21 @@ describe('NotificationDropdown', () => {
       isMarkAsReadError: false,
       isMarkAsReadSuccess: false,
     } as ReturnType<typeof useMarkAsReadNotification>);
+
+    mockGetQuestions.mockResolvedValue({
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 100,
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   afterEach(() => {
@@ -158,6 +180,89 @@ describe('NotificationDropdown', () => {
     expect(mutateMarkAsRead).toHaveBeenCalledWith('1');
     expect(navigate).toHaveBeenCalledWith('/forum/questions/42');
     expect(within(unreadNotification).getByText('Pročitano')).toBeVisible();
+  });
+
+  it('navigates forum answer notifications to the related question', async () => {
+    mockUseGetAllNotifications.mockReturnValue({
+      allNotifications: {
+        data: [
+          notification({
+            id: 3,
+            content: 'Netko je odgovorio na tvoje pitanje.',
+            actionType: 'forum_answer',
+            actionId: 42,
+          }),
+        ],
+      },
+      allNotificationsError: null,
+      areAllNotificationsLoading: false,
+    } as ReturnType<typeof useGetAllNotifcations>);
+
+    renderNotifications();
+
+    fireEvent.click(screen.getByRole('button', { name: /obavijesti/i }));
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: /netko je odgovorio na tvoje pitanje/i,
+      })
+    );
+
+    expect(navigate).toHaveBeenCalledWith('/forum/questions/42');
+  });
+
+  it('resolves reply-to-answer notifications from answer id to question id', async () => {
+    mockUseGetAllNotifications.mockReturnValue({
+      allNotifications: {
+        data: [
+          notification({
+            id: 4,
+            content: 'Netko je odgovorio na tvoj odgovor.',
+            actionType: 'forum_answer',
+            actionId: 11,
+          }),
+        ],
+      },
+      allNotificationsError: null,
+      areAllNotificationsLoading: false,
+    } as ReturnType<typeof useGetAllNotifcations>);
+    mockGetQuestions.mockResolvedValue({
+      data: [
+        {
+          id: 42,
+          userId: 7,
+          title: 'Pitanje',
+          body: 'Sadrzaj',
+          isResolved: false,
+          createdAt: '2026-05-25T10:00:00.000Z',
+          updatedAt: '2026-05-25T10:00:00.000Z',
+          Answers: [
+            {
+              id: 11,
+              questionId: 42,
+              userId: 7,
+              body: 'Odgovor',
+              isAccepted: false,
+              createdAt: '2026-05-25T10:00:00.000Z',
+              updatedAt: '2026-05-25T10:00:00.000Z',
+            },
+          ],
+        },
+      ],
+      total: 1,
+      page: 1,
+      limit: 100,
+    });
+
+    renderNotifications();
+
+    fireEvent.click(screen.getByRole('button', { name: /obavijesti/i }));
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: /netko je odgovorio na tvoj odgovor/i,
+      })
+    );
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/forum/questions/42'));
   });
 
   it('keeps the mobile dropdown open until the user closes it', async () => {

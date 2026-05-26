@@ -1,8 +1,10 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import UsersPage from '.';
+import { getProfilePhoto } from '@app/api/uploads';
 import { useSocket } from '../../context/useSocket';
 import { useEnsureBackendUser } from '../../hooks/useEnsureBackendUser';
 import { useGetAllUsers } from '../../hooks/useGetAllUsers';
@@ -10,6 +12,10 @@ import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+jest.mock('@app/api/uploads', () => ({
+  getProfilePhoto: jest.fn(),
 }));
 
 jest.mock('@app/components/UserAvatar', () => ({
@@ -41,6 +47,7 @@ jest.mock('@app/hooks/useGetWindowSize', () => ({
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseEnsureBackendUser = jest.mocked(useEnsureBackendUser);
 const mockUseGetAllUsers = jest.mocked(useGetAllUsers);
+const mockGetProfilePhoto = jest.mocked(getProfilePhoto);
 
 const apiUser = ({
   id,
@@ -51,6 +58,7 @@ const apiUser = ({
   gender = 'Nebinarna osoba',
   location = 'Zagreb',
   sexuality = 'Queer',
+  avatar = '',
 }: {
   id: number;
   username: string;
@@ -60,13 +68,14 @@ const apiUser = ({
   gender?: string;
   location?: string;
   sexuality?: string;
+  avatar?: string;
 }) => ({
   id,
   username,
   isVerified,
   status,
   updatedAt,
-  avatar: '',
+  avatar,
   email: `${username}@example.com`,
   lastName: '',
   firstName: '',
@@ -83,16 +92,23 @@ const LocationProbe = () => {
   return <div data-testid="location">{location.pathname}</div>;
 };
 
-const renderUsersPage = () =>
-  render(
-    <MemoryRouter initialEntries={['/users']}>
-      <LocationProbe />
-      <Routes>
-        <Route path="/users" element={<UsersPage />} />
-        <Route path="/user/:userId" element={<h1>User profile</h1>} />
-      </Routes>
-    </MemoryRouter>
+const renderUsersPage = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/users']}>
+        <LocationProbe />
+        <Routes>
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/user/:userId" element={<h1>User profile</h1>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
 
 describe('UsersPage dating flow integration', () => {
   beforeEach(() => {
@@ -108,6 +124,9 @@ describe('UsersPage dating flow integration', () => {
       },
       isLoading: false,
     } as ReturnType<typeof useEnsureBackendUser>);
+    mockGetProfilePhoto.mockResolvedValue({ data: {} } as Awaited<
+      ReturnType<typeof getProfilePhoto>
+    >);
   });
 
   it('renders user cards from API data', () => {
@@ -150,6 +169,41 @@ describe('UsersPage dating flow integration', () => {
     expect(screen.getByText('Offline')).toBeVisible();
     expect(screen.queryByRole('heading', { name: 'current_user' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'unverified_user' })).not.toBeInTheDocument();
+  });
+
+  it('filters users by profile photo', async () => {
+    mockGetProfilePhoto.mockImplementation((userId) =>
+      Promise.resolve({
+        data: userId === '2' ? { securePhotoUrl: '/uploads/avatar.jpg' } : {},
+      } as Awaited<ReturnType<typeof getProfilePhoto>>)
+    );
+    mockUseGetAllUsers.mockReturnValue({
+      allUsers: {
+        data: [
+          apiUser({
+            id: 2,
+            username: 'user_with_photo',
+          }),
+          apiUser({
+            id: 3,
+            username: 'user_without_photo',
+          }),
+        ],
+      },
+      allUsersError: null,
+      isAllUsersLoading: false,
+    } as ReturnType<typeof useGetAllUsers>);
+
+    renderUsersPage();
+
+    fireEvent.click(screen.getByLabelText('Prikaži samo korisnike s profilnom'));
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'user_with_photo' })).toBeVisible()
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: 'user_without_photo' })).not.toBeInTheDocument()
+    );
   });
 
   it('opens a user profile when a rendered card is clicked', () => {

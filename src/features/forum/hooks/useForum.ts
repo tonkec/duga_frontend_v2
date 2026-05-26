@@ -4,6 +4,7 @@ import { useSocket } from '@app/context/useSocket';
 import {
   acceptAnswer,
   addAnswerReaction,
+  addAnswerReplyReaction,
   createAnswerReply,
   createAnswer,
   createQuestion,
@@ -11,6 +12,7 @@ import {
   deleteAnswerImage,
   deleteAnswerReply,
   deleteAnswerReaction,
+  deleteAnswerReplyReaction,
   deleteAnswerVote,
   deleteQuestion,
   deleteQuestionImage,
@@ -54,7 +56,11 @@ const FORUM_SOCKET_EVENTS = [
   'forum-answer-updated',
   'forum-answer-deleted',
   'forum-answer-accepted',
+  'forum-answer-reply-created',
+  'forum-answer-reply-updated',
+  'forum-answer-reply-deleted',
   'forum-answer-reaction-updated',
+  'forum-answer-reply-reaction-updated',
   'forum-question-vote-updated',
   'forum-answer-vote-updated',
 ] as const;
@@ -63,12 +69,16 @@ const FORUM_QUESTION_LIST_SOCKET_EVENTS = [
   'forum-question-created',
   'forum-question-updated',
   'forum-question-deleted',
+  'forum-answer-reply-created',
+  'forum-answer-reply-updated',
+  'forum-answer-reply-deleted',
 ] as const;
 
 type ForumSocketEvent = (typeof FORUM_SOCKET_EVENTS)[number];
 
 type ForumSocketEnvelope = {
   data?: unknown;
+  answerId?: number | string;
   questionId?: number | string;
 };
 
@@ -81,6 +91,11 @@ const toNumber = (value: unknown) => {
   return Number.isFinite(numberValue) ? numberValue : undefined;
 };
 
+const isAnswerReplyCrudEvent = (event: ForumSocketEvent) =>
+  event === 'forum-answer-reply-created' ||
+  event === 'forum-answer-reply-updated' ||
+  event === 'forum-answer-reply-deleted';
+
 const getEnvelopeQuestionId = (payload: ForumSocketEnvelope) => {
   const payloadQuestionId = toNumber(payload.questionId);
   if (payloadQuestionId) return payloadQuestionId;
@@ -92,9 +107,36 @@ const getEnvelopeQuestionId = (payload: ForumSocketEnvelope) => {
   return undefined;
 };
 
+const getQuestionIdFromPayload = (payload: ForumSocketEnvelope) => {
+  return (
+    getEnvelopeQuestionId(payload) ??
+    (isRecord(payload.data) ? toNumber(payload.data.id) : undefined)
+  );
+};
+
+const getDetailEventQuestionId = (event: ForumSocketEvent, payload: ForumSocketEnvelope) => {
+  if (
+    event === 'forum-question-created' ||
+    event === 'forum-question-updated' ||
+    event === 'forum-question-deleted'
+  ) {
+    return getQuestionIdFromPayload(payload);
+  }
+
+  return getEnvelopeQuestionId(payload);
+};
+
 const getAnswerIdFromPayload = (payload: ForumSocketEnvelope) => {
   if (!isRecord(payload.data)) return undefined;
   return toNumber(payload.data.id) ?? toNumber(payload.data.answerId);
+};
+
+const getQuestionFromPayload = (payload: ForumSocketEnvelope): Question | null => {
+  if (!isRecord(payload.data) || !toNumber(payload.data.id)) {
+    return null;
+  }
+
+  return payload.data as unknown as Question;
 };
 
 const getAnswerFromPayload = (payload: ForumSocketEnvelope): Answer | null => {
@@ -317,6 +359,90 @@ const updateCachedAnswerReactionFromSocket = (
   };
 };
 
+const getAnswerReplyIdFromPayload = (payload: ForumSocketEnvelope) => {
+  if (!isRecord(payload.data)) return undefined;
+  return (
+    toNumber(payload.data.answerReplyId) ??
+    toNumber(payload.data.replyId) ??
+    toNumber(payload.data.id)
+  );
+};
+
+const getAnswerReplyFromPayload = (payload: ForumSocketEnvelope): AnswerReply | null => {
+  if (!isRecord(payload.data) || !toNumber(payload.data.id)) {
+    return null;
+  }
+
+  return payload.data as unknown as AnswerReply;
+};
+
+const getAnswerIdForReplyPayload = (payload: ForumSocketEnvelope) => {
+  if (!isRecord(payload.data)) return toNumber(payload.answerId);
+  return toNumber(payload.data.answerId) ?? toNumber(payload.answerId);
+};
+
+const getAnswerReplyReactionsFromPayload = (
+  payload: ForumSocketEnvelope
+): AnswerReply['reactions'] => {
+  if (!isRecord(payload.data) || !Array.isArray(payload.data.reactions)) return undefined;
+
+  const userReactions = Array.isArray(payload.data.userReactions)
+    ? payload.data.userReactions.filter((emoji): emoji is string => typeof emoji === 'string')
+    : [];
+
+  return payload.data.reactions
+    .filter((reaction): reaction is Record<string, unknown> => isRecord(reaction))
+    .map((reaction) => {
+      const emoji = typeof reaction.emoji === 'string' ? reaction.emoji : '';
+      const count = toNumber(reaction.count) ?? 0;
+
+      return {
+        emoji,
+        count,
+        reactedByCurrentUser: userReactions.includes(emoji),
+      };
+    })
+    .filter((reaction) => reaction.emoji && reaction.count > 0);
+};
+
+const updateCachedAnswerReplyReactionFromSocket = (
+  question: Question | undefined,
+  payload: ForumSocketEnvelope
+): Question | undefined => {
+  if (!question?.Answers || !isRecord(payload.data)) return question;
+
+  const answerId = toNumber(payload.data.answerId) ?? toNumber(payload.answerId);
+  const replyId = getAnswerReplyIdFromPayload(payload);
+  if (!replyId) return question;
+
+  const reactions = getAnswerReplyReactionsFromPayload(payload);
+  const reactionCount = toNumber(payload.data.reactionCount);
+  const userReactions = Array.isArray(payload.data.userReactions)
+    ? payload.data.userReactions.filter((emoji): emoji is string => typeof emoji === 'string')
+    : undefined;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((answer) => {
+      if (answerId && answer.id !== answerId) return answer;
+
+      return {
+        ...answer,
+        replies: answer.replies?.map((reply) =>
+          reply.id === replyId
+            ? {
+                ...reply,
+                reactions: reactions ?? reply.reactions,
+                reactionCount: reactionCount ?? reply.reactionCount,
+                userReactions: userReactions ?? reply.userReactions,
+              }
+            : reply
+        ),
+      };
+    }),
+  };
+};
+
 const updateCachedQuestionFromSocket = (
   question: Question | undefined,
   event: ForumSocketEvent,
@@ -335,18 +461,39 @@ const updateCachedQuestionFromSocket = (
       const answerId = getAnswerIdFromPayload(payload);
       return answerId ? removeCachedAnswer(question, answerId) : question;
     }
+    case 'forum-answer-reply-created': {
+      const reply = getAnswerReplyFromPayload(payload);
+      const answerId = getAnswerIdForReplyPayload(payload);
+      return reply && answerId ? addCachedAnswerReply(question, answerId, reply) : question;
+    }
+    case 'forum-answer-reply-updated': {
+      const reply = getAnswerReplyFromPayload(payload);
+      return reply ? updateCachedAnswerReply(question, reply.id, reply) : question;
+    }
+    case 'forum-answer-reply-deleted': {
+      const replyId = getAnswerReplyIdFromPayload(payload);
+      return replyId ? removeCachedAnswerReply(question, replyId) : question;
+    }
     case 'forum-answer-accepted':
       return applyAcceptedAnswer(question, payload);
     case 'forum-answer-reaction-updated':
       return updateCachedAnswerReactionFromSocket(question, payload);
+    case 'forum-answer-reply-reaction-updated':
+      return updateCachedAnswerReplyReactionFromSocket(question, payload);
     case 'forum-question-vote-updated':
       return updateCachedQuestionVote(question, payload);
     case 'forum-answer-vote-updated':
       return updateCachedAnswerVoteFromSocket(question, payload);
+    case 'forum-question-created': {
+      const nextQuestion = getQuestionFromPayload(payload);
+      return nextQuestion ?? question;
+    }
     case 'forum-question-updated':
-      return isRecord(payload.data) && question
-        ? { ...question, ...(payload.data as Partial<Question>) }
+      return isRecord(payload.data)
+        ? ({ ...(question ?? {}), ...(payload.data as Partial<Question>) } as Question)
         : question;
+    case 'forum-question-deleted':
+      return undefined;
     default:
       return question;
   }
@@ -364,7 +511,9 @@ export const useForumSocketEvents = (questionId?: number) => {
     };
 
     const handleDetailEvent = (event: ForumSocketEvent) => (payload: ForumSocketEnvelope) => {
-      if (!questionId || getEnvelopeQuestionId(payload) !== questionId) return;
+      const eventQuestionId = getDetailEventQuestionId(event, payload);
+      if (!questionId || (eventQuestionId && eventQuestionId !== questionId)) return;
+      if (!eventQuestionId && !isAnswerReplyCrudEvent(event)) return;
 
       queryClient.setQueryData<Question>(forumQueryKeys.question(questionId), (currentQuestion) =>
         updateCachedQuestionFromSocket(currentQuestion, event, payload)
@@ -496,6 +645,59 @@ const updateCachedAnswerReaction = (
         reactions: nextReactions.filter((reaction) => reaction.count > 0),
       };
     }),
+  };
+};
+
+const updateCachedAnswerReplyReaction = (
+  question: Question | undefined,
+  replyId: number,
+  emoji: string,
+  reactedByCurrentUser: boolean
+) => {
+  if (!question?.Answers) return question;
+
+  return {
+    ...question,
+    Answers: question.Answers.map((answer) => ({
+      ...answer,
+      replies: answer.replies?.map((reply) => {
+        if (reply.id !== replyId) return reply;
+
+        const reactions = reply.reactions ?? [];
+        const currentUserReactions = [
+          ...(reply.currentUserReactions ?? []),
+          ...(reply.myReactions ?? []),
+          ...(reply.userReactions ?? []),
+        ];
+        const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
+        const hasReacted =
+          existingReaction?.reactedByCurrentUser || currentUserReactions.includes(emoji);
+        const nextCount = reactedByCurrentUser
+          ? (existingReaction?.count ?? 0) + (hasReacted ? 0 : 1)
+          : Math.max(0, (existingReaction?.count ?? 0) - (hasReacted ? 1 : 0));
+        const nextReaction = {
+          emoji,
+          count: nextCount,
+          reactedByCurrentUser,
+        };
+        const nextReactions = existingReaction
+          ? reactions.map((reaction) => (reaction.emoji === emoji ? nextReaction : reaction))
+          : [...reactions, nextReaction];
+        const nextUserReactions = reactedByCurrentUser
+          ? Array.from(new Set([...currentUserReactions, emoji]))
+          : currentUserReactions.filter((reactionEmoji) => reactionEmoji !== emoji);
+
+        return {
+          ...reply,
+          reactions: nextReactions.filter((reaction) => reaction.count > 0),
+          reactionCount: nextReactions.reduce(
+            (sum, reaction) => sum + Math.max(0, reaction.count),
+            0
+          ),
+          userReactions: nextUserReactions,
+        };
+      }),
+    })),
   };
 };
 
@@ -911,6 +1113,78 @@ export const useDeleteAnswerReaction = (questionId: number) => {
       if (answer) {
         queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
           mergeCachedAnswer(currentQuestion, answer)
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
+    },
+  });
+};
+
+export const useAddAnswerReplyReaction = (questionId: number) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: ({ replyId, payload }: { replyId: number; payload: ReactionPayload }) =>
+      addAnswerReplyReaction(replyId, payload),
+    onMutate: async ({ replyId, payload }) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        updateCachedAnswerReplyReaction(currentQuestion, replyId, payload.emoji, true)
+      );
+
+      return { previousQuestion };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSuccess: (reply) => {
+      if (reply) {
+        queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+          updateCachedAnswerReply(currentQuestion, reply.id, reply)
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: questionQueryKey });
+      queryClient.invalidateQueries({ queryKey: forumQueryKeys.all });
+    },
+  });
+};
+
+export const useDeleteAnswerReplyReaction = (questionId: number) => {
+  const queryClient = useQueryClient();
+  const questionQueryKey = forumQueryKeys.question(questionId);
+
+  return useMutation({
+    mutationFn: ({ replyId, payload }: { replyId: number; payload: ReactionPayload }) =>
+      deleteAnswerReplyReaction(replyId, payload),
+    onMutate: async ({ replyId, payload }) => {
+      await queryClient.cancelQueries({ queryKey: questionQueryKey });
+      const previousQuestion = queryClient.getQueryData<Question>(questionQueryKey);
+
+      queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+        updateCachedAnswerReplyReaction(currentQuestion, replyId, payload.emoji, false)
+      );
+
+      return { previousQuestion };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousQuestion) {
+        queryClient.setQueryData(questionQueryKey, context.previousQuestion);
+      }
+    },
+    onSuccess: (reply) => {
+      if (reply) {
+        queryClient.setQueryData<Question>(questionQueryKey, (currentQuestion) =>
+          updateCachedAnswerReply(currentQuestion, reply.id, reply)
         );
       }
     },

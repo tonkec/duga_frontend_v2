@@ -108,12 +108,29 @@ const normalizeAnswerReactions = (answer: Answer): AnswerReaction[] | undefined 
 
 const normalizeAnswerReply = (reply: AnswerReply): AnswerReply => {
   const user = normalizeUser(reply.User || reply.user);
+  const sourceReactions = reply.reactions ?? reply.Reactions ?? [];
+  const currentUserReactionEmojis = new Set([
+    ...(reply.currentUserReactions ?? []),
+    ...(reply.myReactions ?? []),
+    ...(reply.userReactions ?? []),
+  ]);
+  const reactions = sourceReactions
+    .map((reaction) => ({
+      ...reaction,
+      count: toOptionalNumber(reaction.count) ?? 0,
+      reactedByCurrentUser:
+        Boolean(reaction.reactedByCurrentUser) ||
+        isCurrentUserReaction(reaction) ||
+        currentUserReactionEmojis.has(reaction.emoji),
+    }))
+    .filter((reaction) => reaction.emoji && reaction.count > 0);
 
   return {
     ...reply,
     answerId: toOptionalNumber(reply.answerId) ?? reply.answerId,
     userId: toOptionalNumber(reply.userId) ?? user?.id ?? reply.userId,
     User: user,
+    reactions,
   };
 };
 
@@ -435,4 +452,37 @@ export const deleteAnswerReply = async (id: number): Promise<void> => {
   await client.delete(`/forum/answer-replies/${id}`, {
     skipGlobalErrorHandler: true,
   });
+};
+
+export const addAnswerReplyReaction = async (
+  id: number,
+  payload: ReactionPayload
+): Promise<AnswerReply | undefined> => {
+  const client = apiClient();
+  const response = await client.post<SingleResponse<AnswerReply>>(
+    `/forum/answer-replies/${id}/reactions`,
+    payload,
+    {
+      skipGlobalErrorHandler: true,
+    }
+  );
+
+  return response.data ? normalizeAnswerReply(unwrapResponse(response.data)) : undefined;
+};
+
+export const deleteAnswerReplyReaction = async (
+  id: number,
+  payload: ReactionPayload
+): Promise<AnswerReply | undefined> => {
+  const client = apiClient();
+  const response = await client.delete<SingleResponse<AnswerReply>>(
+    `/forum/answer-replies/${id}/reactions`,
+    {
+      data: payload,
+      params: payload,
+      skipGlobalErrorHandler: true,
+    }
+  );
+
+  return response.data ? normalizeAnswerReply(unwrapResponse(response.data)) : undefined;
 };
