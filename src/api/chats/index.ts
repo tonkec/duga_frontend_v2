@@ -1,9 +1,10 @@
 import { apiClient } from '..';
 
 export type CreateChatInput =
-  | { partnerId: number }
+  | { partnerId?: number; partnerPublicId?: string }
   | {
-      userIds: number[];
+      userIds?: number[];
+      userPublicIds?: string[];
       name: string;
     };
 

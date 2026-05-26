@@ -27,6 +27,7 @@ const navItems = [
   { to: '/forum', label: 'Forum', icon: <BiHelpCircle fontSize={20} /> },
   { to: '/settings', label: 'Postavke', icon: <BiCog fontSize={20} /> },
   { to: '/report', label: 'Prijavi problem', icon: <BiFlag fontSize={20} /> },
+  { to: '/help', label: 'Pomoć', icon: <BiHelpCircle fontSize={20} /> },
 ];
 
 export const NavigationItems = ({

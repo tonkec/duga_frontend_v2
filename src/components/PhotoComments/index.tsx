@@ -75,9 +75,10 @@ export interface IComment {
   id: number;
   comment: string;
   userId: string;
+  userPublicId?: string;
   uploadId: string;
   createdAt: string;
-  taggedUsers?: { id: number; username: string }[];
+  taggedUsers?: { id: number; publicId?: string; username: string }[];
   imageUrl?: string;
   securePhotoUrl?: string;
 }
@@ -110,7 +111,9 @@ const PhotoComments = () => {
   const { allUserImages } = useGetAllUserImages();
 
   const [allComments, setAllComments] = useState<IComment[]>([]);
-  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>([]);
+  const [taggedUsers, setTaggedUsers] = useState<
+    Array<{ id: number; publicId?: string; username: string }>
+  >([]);
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
 

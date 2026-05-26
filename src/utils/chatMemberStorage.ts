@@ -1,6 +1,7 @@
 export type ChatMemberLike = {
   id?: number;
   userId?: number;
+  publicId?: string;
   username?: string;
   avatar?: string;
   createdAt?: string;

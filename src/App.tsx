@@ -18,6 +18,7 @@ import type { Question } from './features/forum/types/forum.types';
 import { getVoteScore } from './features/forum/components/VoteControls';
 import RecordCreatedAt from './components/RecordCreatedAt';
 import { getVoteLabel } from './features/forum/utils/forumLabels';
+import { getUserProfilePath } from './utils/userProfilePath';
 
 interface WelcomeHeroProps {
   onEditProfile: () => void;
@@ -432,7 +433,7 @@ function App() {
               <li className="h-full" key={user.id}>
                 <UserCard
                   user={user}
-                  onButtonClick={() => navigate(`/user/${user.id}`)}
+                  onButtonClick={() => navigate(getUserProfilePath(user))}
                   isOnline={user.status === 'online'}
                 />
               </li>

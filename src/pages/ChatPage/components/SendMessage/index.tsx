@@ -32,11 +32,14 @@ import {
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
+import UserAvatar from '@app/components/UserAvatar';
 
 type Inputs = {
   content: string;
   files: FileList | null;
 };
+
+type MentionableUser = Pick<IUser, 'id' | 'username'>;
 
 const schema = z
   .object({
@@ -84,6 +87,7 @@ interface ISendMessageProps {
   chatId: string;
   otherUserId: number | undefined | null;
   otherUserIds?: number[];
+  mentionableUsers?: MentionableUser[];
 }
 
 interface INotification {
@@ -98,7 +102,34 @@ export const getMessageImagePath = (chatId: string, timestamp: string, fileName:
   return `chat/${chatId}/${timestamp}/${cleanedName}`;
 };
 
-const SendMessage = ({ chatId, otherUserId, otherUserIds }: ISendMessageProps) => {
+const mentionQueryRegex = /(^|\s)@([\w\d_]*)$/;
+const messageMentionRegex = /@([\w\d_]+)/g;
+
+const getMentionQuery = (value: string) => value.match(mentionQueryRegex)?.[2]?.toLowerCase();
+
+const getMentionIds = (message: string, mentionableUsers: MentionableUser[]) => {
+  const mentionedUsernames = Array.from(message.matchAll(messageMentionRegex)).map((match) =>
+    match[1].toLowerCase()
+  );
+  const mentionableUsersByUsername = new Map(
+    mentionableUsers.map((user) => [user.username.toLowerCase(), Number(user.id)])
+  );
+
+  return Array.from(
+    new Set(
+      mentionedUsernames
+        .map((username) => mentionableUsersByUsername.get(username))
+        .filter((userId): userId is number => Number.isFinite(userId))
+    )
+  );
+};
+
+const SendMessage = ({
+  chatId,
+  otherUserId,
+  otherUserIds,
+  mentionableUsers = [],
+}: ISendMessageProps) => {
   init({ data });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -127,9 +158,17 @@ const SendMessage = ({ chatId, otherUserId, otherUserIds }: ISendMessageProps) =
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState<string | undefined>();
   const { allNotifications } = useGetAllNotifcations();
   const { mutateMarkAsRead } = useMarkAsReadNotification();
   const { allUserImages } = useGetAllUserImages();
+  const mentionSuggestions = useMemo(() => {
+    if (mentionQuery === undefined) return [];
+
+    return mentionableUsers
+      .filter((user) => user.username.toLowerCase().includes(mentionQuery))
+      .slice(0, 6);
+  }, [mentionQuery, mentionableUsers]);
 
   const emitStopTyping = useCallback(() => {
     if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
@@ -246,13 +285,16 @@ const SendMessage = ({ chatId, otherUserId, otherUserIds }: ISendMessageProps) =
   };
 
   const onMessageSubmit = (data: Inputs) => {
+    const message = data.content?.trim() ?? '';
+    const mentions = getMentionIds(message, mentionableUsers);
     const msg = {
       type: 'text',
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
       toUserId: recipientIds,
       chatId,
-      message: data.content,
+      message,
+      mentions,
     };
 
     if (recipientIds.length) {
@@ -261,6 +303,7 @@ const SendMessage = ({ chatId, otherUserId, otherUserIds }: ISendMessageProps) =
     }
 
     emitStopTyping();
+    setMentionQuery(undefined);
     reset();
   };
 
@@ -381,42 +424,81 @@ const SendMessage = ({ chatId, otherUserId, otherUserIds }: ISendMessageProps) =
               const debouncedSearch = debounce(handleSearch, 300);
 
               return (
-                <Input
-                  className="!rounded-full !border-[#dce4ff] py-2.5"
-                  type="text"
-                  placeholder="Napiši poruku… ( : za emoji )"
-                  {...field}
-                  onChange={(e: SyntheticEvent) => {
-                    const value = (e.target as HTMLInputElement).value;
-                    debouncedSearch(value);
-                    if (value.trim()) {
+                <div className="relative">
+                  <Input
+                    className="!rounded-full !border-[#dce4ff] py-2.5"
+                    type="text"
+                    placeholder="Napiši poruku… ( @ za mention, : za emoji )"
+                    {...field}
+                    onChange={(e: SyntheticEvent) => {
+                      const value = (e.target as HTMLInputElement).value;
+                      debouncedSearch(value);
+                      setMentionQuery(getMentionQuery(value));
+                      if (value.trim()) {
+                        emitTyping();
+                      } else {
+                        emitStopTyping();
+                      }
+                      field.onChange(e);
+                    }}
+                    onFocus={() => {
+                      setMentionQuery(getMentionQuery(field.value ?? ''));
                       emitTyping();
-                    } else {
-                      emitStopTyping();
-                    }
-                    field.onChange(e);
-                  }}
-                  onFocus={() => {
-                    emitTyping();
-                    socket?.emit('markAsRead', {
-                      userId: currentUserId,
-                      chatId: Number(chatId),
-                    });
-
-                    if (allNotifications?.data) {
-                      allNotifications.data.forEach((notification: INotification) => {
-                        if (
-                          notification.type === 'message' &&
-                          notification.chatId === Number(chatId) &&
-                          !notification.isRead
-                        ) {
-                          mutateMarkAsRead(String(notification.id));
-                        }
+                      socket?.emit('markAsRead', {
+                        userId: currentUserId,
+                        chatId: Number(chatId),
                       });
-                    }
-                  }}
-                  onBlur={emitStopTyping}
-                />
+
+                      if (allNotifications?.data) {
+                        allNotifications.data.forEach((notification: INotification) => {
+                          if (
+                            notification.type === 'message' &&
+                            notification.chatId === Number(chatId) &&
+                            !notification.isRead
+                          ) {
+                            mutateMarkAsRead(String(notification.id));
+                          }
+                        });
+                      }
+                    }}
+                    onBlur={() => {
+                      window.setTimeout(() => setMentionQuery(undefined), 120);
+                      emitStopTyping();
+                    }}
+                  />
+
+                  {mentionSuggestions.length > 0 && (
+                    <ul className="absolute bottom-full left-0 right-0 z-30 mb-2 max-h-56 overflow-y-auto rounded-2xl border border-[#dce4ff] bg-white p-1 shadow-xl shadow-blue-dark/10">
+                      {mentionSuggestions.map((user) => (
+                        <li key={user.id}>
+                          <button
+                            type="button"
+                            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-gray-800 transition-colors hover:bg-[#f0f4ff] hover:text-blue-dark"
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={() => {
+                              const currentValue = field.value ?? '';
+                              const nextValue = currentValue.replace(
+                                mentionQueryRegex,
+                                `$1@${user.username} `
+                              );
+                              field.onChange(nextValue);
+                              setValue('content', nextValue, { shouldValidate: true });
+                              setMentionQuery(undefined);
+                            }}
+                          >
+                            <UserAvatar
+                              avatarFallbackName={user.username}
+                              color="#2D46B9"
+                              userId={String(user.id)}
+                              className="h-8 w-8 shrink-0 rounded-full"
+                            />
+                            <span className="font-semibold">@{user.username}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               );
             }}
           />

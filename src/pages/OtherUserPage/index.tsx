@@ -5,9 +5,11 @@ import Select from 'react-select';
 import {
   BiFlag,
   BiHelpCircle,
+  BiLink,
   BiMessageRoundedDots,
   BiSolidCamera,
   BiSolidFile,
+  BiUserX,
 } from 'react-icons/bi';
 import UserProfileCard from '@app/components/UserProfileCard';
 import { useGetAllImages } from '@app/hooks/useGetAllImages';
@@ -25,6 +27,8 @@ import UserForumActivity, {
   getUserForumQuestions,
 } from '@app/features/forum/components/UserForumActivity';
 import { useQuestionDetails, useQuestions } from '@app/features/forum/hooks/useForum';
+import ProfileSharePanel from '@app/components/ProfileSharePanel';
+import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 const getChatWithUser = (userChats: IChat[] | undefined, userId: string | undefined) => {
   if (!userId) return undefined;
@@ -67,6 +71,7 @@ const profileTabSelectStyles = {
 const getProfileTabLabel = (tabId: string) => {
   const labels: Record<string, string> = {
     general: 'Općenito',
+    share: 'Podijeli profil',
     photos: 'Fotografije',
     questions: 'Pitanja',
     answers: 'Odgovori',
@@ -75,20 +80,78 @@ const getProfileTabLabel = (tabId: string) => {
   return labels[tabId] ?? tabId;
 };
 
+const isNumericProfileIdentifier = (value: string | undefined) =>
+  Boolean(value && /^\d+$/.test(value));
+
+const ProfileNotFoundState = ({
+  onBack,
+  onBrowseUsers,
+}: {
+  onBack: () => void;
+  onBrowseUsers: () => void;
+}) => (
+  <AppLayout>
+    <section className="mx-auto flex min-h-[calc(100vh-18rem)] max-w-2xl items-center justify-center rounded-3xl border border-[#dce4ff] bg-white px-6 py-12 text-center shadow-sm">
+      <div className="flex max-w-lg flex-col items-center">
+        <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] text-blue-dark shadow-sm">
+          <BiUserX size={34} />
+        </div>
+        <span className="mb-4 rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
+          Profil nije dostupan
+        </span>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-950">
+          Ne možemo pronaći profil.
+        </h1>
+        <p className="mt-3 text-sm leading-7 text-gray-600">
+          Link je možda promijenjen, profil više ne postoji ili trenutno nije dostupan. Možeš se
+          vratiti natrag ili pregledati sve dostupne korisnike.
+        </p>
+
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <Button
+            type="blue"
+            className="rounded-full px-6 py-3 font-semibold shadow-md shadow-blue/15"
+            onClick={onBack}
+          >
+            Natrag
+          </Button>
+          <Button
+            type="secondary"
+            className="rounded-full border border-[#dce4ff] px-6 py-3 font-semibold"
+            onClick={onBrowseUsers}
+          >
+            Pregledaj korisnike
+          </Button>
+        </div>
+      </div>
+    </section>
+  </AppLayout>
+);
+
 const OtherUserPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { userId } = useParams();
-  const { allImages, allImagesLoading } = useGetAllImages(userId as string);
-  const { user: otherUser, isUserLoading } = useGetUserById(userId as string);
+  const isLegacyNumericProfileUrl = isNumericProfileIdentifier(userId);
+  const { user: otherUser, isUserLoading } = useGetUserById(
+    !isLegacyNumericProfileUrl ? (userId as string) : ''
+  );
+  const otherUserInternalId = otherUser?.data?.id;
+  const { allImages, allImagesLoading } = useGetAllImages(
+    otherUserInternalId !== undefined ? String(otherUserInternalId) : ''
+  );
+  const { user: currentUser } = useGetCurrentUser();
   const { userChats } = useGetAllUserChats();
-  const existingChat = getChatWithUser(userChats?.data, userId);
+  const existingChat = getChatWithUser(
+    userChats?.data,
+    otherUserInternalId !== undefined ? String(otherUserInternalId) : userId
+  );
   const {
     data: forumData,
     isError: isForumError,
     isPending: isForumLoading,
   } = useQuestions({ page: 1, limit: 100 });
-  const numericUserId = Number(userId);
+  const numericUserId = Number(otherUserInternalId ?? userId);
   const profileImages = allImages?.data.images ?? [];
   const forumQuestions = forumData?.data ?? [];
   const forumDetailQueries = useQuestionDetails(forumQuestions);
@@ -108,6 +171,9 @@ const OtherUserPage = () => {
   const userForumAnswers = Number.isFinite(numericUserId)
     ? getUserForumAnswers(forumQuestionsWithDetails, numericUserId)
     : [];
+  const isOwnSharedProfile =
+    Number(currentUser?.data?.id) === Number(otherUserInternalId ?? userId) ||
+    (!!currentUser?.data?.publicId && currentUser.data.publicId === userId);
 
   const profileTabs = [
     {
@@ -118,7 +184,11 @@ const OtherUserPage = () => {
         </div>
       ),
       panel: (
-        <div className="grid grid-cols-1 gap-5 mb-3 xl:grid-cols-[1fr_280px]">
+        <div
+          className={`mb-3 grid grid-cols-1 gap-5 ${
+            isOwnSharedProfile ? '' : 'xl:grid-cols-[1fr_280px]'
+          }`}
+        >
           <div className="min-w-0">
             <UserProfileCard
               user={otherUser?.data}
@@ -127,38 +197,57 @@ const OtherUserPage = () => {
             />
           </div>
 
-          <aside className="grid content-start items-start gap-4 md:grid-cols-2 xl:grid-cols-1">
-            <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
-              <SendMessageButton
-                sendMessageToId={userId as string}
-                buttonType="blue"
-                buttonClasses="w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
-                hasChatWithUser={Boolean(existingChat)}
-                existingChatId={existingChat?.id}
-              />
-            </Cta>
-            <div className="rounded-3xl border border-red/20 bg-red/10 p-5 shadow-sm">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-red shadow-sm">
-                <BiFlag size={22} />
+          {!isOwnSharedProfile && (
+            <aside className="grid content-start items-start gap-4 md:grid-cols-2 xl:grid-cols-1">
+              <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
+                <SendMessageButton
+                  sendMessageToId={String(otherUserInternalId ?? userId)}
+                  sendMessageToPublicId={otherUser?.data?.publicId}
+                  buttonType="blue"
+                  buttonClasses="w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
+                  hasChatWithUser={Boolean(existingChat)}
+                  existingChatId={existingChat?.id}
+                />
+              </Cta>
+              <div className="rounded-3xl border border-red/20 bg-red/10 p-5 shadow-sm">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-red shadow-sm">
+                  <BiFlag size={22} />
+                </div>
+                <h2 className="text-xl font-bold text-gray-950">Postoji li problem?</h2>
+                <p className="mt-2 text-sm leading-6 text-gray-700">
+                  Ako primijetiš uznemiravanje, lažan profil ili drugi sigurnosni problem, prijavi
+                  ga administratorima.
+                </p>
+                <Button
+                  type="danger"
+                  className="mt-5 rounded-full border border-red/30 bg-white px-5 py-3 font-semibold text-red transition-colors hover:bg-red hover:text-white"
+                  onClick={() => navigate('/report/')}
+                >
+                  Prijavi problem
+                </Button>
               </div>
-              <h2 className="text-xl font-bold text-gray-950">Postoji li problem?</h2>
-              <p className="mt-2 text-sm leading-6 text-gray-700">
-                Ako primijetiš uznemiravanje, lažan profil ili drugi sigurnosni problem, prijavi ga
-                administratorima.
-              </p>
-              <Button
-                type="danger"
-                className="mt-5 rounded-full border border-red/30 bg-white px-5 py-3 font-semibold text-red transition-colors hover:bg-red hover:text-white"
-                onClick={() => navigate('/report/')}
-              >
-                Prijavi problem
-              </Button>
-            </div>
-          </aside>
+            </aside>
+          )}
         </div>
       ),
     },
   ];
+
+  profileTabs.push({
+    id: 'share',
+    tab: (
+      <div className="flex items-center gap-2">
+        Podijeli profil <BiLink fontSize={20} />
+      </div>
+    ),
+    panel: (
+      <ProfileSharePanel
+        userId={otherUserInternalId ?? userId}
+        publicId={otherUser?.data?.publicId}
+        username={otherUser?.data?.username}
+      />
+    ),
+  });
 
   if (profileImages.length > 0) {
     profileTabs.push({
@@ -231,11 +320,9 @@ const OtherUserPage = () => {
     setSearchParams(nextSearchParams);
   };
 
-  if (!userId || isNaN(Number(userId))) {
+  if (!userId || isLegacyNumericProfileUrl) {
     return (
-      <AppLayout>
-        <p>Korisnik_ca nije pronađen_a!</p>
-      </AppLayout>
+      <ProfileNotFoundState onBack={() => navigate(-1)} onBrowseUsers={() => navigate('/users')} />
     );
   }
 
@@ -249,9 +336,7 @@ const OtherUserPage = () => {
 
   if (!otherUser) {
     return (
-      <AppLayout>
-        <p>Korisnik_ca nije pronađen_a!</p>
-      </AppLayout>
+      <ProfileNotFoundState onBack={() => navigate(-1)} onBrowseUsers={() => navigate('/users')} />
     );
   }
 

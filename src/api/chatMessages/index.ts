@@ -1,5 +1,5 @@
 import { apiClient } from '..';
-import { IMessage } from '@app/pages/ChatPage/components/Message';
+import { IMessage, MessageType } from '@app/pages/ChatPage/components/Message';
 import { API_KEY } from '@app/utils/consts';
 import axios from 'axios';
 
@@ -26,6 +26,7 @@ export const sendChatMessage = async (data: {
   type: MessageType;
   messagePhotoUrl?: string;
   securePhotoUrl?: string;
+  mentions?: number[];
 }) => {
   const client = apiClient();
   return client.post('/messages', data);

@@ -13,6 +13,7 @@ export interface IUser {
   bio: string;
   gender: string;
   id: number;
+  publicId?: string;
   isVerified: boolean;
   location: string;
   password: string;

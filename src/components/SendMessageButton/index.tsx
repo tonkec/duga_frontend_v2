@@ -11,6 +11,7 @@ const getChatWithOtherUser = (userChats: IChat[], partnerId: number) => {
 
 interface ISendMessageButtonProps {
   sendMessageToId: string;
+  sendMessageToPublicId?: string;
   buttonType: ButtonType;
   buttonClasses?: string;
   hasChatWithUser?: boolean;
@@ -19,6 +20,7 @@ interface ISendMessageButtonProps {
 
 const SendMessageButton = ({
   sendMessageToId,
+  sendMessageToPublicId,
   buttonType,
   buttonClasses,
   hasChatWithUser = false,
@@ -39,7 +41,11 @@ const SendMessageButton = ({
         }
 
         if (!hasAlreadyChatted(userChats?.data, sendMessageToId)) {
-          onCreateChat({ partnerId: Number(sendMessageToId) });
+          onCreateChat(
+            sendMessageToPublicId
+              ? { partnerPublicId: sendMessageToPublicId }
+              : { partnerId: Number(sendMessageToId) }
+          );
         }
 
         const chat = getChatWithOtherUser(userChats?.data, Number(sendMessageToId));

@@ -6,27 +6,37 @@ const PaginatedMessages = ({
   otherUserName,
   currentUserName,
   otherUserId,
+  otherUserPublicId,
   receivedMessages,
   currentUserId,
   isCurrentUserLoading,
   messages,
   fetchNextPage,
   onReactionToggle,
+  messageSearchQuery = '',
 }: {
   otherUserName: string;
   currentUserName: string;
   otherUserId: number | undefined;
+  otherUserPublicId?: string;
   receivedMessages: IMessage[];
   messages: IMessage[];
   fetchNextPage: () => void;
   currentUserId: number;
   isCurrentUserLoading: boolean;
   onReactionToggle: (message: IMessage, emoji: string, hasReacted: boolean) => void;
+  messageSearchQuery?: string;
 }) => {
   const allMessages = [...receivedMessages, ...messages];
   const sortedMessages = allMessages.sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
+  const normalizedSearchQuery = messageSearchQuery.trim().toLowerCase();
+  const visibleMessages = normalizedSearchQuery
+    ? sortedMessages.filter((message) =>
+        (message.message ?? '').toLowerCase().includes(normalizedSearchQuery)
+      )
+    : sortedMessages;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const prevScrollHeightRef = useRef(0);
@@ -47,7 +57,7 @@ const PaginatedMessages = ({
       scrollToBottom();
       prevScrollHeightRef.current = scrollHeight;
     }
-  }, [messages.length, receivedMessages.length]);
+  }, [messages.length, receivedMessages.length, visibleMessages.length]);
 
   if (!messages.length && !receivedMessages.length) {
     return (
@@ -67,6 +77,14 @@ const PaginatedMessages = ({
 
   const getSenderId = (msg: IMessage) => Number(msg.fromUserId ?? msg.User?.id);
 
+  if (normalizedSearchQuery && visibleMessages.length === 0) {
+    return (
+      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+        <p className="text-center text-sm text-gray-500">Nema poruka koje odgovaraju pretrazi.</p>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -75,8 +93,8 @@ const PaginatedMessages = ({
       }, 500)}
       className="flex min-h-[min(420px,calc(100vh-22rem))] max-h-[min(560px,calc(100vh-18rem))] flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
     >
-      {sortedMessages.map((message, index) => {
-        const previousMessage = sortedMessages[index - 1];
+      {visibleMessages.map((message, index) => {
+        const previousMessage = visibleMessages[index - 1];
         const showAvatar =
           !previousMessage || getSenderId(previousMessage) !== getSenderId(message);
 
@@ -88,6 +106,7 @@ const PaginatedMessages = ({
             key={message.id ?? `${message.createdAt}-${index}`}
             message={message}
             otherUserId={otherUserId}
+            otherUserPublicId={otherUserPublicId}
             messagePhotoUrl={
               message.type === 'gif'
                 ? message.messagePhotoUrl

@@ -5,6 +5,7 @@ import Loader from '@app/components/Loader';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import UserAvatar from '@app/components/UserAvatar';
 import { useGetProfileViews } from '@app/hooks/useGetProfileViews';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 const PROFILE_VIEWS_FETCH_LIMIT = 10;
 const PROFILE_VIEWS_PER_PAGE = 5;
@@ -68,7 +69,7 @@ const ProfileViews = () => {
         {views.map((profileView) => (
           <Link
             key={profileView.id}
-            to={`/user/${profileView.viewer.id}`}
+            to={getUserProfilePath(profileView.viewer)}
             className="flex items-center gap-3 rounded-2xl border border-[#e8eeff] bg-[#f7f9ff] p-3 transition hover:-translate-y-0.5 hover:border-blue/30 hover:bg-white hover:shadow-md hover:shadow-blue/10"
           >
             <UserAvatar
@@ -97,7 +98,7 @@ const ProfileViews = () => {
           <div className="flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white p-1.5 shadow-sm">
             <button
               type="button"
-              className="grid h-10 w-10 place-items-center rounded-full bg-[#f7f9ff] text-blue-dark transition-colors hover:bg-blue hover:text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+              className="profile-views-pagination-button grid h-10 w-10 place-items-center rounded-full bg-[#f7f9ff] text-blue-dark transition-colors hover:bg-blue hover:text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPage((currentPage) => Math.max(currentPage - 1, 1))}
               disabled={page === 1}
               aria-label="Prethodna stranica pregleda"
@@ -109,7 +110,7 @@ const ProfileViews = () => {
             </span>
             <button
               type="button"
-              className="grid h-10 w-10 place-items-center rounded-full bg-blue text-white shadow-sm shadow-blue/20 transition-colors hover:bg-blue-dark disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none"
+              className="profile-views-pagination-button grid h-10 w-10 place-items-center rounded-full bg-blue text-white shadow-sm shadow-blue/20 transition-colors hover:bg-blue-dark disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none"
               onClick={() => setPage((currentPage) => Math.min(currentPage + 1, totalPages))}
               disabled={page === totalPages}
               aria-label="Sljedeća stranica pregleda"

@@ -6,6 +6,7 @@ import { BiFlag } from 'react-icons/bi';
 import type { Question } from '../types/forum.types';
 import { getVoteScore } from './VoteControls';
 import { getVoteLabel } from '../utils/forumLabels';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface QuestionCardProps {
   question: Question;
@@ -78,9 +79,9 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#eef3ff] pt-4 text-xs font-medium text-gray-500">
+      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500">
         <Link
-          to={`/user/${authorId}`}
+          to={getUserProfilePath({ id: authorId, publicId: question.User?.publicId })}
           onClick={(event) => event.stopPropagation()}
           className="inline-flex items-center gap-2 align-middle font-semibold text-blue underline"
         >

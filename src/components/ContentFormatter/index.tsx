@@ -1,16 +1,44 @@
 import Image from '@app/components/Image';
 import { Link } from 'react-router-dom';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
+import { useEffect, useMemo } from 'react';
 
 interface IContentFormatterProps {
   text: string;
   renderRichContent?: boolean;
-  taggedUsers?: { id: number; username?: string }[];
+  taggedUsers?: { id: number; publicId?: string; username?: string }[];
+  linkClassName?: string;
 }
+
+const SecureInlineImage = ({ secureUrl }: { secureUrl: string }) => {
+  const { data: imageBlob } = useGetImageBlob(secureUrl);
+  const imageUrl = useMemo(() => (imageBlob ? URL.createObjectURL(imageBlob) : ''), [imageBlob]);
+
+  useEffect(() => {
+    return () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [imageUrl]);
+
+  if (!imageUrl) {
+    return <span>Slika</span>;
+  }
+
+  return (
+    <Image
+      src={imageUrl}
+      alt="Slika iz poruke"
+      className="mt-2 max-h-72 max-w-full rounded-2xl object-contain"
+    />
+  );
+};
 
 const ContentFormatter = ({
   text,
   renderRichContent = true,
   taggedUsers = [],
+  linkClassName = 'text-blue underline',
 }: IContentFormatterProps) => {
   const parts = text.split(/(\s+)/);
 
@@ -20,6 +48,9 @@ const ContentFormatter = ({
     /(?:https?:\/\/)?(?:(?:www\.)?giphy\.com\/(?:gifs|embed)\/([\w-]+)|media[0-9]?\.giphy\.com\/media\/([\w-]+)\/giphy\.gif)/;
   const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i;
   const urlRegex = /(https?:\/\/[^\s]+)/;
+  const internalProfilePathRegex =
+    /^\/user\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const secureImagePathRegex = /^(?:https?:\/\/[^/\s]+)?\/uploads\/[^\s]+$/;
 
   return (
     <>
@@ -33,7 +64,7 @@ const ContentFormatter = ({
 
           if (taggedUser) {
             return (
-              <Link key={i} to={`/user/${taggedUser.id}`} className="text-blue underline">
+              <Link key={i} to={getUserProfilePath(taggedUser)} className={linkClassName}>
                 {part}
               </Link>
             );
@@ -80,6 +111,22 @@ const ContentFormatter = ({
               ></iframe>
             );
           }
+        }
+
+        if (secureImagePathRegex.test(part)) {
+          if (!renderRichContent) {
+            return <span key={i}>Slika</span>;
+          }
+
+          return <SecureInlineImage key={i} secureUrl={part} />;
+        }
+
+        if (internalProfilePathRegex.test(part)) {
+          return (
+            <Link key={i} to={part} className={linkClassName}>
+              {part}
+            </Link>
+          );
         }
 
         if (imageRegex.test(part)) {

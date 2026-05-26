@@ -1,5 +1,6 @@
 export interface ForumUser {
   id: number;
+  publicId?: string;
   name?: string;
   username?: string;
   picture?: string;

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { Auth0Context, Auth0Provider } from '@auth0/auth0-react';
 import { ReactNode, useMemo, useState } from 'react';
+import { getEnv } from '@app/configs/env';
 
 type AppState = {
   returnTo?: string;
@@ -71,9 +72,9 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
     return <CypressAuth0Provider>{children}</CypressAuth0Provider>;
   }
 
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN;
-  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-  const redirectUri = import.meta.env.VITE_AUTH0_CALLBACK_URL;
+  const domain = getEnv('VITE_AUTH0_DOMAIN');
+  const clientId = getEnv('VITE_AUTH0_CLIENT_ID');
+  const redirectUri = getEnv('VITE_AUTH0_CALLBACK_URL');
 
   const onRedirectCallback = (appState: AppState | undefined) => {
     navigate(appState?.returnTo || window.location.pathname);
@@ -90,7 +91,7 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
       cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: redirectUri,
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        audience: getEnv('VITE_AUTH0_AUDIENCE'),
       }}
       onRedirectCallback={onRedirectCallback}
     >

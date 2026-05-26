@@ -52,6 +52,7 @@ const mockGetProfilePhoto = jest.mocked(getProfilePhoto);
 const apiUser = ({
   id,
   username,
+  publicId = `user-${id}-public-id`,
   isVerified = true,
   status = 'offline',
   updatedAt = '2026-05-23T08:00:00.000Z',
@@ -62,6 +63,7 @@ const apiUser = ({
 }: {
   id: number;
   username: string;
+  publicId?: string;
   isVerified?: boolean;
   status?: 'online' | 'offline';
   updatedAt?: string;
@@ -71,6 +73,7 @@ const apiUser = ({
   avatar?: string;
 }) => ({
   id,
+  publicId,
   username,
   isVerified,
   status,
@@ -224,7 +227,7 @@ describe('UsersPage dating flow integration', () => {
 
     fireEvent.click(screen.getByRole('heading', { name: 'profile_target' }));
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/user/2');
+    expect(screen.getByTestId('location')).toHaveTextContent('/user/user-2-public-id');
     expect(screen.getByRole('heading', { name: 'User profile' })).toBeVisible();
   });
 
@@ -246,7 +249,7 @@ describe('UsersPage dating flow integration', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Pogledaj profil' }));
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/user/5');
+    expect(screen.getByTestId('location')).toHaveTextContent('/user/user-5-public-id');
     expect(screen.getByRole('heading', { name: 'User profile' })).toBeVisible();
   });
 

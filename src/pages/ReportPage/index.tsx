@@ -10,10 +10,11 @@ import TextArea from '@app/components/Textarea';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
 import FieldError from '@app/components/FieldError';
+import { getEnv } from '@app/configs/env';
 
-const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string;
-const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string;
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string;
+const SERVICE_ID = getEnv('VITE_EMAILJS_SERVICE_ID') || '';
+const TEMPLATE_ID = getEnv('VITE_EMAILJS_TEMPLATE_ID') || '';
+const PUBLIC_KEY = getEnv('VITE_EMAILJS_PUBLIC_KEY') || '';
 
 type Option = { value: string; label: string };
 

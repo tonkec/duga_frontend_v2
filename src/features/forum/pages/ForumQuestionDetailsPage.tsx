@@ -40,6 +40,7 @@ import { getForumErrorMessage } from '../utils/forumErrors';
 import ForumImageGallery from '../components/ForumImageGallery';
 import type { Answer } from '../types/forum.types';
 import { getVoteLabel } from '../utils/forumLabels';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface CurrentUserData {
   id?: number;
@@ -179,6 +180,7 @@ const ForumQuestionDetailsPage = () => {
     (question?.userId ?? question?.User?.id ?? question?.user?.id) === currentUserData.id;
   const authorName = question?.User?.name || question?.User?.username || 'Korisnik';
   const authorId = question?.User?.id ?? question?.userId;
+  const authorPublicId = question?.User?.publicId ?? question?.user?.publicId;
   const isQuestionVotePending =
     voteQuestionMutation.isPending || deleteQuestionVoteMutation.isPending;
   const isAnswerReactionPending =
@@ -382,7 +384,7 @@ const ForumQuestionDetailsPage = () => {
 
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
               <Link
-                to={`/user/${authorId}`}
+                to={getUserProfilePath({ id: authorId, publicId: authorPublicId })}
                 className="inline-flex items-center gap-2 font-semibold text-blue underline"
               >
                 <UserAvatar

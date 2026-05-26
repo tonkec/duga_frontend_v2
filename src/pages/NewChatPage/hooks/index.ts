@@ -16,10 +16,12 @@ export interface IChat {
 
 export interface User {
   id: number;
+  publicId?: string;
   firstName: string;
   lastName: string;
   email: string;
   avatar: string;
+  username?: string;
 }
 
 interface Message {
