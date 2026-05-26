@@ -158,7 +158,11 @@ const Navigation = () => {
                 <span>Obavijesti</span>
                 <BiBell aria-hidden fontSize={20} />
                 {hasUnreadNotifications && (
-                  <span className="h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white/80" />
+                  <span
+                    role="status"
+                    aria-label="Nove obavijesti"
+                    className="h-2.5 w-2.5 rounded-full bg-red ring-2 ring-white/80"
+                  />
                 )}
               </Link>
             </div>

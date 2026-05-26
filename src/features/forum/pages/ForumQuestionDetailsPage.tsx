@@ -14,6 +14,7 @@ import AnswerCard from '../components/AnswerCard';
 import AnswerForm from '../components/AnswerForm';
 import QuestionForm from '../components/QuestionForm';
 import VoteControls from '../components/VoteControls';
+import { getVoteScore } from '../components/VoteControls';
 import {
   useAcceptAnswer,
   useAddAnswerReaction,
@@ -38,6 +39,7 @@ import {
 import { getForumErrorMessage } from '../utils/forumErrors';
 import ForumImageGallery from '../components/ForumImageGallery';
 import type { Answer } from '../types/forum.types';
+import { getVoteLabel } from '../utils/forumLabels';
 
 interface CurrentUserData {
   id?: number;
@@ -187,6 +189,7 @@ const ForumQuestionDetailsPage = () => {
     deleteAnswerReplyMutation.isPending;
   const isAnswerReplyReactionPending =
     addAnswerReplyReactionMutation.isPending || deleteAnswerReplyReactionMutation.isPending;
+  const questionVoteScore = question ? getVoteScore(question) : 0;
 
   useEffect(() => {
     if (!isQuestionActionsOpen) return;
@@ -412,16 +415,20 @@ const ForumQuestionDetailsPage = () => {
               className="mt-5"
               imageClassName="max-w-full rounded-2xl border border-[#dce4ff]"
             />
-            {!isQuestionOwner && (
-              <div className="mt-5 flex justify-end">
+            <div className="mt-5 flex justify-end">
+              {!isQuestionOwner ? (
                 <VoteControls
                   item={question}
                   isPending={isQuestionVotePending}
                   onVote={(value) => voteQuestionMutation.mutate({ value })}
                   onClearVote={() => deleteQuestionVoteMutation.mutate()}
                 />
-              </div>
-            )}
+              ) : (
+                <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-sm font-semibold text-blue-dark">
+                  {questionVoteScore} {getVoteLabel(questionVoteScore)}
+                </span>
+              )}
+            </div>
           </section>
         )}
 

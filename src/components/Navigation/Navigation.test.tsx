@@ -81,7 +81,7 @@ describe('Navigation', () => {
     } as unknown as ReturnType<typeof useSocket>);
   });
 
-  it('does not show a red dot on the mobile menu button when notifications are unread', () => {
+  it('shows a red dot in the mobile header when notifications are unread', () => {
     mockUseGetAllNotifications.mockReturnValue({
       allNotifications: {
         data: [{ id: 1, isRead: false }],
@@ -93,7 +93,7 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     expect(screen.getByRole('button', { name: 'Otvori navigaciju' })).toBeVisible();
-    expect(screen.queryByRole('status', { name: 'Nove obavijesti' })).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Nove obavijesti' })).toBeVisible();
   });
 
   it('prefixes the page title with the unread notification count', async () => {
