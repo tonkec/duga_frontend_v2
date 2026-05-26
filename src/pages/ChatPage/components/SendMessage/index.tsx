@@ -292,7 +292,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
 
   return (
     <div>
-      <form onSubmit={onSubmit} className="flex items-center gap-2">
+      <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-2">
         <input
           name="avatars"
           type="file"
@@ -317,104 +317,108 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
             });
           }}
         />
-        <button
-          type="button"
-          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={handleIconClick}
-          disabled={isUploadingMessageImage}
-          aria-label="Priloži datoteku"
-        >
-          <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
-        </button>
+        <div className="order-2 flex w-full items-center gap-2 sm:order-none sm:w-auto">
+          <button
+            type="button"
+            className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleIconClick}
+            disabled={isUploadingMessageImage}
+            aria-label="Priloži datoteku"
+          >
+            <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
+          </button>
 
-        <button
-          type="button"
-          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={() => {
-            setShowGiphySearch((isOpen) => !isOpen);
-            setShowEmojiSearch(false);
-          }}
-          disabled={isUploadingMessageImage}
-          aria-label="Odaberi GIF"
-        >
-          <BiSolidFileGif fontSize={20} />
-        </button>
+          <button
+            type="button"
+            className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => {
+              setShowGiphySearch((isOpen) => !isOpen);
+              setShowEmojiSearch(false);
+            }}
+            disabled={isUploadingMessageImage}
+            aria-label="Odaberi GIF"
+          >
+            <BiSolidFileGif fontSize={20} />
+          </button>
 
-        <button
-          type="button"
-          className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={() => {
-            setShowEmojiSearch((isOpen) => !isOpen);
-            setShowGiphySearch(false);
-            setCurrentEmojis([]);
-          }}
-          disabled={isUploadingMessageImage}
-          aria-label="Odaberi emoji"
-        >
-          <BiSmile fontSize={20} />
-        </button>
+          <button
+            type="button"
+            className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => {
+              setShowEmojiSearch((isOpen) => !isOpen);
+              setShowGiphySearch(false);
+              setCurrentEmojis([]);
+            }}
+            disabled={isUploadingMessageImage}
+            aria-label="Odaberi emoji"
+          >
+            <BiSmile fontSize={20} />
+          </button>
+        </div>
 
-        <Controller
-          name="content"
-          control={control}
-          render={({ field }) => {
-            const handleSearch = async (value: string) => {
-              const searchTerm = getEmojiSearchQueryFromText(value);
+        <div className="order-1 min-w-0 flex-1 sm:order-none">
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => {
+              const handleSearch = async (value: string) => {
+                const searchTerm = getEmojiSearchQueryFromText(value);
 
-              if (searchTerm) {
-                const emojis = await searchEmojiNatives(searchTerm);
-                setCurrentEmojis(emojis);
-              } else {
-                setCurrentEmojis([]);
-              }
-            };
+                if (searchTerm) {
+                  const emojis = await searchEmojiNatives(searchTerm);
+                  setCurrentEmojis(emojis);
+                } else {
+                  setCurrentEmojis([]);
+                }
+              };
 
-            const debouncedSearch = debounce(handleSearch, 300);
+              const debouncedSearch = debounce(handleSearch, 300);
 
-            return (
-              <Input
-                className="!rounded-full !border-[#dce4ff] py-2.5"
-                type="text"
-                placeholder="Napiši poruku… ( : za emoji )"
-                {...field}
-                onChange={(e: SyntheticEvent) => {
-                  const value = (e.target as HTMLInputElement).value;
-                  debouncedSearch(value);
-                  if (value.trim()) {
+              return (
+                <Input
+                  className="!rounded-full !border-[#dce4ff] py-2.5"
+                  type="text"
+                  placeholder="Napiši poruku… ( : za emoji )"
+                  {...field}
+                  onChange={(e: SyntheticEvent) => {
+                    const value = (e.target as HTMLInputElement).value;
+                    debouncedSearch(value);
+                    if (value.trim()) {
+                      emitTyping();
+                    } else {
+                      emitStopTyping();
+                    }
+                    field.onChange(e);
+                  }}
+                  onFocus={() => {
                     emitTyping();
-                  } else {
-                    emitStopTyping();
-                  }
-                  field.onChange(e);
-                }}
-                onFocus={() => {
-                  emitTyping();
-                  socket?.emit('markAsRead', {
-                    userId: currentUserId,
-                    chatId: Number(chatId),
-                  });
-
-                  if (allNotifications?.data) {
-                    allNotifications.data.forEach((notification: INotification) => {
-                      if (
-                        notification.type === 'message' &&
-                        notification.chatId === Number(chatId) &&
-                        !notification.isRead
-                      ) {
-                        mutateMarkAsRead(String(notification.id));
-                      }
+                    socket?.emit('markAsRead', {
+                      userId: currentUserId,
+                      chatId: Number(chatId),
                     });
-                  }
-                }}
-                onBlur={emitStopTyping}
-              />
-            );
-          }}
-        />
+
+                    if (allNotifications?.data) {
+                      allNotifications.data.forEach((notification: INotification) => {
+                        if (
+                          notification.type === 'message' &&
+                          notification.chatId === Number(chatId) &&
+                          !notification.isRead
+                        ) {
+                          mutateMarkAsRead(String(notification.id));
+                        }
+                      });
+                    }
+                  }}
+                  onBlur={emitStopTyping}
+                />
+              );
+            }}
+          />
+        </div>
 
         <Button
           type="blue"
-          className="!rounded-full !p-2.5 shrink-0"
+          className="order-1 shrink-0 !rounded-full !p-2.5 sm:order-none"
           htmlType="submit"
           disabled={isUploadingMessageImage}
         >
