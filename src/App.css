@@ -369,6 +369,7 @@ select:disabled {
 }
 
 [data-theme='dark'] .landing-hero-primary-action,
+[data-theme='dark'] .landing-hero-secondary-action,
 [data-theme='dark'] .landing-primary-action {
   background-color: var(--duga-dark-accent) !important;
   color: var(--duga-dark-base) !important;
@@ -376,6 +377,7 @@ select:disabled {
 }
 
 [data-theme='dark'] .landing-hero-primary-action:hover,
+[data-theme='dark'] .landing-hero-secondary-action:hover,
 [data-theme='dark'] .landing-primary-action:hover {
   background-color: #2bd5dc !important;
   color: var(--duga-dark-base) !important;

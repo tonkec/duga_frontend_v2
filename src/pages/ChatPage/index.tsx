@@ -759,25 +759,6 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleMessageError = (error: { message?: string }) => {
-      if (error.message === 'Mentions must be chat members') {
-        toast.error('Mention možeš poslati samo osobi koja je član ovog razgovora.', toastConfig);
-        return;
-      }
-
-      toast.error(error.message || 'Poruka nije poslana. Probaj opet.', toastConfig);
-    };
-
-    socket.on('message_error', handleMessageError);
-
-    return () => {
-      socket.off('message_error', handleMessageError);
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (!socket) return;
-
     const handleRemoveUserFromChat = ({
       chatId: removedChatId,
       userId: removedUserId,
@@ -807,8 +788,13 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleMessageError = () => {
-      toast.error('Poruku nije moguće poslati. Probaj opet.', toastConfig);
+    const handleMessageError = (error?: { message?: string }) => {
+      if (error?.message === 'Mentions must be chat members') {
+        toast.error('Mention možeš poslati samo osobi koja je član ovog razgovora.', toastConfig);
+      } else {
+        toast.error(error?.message || 'Poruku nije moguće poslati. Probaj opet.', toastConfig);
+      }
+
       queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
     };
