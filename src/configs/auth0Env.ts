@@ -1,1 +1,3 @@
-export const getAuth0Audience = () => import.meta.env.VITE_AUTH0_AUDIENCE;
+import { getEnv } from '@app/configs/env';
+
+export const getAuth0Audience = () => getEnv('VITE_AUTH0_AUDIENCE');

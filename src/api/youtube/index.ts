@@ -1,3 +1,5 @@
+import { getEnv } from '@app/configs/env';
+
 export interface YouTubeVideo {
   id: string;
   title: string;
@@ -65,7 +67,7 @@ export const searchYouTubeVideos = async (query: string): Promise<YouTubeVideo[]
 
   if (normalizedQuery.length < 2) return [];
 
-  const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+  const apiKey = getEnv('VITE_YOUTUBE_API_KEY');
 
   if (!apiKey) {
     throw new Error('YouTube API ključ nije konfiguriran.');

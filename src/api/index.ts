@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { resolveAccessToken } from './authToken';
 import { getAppSessionId, SESSION_HEADER } from './appSession';
 import { handleGlobalApiError } from './globalErrorHandler';
+import { getEnv } from '@app/configs/env';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -27,7 +28,7 @@ export const getCookie = (name: string): string | null => {
  */
 export const apiClient = (token?: string): AxiosInstance => {
   const instance = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
+    baseURL: getEnv('VITE_BASE_URL'),
     headers: {
       'Content-Type': 'application/json',
     },

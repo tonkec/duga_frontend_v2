@@ -1,10 +1,12 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import OtherUserPage from '.';
 import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { useGetAllUserChats } from '../../hooks/useGetAllUserChats';
+import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useQuestionDetails, useQuestions } from '../../features/forum/hooks/useForum';
 
@@ -31,6 +33,10 @@ jest.mock('@app/hooks/useGetAllUserChats', () => ({
   useGetAllUserChats: jest.fn(),
 }));
 
+jest.mock('@app/hooks/useGetCurrentUser', () => ({
+  useGetCurrentUser: jest.fn(),
+}));
+
 jest.mock('@app/hooks/useGetUserById', () => ({
   useGetUserById: jest.fn(),
 }));
@@ -48,6 +54,7 @@ jest.mock('@app/features/forum/hooks/useForum', () => ({
 
 const mockUseGetAllImages = jest.mocked(useGetAllImages);
 const mockUseGetAllUserChats = jest.mocked(useGetAllUserChats);
+const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
 const mockUseGetUserById = jest.mocked(useGetUserById);
 const mockUseQuestions = jest.mocked(useQuestions);
 const mockUseQuestionDetails = jest.mocked(useQuestionDetails);
@@ -59,6 +66,7 @@ const LocationProbe = () => {
 
 const otherUser = {
   id: 42,
+  publicId: 'user-42-public-id',
   username: 'existing_friend',
 };
 
@@ -69,16 +77,23 @@ const existingChat = {
   Messages: [],
 };
 
-const renderOtherUserPage = () =>
-  render(
-    <MemoryRouter initialEntries={['/user/42']}>
-      <LocationProbe />
-      <Routes>
-        <Route path="/user/:userId" element={<OtherUserPage />} />
-        <Route path="/chat/:chatId" element={<h1>Chat page</h1>} />
-      </Routes>
-    </MemoryRouter>
+const renderOtherUserPage = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/user/user-42-public-id']}>
+        <LocationProbe />
+        <Routes>
+          <Route path="/user/:userId" element={<OtherUserPage />} />
+          <Route path="/chat/:chatId" element={<h1>Chat page</h1>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
 
 describe('OtherUserPage existing chat integration', () => {
   beforeEach(() => {
@@ -92,6 +107,18 @@ describe('OtherUserPage existing chat integration', () => {
       allImagesError: null,
       allImagesLoading: false,
     } as ReturnType<typeof useGetAllImages>);
+
+    mockUseGetCurrentUser.mockReturnValue({
+      user: {
+        data: {
+          id: 1,
+          publicId: 'current-user-public-id',
+          username: 'current_user',
+        },
+      },
+      userError: null,
+      isUserLoading: false,
+    } as ReturnType<typeof useGetCurrentUser>);
 
     mockUseGetUserById.mockReturnValue({
       user: {

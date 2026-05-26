@@ -65,6 +65,7 @@ const mockUseUploadMessageImage = jest.mocked(useUploadMessageImage);
 const socketEmit = jest.fn();
 const mutateMarkAsRead = jest.fn();
 const uploadMessageImage = jest.fn();
+const messageInputPlaceholder = 'Napiši poruku… ( @ za mention, : za emoji )';
 
 const renderSendMessage = () => {
   const queryClient = new QueryClient({
@@ -150,7 +151,7 @@ describe('SendMessage integration', () => {
   it('sends a text message and marks unread chat notifications as read', async () => {
     renderSendMessage();
 
-    const input = screen.getByPlaceholderText('Napiši poruku… ( : za emoji )');
+    const input = screen.getByPlaceholderText(messageInputPlaceholder);
     fireEvent.focus(input);
 
     expect(socketEmit).toHaveBeenCalledWith('typing', {
@@ -182,6 +183,7 @@ describe('SendMessage integration', () => {
         toUserId: [2],
         chatId: '123',
         message: 'Hello from the integration test',
+        mentions: [],
       })
     );
     expect(input).toHaveValue('');
@@ -195,7 +197,7 @@ describe('SendMessage integration', () => {
   it('emits typing while the draft changes and stops when it is cleared', () => {
     renderSendMessage();
 
-    const input = screen.getByPlaceholderText('Napiši poruku… ( : za emoji )');
+    const input = screen.getByPlaceholderText(messageInputPlaceholder);
 
     fireEvent.change(input, {
       target: {
