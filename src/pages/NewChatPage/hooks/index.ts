@@ -1,18 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createChat } from '@app/api/chats';
+import { createChat, CreateChatInput } from '@app/api/chats';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useNavigate } from 'react-router';
 import { isMessageRead, markMessagesAsRead } from '@app/api/chatMessages';
 import { MessageType } from '@app/pages/ChatPage/components/Message';
 
-interface CreateChatInput {
-  partnerId: number;
-}
-
 export interface IChat {
   id: number;
   type: string;
+  name?: string;
   Users: User[];
   Messages: Message[];
 }
@@ -46,14 +43,16 @@ export const useCreateNewChat = () => {
     isPending: isCreatingChat,
     isError: isCreateChatError,
     isSuccess: isCreateChatSuccess,
-  } = useMutation<IChat[], unknown, CreateChatInput>({
+  } = useMutation<IChat | IChat[], unknown, CreateChatInput>({
     mutationFn: async (input: CreateChatInput) => {
       const response = await createChat(input);
       return response.data;
     },
     onSuccess: (data) => {
+      const createdChat = Array.isArray(data) ? data[0] : data;
+
       toast.success('Razgovor uspješno kreiran', toastConfig);
-      navigate(`/chat/${data[0].id}`);
+      navigate(`/chat/${createdChat.id}`);
     },
     onError: (error: unknown) => {
       console.error(error);

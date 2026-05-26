@@ -5,6 +5,19 @@ import { getOtherUser } from '@app/pages/ChatPage/utils/getOtherUser';
 import { useEffect, useState } from 'react';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
+type ChatUser = {
+  id?: number;
+  userId?: number;
+};
+
+const getChatUsers = (chatData: unknown): ChatUser[] => {
+  if (Array.isArray(chatData)) return chatData;
+  if (!chatData || typeof chatData !== 'object') return [];
+
+  const chat = chatData as { Users?: ChatUser[] };
+  return chat.Users ?? [];
+};
+
 const OnlineStatusWrapper = ({
   children,
   isCurrentUser = false,
@@ -18,7 +31,10 @@ const OnlineStatusWrapper = ({
   const { chatId } = useParams();
   const { userId } = useParams();
   const { currentChat } = useGetCurrentChat(chatId as string);
-  const otherUserFromChatId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
+  const otherUserFromChatId = getOtherUser(
+    getChatUsers(currentChat?.data).map((user) => ({ userId: Number(user.id ?? user.userId) })),
+    currentUserId as string
+  )?.userId;
 
   useEffect(() => {
     if (isCurrentUser) {

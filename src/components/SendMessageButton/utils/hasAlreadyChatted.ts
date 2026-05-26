@@ -1,5 +1,8 @@
 import { IChat } from '@app/pages/NewChatPage/hooks';
 
-export const hasAlreadyChatted = (userChats: IChat[], userId: string) => {
-  return userChats?.some((chat: IChat) => Number(chat.Users[0].id) === Number(userId));
+export const hasAlreadyChatted = (userChats: IChat[] | undefined, userId: string) => {
+  return userChats?.some(
+    (chat: IChat) =>
+      chat.type !== 'group' && chat.Users.some((user) => Number(user.id) === Number(userId))
+  );
 };

@@ -6,16 +6,31 @@ import { IUser } from '@app/components/UserCard';
 import UserAvatar from '@app/components/UserAvatar';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
+import { BiGroup } from 'react-icons/bi';
 
 interface IUserChatProps {
   user: IUser;
+  title?: string;
+  participantNames?: string[];
+  isGroup?: boolean;
+  participantCount?: number;
   onClick: () => void;
   lastMessage: IMessage | null;
   isFirst?: boolean;
   isLast?: boolean;
 }
 
-const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProps) => {
+const UserChat = ({
+  user,
+  title,
+  participantNames = [],
+  isGroup = false,
+  participantCount,
+  onClick,
+  lastMessage,
+  isFirst,
+  isLast,
+}: IUserChatProps) => {
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const { onMarkMessagesAsRead } = useMarkMessagesAsRead();
@@ -64,13 +79,19 @@ const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProp
           isUnread && 'ring-2 ring-blue/30 ring-offset-2 rounded-full'
         )}
       >
-        <UserAvatar
-          color="#eef3ff"
-          fgColor="#2D46B9"
-          avatarFallbackName={user.username}
-          userId={String(user.id)}
-          className="h-12 w-12 rounded-full border border-[#dce4ff]"
-        />
+        {isGroup ? (
+          <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dce4ff] bg-[#eef3ff] text-blue-dark">
+            <BiGroup size={24} />
+          </span>
+        ) : (
+          <UserAvatar
+            color="#eef3ff"
+            fgColor="#2D46B9"
+            avatarFallbackName={user.username}
+            userId={String(user.id)}
+            className="h-12 w-12 rounded-full border border-[#dce4ff]"
+          />
+        )}
       </div>
 
       <div className="min-w-0 flex-1">
@@ -81,7 +102,7 @@ const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProp
               isUnread ? 'font-bold text-gray-900' : 'font-semibold text-gray-800'
             )}
           >
-            {user.username}
+            {title ?? user.username}
           </span>
           {lastMessage && (
             <RecordCreatedAt
@@ -91,11 +112,21 @@ const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProp
           )}
         </div>
 
+        {participantNames.length > 0 && (
+          <p className="mt-0.5 truncate text-xs text-gray-500">
+            Članovi: {participantNames.join(', ')}
+          </p>
+        )}
+
         <div className="mt-0.5 flex items-center gap-2">
           {lastMessage ? (
             <LastMessage message={lastMessage} isUnread={isUnread} />
           ) : (
-            <span className="text-sm italic text-gray-400">Još nema poruka</span>
+            <span className="text-sm italic text-gray-400">
+              {isGroup && participantCount
+                ? `${participantCount} članova, još nema poruka`
+                : 'Još nema poruka'}
+            </span>
           )}
           {isUnread && (
             <span

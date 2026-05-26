@@ -28,6 +28,7 @@ const UserAvatar = ({
 }: IUserAvatarProps) => {
   const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
   const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
+  const hasValidUserId = Boolean(userId && userId !== 'undefined' && userId !== 'null');
   const isDarkMode = getStoredThemePreference() === 'dark';
   const fallbackBackgroundColor = isDarkMode ? '#222831' : color;
   const fallbackTextColor = isDarkMode ? '#f8fafc' : fgColor || '#ffffff';
@@ -63,7 +64,7 @@ const UserAvatar = ({
     );
   };
 
-  if (isProfilePhotoLoading) {
+  if (hasValidUserId && isProfilePhotoLoading) {
     return (
       <div className={containerClassName} style={sizeStyle}>
         <Loader variant="inline" size="sm" label="Učitavanje avatara..." />
