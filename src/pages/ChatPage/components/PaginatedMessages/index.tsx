@@ -11,6 +11,7 @@ const PaginatedMessages = ({
   isCurrentUserLoading,
   messages,
   fetchNextPage,
+  onReactionToggle,
 }: {
   otherUserName: string;
   currentUserName: string;
@@ -20,6 +21,7 @@ const PaginatedMessages = ({
   fetchNextPage: () => void;
   currentUserId: number;
   isCurrentUserLoading: boolean;
+  onReactionToggle: (message: IMessage, emoji: string, hasReacted: boolean) => void;
 }) => {
   const allMessages = [...receivedMessages, ...messages];
   const sortedMessages = allMessages.sort((a, b) => {
@@ -93,6 +95,7 @@ const PaginatedMessages = ({
             }
             showAvatar={showAvatar}
             isCurrentUserLoading={isCurrentUserLoading}
+            onReactionToggle={onReactionToggle}
           />
         );
       })}

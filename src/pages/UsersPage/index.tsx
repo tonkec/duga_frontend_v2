@@ -1,4 +1,5 @@
 import AppLayout from '@app/components/AppLayout';
+import { getProfilePhoto } from '@app/api/uploads';
 import Loader from '@app/components/Loader';
 import Paginated from '@app/components/Paginated';
 import UserCard, { IUser } from '@app/components/UserCard';
@@ -7,7 +8,8 @@ import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
 import { useGetWindowSize } from '@app/hooks/useGetWindowSize';
 import { filterUsers, getVisibleVerifiedUsers } from '@app/utils/userDirectory';
-import { useState } from 'react';
+import { useQueries } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { BiGroup, BiSearch } from 'react-icons/bi';
 
@@ -23,6 +25,44 @@ const UsersPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [selectValue, setSelectValue] = useState(defaultSelectValue);
+  const [showOnlyWithProfilePhoto, setShowOnlyWithProfilePhoto] = useState(false);
+  const visibleUsers = useMemo(
+    () => getVisibleVerifiedUsers(allUsers?.data, currentUser?.id),
+    [allUsers?.data, currentUser?.id]
+  );
+  const profilePhotoQueries = useQueries({
+    queries: showOnlyWithProfilePhoto
+      ? visibleUsers.map((user) => ({
+          queryKey: ['profilePhoto', String(user.id)],
+          queryFn: () => getProfilePhoto(String(user.id)),
+          staleTime: 1000 * 60 * 5,
+          refetchOnMount: false,
+          retry: false,
+          throwOnError: false,
+        }))
+      : [],
+  });
+  const userIdsWithProfilePhoto = useMemo(
+    () =>
+      new Set(
+        profilePhotoQueries
+          .map((query, index) => (query.data?.data?.securePhotoUrl ? visibleUsers[index].id : null))
+          .filter((userId): userId is number => userId !== null)
+      ),
+    [profilePhotoQueries, visibleUsers]
+  );
+  const isProfilePhotoFilterLoading =
+    showOnlyWithProfilePhoto && profilePhotoQueries.some((query) => query.isPending);
+  const renderUserCard = useCallback(
+    ({ singleEntry }: { singleEntry: IUser }) => (
+      <UserCard
+        user={singleEntry}
+        onButtonClick={() => navigate(`/user/${singleEntry.id}`)}
+        isOnline={singleEntry.status === 'online'}
+      />
+    ),
+    [navigate]
+  );
 
   if (isAllUsersLoading || isUserLoading) {
     return (
@@ -32,8 +72,10 @@ const UsersPage = () => {
     );
   }
 
-  const visibleUsers = getVisibleVerifiedUsers(allUsers?.data, currentUser?.id);
-  const renderedUsers = filterUsers(visibleUsers, search, selectValue);
+  const filteredUsers = filterUsers(visibleUsers, search, selectValue);
+  const renderedUsers = showOnlyWithProfilePhoto
+    ? filteredUsers.filter((user) => userIdsWithProfilePhoto.has(user.id))
+    : filteredUsers;
   const itemsPerPage = windowSize.width < 1024 ? 4 : 8;
 
   return (
@@ -45,7 +87,22 @@ const UsersPage = () => {
         setSearch={setSearch}
       />
 
+      <div className="mt-4 rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 shadow-sm">
+        <label className="flex w-fit cursor-pointer items-center gap-3 text-sm font-semibold text-gray-800">
+          <input
+            type="checkbox"
+            checked={showOnlyWithProfilePhoto}
+            onChange={(event) => setShowOnlyWithProfilePhoto(event.target.checked)}
+            className="h-4 w-4 accent-blue"
+          />
+          Prikaži samo korisnike s profilnom
+        </label>
+      </div>
+
       <div className="mt-4">
+        {isProfilePhotoFilterLoading && (
+          <p className="mb-3 text-sm font-medium text-gray-500">Provjeravam profilne slike...</p>
+        )}
         {!renderedUsers.length && (
           <section className="relative isolate mx-auto mt-8 max-w-2xl overflow-hidden rounded-3xl border border-dashed border-[#b9c6ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#eef3ff] px-6 py-10 text-center shadow-sm">
             <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-blue/10 blur-3xl" />
@@ -87,13 +144,7 @@ const UsersPage = () => {
           data={renderedUsers}
           itemsPerPage={itemsPerPage}
           getItemKey={(user) => user.id}
-          paginatedSingle={({ singleEntry }: { singleEntry: IUser }) => (
-            <UserCard
-              user={singleEntry}
-              onButtonClick={() => navigate(`/user/${singleEntry.id}`)}
-              isOnline={singleEntry.status === 'online'}
-            />
-          )}
+          paginatedSingle={renderUserCard}
         />
       </div>
     </AppLayout>

@@ -110,6 +110,23 @@ body {
   color: var(--duga-dark-text);
 }
 
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  color: #6b7280 !important;
+  opacity: 1;
+}
+
+[data-theme='dark'] input:disabled,
+[data-theme='dark'] textarea:disabled,
+[data-theme='dark'] select:disabled {
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #d1d5db !important;
+}
+
 [data-theme='dark'] input::placeholder,
 [data-theme='dark'] textarea::placeholder {
   color: rgba(248, 250, 252, 0.58);
@@ -118,16 +135,50 @@ body {
 [data-theme='dark'] .react-select__control {
   background-color: var(--duga-dark-surface) !important;
   border-color: var(--duga-dark-border) !important;
+  box-shadow: none !important;
+}
+
+[data-theme='dark'] .react-select__control:hover,
+[data-theme='dark'] .react-select__control--is-focused {
+  border-color: var(--duga-dark-accent) !important;
+  box-shadow: 0 0 0 1px var(--duga-dark-accent) !important;
 }
 
 [data-theme='dark'] .react-select__single-value,
-[data-theme='dark'] .react-select__input-container {
+[data-theme='dark'] .react-select__input-container,
+[data-theme='dark'] .react-select__input,
+[data-theme='dark'] .react-select__placeholder {
   color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .react-select__placeholder {
+  opacity: 0.68;
+}
+
+[data-theme='dark'] .react-select__indicator,
+[data-theme='dark'] .react-select__dropdown-indicator,
+[data-theme='dark'] .react-select__clear-indicator {
+  color: var(--duga-dark-muted) !important;
+}
+
+[data-theme='dark'] .react-select__indicator:hover,
+[data-theme='dark'] .react-select__dropdown-indicator:hover,
+[data-theme='dark'] .react-select__clear-indicator:hover {
+  color: var(--duga-dark-accent) !important;
+}
+
+[data-theme='dark'] .react-select__indicator-separator {
+  background-color: var(--duga-dark-border) !important;
 }
 
 [data-theme='dark'] .react-select__menu {
   background-color: var(--duga-dark-surface) !important;
   border-color: var(--duga-dark-border) !important;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .react-select__menu-list {
+  background-color: var(--duga-dark-surface) !important;
 }
 
 [data-theme='dark'] .react-select__option {
@@ -141,11 +192,90 @@ body {
 
 [data-theme='dark'] .react-select__option--is-selected {
   background-color: var(--duga-dark-accent) !important;
+  color: var(--duga-dark-base) !important;
+}
+
+[data-theme='dark'] .react-select__no-options-message,
+[data-theme='dark'] .react-select__loading-message {
+  color: var(--duga-dark-muted) !important;
 }
 
 [data-theme='dark'] .Toastify__toast {
   background-color: var(--duga-dark-surface) !important;
   border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .notification-mark-all-button {
+  background-color: var(--duga-dark-base) !important;
+  border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-accent) !important;
+}
+
+[data-theme='dark'] .notification-mark-all-button:hover:not(:disabled) {
+  background-color: var(--duga-dark-accent) !important;
+  color: var(--duga-dark-base) !important;
+}
+
+[data-theme='dark'] .desktop-topbar {
+  background-color: rgba(34, 40, 49, 0.85) !important;
+  border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .desktop-sidebar-toggle {
+  background-color: var(--duga-dark-surface) !important;
+  border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .desktop-sidebar-toggle:hover {
+  background-color: #4b5260 !important;
+}
+
+[data-theme='dark'] .notification-topbar-trigger {
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .notification-topbar-trigger:hover {
+  background-color: rgba(248, 250, 252, 0.1) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .user-chat-item:hover {
+  background-color: rgba(0, 173, 181, 0.16) !important;
+}
+
+@media (min-width: 1000px) {
+  .app-layout-content {
+    padding-left: 16rem;
+    padding-top: 11rem;
+    transition: padding-left 300ms ease-in-out;
+  }
+
+  .app-layout-content-sidebar-hidden {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 999px) {
+  .app-layout-content {
+    padding-top: 2rem;
+  }
+}
+
+.chat-bubble-other {
+  background-color: #f0f4ff !important;
+}
+
+[data-theme='dark'] .chat-bubble-own {
+  background-color: var(--duga-dark-accent) !important;
+  color: var(--duga-dark-base) !important;
+}
+
+[data-theme='dark'] .chat-bubble-other {
+  background-color: var(--duga-dark-base) !important;
+  border-color: rgba(248, 250, 252, 0.22) !important;
   color: var(--duga-dark-text) !important;
 }
 
@@ -170,6 +300,16 @@ body {
 [data-theme='dark'] .profile-views-empty-icon {
   background-color: var(--duga-dark-accent) !important;
   color: var(--duga-dark-base) !important;
+}
+
+[data-theme='dark'] .profile-lifestyle-card {
+  background-color: var(--duga-dark-base) !important;
+  border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-muted) !important;
+}
+
+[data-theme='dark'] .profile-lifestyle-card p {
+  color: var(--duga-dark-muted) !important;
 }
 
 [data-theme='dark'] .giphy-search-panel {
@@ -210,11 +350,36 @@ body {
 [data-theme='dark'] .pagination-button:disabled {
   background-color: rgba(248, 250, 252, 0.12) !important;
   color: rgba(248, 250, 252, 0.55) !important;
+  opacity: 1 !important;
+}
+
+[data-theme='dark'] .pagination-text-button {
+  background-color: var(--duga-dark-surface) !important;
+  border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .pagination-text-button:hover:not(:disabled) {
+  background-color: var(--duga-dark-accent) !important;
+  border-color: var(--duga-dark-accent) !important;
+  color: var(--duga-dark-base) !important;
+}
+
+[data-theme='dark'] .pagination-text-button:disabled {
+  background-color: rgba(248, 250, 252, 0.12) !important;
+  border-color: rgba(248, 250, 252, 0.12) !important;
+  color: rgba(248, 250, 252, 0.5) !important;
+  opacity: 1 !important;
 }
 
 [data-theme='dark'] .policy-header {
   background-color: var(--duga-dark-surface) !important;
   background-image: none !important;
+}
+
+[data-theme='dark'] .policy-section-nav {
+  background-color: var(--duga-dark-surface) !important;
+  border-color: var(--duga-dark-border) !important;
 }
 
 [data-theme='dark'] .policy-header-glow {
@@ -320,6 +485,124 @@ body {
 [data-theme='dark'] .quick-actions-cta > .pointer-events-none,
 [data-theme='dark'] .cta-card-glow {
   display: none !important;
+}
+
+[data-theme='dark'] .cta-card-icon {
+  background-color: rgba(0, 173, 181, 0.12) !important;
+  border: 1px solid rgba(0, 173, 181, 0.35) !important;
+  color: var(--duga-dark-accent) !important;
+}
+
+[data-theme='dark'] .profile-cta-edit {
+  background-color: #26354f !important;
+  background-image: linear-gradient(135deg, #26354f 0%, #1f2937 100%) !important;
+  border-color: rgba(96, 165, 250, 0.32) !important;
+}
+
+[data-theme='dark'] .profile-cta-chat {
+  background-color: #1f4a4b !important;
+  background-image: linear-gradient(135deg, #1f4a4b 0%, #1f2937 100%) !important;
+  border-color: rgba(45, 212, 191, 0.32) !important;
+}
+
+[data-theme='dark'] .profile-cta-community {
+  background-color: #3d2f59 !important;
+  background-image: linear-gradient(135deg, #3d2f59 0%, #1f2937 100%) !important;
+  border-color: rgba(167, 139, 250, 0.34) !important;
+}
+
+[data-theme='dark'] .profile-cta-forum {
+  background-color: #5a3724 !important;
+  background-image: linear-gradient(135deg, #5a3724 0%, #1f2937 100%) !important;
+  border-color: rgba(251, 146, 60, 0.34) !important;
+}
+
+[data-theme='dark'] .profile-cta-edit .cta-card-glow,
+[data-theme='dark'] .profile-cta-chat .cta-card-glow,
+[data-theme='dark'] .profile-cta-community .cta-card-glow,
+[data-theme='dark'] .profile-cta-forum .cta-card-glow {
+  display: block !important;
+  opacity: 0.55;
+}
+
+[data-theme='dark'] .profile-cta-edit .cta-card-glow {
+  background-color: rgba(96, 165, 250, 0.32) !important;
+}
+
+[data-theme='dark'] .profile-cta-chat .cta-card-glow {
+  background-color: rgba(45, 212, 191, 0.28) !important;
+}
+
+[data-theme='dark'] .profile-cta-community .cta-card-glow {
+  background-color: rgba(167, 139, 250, 0.3) !important;
+}
+
+[data-theme='dark'] .profile-cta-forum .cta-card-glow {
+  background-color: rgba(251, 146, 60, 0.28) !important;
+}
+
+[data-theme='dark'] .profile-cta-edit .cta-card-icon {
+  background-color: rgba(96, 165, 250, 0.16) !important;
+  border-color: rgba(96, 165, 250, 0.38) !important;
+  color: #93c5fd !important;
+}
+
+[data-theme='dark'] .profile-cta-chat .cta-card-icon {
+  background-color: rgba(45, 212, 191, 0.16) !important;
+  border-color: rgba(45, 212, 191, 0.36) !important;
+  color: #5eead4 !important;
+}
+
+[data-theme='dark'] .profile-cta-community .cta-card-icon {
+  background-color: rgba(167, 139, 250, 0.16) !important;
+  border-color: rgba(167, 139, 250, 0.38) !important;
+  color: #c4b5fd !important;
+}
+
+[data-theme='dark'] .profile-cta-forum .cta-card-icon {
+  background-color: rgba(251, 146, 60, 0.16) !important;
+  border-color: rgba(251, 146, 60, 0.38) !important;
+  color: #fdba74 !important;
+}
+
+[data-theme='dark'] .profile-cta-edit button {
+  background-color: #60a5fa !important;
+  color: #111827 !important;
+  box-shadow: 0 12px 24px rgba(96, 165, 250, 0.18) !important;
+}
+
+[data-theme='dark'] .profile-cta-chat button {
+  background-color: #2dd4bf !important;
+  color: #111827 !important;
+  box-shadow: 0 12px 24px rgba(45, 212, 191, 0.18) !important;
+}
+
+[data-theme='dark'] .profile-cta-community button {
+  background-color: #a78bfa !important;
+  color: #111827 !important;
+  box-shadow: 0 12px 24px rgba(167, 139, 250, 0.18) !important;
+}
+
+[data-theme='dark'] .profile-cta-forum button {
+  background-color: #fb923c !important;
+  color: #111827 !important;
+  box-shadow: 0 12px 24px rgba(251, 146, 60, 0.18) !important;
+}
+
+[data-theme='dark'] .profile-cta-edit button:hover {
+  background-color: #93c5fd !important;
+}
+
+[data-theme='dark'] .profile-cta-chat button:hover {
+  background-color: #5eead4 !important;
+}
+
+[data-theme='dark'] .profile-cta-community button:hover {
+  background-color: #c4b5fd !important;
+}
+
+[data-theme='dark'] .profile-cta-forum button:hover {
+  background-color: #fdba74 !important;
 }
 
 [data-theme='dark'] .user-card {

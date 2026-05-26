@@ -46,7 +46,7 @@ export default function CookiePolicyPage() {
         </div>
       </header>
 
-      <nav className="sticky top-4 z-10 mb-8 rounded-3xl border border-[#dce4ff] bg-white/90 p-3 shadow-sm backdrop-blur">
+      <nav className="policy-section-nav sticky top-4 z-10 mb-8 rounded-3xl border border-[#dce4ff] bg-white/90 p-3 shadow-sm backdrop-blur">
         <ul className="flex flex-wrap gap-2">
           {navItems.map((item) => (
             <li key={item.href}>

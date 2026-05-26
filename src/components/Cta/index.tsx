@@ -39,7 +39,7 @@ const Cta = ({
       <div className="relative z-10 flex h-full flex-col">
         {icon && (
           <div
-            className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue/10 text-blue ${iconClassName ?? ''}`}
+            className={`cta-card-icon mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue/10 text-blue ${iconClassName ?? ''}`}
           >
             {icon}
           </div>

@@ -638,7 +638,7 @@ const ForumQuestionsPage = () => {
             <div className="mt-6 flex items-center justify-between gap-3">
               <Button
                 type="secondary"
-                className="rounded-full border border-[#dce4ff] px-5 py-2"
+                className="pagination-text-button rounded-full border border-[#dce4ff] px-5 py-2"
                 disabled={questionParams.page === 1}
                 onClick={() => goToPage((questionParams.page ?? 1) - 1)}
               >
@@ -649,7 +649,7 @@ const ForumQuestionsPage = () => {
               </span>
               <Button
                 type="secondary"
-                className="rounded-full border border-[#dce4ff] px-5 py-2"
+                className="pagination-text-button rounded-full border border-[#dce4ff] px-5 py-2"
                 disabled={(questionParams.page ?? 1) >= totalPages}
                 onClick={() => goToPage((questionParams.page ?? 1) + 1)}
               >

@@ -3,7 +3,7 @@ import AppLayout from '@app/components/AppLayout';
 import Loader from '@app/components/Loader';
 import Card from '@app/components/Card';
 import SendMessage from './components/SendMessage';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
 import { useDeleteCurrentChat, useGetAllMessages, useGetCurrentChat } from './hooks';
@@ -18,6 +18,7 @@ import ChatBubble from '@app/components/ChatBubble';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ITypingData {
   userId: number;
@@ -28,6 +29,168 @@ interface IDeleteChatModalProps {
   onDeleteChat: () => void;
   isDeleteModalVisible: boolean;
 }
+
+type MessagesQueryData = {
+  pages?: Array<{
+    data?: {
+      messages?: IMessage[];
+    };
+  }>;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const toNumber = (value: unknown) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : undefined;
+};
+
+const getReactionPayloadRecord = (payload: unknown): Record<string, unknown> | undefined => {
+  if (!isRecord(payload)) return undefined;
+
+  if (isRecord(payload.message)) return payload.message;
+  if (isRecord(payload.data)) {
+    if (isRecord(payload.data.message)) return payload.data.message;
+    return payload.data;
+  }
+
+  return payload;
+};
+
+const getReactionPayloadMessageId = (payload: unknown) => {
+  if (!isRecord(payload)) return undefined;
+
+  const nestedMessage = isRecord(payload.message) ? payload.message : undefined;
+  const nestedData = isRecord(payload.data) ? payload.data : undefined;
+  const nestedDataMessage =
+    nestedData && isRecord(nestedData.message) ? nestedData.message : undefined;
+
+  return [
+    payload.messageId,
+    payload.id,
+    nestedMessage?.messageId,
+    nestedMessage?.id,
+    nestedData?.messageId,
+    nestedData?.id,
+    nestedDataMessage?.messageId,
+    nestedDataMessage?.id,
+  ]
+    .map(toNumber)
+    .find((id) => id !== undefined);
+};
+
+const getCurrentUserReactions = (message: IMessage) => [
+  ...(message.userReactions ?? []),
+  ...(message.currentUserReactions ?? []),
+  ...(message.myReactions ?? []),
+];
+
+const updateMessageReactionLocally = (message: IMessage, emoji: string, hasReacted: boolean) => {
+  const reactions = message.reactions ?? message.Reactions ?? [];
+  const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
+  const currentUserReactions = getCurrentUserReactions(message);
+  const previouslyReacted = currentUserReactions.includes(emoji);
+  const currentCount = Math.max(
+    0,
+    Number(existingReaction?.count ?? existingReaction?.reactionCount ?? 0)
+  );
+  const nextCount = hasReacted
+    ? currentCount + (previouslyReacted ? 0 : 1)
+    : Math.max(0, currentCount - (previouslyReacted ? 1 : 0));
+  const nextReaction = {
+    ...existingReaction,
+    emoji,
+    count: nextCount,
+    reactedByCurrentUser: hasReacted,
+  };
+  const nextReactions = existingReaction
+    ? reactions.map((reaction) => (reaction.emoji === emoji ? nextReaction : reaction))
+    : [...reactions, nextReaction];
+  const nextUserReactions = hasReacted
+    ? Array.from(new Set([...currentUserReactions, emoji]))
+    : currentUserReactions.filter((reactionEmoji) => reactionEmoji !== emoji);
+  const currentTotalCount = Number(
+    message.reactionCount ??
+      reactions.reduce((sum, reaction) => {
+        return sum + Math.max(0, Number(reaction.count ?? reaction.reactionCount ?? 0));
+      }, 0)
+  );
+  const nextTotalCount = Math.max(
+    0,
+    currentTotalCount +
+      (hasReacted && !previouslyReacted ? 1 : !hasReacted && previouslyReacted ? -1 : 0)
+  );
+
+  return {
+    ...message,
+    reactions: nextReactions.filter((reaction) => Number(reaction.count ?? 0) > 0),
+    reactionCount: nextTotalCount,
+    userReactions: nextUserReactions,
+  };
+};
+
+const mergeReactionSocketUpdate = (message: IMessage, payload: unknown): IMessage => {
+  const reactionData = getReactionPayloadRecord(payload);
+  if (!reactionData) return message;
+
+  const textMessage =
+    typeof reactionData.message === 'string' ? reactionData.message : message.message;
+  const nextMessage = {
+    ...message,
+    ...reactionData,
+    message: textMessage,
+  } as IMessage;
+  const emoji = typeof reactionData.emoji === 'string' ? reactionData.emoji : undefined;
+
+  if (!emoji || Array.isArray(reactionData.reactions) || Array.isArray(reactionData.Reactions)) {
+    return nextMessage;
+  }
+
+  const reactions = nextMessage.reactions ?? nextMessage.Reactions ?? [];
+  const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
+  const nextCount = toNumber(reactionData.count) ?? toNumber(reactionData.reactionCount);
+  if (nextCount === undefined) return nextMessage;
+
+  const nextReaction = {
+    ...existingReaction,
+    emoji,
+    count: nextCount,
+    reactedByCurrentUser:
+      typeof reactionData.reactedByCurrentUser === 'boolean'
+        ? reactionData.reactedByCurrentUser
+        : existingReaction?.reactedByCurrentUser,
+  };
+  const nextReactions = existingReaction
+    ? reactions.map((reaction) => (reaction.emoji === emoji ? nextReaction : reaction))
+    : [...reactions, nextReaction];
+
+  return {
+    ...nextMessage,
+    reactions: nextReactions.filter((reaction) => Number(reaction.count ?? 0) > 0),
+  };
+};
+
+const updateMessageInQueryData = (
+  data: MessagesQueryData | undefined,
+  messageId: number,
+  updateMessage: (message: IMessage) => IMessage
+) => {
+  if (!data?.pages) return data;
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      data: {
+        ...page.data,
+        messages: page.data?.messages?.map((message) =>
+          Number(message.id) === Number(messageId) ? updateMessage(message) : message
+        ),
+      },
+    })),
+  };
+};
 
 const DeleteChatModal = ({
   setIsDeleteModalVisible,
@@ -52,6 +215,7 @@ const ChatPage = () => {
   const deletedBySelfRef = useRef(false);
   const socket = useSocket();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
   const { chatId } = useParams();
@@ -70,17 +234,80 @@ const ChatPage = () => {
 
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');
 
+  const updateMessageEverywhere = useCallback(
+    (messageId: number, updateMessage: (message: IMessage) => IMessage) => {
+      setReceivedMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          Number(message.id) === Number(messageId) ? updateMessage(message) : message
+        )
+      );
+
+      queryClient.setQueryData<MessagesQueryData>(['messages', chatId], (data) =>
+        updateMessageInQueryData(data, messageId, updateMessage)
+      );
+    },
+    [chatId, queryClient]
+  );
+
+  const handleReactionToggle = useCallback(
+    (message: IMessage, emoji: string, hasReacted: boolean) => {
+      if (!socket || !message.id || !currentUserId) return;
+
+      const nextHasReacted = !hasReacted;
+      updateMessageEverywhere(message.id, (currentMessage) =>
+        updateMessageReactionLocally(currentMessage, emoji, nextHasReacted)
+      );
+      socket.emit(nextHasReacted ? 'react-message' : 'remove-message-reaction', {
+        messageId: message.id,
+        emoji,
+      });
+    },
+    [currentUserId, socket, updateMessageEverywhere]
+  );
+
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('received', (data: IMessage) => {
+    const handleReceived = (data: IMessage) => {
       setReceivedMessages((prev) => [...prev, data]);
-    });
+    };
+
+    socket.on('received', handleReceived);
 
     return () => {
-      socket.off('received');
+      socket.off('received', handleReceived);
     };
   }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReactionUpdate = (payload: unknown) => {
+      const messageId = getReactionPayloadMessageId(payload);
+      if (!messageId) {
+        queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
+        queryClient.invalidateQueries({ queryKey: ['userChats'] });
+        return;
+      }
+
+      updateMessageEverywhere(messageId, (message) => mergeReactionSocketUpdate(message, payload));
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+    };
+
+    const handleReactionError = () => {
+      toast.error('Reakciju nije moguće spremiti. Probaj opet.', toastConfig);
+      queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+    };
+
+    socket.on('message-reaction-updated', handleReactionUpdate);
+    socket.on('message_reaction_error', handleReactionError);
+
+    return () => {
+      socket.off('message-reaction-updated', handleReactionUpdate);
+      socket.off('message_reaction_error', handleReactionError);
+    };
+  }, [chatId, queryClient, socket, updateMessageEverywhere]);
 
   useEffect(() => {
     if (!socket) return;
@@ -179,10 +406,11 @@ const ChatPage = () => {
               onClick={() => navigate(`/user/${otherUserId}`)}
             >
               <UserAvatar
-                color="#2D46B9"
+                color="#eef3ff"
+                fgColor="#2D46B9"
                 avatarFallbackName={otherUserName ?? ''}
                 userId={String(otherUserId ?? '')}
-                className="h-11 w-11 shrink-0 rounded-full"
+                className="h-11 w-11 shrink-0 rounded-full border border-[#dce4ff]"
               />
               <div className="min-w-0">
                 <h1 className="truncate text-lg font-semibold text-gray-900">{otherUserName}</h1>
@@ -213,6 +441,7 @@ const ChatPage = () => {
               fetchNextPage={fetchNextPage}
               currentUserId={currentUserId as number}
               isCurrentUserLoading={isCurrentUserLoading}
+              onReactionToggle={handleReactionToggle}
             />
             {isTyping && (
               <div className="px-4 pb-2">

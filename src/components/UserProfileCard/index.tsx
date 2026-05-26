@@ -1,5 +1,5 @@
 import Card from '@app/components/Card';
-import { BiBody, BiBoltCircle, BiCheckCircle, BiSolidMap, BiStopwatch, BiX } from 'react-icons/bi';
+import { BiBody, BiBoltCircle, BiSolidMap, BiStopwatch } from 'react-icons/bi';
 import {
   getFavoriteDayOfWeekTranslation,
   getLookingForTranslation,
@@ -35,9 +35,9 @@ export interface IUserProfileCardProps {
   username: string;
   lookingFor: string;
   relationshipStatus: string;
-  cigarettes: boolean;
-  alcohol: boolean;
-  sport: boolean;
+  cigarettes?: boolean | null;
+  alcohol?: boolean | null;
+  sport?: boolean | null;
   favoriteDay: string;
   spirituality: string;
   embarasement: string;
@@ -70,27 +70,6 @@ const ProfileDetail = ({
       {label}
     </p>
     <div className="text-base font-semibold text-gray-900">{value}</div>
-  </div>
-);
-
-const BooleanDetail = ({
-  negativeLabel,
-  positiveLabel,
-  value,
-}: {
-  negativeLabel: string;
-  positiveLabel: string;
-  value: boolean;
-}) => (
-  <div
-    className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${
-      value
-        ? 'bg-green/10 text-green'
-        : 'bg-red/10 text-red line-through decoration-red/70 decoration-2'
-    }`}
-  >
-    {value ? <BiCheckCircle fontSize={20} /> : <BiX fontSize={20} />}
-    <span>{value ? positiveLabel : negativeLabel}</span>
   </div>
 );
 
@@ -211,6 +190,28 @@ const UserProfileCard = ({
       shouldRender: hasDisplayValue(relationshipStatusLabel),
     },
   ].filter((detail) => detail.shouldRender);
+  const lifestyleDetails = [
+    {
+      key: 'cigarettes',
+      negativeLabel: 'Ne puši',
+      positiveLabel: 'Cigarete',
+      value: user.cigarettes,
+    },
+    {
+      key: 'alcohol',
+      negativeLabel: 'Ne pije',
+      positiveLabel: 'Konzumira alkohol',
+      value: user.alcohol,
+    },
+    {
+      key: 'sport',
+      negativeLabel: 'Ne bavi se sportom',
+      positiveLabel: 'Bavi se sportom',
+      value: user.sport,
+    },
+  ].filter(
+    (detail): detail is typeof detail & { value: boolean } => typeof detail.value === 'boolean'
+  );
   const favoriteSongEmbedUrl = getYouTubeEmbedUrl(user.favoriteSong);
   const favoriteMovieUrl = getImdbTitleUrl(user.favoriteMovie);
 
@@ -266,15 +267,20 @@ const UserProfileCard = ({
           </div>
         )}
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <BooleanDetail negativeLabel="Ne puši" positiveLabel="Puši" value={user.cigarettes} />
-          <BooleanDetail negativeLabel="Ne pije" positiveLabel="Pije" value={user.alcohol} />
-          <BooleanDetail
-            negativeLabel="Ne bavi se sportom"
-            positiveLabel="Bavi se sportom"
-            value={user.sport}
-          />
-        </div>
+        {lifestyleDetails.length > 0 && (
+          <div className="profile-lifestyle-card mt-4 w-full max-w-md rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-700 sm:w-fit sm:min-w-72">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
+              Životni stil
+            </p>
+            <ul className="list-disc space-y-1 pl-5 text-sm font-semibold">
+              {lifestyleDetails.map((detail) => (
+                <li key={detail.key}>
+                  {detail.value ? detail.positiveLabel : detail.negativeLabel}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="mt-5 grid gap-4">

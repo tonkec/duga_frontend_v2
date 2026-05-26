@@ -30,7 +30,7 @@ const UserAvatar = ({
   const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
   const isDarkMode = getStoredThemePreference() === 'dark';
   const fallbackBackgroundColor = isDarkMode ? '#222831' : color;
-  const fallbackTextColor = isDarkMode ? '#f8fafc' : fgColor || '#1f2937';
+  const fallbackTextColor = isDarkMode ? '#f8fafc' : fgColor || '#ffffff';
   const resolvedSize = size || '40';
   const cssSize = /^\d+(\.\d+)?$/.test(resolvedSize) ? `${resolvedSize}px` : resolvedSize;
   const sizeStyle = size || !className ? { width: cssSize, height: cssSize } : undefined;

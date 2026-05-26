@@ -16,6 +16,14 @@ jest.mock('@uidotdev/usehooks', () => ({
   useWindowSize: jest.fn(),
 }));
 
+jest.mock('react-router-dom', () => ({
+  Link: ({ children, to, ...props }: { children: React.ReactNode; to: string }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
 jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
 }));
@@ -30,6 +38,16 @@ jest.mock('./hooks', () => ({
 
 jest.mock('../NavigationLinks', () => ({
   NavigationItems: () => <div>Navigation items</div>,
+}));
+
+jest.mock('./components/Notifications', () => ({
+  __esModule: true,
+  default: () => <div>Notification dropdown</div>,
+}));
+
+jest.mock('@app/components/UserAvatar', () => ({
+  __esModule: true,
+  default: () => <div>Avatar</div>,
 }));
 
 const mockUseAuth0 = jest.mocked(useAuth0);
@@ -63,7 +81,7 @@ describe('Navigation', () => {
     } as unknown as ReturnType<typeof useSocket>);
   });
 
-  it('shows a red dot on the mobile menu button when notifications are unread', () => {
+  it('does not show a red dot on the mobile menu button when notifications are unread', () => {
     mockUseGetAllNotifications.mockReturnValue({
       allNotifications: {
         data: [{ id: 1, isRead: false }],
@@ -75,7 +93,7 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     expect(screen.getByRole('button', { name: 'Otvori navigaciju' })).toBeVisible();
-    expect(screen.getByRole('status', { name: 'Nove obavijesti' })).toBeVisible();
+    expect(screen.queryByRole('status', { name: 'Nove obavijesti' })).not.toBeInTheDocument();
   });
 
   it('prefixes the page title with the unread notification count', async () => {

@@ -77,7 +77,7 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
       />
 
       <Card className="!rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
-        <ul className="divide-y divide-[#e8eeff]" role="list">
+        <ul role="list">
           {sortedChats.map((chat, index) => {
             const chatId = getChatId(chat);
             return (
