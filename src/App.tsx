@@ -60,7 +60,7 @@ const WelcomeHero = ({
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Button
             type="secondary"
-            className="rounded-full px-6 py-3 font-bold shadow-lg shadow-black/10"
+            className="welcome-hero-primary-action rounded-full px-6 py-3 font-bold shadow-lg shadow-black/10"
             onClick={onEditProfile}
           >
             Uredi profil
@@ -75,12 +75,12 @@ const WelcomeHero = ({
         </div>
       </div>
 
-      <div className="rounded-3xl border border-white/15 bg-white/95 p-4 text-gray-950 shadow-lg shadow-black/10">
+      <div className="welcome-steps-card rounded-3xl border border-white/15 bg-white/95 p-4 text-gray-950 shadow-lg shadow-black/10">
         <p className="mb-3 text-sm font-bold text-gray-900">Što sad?</p>
         <button
           type="button"
           onClick={onEditProfile}
-          className="flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
+          className="welcome-step-item flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue text-sm font-bold text-white">
             1
@@ -96,7 +96,7 @@ const WelcomeHero = ({
         <button
           type="button"
           onClick={onFindUsers}
-          className="mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
+          className="welcome-step-item mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue/10 text-sm font-bold text-blue">
             2
@@ -112,7 +112,7 @@ const WelcomeHero = ({
         <button
           type="button"
           onClick={onSendMessage}
-          className="mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
+          className="welcome-step-item mt-1 flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-[#f0f4ff]"
         >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue/10 text-sm font-bold text-blue">
             3

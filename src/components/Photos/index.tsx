@@ -69,8 +69,7 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
   }
 
   return (
-    <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff]">
-      <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue/10 blur-3xl" />
+    <div className="relative isolate overflow-hidden rounded-3xl bg-white">
       <div className="relative z-10 mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Fotografije</p>

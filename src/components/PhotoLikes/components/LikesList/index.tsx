@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import UserAvatar from '@app/components/UserAvatar';
+import { useGetUserById } from '@app/hooks/useGetUserById';
 
 interface IUser {
   id: number;
@@ -16,6 +17,27 @@ interface ILike {
 interface PhotoLikeDropdownProps {
   likes: ILike[];
 }
+
+const PhotoLikeUser = ({ like }: { like: ILike }) => {
+  const { user } = useGetUserById(String(like.userId));
+  const username = like.user?.username || user?.data?.username || 'Korisnik';
+
+  return (
+    <>
+      <UserAvatar
+        userId={String(like.userId)}
+        avatarFallbackName={username}
+        color="#2D46B9"
+        size="36"
+        className="rounded-full"
+      />
+      <div className="min-w-0">
+        <p className="truncate text-sm font-semibold text-gray-900">{username}</p>
+        <p className="text-xs text-gray-500">Sviđa mu_joj se fotografija</p>
+      </div>
+    </>
+  );
+};
 
 const getLikesTranslation = (likesNumber: number) => {
   switch (likesNumber) {
@@ -85,19 +107,7 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
                   navigate(`/user/${like.userId}`);
                 }}
               >
-                <UserAvatar
-                  userId={String(like.userId)}
-                  avatarFallbackName={like.user?.username || `User ${like.userId}`}
-                  color="#2D46B9"
-                  size="36"
-                  className="rounded-full"
-                />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-gray-900">
-                    {like.user?.username || `User #${like.userId}`}
-                  </p>
-                  <p className="text-xs text-gray-500">Sviđa mu_joj se fotografija</p>
-                </div>
+                <PhotoLikeUser like={like} />
               </button>
             ))}
           </div>

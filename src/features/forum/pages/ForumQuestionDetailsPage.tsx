@@ -13,15 +13,18 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import AnswerCard from '../components/AnswerCard';
 import AnswerForm from '../components/AnswerForm';
 import QuestionForm from '../components/QuestionForm';
-import VoteControls, { getVoteScore } from '../components/VoteControls';
+import VoteControls from '../components/VoteControls';
+import { getVoteScore } from '../components/VoteControls';
 import {
   useAcceptAnswer,
   useAddAnswerReaction,
+  useAddAnswerReplyReaction,
   useCreateAnswer,
   useCreateAnswerReply,
   useDeleteAnswer,
   useDeleteAnswerImage,
   useDeleteAnswerReply,
+  useDeleteAnswerReplyReaction,
   useDeleteAnswerReaction,
   useDeleteQuestion,
   useDeleteQuestionImage,
@@ -48,10 +51,19 @@ interface CurrentUserData {
 const ANSWERS_PER_PAGE = 5;
 type AnswerSortOption = 'newest' | 'oldest' | 'accepted';
 
-const answerSortOptions: { label: string; value: AnswerSortOption }[] = [
+const baseAnswerSortOptions: { label: string; value: AnswerSortOption }[] = [
   { label: 'Najnoviji', value: 'newest' },
   { label: 'Najstariji', value: 'oldest' },
-  { label: 'Prihvaćeni prvo', value: 'accepted' },
+];
+
+const acceptedAnswerSortOption: { label: string; value: AnswerSortOption } = {
+  label: 'Prihvaćeni prvo',
+  value: 'accepted',
+};
+
+const getAnswerSortOptions = (hasAcceptedAnswer: boolean) => [
+  ...baseAnswerSortOptions,
+  ...(hasAcceptedAnswer ? [acceptedAnswerSortOption] : []),
 ];
 
 const answerSortSelectStyles = {
@@ -140,6 +152,12 @@ const ForumQuestionDetailsPage = () => {
   const deleteAnswerImageMutation = useDeleteAnswerImage(isValidQuestionId ? questionId : 0);
   const addAnswerReactionMutation = useAddAnswerReaction(isValidQuestionId ? questionId : 0);
   const deleteAnswerReactionMutation = useDeleteAnswerReaction(isValidQuestionId ? questionId : 0);
+  const addAnswerReplyReactionMutation = useAddAnswerReplyReaction(
+    isValidQuestionId ? questionId : 0
+  );
+  const deleteAnswerReplyReactionMutation = useDeleteAnswerReplyReaction(
+    isValidQuestionId ? questionId : 0
+  );
   const createAnswerReplyMutation = useCreateAnswerReply(
     isValidQuestionId ? questionId : 0,
     forumCurrentUser
@@ -149,6 +167,7 @@ const ForumQuestionDetailsPage = () => {
   const question = questionQuery.data;
   const answers = sortAnswers(question?.Answers ?? [], answerSort);
   const hasAcceptedAnswer = answers.some((answer) => answer.isAccepted);
+  const answerSortOptions = getAnswerSortOptions(hasAcceptedAnswer);
   const totalAnswerPages = Math.max(1, Math.ceil(answers.length / ANSWERS_PER_PAGE));
   const visibleAnswerPage = Math.min(answerPage, totalAnswerPages);
   const paginatedAnswers = answers.slice(
@@ -168,6 +187,8 @@ const ForumQuestionDetailsPage = () => {
     createAnswerReplyMutation.isPending ||
     updateAnswerReplyMutation.isPending ||
     deleteAnswerReplyMutation.isPending;
+  const isAnswerReplyReactionPending =
+    addAnswerReplyReactionMutation.isPending || deleteAnswerReplyReactionMutation.isPending;
   const questionVoteScore = question ? getVoteScore(question) : 0;
 
   useEffect(() => {
@@ -185,6 +206,13 @@ const ForumQuestionDetailsPage = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isQuestionActionsOpen]);
+
+  useEffect(() => {
+    if (!hasAcceptedAnswer && answerSort === 'accepted') {
+      setAnswerSort('newest');
+      setAnswerPage(1);
+    }
+  }, [answerSort, hasAcceptedAnswer]);
 
   if (!isValidQuestionId) {
     return (
@@ -290,78 +318,65 @@ const ForumQuestionDetailsPage = () => {
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <h1 className="text-3xl font-bold text-gray-950">{question.title}</h1>
-              <div className="relative" ref={questionActionsDropdownRef}>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-blue hover:text-blue"
-                  onClick={() => setIsQuestionActionsOpen((isOpen) => !isOpen)}
-                  aria-expanded={isQuestionActionsOpen}
-                  aria-haspopup="menu"
-                >
-                  Akcije
-                  <BiDotsVerticalRounded size={18} />
-                </button>
-
-                {isQuestionActionsOpen && (
-                  <div
-                    role="menu"
-                    className="absolute right-0 top-12 z-20 w-60 rounded-2xl border border-[#dce4ff] bg-white p-2 text-sm shadow-xl shadow-blue-dark/10"
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <div className="relative" ref={questionActionsDropdownRef}>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-blue hover:text-blue"
+                    onClick={() => setIsQuestionActionsOpen((isOpen) => !isOpen)}
+                    aria-expanded={isQuestionActionsOpen}
+                    aria-haspopup="menu"
                   >
-                    {!isQuestionOwner && (
-                      <div className="mb-2 rounded-xl bg-[#f7f9ff] p-2">
-                        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
-                          Glasanje
-                        </p>
-                        <VoteControls
-                          item={question}
-                          isPending={isQuestionVotePending}
-                          onVote={(value) => voteQuestionMutation.mutate({ value })}
-                          onClearVote={() => deleteQuestionVoteMutation.mutate()}
-                          className="w-full justify-center"
-                        />
-                      </div>
-                    )}
+                    Akcije
+                    <BiDotsVerticalRounded size={18} />
+                  </button>
 
-                    {isQuestionOwner && (
-                      <>
-                        <button
-                          type="button"
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-gray-700 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={deleteQuestionMutation.isPending}
-                          onClick={() => {
-                            setIsQuestionActionsOpen(false);
-                            setIsEditingQuestion(true);
-                          }}
-                        >
-                          <BiEdit size={20} />
-                          Uredi pitanje
-                        </button>
-                        <button
-                          type="button"
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10 disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={deleteQuestionMutation.isPending}
-                          onClick={() => {
-                            setIsQuestionActionsOpen(false);
-                            setIsDeleteQuestionModalOpen(true);
-                          }}
-                        >
-                          <BiTrash size={20} />
-                          {deleteQuestionMutation.isPending ? 'Brišem...' : 'Obriši pitanje'}
-                        </button>
-                      </>
-                    )}
-
-                    <Link
-                      to="/report"
-                      role="menuitem"
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
-                      onClick={() => setIsQuestionActionsOpen(false)}
+                  {isQuestionActionsOpen && (
+                    <div
+                      role="menu"
+                      className="absolute right-0 top-12 z-20 w-60 rounded-2xl border border-[#dce4ff] bg-white p-2 text-sm shadow-xl shadow-blue-dark/10"
                     >
-                      <BiFlag size={20} />
-                      Prijavi
-                    </Link>
-                  </div>
-                )}
+                      {isQuestionOwner && (
+                        <>
+                          <button
+                            type="button"
+                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-gray-700 transition-colors hover:bg-[#f0f4ff] hover:text-blue disabled:cursor-not-allowed disabled:opacity-50"
+                            disabled={deleteQuestionMutation.isPending}
+                            onClick={() => {
+                              setIsQuestionActionsOpen(false);
+                              setIsEditingQuestion(true);
+                            }}
+                          >
+                            <BiEdit size={20} />
+                            Uredi pitanje
+                          </button>
+                          <button
+                            type="button"
+                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10 disabled:cursor-not-allowed disabled:opacity-50"
+                            disabled={deleteQuestionMutation.isPending}
+                            onClick={() => {
+                              setIsQuestionActionsOpen(false);
+                              setIsDeleteQuestionModalOpen(true);
+                            }}
+                          >
+                            <BiTrash size={20} />
+                            {deleteQuestionMutation.isPending ? 'Brišem...' : 'Obriši pitanje'}
+                          </button>
+                        </>
+                      )}
+
+                      <Link
+                        to="/report"
+                        role="menuitem"
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
+                        onClick={() => setIsQuestionActionsOpen(false)}
+                      >
+                        <BiFlag size={20} />
+                        Prijavi
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -401,9 +416,18 @@ const ForumQuestionDetailsPage = () => {
               imageClassName="max-w-full rounded-2xl border border-[#dce4ff]"
             />
             <div className="mt-5 flex justify-end">
-              <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-sm font-semibold text-blue-dark">
-                {questionVoteScore} {getVoteLabel(questionVoteScore)}
-              </span>
+              {!isQuestionOwner ? (
+                <VoteControls
+                  item={question}
+                  isPending={isQuestionVotePending}
+                  onVote={(value) => voteQuestionMutation.mutate({ value })}
+                  onClearVote={() => deleteQuestionVoteMutation.mutate()}
+                />
+              ) : (
+                <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-sm font-semibold text-blue-dark">
+                  {questionVoteScore} {getVoteLabel(questionVoteScore)}
+                </span>
+              )}
             </div>
           </section>
         )}
@@ -466,6 +490,7 @@ const ForumQuestionDetailsPage = () => {
                     isUpdating={updateAnswerMutation.isPending}
                     isReactionPending={isAnswerReactionPending}
                     isReplyPending={isAnswerReplyPending}
+                    isReplyReactionPending={isAnswerReplyReactionPending}
                     onAccept={(answerId) => acceptAnswerMutation.mutate(answerId)}
                     onDelete={(answerId) => deleteAnswerMutation.mutate(answerId)}
                     onDeleteImage={(answerId) => deleteAnswerImageMutation.mutate(answerId)}
@@ -485,6 +510,12 @@ const ForumQuestionDetailsPage = () => {
                       updateAnswerReplyMutation.mutate({ id: replyId, payload })
                     }
                     onDeleteReply={(replyId) => deleteAnswerReplyMutation.mutate(replyId)}
+                    onAddReplyReaction={(replyId, emoji) =>
+                      addAnswerReplyReactionMutation.mutate({ replyId, payload: { emoji } })
+                    }
+                    onDeleteReplyReaction={(replyId, emoji) =>
+                      deleteAnswerReplyReactionMutation.mutate({ replyId, payload: { emoji } })
+                    }
                   />
                 ))}
               </div>
@@ -493,7 +524,7 @@ const ForumQuestionDetailsPage = () => {
                 <div className="mt-6 flex items-center justify-between gap-3">
                   <Button
                     type="secondary"
-                    className="rounded-full border border-[#dce4ff] px-5 py-2"
+                    className="pagination-text-button rounded-full border border-[#dce4ff] px-5 py-2"
                     disabled={visibleAnswerPage === 1}
                     onClick={() => setAnswerPage((currentPage) => Math.max(1, currentPage - 1))}
                   >
@@ -504,7 +535,7 @@ const ForumQuestionDetailsPage = () => {
                   </span>
                   <Button
                     type="secondary"
-                    className="rounded-full border border-[#dce4ff] px-5 py-2"
+                    className="pagination-text-button rounded-full border border-[#dce4ff] px-5 py-2"
                     disabled={visibleAnswerPage >= totalAnswerPages}
                     onClick={() =>
                       setAnswerPage((currentPage) => Math.min(totalAnswerPages, currentPage + 1))

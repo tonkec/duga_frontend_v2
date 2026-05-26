@@ -1,10 +1,12 @@
 import { useCookieConsent } from '@app/hooks/useCookieConsent';
+import ConfirmModal from '@app/components/ConfirmModal';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { Link } from 'react-router';
 
 const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [cookies] = useCookies(['cookieAccepted', 'cookieRejectedAt']);
   const { acceptCookies, rejectCookies } = useCookieConsent();
 
@@ -21,6 +23,21 @@ const CookieBanner = () => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex justify-center items-center">
+      <ConfirmModal
+        isOpen={isRejectModalOpen}
+        onClose={() => setIsRejectModalOpen(false)}
+        onConfirm={() => {
+          rejectCookies();
+          setIsRejectModalOpen(false);
+          setShowBanner(false);
+        }}
+      >
+        <h2 className="text-2xl font-bold text-gray-950">Odbiti kolačiće?</h2>
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          Ako odbiješ kolačiće, neke funkcije aplikacije neće raditi ispravno, uključujući slanje
+          poruka.
+        </p>
+      </ConfirmModal>
       <div className="bg-white p-6 rounded-lg max-w-md text-center">
         <h2 className="text-xl font-bold mb-4">Kolačići</h2>
         <p className="mb-6">
@@ -33,8 +50,7 @@ const CookieBanner = () => {
         <div className="flex justify-center gap-4">
           <button
             onClick={() => {
-              rejectCookies();
-              setShowBanner(false);
+              setIsRejectModalOpen(true);
             }}
             className="bg-slate-900 text-white px-4 py-2 rounded"
           >

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BiCheckCircle,
+  BiChevronDown,
+  BiChevronUp,
   BiDotsVerticalRounded,
   BiEdit,
   BiFlag,
@@ -39,6 +41,7 @@ interface AnswerCardProps {
   isUpdating: boolean;
   isReactionPending: boolean;
   isReplyPending: boolean;
+  isReplyReactionPending: boolean;
   onAccept: (answerId: number) => void;
   onDelete: (answerId: number) => void;
   onDeleteImage: (answerId: number) => void;
@@ -48,6 +51,8 @@ interface AnswerCardProps {
   onCreateReply: (answerId: number, payload: AnswerReplyPayload) => void;
   onUpdateReply: (replyId: number, payload: AnswerReplyPayload) => void;
   onDeleteReply: (replyId: number) => void;
+  onAddReplyReaction: (replyId: number, emoji: string) => void;
+  onDeleteReplyReaction: (replyId: number, emoji: string) => void;
 }
 
 const ANSWER_MIN_LENGTH = 2;
@@ -69,16 +74,16 @@ const getReplyAuthorId = (reply: AnswerReply) => reply.User?.id ?? reply.user?.i
 
 const hasCurrentUserReacted = (
   reaction: NonNullable<Answer['reactions']>[number] | undefined,
-  currentUserId?: number
+  currentUserId?: number,
+  userReactions: string[] = []
 ) => {
-  if (!reaction) return false;
-
   return Boolean(
-    reaction.reactedByCurrentUser ||
-      reaction.currentUserReacted ||
-      reaction.hasReacted ||
-      (currentUserId && reaction.userIds?.includes(currentUserId)) ||
-      (currentUserId && reaction.users?.some((user) => user.id === currentUserId))
+    userReactions.includes(reaction?.emoji ?? '') ||
+      reaction?.reactedByCurrentUser ||
+      reaction?.currentUserReacted ||
+      reaction?.hasReacted ||
+      (currentUserId && reaction?.userIds?.includes(currentUserId)) ||
+      (currentUserId && reaction?.users?.some((user) => user.id === currentUserId))
   );
 };
 
@@ -93,6 +98,7 @@ const AnswerCard = ({
   isUpdating,
   isReactionPending,
   isReplyPending,
+  isReplyReactionPending,
   onAccept,
   onDelete,
   onDeleteImage,
@@ -102,6 +108,8 @@ const AnswerCard = ({
   onCreateReply,
   onUpdateReply,
   onDeleteReply,
+  onAddReplyReaction,
+  onDeleteReplyReaction,
 }: AnswerCardProps) => {
   const isOwnAnswer = currentUserId === (answer.userId ?? answer.User?.id ?? answer.user?.id);
   const authorId = getAuthorId(answer);
@@ -124,6 +132,9 @@ const AnswerCard = ({
   const [replyError, setReplyError] = useState<string | null>(null);
   const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
   const [editingReplyBody, setEditingReplyBody] = useState('');
+  const [replyIdPendingDelete, setReplyIdPendingDelete] = useState<number | null>(null);
+  const [isRepliesCollapsed, setIsRepliesCollapsed] = useState(false);
+  const [replyReactionDropdownId, setReplyReactionDropdownId] = useState<number | null>(null);
   const draftImagePreviewUrls = draftImages.map((image) => URL.createObjectURL(image));
   const hasExistingImage = Boolean(
     answer.securePhotoUrl ||
@@ -134,6 +145,7 @@ const AnswerCard = ({
   const shouldShowExistingImage =
     hasExistingImage && draftImagePreviewUrls.length === 0 && !removeExistingImage;
   const existingImageCount = removeExistingImage ? 0 : getForumImageItems(answer).length;
+  const replyCount = answer.replies?.length ?? 0;
 
   useEffect(() => {
     if (!isActionsOpen) return;
@@ -199,6 +211,13 @@ const AnswerCard = ({
     setIsDeleteModalOpen(false);
   };
 
+  const handleDeleteReply = () => {
+    if (!replyIdPendingDelete) return;
+
+    onDeleteReply(replyIdPendingDelete);
+    setReplyIdPendingDelete(null);
+  };
+
   const handleSubmitReply = () => {
     const trimmedReplyBody = replyBody.trim();
     if (trimmedReplyBody.length < ANSWER_MIN_LENGTH) {
@@ -243,16 +262,27 @@ const AnswerCard = ({
           Ova radnja će trajno ukloniti tvoj odgovor s pitanja.
         </p>
       </ConfirmModal>
+      <ConfirmModal
+        isOpen={replyIdPendingDelete !== null}
+        onClose={() => setReplyIdPendingDelete(null)}
+        onConfirm={handleDeleteReply}
+      >
+        <h2 className="text-xl font-bold text-gray-950">Obrisati odgovor na odgovor?</h2>
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          Ova radnja će trajno ukloniti tvoj odgovor iz rasprave.
+        </p>
+      </ConfirmModal>
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-3">
           <Link to={`/user/${authorId}`} className="shrink-0">
             <UserAvatar
               avatarFallbackName={authorName}
-              color="#2D46B9"
+              color="#eef3ff"
+              fgColor="#2D46B9"
               userId={String(authorId)}
               size="40"
-              className="h-10 w-10 rounded-full"
+              className="h-10 w-10 rounded-full border border-[#dce4ff]"
             />
           </Link>
           <div>
@@ -342,6 +372,44 @@ const AnswerCard = ({
                     </button>
                   </>
                 )}
+
+                <div className="my-1 border-t border-[#dce4ff]" />
+                <div className="px-3 py-2">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-gray-500">
+                    Reakcije
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ANSWER_REACTION_EMOJIS.map((emoji) => {
+                      const reaction = answer.reactions?.find((item) => item.emoji === emoji);
+                      const hasReacted = hasCurrentUserReacted(reaction, currentUserId);
+                      const count = reaction?.count ?? 0;
+
+                      return (
+                        <button
+                          key={emoji}
+                          type="button"
+                          disabled={isReactionPending || !currentUserId}
+                          onClick={() => {
+                            if (hasReacted) {
+                              onDeleteReaction(answer.id, emoji);
+                            } else {
+                              onAddReaction(answer.id, emoji);
+                            }
+                          }}
+                          className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                            hasReacted
+                              ? 'border-blue bg-blue text-white'
+                              : 'border-[#dce4ff] bg-white text-gray-700 hover:border-blue hover:text-blue'
+                          }`}
+                          aria-label={`${hasReacted ? 'Makni' : 'Dodaj'} reakciju ${emoji}`}
+                        >
+                          <span>{emoji}</span>
+                          {count > 0 && <span className="tabular-nums">{count}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 <Link
                   to="/report"
@@ -492,43 +560,26 @@ const AnswerCard = ({
             className="mt-4"
             imageClassName="max-w-full rounded-2xl border border-[#dce4ff]"
           />
-          <div className="mt-4 flex flex-wrap gap-2">
-            {ANSWER_REACTION_EMOJIS.map((emoji) => {
-              const reaction = answer.reactions?.find((item) => item.emoji === emoji);
-              const hasReacted = hasCurrentUserReacted(reaction, currentUserId);
-              const count = reaction?.count ?? 0;
-
-              return (
+          <div className="mt-5 pt-4">
+            {replyCount > 0 && (
+              <div className="mt-3">
                 <button
-                  key={emoji}
                   type="button"
-                  disabled={isReactionPending || !currentUserId}
-                  onClick={() => {
-                    if (hasReacted) {
-                      onDeleteReaction(answer.id, emoji);
-                      return;
-                    }
-
-                    onAddReaction(answer.id, emoji);
-                  }}
-                  className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                    hasReacted
-                      ? 'border-blue bg-blue text-white'
-                      : 'border-[#dce4ff] bg-[#f7f9ff] text-gray-700 hover:border-blue hover:text-blue'
-                  }`}
-                  aria-label={`${hasReacted ? 'Makni' : 'Dodaj'} reakciju ${emoji}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#dce4ff] bg-white px-3 py-1.5 text-xs font-bold text-gray-700 transition-colors hover:border-blue hover:text-blue"
+                  onClick={() => setIsRepliesCollapsed((isCollapsed) => !isCollapsed)}
+                  aria-expanded={!isRepliesCollapsed}
+                  aria-controls={`answer-${answer.id}-replies`}
                 >
-                  <span>{emoji}</span>
-                  {count > 0 && <span className="tabular-nums">{count}</span>}
+                  {isRepliesCollapsed ? <BiChevronDown size={18} /> : <BiChevronUp size={18} />}
+                  {isRepliesCollapsed
+                    ? `Prikaži odgovore (${replyCount})`
+                    : `Sakrij odgovore (${replyCount})`}
                 </button>
-              );
-            })}
-          </div>
-          <div className="mt-5 border-t border-[#eef3ff] pt-4">
-            <p className="text-sm font-bold text-gray-950">Odgovori na odgovor</p>
-            {!!answer.replies?.length && (
-              <div className="mt-3 space-y-3">
-                {answer.replies.map((reply) => {
+              </div>
+            )}
+            {replyCount > 0 && !isRepliesCollapsed && (
+              <div id={`answer-${answer.id}-replies`} className="mt-3 space-y-3">
+                {(answer.replies ?? []).map((reply) => {
                   const replyAuthorId = getReplyAuthorId(reply);
                   const isOwnReply = currentUserId === replyAuthorId;
                   const isEditingReply = editingReplyId === reply.id;
@@ -589,30 +640,99 @@ const AnswerCard = ({
                           <ContentFormatter text={reply.body} />
                         </div>
                       )}
-                      {isOwnReply && !isEditingReply && (
+                      {!isEditingReply && (
                         <div className="mt-2 flex justify-end gap-2">
-                          <Button
-                            type="transparent"
-                            htmlType="button"
-                            className="!px-3 !py-1 text-xs"
-                            onClick={() => {
-                              setEditingReplyId(reply.id);
-                              setEditingReplyBody(reply.body);
-                              setReplyError(null);
-                            }}
-                            disabled={isReplyPending}
-                          >
-                            Uredi
-                          </Button>
-                          <Button
-                            type="danger"
-                            htmlType="button"
-                            className="!px-3 !py-1 text-xs"
-                            onClick={() => onDeleteReply(reply.id)}
-                            disabled={isReplyPending}
-                          >
-                            Obriši
-                          </Button>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 rounded-full border border-[#dce4ff] bg-white px-3 py-1 text-xs font-bold text-gray-700 transition-colors hover:border-blue hover:text-blue"
+                              onClick={() =>
+                                setReplyReactionDropdownId((currentReplyId) =>
+                                  currentReplyId === reply.id ? null : reply.id
+                                )
+                              }
+                              aria-expanded={replyReactionDropdownId === reply.id}
+                              aria-haspopup="menu"
+                            >
+                              Reakcije
+                              <BiChevronDown size={16} />
+                            </button>
+                            {replyReactionDropdownId === reply.id && (
+                              <div
+                                role="menu"
+                                className="absolute bottom-8 right-0 z-20 w-48 rounded-2xl border border-[#dce4ff] bg-white p-3 shadow-xl shadow-blue-dark/10"
+                              >
+                                <div className="flex flex-wrap gap-1.5">
+                                  {ANSWER_REACTION_EMOJIS.map((emoji) => {
+                                    const reaction = reply.reactions?.find(
+                                      (item) => item.emoji === emoji
+                                    );
+                                    const userReactions = [
+                                      ...(reply.currentUserReactions ?? []),
+                                      ...(reply.myReactions ?? []),
+                                      ...(reply.userReactions ?? []),
+                                    ];
+                                    const hasReacted = hasCurrentUserReacted(
+                                      reaction,
+                                      currentUserId,
+                                      userReactions
+                                    );
+                                    const count = reaction?.count ?? 0;
+
+                                    return (
+                                      <button
+                                        key={emoji}
+                                        type="button"
+                                        disabled={isReplyReactionPending || !currentUserId}
+                                        onClick={() => {
+                                          if (hasReacted) {
+                                            onDeleteReplyReaction(reply.id, emoji);
+                                          } else {
+                                            onAddReplyReaction(reply.id, emoji);
+                                          }
+                                        }}
+                                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                                          hasReacted
+                                            ? 'border-blue bg-blue text-white'
+                                            : 'border-[#dce4ff] bg-white text-gray-700 hover:border-blue hover:text-blue'
+                                        }`}
+                                        aria-label={`${hasReacted ? 'Makni' : 'Dodaj'} reakciju ${emoji}`}
+                                      >
+                                        <span>{emoji}</span>
+                                        {count > 0 && <span className="tabular-nums">{count}</span>}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          {isOwnReply && (
+                            <>
+                              <Button
+                                type="transparent"
+                                htmlType="button"
+                                className="!px-3 !py-1 text-xs"
+                                onClick={() => {
+                                  setEditingReplyId(reply.id);
+                                  setEditingReplyBody(reply.body);
+                                  setReplyError(null);
+                                }}
+                                disabled={isReplyPending}
+                              >
+                                Uredi
+                              </Button>
+                              <Button
+                                type="danger"
+                                htmlType="button"
+                                className="!px-3 !py-1 text-xs"
+                                onClick={() => setReplyIdPendingDelete(reply.id)}
+                                disabled={isReplyPending}
+                              >
+                                Obriši
+                              </Button>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>

@@ -8,9 +8,9 @@ export interface IUserUpdateProps {
   age: string;
   lookingFor: string;
   relationshipStatus: string;
-  cigarettes: boolean;
-  alcohol: boolean;
-  sport: boolean;
+  cigarettes?: boolean;
+  alcohol?: boolean;
+  sport?: boolean;
   favoriteDay: string;
   spirituality: string;
   embarasement: string;

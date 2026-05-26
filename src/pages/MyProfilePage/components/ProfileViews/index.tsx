@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BiChevronLeft, BiChevronRight, BiShow } from 'react-icons/bi';
 import Loader from '@app/components/Loader';
@@ -6,17 +6,27 @@ import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import UserAvatar from '@app/components/UserAvatar';
 import { useGetProfileViews } from '@app/hooks/useGetProfileViews';
 
-const PROFILE_VIEWS_LIMIT = 20;
+const PROFILE_VIEWS_FETCH_LIMIT = 10;
+const PROFILE_VIEWS_PER_PAGE = 5;
 
 const ProfileViews = () => {
   const [page, setPage] = useState(1);
   const { profileViews, areProfileViewsLoading } = useGetProfileViews({
-    page,
-    limit: PROFILE_VIEWS_LIMIT,
+    page: 1,
+    limit: PROFILE_VIEWS_FETCH_LIMIT,
   });
-  const views = profileViews?.data.data ?? [];
+  const latestViews = profileViews?.data.data.slice(0, PROFILE_VIEWS_FETCH_LIMIT) ?? [];
   const pagination = profileViews?.data.pagination;
-  const totalPages = pagination?.totalPages ?? 0;
+  const displayedTotal = latestViews.length;
+  const totalPages = Math.max(Math.ceil(displayedTotal / PROFILE_VIEWS_PER_PAGE), 1);
+  const views = latestViews.slice(
+    (page - 1) * PROFILE_VIEWS_PER_PAGE,
+    page * PROFILE_VIEWS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
 
   if (areProfileViewsLoading) {
     return (
@@ -49,7 +59,7 @@ const ProfileViews = () => {
         </div>
         {pagination && (
           <span className="w-fit rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-gray-700">
-            {pagination.total} {pagination.total === 1 ? 'pregled' : 'pregleda'}
+            Zadnjih {displayedTotal} {displayedTotal === 1 ? 'pregled' : 'pregleda'}
           </span>
         )}
       </div>

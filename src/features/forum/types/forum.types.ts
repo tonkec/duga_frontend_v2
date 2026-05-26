@@ -58,6 +58,12 @@ export interface AnswerReply {
   updatedAt: string;
   User?: ForumUser;
   user?: ForumUser;
+  reactions?: AnswerReaction[];
+  Reactions?: AnswerReaction[];
+  reactionCount?: number;
+  currentUserReactions?: string[];
+  myReactions?: string[];
+  userReactions?: string[];
 }
 
 export interface Answer extends VoteMetadata {

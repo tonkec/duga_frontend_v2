@@ -51,8 +51,8 @@ const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProp
       type="button"
       onClick={handleClick}
       className={clsx(
-        'group flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors duration-150',
-        'hover:bg-[#f0f4ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue',
+        'user-chat-item group flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors duration-150',
+        'hover:bg-[#eef3ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue',
         isUnread && 'bg-[#f7f9ff]',
         isFirst && 'rounded-t-xl',
         isLast && 'rounded-b-xl'
@@ -65,10 +65,11 @@ const UserChat = ({ user, onClick, lastMessage, isFirst, isLast }: IUserChatProp
         )}
       >
         <UserAvatar
-          color="#2D46B9"
+          color="#eef3ff"
+          fgColor="#2D46B9"
           avatarFallbackName={user.username}
           userId={String(user.id)}
-          className="h-12 w-12 rounded-full"
+          className="h-12 w-12 rounded-full border border-[#dce4ff]"
         />
       </div>
 

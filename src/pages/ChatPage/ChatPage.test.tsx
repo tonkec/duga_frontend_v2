@@ -7,6 +7,7 @@ import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useSocket } from '../../context/useSocket';
 import { useDeleteCurrentChat, useGetAllMessages, useGetCurrentChat } from './hooks';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
@@ -104,15 +105,26 @@ const message = (id: number, fromUserId: number, text: string, createdAt: string
   chatId: 123,
 });
 
-const renderChatPage = () =>
-  render(
-    <MemoryRouter initialEntries={['/chat/123']}>
-      <Routes>
-        <Route path="/chat/:chatId" element={<ChatPage />} />
-        <Route path="/new-chat" element={<h1>Messages page</h1>} />
-      </Routes>
-    </MemoryRouter>
+const renderChatPage = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/chat/123']}>
+        <Routes>
+          <Route path="/chat/:chatId" element={<ChatPage />} />
+          <Route path="/new-chat" element={<h1>Messages page</h1>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
 
 describe('ChatPage integration', () => {
   beforeEach(() => {
@@ -248,6 +260,26 @@ describe('ChatPage integration', () => {
     });
 
     expect(screen.queryByRole('status', { name: 'Druga osoba piše' })).not.toBeInTheDocument();
+  });
+
+  it('emits a socket event when reacting to a message', async () => {
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [message(1, otherUser.id, 'React to me', '2026-05-23T08:00:00.000Z')],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    screen.getByRole('button', { name: 'Dodaj reakciju' }).click();
+    (await screen.findByRole('button', { name: 'Odaberi emoji 👍' })).click();
+
+    expect(socketEmit).toHaveBeenCalledWith('react-message', {
+      messageId: 1,
+      emoji: '👍',
+    });
   });
 
   it('renders a loading state while the chat is loading', () => {

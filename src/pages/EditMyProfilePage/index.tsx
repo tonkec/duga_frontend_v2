@@ -79,9 +79,9 @@ type Inputs = {
   username: string;
   lookingFor: string;
   relationshipStatus: string;
-  cigarettes: boolean;
-  alcohol: boolean;
-  sport: boolean;
+  cigarettes?: boolean;
+  alcohol?: boolean;
+  sport?: boolean;
   favoriteDay: string;
   spirituality: string;
   embarasement: string;
@@ -189,6 +189,8 @@ const schema = z.object({
   languages: maxProfileTextLength(200),
   ending: maxProfileTextLength(500),
 });
+
+const getOptionalBoolean = (value: unknown) => (typeof value === 'boolean' ? value : undefined);
 
 const tabClassName =
   'shrink-0 cursor-pointer whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
@@ -439,7 +441,7 @@ const EditMyProfilePage = () => {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { dirtyFields, isValid },
     reset,
     control,
     watch,
@@ -463,9 +465,9 @@ const EditMyProfilePage = () => {
           lookingForOptions.find((option) => option.value === currentUser.data.lookingFor)?.value ||
           '',
         relationshipStatus: currentUser.data.relationshipStatus || '',
-        cigarettes: currentUser.data.cigarettes || false,
-        alcohol: currentUser.data.alcohol || false,
-        sport: currentUser.data.sport || currentUser.data.sports || false,
+        cigarettes: getOptionalBoolean(currentUser.data.cigarettes),
+        alcohol: getOptionalBoolean(currentUser.data.alcohol),
+        sport: getOptionalBoolean(currentUser.data.sport ?? currentUser.data.sports),
         favoriteDay: daysOfWeek.find(
           (option) => option.value === currentUser.data.favoriteDayOfWeek
         )?.value,
@@ -484,8 +486,22 @@ const EditMyProfilePage = () => {
 
   const onSubmitForm: SubmitHandler<Inputs> = (data) => {
     if (isValid) {
+      const lifestyleFields = {
+        ...(dirtyFields.cigarettes || typeof currentUser?.data?.cigarettes === 'boolean'
+          ? { cigarettes: data.cigarettes ?? false }
+          : {}),
+        ...(dirtyFields.alcohol || typeof currentUser?.data?.alcohol === 'boolean'
+          ? { alcohol: data.alcohol ?? false }
+          : {}),
+        ...(dirtyFields.sport ||
+        typeof (currentUser?.data?.sport ?? currentUser?.data?.sports) === 'boolean'
+          ? { sport: data.sport ?? false }
+          : {}),
+      };
+
       updateUserMutation({
         ...data,
+        ...lifestyleFields,
         age: data.age || currentUser?.data?.age || '',
         favoriteDay: data.favoriteDay || currentUser?.data?.favoriteDayOfWeek || '',
         favoriteSong: data.favoriteSong ? getYouTubeEmbedUrl(data.favoriteSong) || '' : '',
@@ -674,6 +690,7 @@ const EditMyProfilePage = () => {
                           isClearable
                           {...field}
                           styles={selectStyles}
+                          classNamePrefix="react-select"
                           options={cityOptions}
                           placeholder="Tvoja lokacija otprilike..."
                           theme={(theme) => ({
@@ -724,6 +741,7 @@ const EditMyProfilePage = () => {
                           isClearable
                           {...field}
                           styles={selectStyles}
+                          classNamePrefix="react-select"
                           options={lookingForOptions}
                           placeholder="Trenutno tražim..."
                           theme={(theme) => ({
@@ -758,6 +776,7 @@ const EditMyProfilePage = () => {
                           isClearable
                           {...field}
                           styles={selectStyles}
+                          classNamePrefix="react-select"
                           options={relationshipStatusOptions}
                           placeholder="Trenutno sam..."
                           theme={(theme) => ({
@@ -853,6 +872,7 @@ const EditMyProfilePage = () => {
                         isClearable
                         {...field}
                         styles={selectStyles}
+                        classNamePrefix="react-select"
                         options={daysOfWeek}
                         placeholder="Najdraži dan u tjednu"
                         theme={(theme) => ({

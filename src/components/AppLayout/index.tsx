@@ -1,4 +1,4 @@
-import { SyntheticEvent } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import AppContainer from '@app/components/AppContainer';
 import Footer from '@app/components/Footer';
 import Navigation from '@app/components/Navigation';
@@ -19,12 +19,22 @@ interface IAppLayoutProps {
 
 const AppLayout = ({ children, onScroll }: IAppLayoutProps) => {
   const { isAuthenticated } = useAuth0();
+  const [isSidebarHidden, setIsSidebarHidden] = useState(false);
   const isCypressAuthenticated =
     Boolean((window as CypressWindow).Cypress) &&
     Boolean(
       (window as CypressWindow).__dugaCypressAuthUser ||
         window.localStorage.getItem('duga:cypress-auth-user')
     );
+
+  useEffect(() => {
+    const handleSidebarVisibility = (event: Event) => {
+      setIsSidebarHidden(Boolean((event as CustomEvent<boolean>).detail));
+    };
+
+    window.addEventListener('duga:sidebar-visibility', handleSidebarVisibility);
+    return () => window.removeEventListener('duga:sidebar-visibility', handleSidebarVisibility);
+  }, []);
 
   if (!isAuthenticated && !isCypressAuthenticated) {
     return false;
@@ -34,10 +44,14 @@ const AppLayout = ({ children, onScroll }: IAppLayoutProps) => {
     <>
       <UserChatsSocketSync />
       <Navigation />
-      <AppContainer onScroll={(e) => onScroll?.(e)}>
-        <main className="mt-10">{children}</main>
-        <Footer />
-      </AppContainer>
+      <div
+        className={`app-layout-content ${isSidebarHidden ? 'app-layout-content-sidebar-hidden' : ''}`}
+      >
+        <AppContainer onScroll={(e) => onScroll?.(e)}>
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </AppContainer>
+      </div>
       <CookieBanner />
     </>
   );

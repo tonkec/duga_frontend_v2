@@ -50,7 +50,7 @@ const EmptyForumActivity = ({ type }: { type: UserForumActivityProps['type'] }) 
 const QuestionActivityCard = ({ question }: { question: Question }) => (
   <Link
     to={`/forum/questions/${question.id}`}
-    className="block rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+    className="user-forum-activity-card block rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
   >
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div>
@@ -59,7 +59,7 @@ const QuestionActivityCard = ({ question }: { question: Question }) => (
           <ContentFormatter text={getPreview(question.body)} renderRichContent={false} />
         </div>
       </div>
-      <span className="shrink-0 rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-blue-dark">
+      <span className="user-forum-activity-badge shrink-0 rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-sm font-semibold text-blue-dark">
         {getAnswerCount(question)} odgovora
       </span>
     </div>
@@ -70,15 +70,15 @@ const QuestionActivityCard = ({ question }: { question: Question }) => (
 const AnswerActivityCard = ({ answer, question }: { answer: Answer; question: Question }) => (
   <Link
     to={`/forum/questions/${question.id}`}
-    className="block rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+    className="user-forum-activity-card block rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
   >
     <div className="mb-3 flex flex-wrap items-center gap-2">
       {answer.isAccepted && (
-        <span className="rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
+        <span className="user-forum-activity-badge rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
           Prihvaćen odgovor
         </span>
       )}
-      <span className="rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark">
+      <span className="user-forum-activity-badge rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark">
         {question.title}
       </span>
     </div>

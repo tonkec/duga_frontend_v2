@@ -131,7 +131,7 @@ const MyProfilePage = () => {
 
           <div className="grid content-start items-start gap-4 md:grid-cols-2 xl:grid-cols-1">
             <Cta
-              className="!border-[#dce4ff] !from-white !via-[#f8fbff] !to-[#eef4ff]"
+              className="profile-cta-edit !border-[#dce4ff] !from-white !via-[#f8fbff] !to-[#eef4ff]"
               icon={<BiSolidFile size={23} />}
               iconClassName="bg-blue/10 text-blue"
               buttonClassName="bg-blue shadow-blue/15 hover:bg-blue-dark"
@@ -143,7 +143,7 @@ const MyProfilePage = () => {
               }}
             />
             <Cta
-              className="!border-[#d8f0ef] !from-white !via-[#f7fdfc] !to-[#eaf8f6]"
+              className="profile-cta-chat !border-[#d8f0ef] !from-white !via-[#f7fdfc] !to-[#eaf8f6]"
               icon={<BiMessageRoundedDots size={23} />}
               iconClassName="bg-teal-100 text-teal-700"
               buttonClassName="bg-teal-600 shadow-teal-600/15 hover:bg-teal-700"
@@ -155,7 +155,7 @@ const MyProfilePage = () => {
               }}
             />
             <Cta
-              className="!border-[#eadcff] !from-white !via-[#fbf8ff] !to-[#f2ecff]"
+              className="profile-cta-community !border-[#eadcff] !from-white !via-[#fbf8ff] !to-[#f2ecff]"
               icon={<BiGlobe size={23} />}
               iconClassName="bg-violet-100 text-violet-700"
               buttonClassName="bg-violet-600 shadow-violet-600/15 hover:bg-violet-700"
@@ -167,7 +167,7 @@ const MyProfilePage = () => {
               }}
             />
             <Cta
-              className="!border-[#ffe1c7] !from-white !via-[#fffaf5] !to-[#fff1e4]"
+              className="profile-cta-forum !border-[#ffe1c7] !from-white !via-[#fffaf5] !to-[#fff1e4]"
               icon={<BiHelpCircle size={24} />}
               iconClassName="bg-orange-100 text-orange-700"
               buttonClassName="bg-orange-500 shadow-orange-500/15 hover:bg-orange-600"

@@ -44,6 +44,25 @@ describe('VoteControls', () => {
     expect(onVote).not.toHaveBeenCalled();
   });
 
+  it('clears the current vote before applying the opposite vote', () => {
+    const onVote = jest.fn();
+    const onClearVote = jest.fn();
+
+    render(
+      <VoteControls
+        item={{ voteScore: 2, currentUserVote: 1 }}
+        isPending={false}
+        onVote={onVote}
+        onClearVote={onClearVote}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Glasaj protiv' }));
+
+    expect(onClearVote).toHaveBeenCalledTimes(1);
+    expect(onVote).not.toHaveBeenCalled();
+  });
+
   it('does not vote while a vote request is pending', () => {
     const onVote = jest.fn();
     const onClearVote = jest.fn();
