@@ -9,6 +9,7 @@ import UserAvatar from '../UserAvatar';
 import Image from '../Image';
 import ContentFormatter from '../ContentFormatter';
 import { BiCommentDetail, BiImage } from 'react-icons/bi';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface IComment {
   id: number;
@@ -16,7 +17,8 @@ interface IComment {
   createdAt: string;
   uploadId: number;
   userId: number;
-  taggedUsers?: { id: number; username: string }[];
+  userPublicId?: string;
+  taggedUsers?: { id: number; publicId?: string; username: string }[];
   imageUrl: string;
   securePhotoUrl?: string;
 }
@@ -44,7 +46,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
               key={index}
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/user/${matchedUser.id}`);
+                navigate(getUserProfilePath(matchedUser));
               }}
               className="cursor-pointer text-blue underline"
             >
@@ -73,7 +75,12 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
           className="flex min-w-0 items-center gap-3 text-left"
           onClick={(event) => {
             event.stopPropagation();
-            navigate(`/user/${comment.userId}`);
+            navigate(
+              getUserProfilePath({
+                id: comment.userId,
+                publicId: comment.userPublicId ?? user?.data?.publicId,
+              })
+            );
           }}
         >
           <UserAvatar

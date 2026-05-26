@@ -14,6 +14,7 @@ import {
 
 const quickLinks = [
   { href: '#kako-koristiti', label: 'Kako koristiti' },
+  { href: '#featurei', label: 'Featurei' },
   { href: '#problemi', label: 'Problemi i kontakt' },
   { href: '#grupni-chatovi', label: 'Grupni chatovi' },
   { href: '#sigurnost', label: 'Sigurnost' },
@@ -116,6 +117,68 @@ export default function HelpPage() {
             </div>
           </section>
 
+          <section id="featurei" className={helpCardClassName}>
+            <SectionHeader
+              icon={<BiHelpCircle size={24} />}
+              label="Mogućnosti"
+              title="Osnovni featurei koje Duga ima"
+            />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  title: 'Korisnički profili',
+                  description:
+                    'Uredi svoj profil, dodaj opis, lokaciju, fotografije i profilnu sliku.',
+                },
+                {
+                  title: 'Pregled korisnika',
+                  description:
+                    'Pronađi verificirane korisnike i otvori profile osoba koje želiš upoznati.',
+                },
+                {
+                  title: 'Privatne poruke',
+                  description:
+                    'Započni razgovor 1 na 1, šalji tekst, emoji reakcije i fotografije.',
+                },
+                {
+                  title: 'Grupni chatovi',
+                  description:
+                    'Kreiraj grupu, dodaj više osoba i vodi zajednički razgovor s admin pravima.',
+                },
+                {
+                  title: 'Forum zajednice',
+                  description:
+                    'Postavi pitanje, odgovori drugima, dodaj slike i sudjeluj u raspravama.',
+                },
+                {
+                  title: 'Fotografije i komentari',
+                  description:
+                    'Objavljuj fotografije, označi profilnu sliku, komentiraj i reagiraj na objave.',
+                },
+                {
+                  title: 'Obavijesti',
+                  description:
+                    'Prati nove poruke, reakcije, komentare i druge bitne aktivnosti u aplikaciji.',
+                },
+                {
+                  title: 'Sigurnosne prijave',
+                  description:
+                    'Prijavi bug, neprimjeren sadržaj, uznemiravanje ili problem s računom.',
+                },
+                {
+                  title: 'AI provjera slika',
+                  description:
+                    'Slike u porukama prolaze automatsku provjeru radi sigurnijeg iskustva.',
+                },
+              ].map((feature) => (
+                <article key={feature.title} className="rounded-2xl bg-[#f7f9ff] px-4 py-4">
+                  <h3 className="font-bold text-gray-950">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">{feature.description}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <section id="problemi" className={helpCardClassName}>
             <SectionHeader
               icon={<BiFlag size={24} />}
@@ -162,7 +225,7 @@ export default function HelpPage() {
                 </p>
               </article>
             </div>
-            <p className="mt-4 rounded-2xl border border-blue/20 bg-blue/10 px-4 py-3 text-sm leading-6 text-blue-dark">
+            <p className="mt-4 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-3 text-sm font-semibold leading-6 text-gray-700">
               Kad se nova osoba doda u grupu, može vidjeti povijest razgovora, zato dodaj samo osobe
               kojima vjeruješ i koje trebaju biti dio razgovora.
             </p>
@@ -182,6 +245,11 @@ export default function HelpPage() {
               <p className="rounded-2xl bg-[#f7f9ff] px-4 py-4 leading-7 text-gray-700">
                 Tvoje prijave i sigurnosni problemi se pregledavaju kako bi zajednica ostala ugodna,
                 korisna i zaštićena od zlouporabe.
+              </p>
+              <p className="rounded-2xl bg-[#f7f9ff] px-4 py-4 leading-7 text-gray-700 md:col-span-2">
+                Slike su zaštićene sa svih strana: prolaze provjere prije objave, dohvaćaju se kroz
+                sigurne linkove i mogu se odmah prijaviti ako nešto izgleda sumnjivo ili
+                neprimjereno.
               </p>
             </div>
           </section>
@@ -206,6 +274,10 @@ export default function HelpPage() {
               <p className="rounded-2xl bg-[#f7f9ff] px-4 py-3 text-sm leading-6 text-gray-600">
                 Administratorima se možeš javiti kroz prijavu problema ako misliš da je slika
                 pogrešno blokirana ili da je nešto prošlo provjeru.
+              </p>
+              <p className="rounded-2xl bg-[#f7f9ff] px-4 py-3 text-sm leading-6 text-gray-600 md:col-span-2">
+                Zaštita slika nije samo jedna provjera: kombiniramo automatsku analizu, ograničenja
+                formata i veličine, sigurnu pohranu te mogućnost ručne prijave administratorima.
               </p>
             </div>
           </section>

@@ -7,6 +7,7 @@ import Loader from '@app/components/Loader';
 import UserAvatar from '@app/components/UserAvatar';
 import { IUser } from '@app/components/UserCard';
 import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
+import { MAX_GROUP_CHAT_MEMBERS } from '@app/utils/consts';
 
 Modal.setAppElement('#root');
 
@@ -52,6 +53,9 @@ const AddChatMembersModal = ({
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
 
   const memberIdSet = useMemo(() => new Set(memberIds.map(Number)), [memberIds]);
+  const remainingMemberSlots = Math.max(0, MAX_GROUP_CHAT_MEMBERS - memberIdSet.size);
+  const hasReachedMemberLimit = remainingMemberSlots === 0;
+  const hasSelectedAllRemainingSlots = selectedUserIds.length >= remainingMemberSlots;
 
   const availableUsers = useMemo(
     () =>
@@ -80,7 +84,7 @@ const AddChatMembersModal = ({
   };
 
   const handleAddMembers = () => {
-    if (!selectedUsers.length) return;
+    if (!selectedUsers.length || selectedUsers.length > remainingMemberSlots) return;
 
     onAddMembers(selectedUsers);
     handleClose();
@@ -106,6 +110,10 @@ const AddChatMembersModal = ({
               </p>
               <p className="mt-3 rounded-2xl border border-blue/20 bg-blue/10 px-4 py-3 text-sm leading-6 text-blue-dark">
                 Novi članovi moći će vidjeti cijelu povijest razgovora.
+              </p>
+              <p className="mt-2 rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 text-sm leading-6 text-gray-600">
+                Grupni chat može imati najviše {MAX_GROUP_CHAT_MEMBERS} članova. Možeš dodati još{' '}
+                {remainingMemberSlots} osoba.
               </p>
             </div>
             <button
@@ -138,6 +146,10 @@ const AddChatMembersModal = ({
               <li className="flex justify-center rounded-2xl border border-dashed border-[#dce4ff] py-10">
                 <Loader variant="inline" label="Učitavanje korisnika..." />
               </li>
+            ) : hasReachedMemberLimit ? (
+              <li className="rounded-2xl border border-dashed border-[#dce4ff] bg-[#f7f9ff] px-4 py-10 text-center text-sm text-gray-500">
+                Ovaj grupni chat već ima maksimalnih {MAX_GROUP_CHAT_MEMBERS} članova.
+              </li>
             ) : selectableUsers.length === 0 ? (
               <li className="rounded-2xl border border-dashed border-[#dce4ff] bg-[#f7f9ff] px-4 py-10 text-center text-sm text-gray-500">
                 {search.trim()
@@ -147,6 +159,7 @@ const AddChatMembersModal = ({
             ) : (
               selectableUsers.map((user: IUser) => {
                 const isSelected = selectedUserIds.includes(user.id);
+                const isDisabled = hasSelectedAllRemainingSlots && !isSelected;
 
                 return (
                   <li key={user.id}>
@@ -154,14 +167,17 @@ const AddChatMembersModal = ({
                       type="button"
                       role="option"
                       aria-selected={isSelected}
+                      disabled={isDisabled}
                       onClick={() =>
                         setSelectedUserIds((currentIds) =>
                           isSelected
                             ? currentIds.filter((id) => id !== user.id)
-                            : [...currentIds, user.id]
+                            : currentIds.length >= remainingMemberSlots
+                              ? currentIds
+                              : [...currentIds, user.id]
                         )
                       }
-                      className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue ${
+                      className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:cursor-not-allowed disabled:opacity-50 ${
                         isSelected ? 'border-blue bg-blue/10' : 'border-transparent bg-white'
                       }`}
                     >
@@ -175,7 +191,11 @@ const AddChatMembersModal = ({
                         <span className="block truncate font-semibold text-gray-950">
                           {user.username}
                         </span>
-                        <span className="text-xs text-gray-500">Klikni za odabir</span>
+                        <span className="text-xs text-gray-500">
+                          {isDisabled
+                            ? `Limit je ${MAX_GROUP_CHAT_MEMBERS} članova`
+                            : 'Klikni za odabir'}
+                        </span>
                       </div>
                       <span className="rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark opacity-0 transition-opacity group-hover:opacity-100">
                         {isSelected ? 'Odabrano' : 'Odaberi'}
@@ -191,7 +211,7 @@ const AddChatMembersModal = ({
             type="blue"
             className="w-full rounded-full py-3"
             onClick={handleAddMembers}
-            disabled={!selectedUsers.length}
+            disabled={!selectedUsers.length || selectedUsers.length > remainingMemberSlots}
           >
             Dodaj odabrane
           </Button>

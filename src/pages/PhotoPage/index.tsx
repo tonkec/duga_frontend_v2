@@ -13,6 +13,7 @@ import UserAvatar from '@app/components/UserAvatar';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
 import ContentFormatter from '@app/components/ContentFormatter';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 const PhotoPage = () => {
   const navigate = useNavigate();
@@ -70,7 +71,9 @@ const PhotoPage = () => {
 
     return (
       <button
-        onClick={() => navigate(`/user/${userId}`)}
+        onClick={() =>
+          navigate(getUserProfilePath({ id: userId, publicId: userData?.data?.publicId }))
+        }
         className="inline-flex items-center gap-3 rounded-full border border-[#dce4ff] bg-white px-3 py-2 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue/40 hover:shadow-md hover:shadow-blue/10"
       >
         <UserAvatar

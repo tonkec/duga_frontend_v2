@@ -17,6 +17,7 @@ import Image from '@app/components/Image';
 import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import UserAvatar from '@app/components/UserAvatar';
 import ConfirmModal from '@app/components/ConfirmModal';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface Inputs {
   comment: string;
@@ -34,9 +35,9 @@ const CommentWithUser: React.FC<{
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [taggedUsers, setTaggedUsers] = useState<Array<{ id: number; username: string }>>(
-    comment.taggedUsers ?? []
-  );
+  const [taggedUsers, setTaggedUsers] = useState<
+    Array<{ id: number; publicId?: string; username: string }>
+  >(comment.taggedUsers ?? []);
   const { user: currentUser } = useGetCurrentUser();
   const currentUserId = currentUser?.data.id;
   const { user, isUserLoading } = useGetUserById(comment?.userId?.toString());
@@ -88,7 +89,7 @@ const CommentWithUser: React.FC<{
 
         if (matchedUser) {
           return (
-            <Link to={`/user/${matchedUser.id}`} key={index} className="text-blue underline">
+            <Link to={getUserProfilePath(matchedUser)} key={index} className="text-blue underline">
               {part}
             </Link>
           );
@@ -197,7 +198,15 @@ const CommentWithUser: React.FC<{
           <button
             type="button"
             className="flex min-w-0 items-center gap-2 text-left"
-            onClick={() => !isOwnComment && navigate(`/user/${comment.userId}`)}
+            onClick={() =>
+              !isOwnComment &&
+              navigate(
+                getUserProfilePath({
+                  id: comment.userId,
+                  publicId: comment.userPublicId ?? user?.data?.publicId,
+                })
+              )
+            }
             disabled={isOwnComment}
           >
             <UserAvatar

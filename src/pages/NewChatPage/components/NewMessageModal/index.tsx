@@ -14,6 +14,7 @@ import { IChat, useCreateNewChat } from '@app/pages/NewChatPage/hooks';
 import { hasAlreadyChatted } from '@app/components/SendMessageButton/utils/hasAlreadyChatted';
 import { useSocket } from '@app/context/useSocket';
 import { setStoredGroupChatAdmin } from '@app/utils/chatMemberStorage';
+import { MAX_GROUP_CHAT_MEMBERS } from '@app/utils/consts';
 
 Modal.setAppElement('#root');
 
@@ -64,6 +65,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
   const { onCreateChat, isCreatingChat } = useCreateNewChat();
 
   const currentUserId = currentUser?.data?.id;
+  const maxSelectableGroupMembers = MAX_GROUP_CHAT_MEMBERS - 1;
 
   const selectableUsers = useMemo(() => {
     const verifiedOthers =
@@ -110,7 +112,9 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
       setSelectedUserIds((currentIds) =>
         currentIds.includes(partnerId)
           ? currentIds.filter((id) => id !== partnerId)
-          : [...currentIds, partnerId]
+          : currentIds.length >= maxSelectableGroupMembers
+            ? currentIds
+            : [...currentIds, partnerId]
       );
       return;
     }
@@ -123,27 +127,50 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
       return;
     }
 
-    onCreateChat({ partnerId });
+    const selectedUser = selectableUsers.find((user: IUser) => user.id === partnerId);
+    onCreateChat(
+      selectedUser?.publicId ? { partnerPublicId: selectedUser.publicId } : { partnerId }
+    );
     handleClose();
   };
 
   const handleCreateGroup = () => {
     const trimmedName = groupName.trim();
-    if (isCreatingChat || selectedUserIds.length < 2 || !trimmedName) return;
+    if (
+      isCreatingChat ||
+      selectedUserIds.length < 2 ||
+      selectedUserIds.length > maxSelectableGroupMembers ||
+      !trimmedName
+    ) {
+      return;
+    }
 
-    onCreateChat(
-      { userIds: selectedUserIds, name: trimmedName },
-      {
-        onSuccess: (data) => {
-          emitGroupCreated(data);
-          handleClose();
-        },
-      }
+    const selectedUsers = (allUsers?.data ?? []).filter((user: IUser) =>
+      selectedUserIds.includes(user.id)
     );
+    const selectedUserPublicIds = selectedUsers
+      .map((user: IUser) => user.publicId)
+      .filter((publicId: string | undefined): publicId is string => Boolean(publicId));
+    const createGroupPayload =
+      selectedUserPublicIds.length === selectedUserIds.length
+        ? { userPublicIds: selectedUserPublicIds, name: trimmedName }
+        : { userIds: selectedUserIds, name: trimmedName };
+
+    onCreateChat(createGroupPayload, {
+      onSuccess: (data) => {
+        emitGroupCreated(data);
+        handleClose();
+      },
+    });
   };
 
   const isLoading = isAllUsersLoading || isUserLoading || (isOpen && isUserChatsLoading);
-  const canCreateGroup = isGroupMode && selectedUserIds.length >= 2 && groupName.trim().length > 0;
+  const hasReachedGroupMemberLimit = selectedUserIds.length >= maxSelectableGroupMembers;
+  const canCreateGroup =
+    isGroupMode &&
+    selectedUserIds.length >= 2 &&
+    selectedUserIds.length <= maxSelectableGroupMembers &&
+    groupName.trim().length > 0;
 
   return (
     <Modal
@@ -206,13 +233,19 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
           </div>
 
           {isGroupMode && (
-            <Input
-              type="text"
-              placeholder="Naziv grupe"
-              value={groupName}
-              onChange={(e) => setGroupName(e.currentTarget.value)}
-              className="w-full rounded-xl border-[#dce4ff] bg-[#f7f9ff] py-3"
-            />
+            <div className="space-y-2">
+              <Input
+                type="text"
+                placeholder="Naziv grupe"
+                value={groupName}
+                onChange={(e) => setGroupName(e.currentTarget.value)}
+                className="w-full rounded-xl border-[#dce4ff] bg-[#f7f9ff] py-3"
+              />
+              <p className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] px-4 py-2 text-xs font-semibold text-gray-600">
+                Grupni chat može imati najviše {MAX_GROUP_CHAT_MEMBERS} članova. Možeš odabrati još{' '}
+                {Math.max(0, maxSelectableGroupMembers - selectedUserIds.length)} osoba.
+              </p>
+            </div>
           )}
 
           <Input
@@ -238,40 +271,48 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
                 {search.trim() ? 'Nema korisnika za taj upit' : 'Nema dostupnih korisnika'}
               </li>
             ) : (
-              selectableUsers.map((user: IUser) => (
-                <li key={user.id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={selectedUserIds.includes(user.id)}
-                    disabled={isCreatingChat}
-                    onClick={() => handleSelectUser(user.id)}
-                    className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:opacity-50 ${
-                      selectedUserIds.includes(user.id)
-                        ? 'border-blue bg-blue/10'
-                        : 'border-transparent bg-white'
-                    }`}
-                  >
-                    <UserAvatar
-                      color="#2D46B9"
-                      avatarFallbackName={user.username}
-                      userId={String(user.id)}
-                      className="h-11 w-11 rounded-full"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-gray-950">
-                        {user.username}
+              selectableUsers.map((user: IUser) => {
+                const isSelected = selectedUserIds.includes(user.id);
+                const isDisabled =
+                  isCreatingChat || (isGroupMode && hasReachedGroupMemberLimit && !isSelected);
+
+                return (
+                  <li key={user.id}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      disabled={isDisabled}
+                      onClick={() => handleSelectUser(user.id)}
+                      className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:cursor-not-allowed disabled:opacity-50 ${
+                        isSelected ? 'border-blue bg-blue/10' : 'border-transparent bg-white'
+                      }`}
+                    >
+                      <UserAvatar
+                        color="#2D46B9"
+                        avatarFallbackName={user.username}
+                        userId={String(user.id)}
+                        className="h-11 w-11 rounded-full"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <span className="block truncate font-semibold text-gray-950">
+                          {user.username}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {isGroupMode
+                            ? isDisabled && !isSelected
+                              ? `Limit je ${MAX_GROUP_CHAT_MEMBERS} članova`
+                              : 'Klikni za odabir u grupu'
+                            : 'Klikni za početak razgovora'}
+                        </span>
+                      </div>
+                      <span className="rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark opacity-0 transition-opacity group-hover:opacity-100">
+                        {isSelected ? 'Odabrano' : 'Odaberi'}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {isGroupMode ? 'Klikni za odabir u grupu' : 'Klikni za početak razgovora'}
-                      </span>
-                    </div>
-                    <span className="rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark opacity-0 transition-opacity group-hover:opacity-100">
-                      {selectedUserIds.includes(user.id) ? 'Odabrano' : 'Odaberi'}
-                    </span>
-                  </button>
-                </li>
-              ))
+                    </button>
+                  </li>
+                );
+              })
             )}
           </ul>
 

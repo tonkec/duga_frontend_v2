@@ -7,6 +7,7 @@ import Select from 'react-select';
 import {
   BiGlobe,
   BiHelpCircle,
+  BiLink,
   BiMessageRoundedDots,
   BiShow,
   BiSolidCamera,
@@ -26,6 +27,7 @@ import UserForumActivity, {
 } from '@app/features/forum/components/UserForumActivity';
 import { useQuestionDetails, useQuestions } from '@app/features/forum/hooks/useForum';
 import ProfileViews from './components/ProfileViews';
+import ProfileSharePanel from '@app/components/ProfileSharePanel';
 
 const tabClassName =
   'shrink-0 cursor-pointer whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition-colors focus:outline-none';
@@ -65,6 +67,7 @@ const getProfileTabLabel = (tabId: string) => {
     'profile-photos': 'Profilne fotografije',
     'all-photos': 'Sve fotografije',
     'profile-views': 'Pregledi',
+    share: 'Podijeli profil',
     questions: 'Pitanja',
     answers: 'Odgovori',
   };
@@ -183,6 +186,23 @@ const MyProfilePage = () => {
       ),
     },
   ];
+
+  profileTabs.push({
+    id: 'share',
+    tab: (
+      <div className="flex items-center gap-2">
+        Podijeli profil <BiLink fontSize={20} />
+      </div>
+    ),
+    panel: (
+      <ProfileSharePanel
+        userId={currentUserId}
+        publicId={currentUser?.data?.publicId}
+        username={currentUser?.data?.username}
+        isOwnProfile
+      />
+    ),
+  });
 
   if (profileImages.length > 0) {
     profileTabs.push({

@@ -29,6 +29,7 @@ import ContentFormatter from '@app/components/ContentFormatter';
 import ForumImageGallery from './ForumImageGallery';
 import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
 import { getForumImageItems } from '../utils/forumImages';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface AnswerCardProps {
   answer: Answer;
@@ -62,6 +63,7 @@ const ANSWER_REACTION_EMOJIS = ['👍', '❤️', '😂', '🎉', '🙏'];
 const getAuthorName = (answer: Answer) => answer.User?.name || answer.User?.username || 'Korisnik';
 
 const getAuthorId = (answer: Answer) => answer.User?.id ?? answer.userId;
+const getAuthorPublicId = (answer: Answer) => answer.User?.publicId ?? answer.user?.publicId;
 
 const getReplyAuthorName = (reply: AnswerReply) =>
   reply.User?.name ||
@@ -71,6 +73,7 @@ const getReplyAuthorName = (reply: AnswerReply) =>
   'Korisnik';
 
 const getReplyAuthorId = (reply: AnswerReply) => reply.User?.id ?? reply.user?.id ?? reply.userId;
+const getReplyAuthorPublicId = (reply: AnswerReply) => reply.User?.publicId ?? reply.user?.publicId;
 
 const hasCurrentUserReacted = (
   reaction: NonNullable<Answer['reactions']>[number] | undefined,
@@ -113,6 +116,7 @@ const AnswerCard = ({
 }: AnswerCardProps) => {
   const isOwnAnswer = currentUserId === (answer.userId ?? answer.User?.id ?? answer.user?.id);
   const authorId = getAuthorId(answer);
+  const authorPublicId = getAuthorPublicId(answer);
   const authorName = getAuthorName(answer);
   const actionsDropdownRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -275,7 +279,10 @@ const AnswerCard = ({
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-3">
-          <Link to={`/user/${authorId}`} className="shrink-0">
+          <Link
+            to={getUserProfilePath({ id: authorId, publicId: authorPublicId })}
+            className="shrink-0"
+          >
             <UserAvatar
               avatarFallbackName={authorName}
               color="#eef3ff"
@@ -286,7 +293,10 @@ const AnswerCard = ({
             />
           </Link>
           <div>
-            <Link to={`/user/${authorId}`} className="font-bold text-blue underline">
+            <Link
+              to={getUserProfilePath({ id: authorId, publicId: authorPublicId })}
+              className="font-bold text-blue underline"
+            >
               {authorName}
             </Link>
             <RecordCreatedAt createdAt={answer.createdAt} />
@@ -581,6 +591,7 @@ const AnswerCard = ({
               <div id={`answer-${answer.id}-replies`} className="mt-3 space-y-3">
                 {(answer.replies ?? []).map((reply) => {
                   const replyAuthorId = getReplyAuthorId(reply);
+                  const replyAuthorPublicId = getReplyAuthorPublicId(reply);
                   const isOwnReply = currentUserId === replyAuthorId;
                   const isEditingReply = editingReplyId === reply.id;
 
@@ -591,7 +602,10 @@ const AnswerCard = ({
                     >
                       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                         <Link
-                          to={`/user/${replyAuthorId}`}
+                          to={getUserProfilePath({
+                            id: replyAuthorId,
+                            publicId: replyAuthorPublicId,
+                          })}
                           className="text-sm font-bold text-blue underline"
                         >
                           {getReplyAuthorName(reply)}

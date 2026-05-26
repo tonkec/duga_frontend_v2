@@ -12,6 +12,7 @@ import { useQueries } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { BiGroup, BiSearch } from 'react-icons/bi';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 const defaultSelectValue = {
   value: 'username',
@@ -57,7 +58,7 @@ const UsersPage = () => {
     ({ singleEntry }: { singleEntry: IUser }) => (
       <UserCard
         user={singleEntry}
-        onButtonClick={() => navigate(`/user/${singleEntry.id}`)}
+        onButtonClick={() => navigate(getUserProfilePath(singleEntry))}
         isOnline={singleEntry.status === 'online'}
       />
     ),

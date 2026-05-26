@@ -52,6 +52,7 @@ export interface IUserProfileCardProps {
   lastName: string;
   favoriteDayOfWeek: string;
   id: string;
+  publicId?: string;
   status: string;
 }
 

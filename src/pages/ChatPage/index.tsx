@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 import AppLayout from '@app/components/AppLayout';
 import Loader from '@app/components/Loader';
 import Card from '@app/components/Card';
@@ -26,7 +27,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useQueryClient } from '@tanstack/react-query';
 import { IUser } from '@app/components/UserCard';
-import { BiGroup } from 'react-icons/bi';
+import { BiGroup, BiSearch } from 'react-icons/bi';
 import {
   addStoredAdditionalChatMembers,
   getStoredGroupChatAdminId,
@@ -37,6 +38,7 @@ import {
   removeStoredChatMembers,
   setStoredGroupChatAdmin,
 } from '@app/utils/chatMemberStorage';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface ITypingData {
   userId: number;
@@ -45,6 +47,7 @@ interface ITypingData {
 interface IChatParticipant {
   id?: number;
   userId?: number;
+  publicId?: string;
   username?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -61,6 +64,13 @@ interface IChatDetails {
   type?: string;
   name?: string;
   Users?: IChatParticipant[];
+}
+
+interface ChatMemberLink {
+  id: number;
+  publicId?: string;
+  label: string;
+  username?: string;
 }
 
 interface IDeleteChatModalProps {
@@ -486,6 +496,7 @@ const ChatPage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
   const [isAddMembersModalOpen, setIsAddMembersModalOpen] = useState(false);
+  const [messageSearchQuery, setMessageSearchQuery] = useState('');
   const deletedBySelfRef = useRef(false);
   const socket = useSocket();
   const navigate = useNavigate();
@@ -543,17 +554,35 @@ const ChatPage = () => {
     otherMembers,
   });
   const currentUserName = currentUser?.data.username;
-  const chatMemberNames = useMemo(() => {
-    const names = chatUsers.map((user) => {
+  const chatMembers = useMemo<ChatMemberLink[]>(() => {
+    const members = chatUsers.flatMap((user) => {
       const userId = Number(user.id);
-      if (user.username) return user.username;
-      if (userId === Number(currentUserId) && currentUserName) return currentUserName;
-      if (userId === Number(otherUserId) && otherUserName) return otherUserName;
-      return `Korisnik #${userId}`;
+      const username =
+        user.username ||
+        (userId === Number(currentUserId) ? currentUserName : undefined) ||
+        (userId === Number(otherUserId) ? otherUserName : undefined);
+
+      if (!Number.isFinite(userId)) return [];
+
+      return [
+        {
+          id: userId,
+          publicId: user.publicId,
+          label: username || `Korisnik #${userId}`,
+          username,
+        },
+      ];
     });
 
-    return Array.from(new Set(names));
+    return Array.from(new Map(members.map((member) => [member.id, member])).values());
   }, [chatUsers, currentUserId, currentUserName, otherUserId, otherUserName]);
+  const mentionableUsers = useMemo(
+    () =>
+      chatMembers
+        .filter((user): user is ChatMemberLink & { username: string } => Boolean(user.username))
+        .map((user) => ({ id: user.id, username: user.username })),
+    [chatMembers]
+  );
 
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');
 
@@ -726,6 +755,25 @@ const ChatPage = () => {
       socket.off('received', handleReceived);
     };
   }, [chatId, socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleMessageError = (error: { message?: string }) => {
+      if (error.message === 'Mentions must be chat members') {
+        toast.error('Mention možeš poslati samo osobi koja je član ovog razgovora.', toastConfig);
+        return;
+      }
+
+      toast.error(error.message || 'Poruka nije poslana. Probaj opet.', toastConfig);
+    };
+
+    socket.on('message_error', handleMessageError);
+
+    return () => {
+      socket.off('message_error', handleMessageError);
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (!socket) return;
@@ -919,7 +967,11 @@ const ChatPage = () => {
               type="button"
               className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-80 disabled:cursor-default disabled:hover:opacity-100"
               onClick={() => {
-                if (!isGroupChat && otherUserId) navigate(`/user/${otherUserId}`);
+                if (!isGroupChat && otherUserId) {
+                  navigate(
+                    getUserProfilePath({ id: otherUserId, publicId: otherUser?.data?.publicId })
+                  );
+                }
               }}
               disabled={Boolean(isGroupChat)}
             >
@@ -994,15 +1046,31 @@ const ChatPage = () => {
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
                 Članovi
               </span>
-              {chatMemberNames.map((memberName) => (
-                <span
-                  key={memberName}
-                  className="rounded-full bg-[#f0f4ff] px-3 py-1 text-xs font-semibold text-gray-700"
+              {chatMembers.map((member) => (
+                <Link
+                  key={member.id}
+                  to={getUserProfilePath(member)}
+                  className="rounded-full bg-[#f0f4ff] px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-blue hover:text-white"
                 >
-                  {memberName}
-                </span>
+                  {member.label}
+                </Link>
               ))}
             </div>
+            <label className="relative mt-3 block">
+              <span className="sr-only">Pretraži poruke u razgovoru</span>
+              <BiSearch
+                aria-hidden
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="search"
+                value={messageSearchQuery}
+                onChange={(event) => setMessageSearchQuery(event.currentTarget.value)}
+                placeholder="Pretraži tekst poruka..."
+                className="block w-full rounded-full border border-[#dce4ff] bg-[#f7f9ff] py-2.5 pl-10 pr-4 text-sm font-medium text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
+              />
+            </label>
           </section>
 
           <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
@@ -1010,12 +1078,14 @@ const ChatPage = () => {
               currentUserName={currentUserName}
               otherUserName={otherUserName}
               otherUserId={otherUserId as number}
+              otherUserPublicId={otherUser?.data?.publicId}
               receivedMessages={receivedMessages}
               messages={messages}
               fetchNextPage={fetchNextPage}
               currentUserId={currentUserId as number}
               isCurrentUserLoading={isCurrentUserLoading}
               onReactionToggle={handleReactionToggle}
+              messageSearchQuery={messageSearchQuery}
             />
             {isTyping && (
               <div className="px-4 pb-2">
@@ -1030,6 +1100,7 @@ const ChatPage = () => {
                 otherUserId={otherUserId}
                 otherUserIds={otherMemberIds}
                 chatId={chatId}
+                mentionableUsers={mentionableUsers}
               />
             </div>
           )}

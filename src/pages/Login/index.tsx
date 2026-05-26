@@ -161,7 +161,7 @@ const LoginPage = () => {
             Duga
           </Link>
           <Button
-            className="!rounded-full !px-5 font-semibold shadow-lg"
+            className="landing-nav-login-action !rounded-full !px-5 font-semibold shadow-lg"
             type="primary"
             onClick={onLogin}
           >
@@ -189,7 +189,7 @@ const LoginPage = () => {
               <div className="mt-9 flex flex-col gap-4 sm:flex-row">
                 <Button
                   type="primary"
-                  className="w-full !rounded-full !px-7 !py-4 !text-lg font-bold shadow-xl sm:w-auto"
+                  className="landing-hero-primary-action w-full !rounded-full !px-7 !py-4 !text-lg font-bold shadow-xl sm:w-auto"
                   onClick={onLogin}
                 >
                   Prijavi se

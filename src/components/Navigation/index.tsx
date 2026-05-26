@@ -108,10 +108,6 @@ const Navigation = () => {
             }`}
             aria-hidden={isSidebarHidden}
           >
-            <div className="mb-6 rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
-              <p className="text-sm uppercase tracking-[0.2em] text-white/70">Duga 🌈</p>
-              <p className="mt-1 text-xl font-bold text-white">Navigacija</p>
-            </div>
             <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain pr-1">
               <NavigationItems userId={userId} isSidebar onLogout={onLogout} />
             </nav>

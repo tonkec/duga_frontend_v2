@@ -1,9 +1,9 @@
-import { SetStateAction } from 'react';
+import { SetStateAction, useState } from 'react';
 import { ImageDescription } from '@app/components/PhotoUploader';
 import PhotoLikes from '@app/components/PhotoLikes';
 import Photo from './components/Photo';
 import { useNavigate } from 'react-router';
-import { BiImages, BiSolidCamera } from 'react-icons/bi';
+import { BiCheck, BiCopy, BiImages, BiSolidCamera } from 'react-icons/bi';
 import ContentFormatter from '@app/components/ContentFormatter';
 
 export interface IImage {
@@ -39,6 +39,22 @@ interface IPhotosProps {
 
 const Photos = ({ images, notFoundText }: IPhotosProps) => {
   const navigate = useNavigate();
+  const [copiedImageId, setCopiedImageId] = useState<number | null>(null);
+  const [copyFailedImageId, setCopyFailedImageId] = useState<number | null>(null);
+
+  const copyPhotoUrl = async (image: IImage) => {
+    if (!image.securePhotoUrl || !navigator.clipboard) {
+      setCopyFailedImageId(image.id);
+      window.setTimeout(() => setCopyFailedImageId(null), 1800);
+      return;
+    }
+
+    await navigator.clipboard.writeText(image.securePhotoUrl);
+    setCopiedImageId(image.id);
+    setCopyFailedImageId(null);
+    window.setTimeout(() => setCopiedImageId(null), 1800);
+  };
+
   if (!images || !images.length) {
     return (
       <div className="relative isolate overflow-hidden rounded-3xl border border-dashed border-[#b9c6ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-14 text-center">
@@ -88,10 +104,30 @@ const Photos = ({ images, notFoundText }: IPhotosProps) => {
               className="group overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10"
               key={index}
             >
-              <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-[#eef3ff]">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#eef3ff]">
                 <Photo image={image} onClick={() => navigate(`/photo/${image.id}`)} />
+                <button
+                  type="button"
+                  className="absolute right-3 top-3 inline-flex min-w-28 items-center justify-center gap-1.5 rounded-full border border-white/40 bg-white/95 px-3 py-1.5 text-xs font-semibold text-blue-dark shadow-lg shadow-blue-dark/10 backdrop-blur transition-colors hover:bg-[#f0f4ff]"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    copyPhotoUrl(image).catch(() => {
+                      setCopyFailedImageId(image.id);
+                      window.setTimeout(() => setCopyFailedImageId(null), 1800);
+                    });
+                  }}
+                  aria-label="Kopiraj fotografiju"
+                >
+                  {copiedImageId === image.id ? <BiCheck size={16} /> : <BiCopy size={16} />}
+                  {copiedImageId === image.id
+                    ? 'Kopirano'
+                    : copyFailedImageId === image.id
+                      ? 'Nije kopirano'
+                      : 'Sheraj sliku'}
+                </button>
               </div>
-              <div className="mt-3 rounded-2xl bg-[#f7f9ff] px-3 py-2">
+              <div className="mt-3 flex flex-col items-start rounded-2xl bg-[#f7f9ff] px-3 py-2">
                 {image.description && (
                   <p className="mb-2 line-clamp-2 text-sm leading-6 text-gray-700">
                     <ContentFormatter text={image.description} taggedUsers={image.taggedUsers} />

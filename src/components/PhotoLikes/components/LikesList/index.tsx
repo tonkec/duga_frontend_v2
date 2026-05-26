@@ -2,9 +2,11 @@ import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import UserAvatar from '@app/components/UserAvatar';
 import { useGetUserById } from '@app/hooks/useGetUserById';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface IUser {
   id: number;
+  publicId?: string;
   username: string;
 }
 
@@ -104,7 +106,12 @@ const PhotoLikeDropdown: React.FC<PhotoLikeDropdownProps> = ({ likes }) => {
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#f7f9ff]"
                 onClick={() => {
                   setOpen(false);
-                  navigate(`/user/${like.userId}`);
+                  navigate(
+                    getUserProfilePath({
+                      id: like.userId,
+                      publicId: like.user?.publicId,
+                    })
+                  );
                 }}
               >
                 <PhotoLikeUser like={like} />

@@ -7,8 +7,16 @@ import ContentFormatter from '@app/components/ContentFormatter';
 import Image from '@app/components/Image';
 import { useEffect, useRef, useState } from 'react';
 import { BiSmile } from 'react-icons/bi';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 export type MessageType = 'text' | 'file' | 'gif';
+
+interface MentionedUser {
+  id: number;
+  publicId?: string;
+  username?: string;
+  avatar?: string;
+}
 
 interface BaseMessageTemplateProps {
   userName: string;
@@ -52,6 +60,7 @@ export interface IMessage {
   currentUserReactions?: string[];
   myReactions?: string[];
   userReactions?: string[];
+  mentionedUsers?: MentionedUser[];
 }
 
 interface IMessageProps {
@@ -59,6 +68,7 @@ interface IMessageProps {
   otherUserName: string;
   currentUserName: string;
   otherUserId?: number;
+  otherUserPublicId?: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
   currentUserId: number;
@@ -68,6 +78,7 @@ interface IMessageProps {
 
 interface OtherUserMessageTemplateProps extends BaseMessageTemplateProps {
   otherUserId?: number;
+  otherUserPublicId?: string;
 }
 
 interface CurrentUserMessageTemplateProps extends BaseMessageTemplateProps {
@@ -81,6 +92,7 @@ interface IMessageContentProps {
   createdAt: string;
   messageType: string;
   isOwnMessage?: boolean;
+  mentionedUsers?: MentionedUser[];
 }
 
 const getMessageSenderId = (msg: IMessage) => Number(msg.fromUserId ?? msg.User?.id);
@@ -122,6 +134,7 @@ const MessageContent = ({
   createdAt,
   messageType,
   isOwnMessage = false,
+  mentionedUsers = [],
 }: IMessageContentProps) => {
   const isS3File = messageType === 'file';
   const isGiphy = messageType === 'gif';
@@ -138,7 +151,15 @@ const MessageContent = ({
         <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '30vw' }} />
       )}
 
-      {!isGiphy && !isS3File && <ContentFormatter text={message} />}
+      {!isGiphy && !isS3File && (
+        <ContentFormatter
+          text={message}
+          taggedUsers={mentionedUsers}
+          linkClassName={
+            isOwnMessage ? 'font-semibold text-white underline' : 'text-blue underline'
+          }
+        />
+      )}
 
       {error && !isGiphy && <p className="text-red-500">❌ Error loading image</p>}
       <RecordCreatedAt
@@ -179,6 +200,7 @@ const CurrentUserMessageTemplate = ({
               message={message}
               createdAt={createdAt}
               isOwnMessage
+              mentionedUsers={chatMessage.mentionedUsers}
             />
           </div>
         </div>
@@ -208,6 +230,7 @@ const OtherUserMessageTemplate = ({
   userName,
   message,
   otherUserId,
+  otherUserPublicId,
   createdAt,
   messagePhotoUrl,
   showAvatar,
@@ -225,7 +248,9 @@ const OtherUserMessageTemplate = ({
           <button
             type="button"
             className="shrink-0 cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue"
-            onClick={() => navigate(`/user/${otherUserId}`)}
+            onClick={() =>
+              navigate(getUserProfilePath({ id: otherUserId, publicId: otherUserPublicId }))
+            }
           >
             <UserAvatar
               color="#eef3ff"
@@ -245,6 +270,7 @@ const OtherUserMessageTemplate = ({
               messagePhotoUrl={messagePhotoUrl}
               message={message}
               createdAt={createdAt}
+              mentionedUsers={chatMessage.mentionedUsers}
             />
           </div>
           <MessageReactionPicker
@@ -393,6 +419,7 @@ const Message = ({
   otherUserName,
   currentUserName,
   otherUserId,
+  otherUserPublicId,
   messagePhotoUrl,
   showAvatar,
   currentUserId,
@@ -442,6 +469,7 @@ const Message = ({
       userName={senderName}
       message={message.message}
       otherUserId={senderId || otherUserId}
+      otherUserPublicId={senderId === Number(otherUserId) ? otherUserPublicId : undefined}
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}

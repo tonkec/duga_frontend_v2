@@ -3,11 +3,13 @@ import { useGetUserById } from '@app/hooks/useGetUserById';
 import { useGetImageBlob } from '../../hooks';
 import UserAvatar from '@app/components/UserAvatar';
 import { BiImage } from 'react-icons/bi';
+import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface IUpload {
   id: string;
   url: string;
   userId: string;
+  userPublicId?: string;
   securePhotoUrl: string;
 }
 
@@ -45,7 +47,12 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
           color="#eef3ff"
           avatarFallbackName={username}
           onClick={() => {
-            navigate(`/user/${upload.userId}`);
+            navigate(
+              getUserProfilePath({
+                id: upload.userId,
+                publicId: upload.userPublicId ?? user?.data?.publicId,
+              })
+            );
           }}
           userId={upload.userId}
           className="h-11 w-11 rounded-full"
@@ -56,7 +63,14 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
           <button
             type="button"
             className="block min-w-0 truncate text-left font-bold text-gray-950 hover:text-blue"
-            onClick={() => navigate(`/user/${upload.userId}`)}
+            onClick={() =>
+              navigate(
+                getUserProfilePath({
+                  id: upload.userId,
+                  publicId: upload.userPublicId ?? user?.data?.publicId,
+                })
+              )
+            }
           >
             {username}
           </button>

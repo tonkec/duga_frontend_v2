@@ -38,6 +38,7 @@ export interface ProfileView {
   updatedAt: string;
   viewer: {
     id: number;
+    publicId?: string;
     username: string;
     firstName?: string;
     lastName?: string;
