@@ -56,7 +56,7 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="mt-2 p-2 border rounded bg-white">
+    <div className="giphy-search-panel mt-2 p-2 border rounded bg-white">
       <Input
         type="text"
         placeholder="Pretraži GIPHY..."
@@ -100,7 +100,7 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
           <button
             onClick={handlePrevPage}
             disabled={page === 1 || isGIFSLoading}
-            className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+            className="giphy-pagination-button px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
           >
             Prethodna
           </button>
@@ -108,7 +108,7 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
           <button
             onClick={handleNextPage}
             disabled={isGIFSLoading || allGIFS.length < limit}
-            className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+            className="giphy-pagination-button px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
           >
             Sljedeća
           </button>

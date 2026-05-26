@@ -4,6 +4,7 @@ import { useGetProfilePhoto } from './hooks/useGetProfilePhoto';
 import Loader from '../Loader';
 import { useGetImageBlob } from '../LatestUploads/hooks';
 import Image from '../Image';
+import { getStoredThemePreference } from '@app/hooks/useThemePreference';
 
 interface IUserAvatarProps {
   avatarFallbackName: string;
@@ -27,20 +28,19 @@ const UserAvatar = ({
 }: IUserAvatarProps) => {
   const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
   const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
+  const isDarkMode = getStoredThemePreference() === 'dark';
+  const fallbackBackgroundColor = isDarkMode ? '#222831' : color;
+  const fallbackTextColor = isDarkMode ? '#f8fafc' : fgColor || '#1f2937';
   const resolvedSize = size || '40';
   const cssSize = /^\d+(\.\d+)?$/.test(resolvedSize) ? `${resolvedSize}px` : resolvedSize;
   const sizeStyle = size || !className ? { width: cssSize, height: cssSize } : undefined;
   const containerClassName = clsx(
-    'inline-block overflow-hidden align-middle',
+    'user-avatar inline-block overflow-hidden align-middle',
     onClick && 'cursor-pointer',
     className
   );
 
   const renderAvatar = () => {
-    const placeholderUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      avatarFallbackName
-    )}&background=f7f9ff&color=1f2937`;
-
     if (imageBlob) {
       return (
         <Image
@@ -53,14 +53,12 @@ const UserAvatar = ({
 
     return (
       <Avatar
-        color={color}
-        src={
-          imageBlob === null ? placeholderUrl : profilePhoto?.data.securePhotoUrl || placeholderUrl
-        }
+        color={fallbackBackgroundColor}
         size={className ? '100%' : resolvedSize}
         round={false}
         textSizeRatio={2}
-        fgColor={fgColor || '#fff'}
+        name={avatarFallbackName}
+        fgColor={fallbackTextColor}
       />
     );
   };

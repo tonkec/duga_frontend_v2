@@ -29,7 +29,7 @@ const sectionClassName = 'rounded-3xl border border-[#dce4ff] bg-white p-5 shado
 
 const SectionHeader = ({ icon, title }: { icon: React.ReactNode; title: string }) => (
   <div className="mb-4 flex items-center gap-3">
-    <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+    <div className="policy-section-icon grid h-11 w-11 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
       {icon}
     </div>
     <h2 className="text-2xl font-bold text-gray-950">{title}</h2>
@@ -39,13 +39,13 @@ const SectionHeader = ({ icon, title }: { icon: React.ReactNode; title: string }
 export default function PrivacyPolicyPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 text-gray-900">
-      <header className="relative isolate mb-8 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-10 shadow-sm md:px-8">
-        <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-        <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
+      <header className="policy-header relative isolate mb-8 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-10 shadow-sm md:px-8">
+        <div className="policy-header-glow absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
+        <div className="policy-header-glow absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
 
         <a
           href="/"
-          className="relative z-10 mb-6 inline-flex rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm transition-colors hover:bg-blue hover:text-white"
+          className="policy-header-back relative z-10 mb-6 inline-flex rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm transition-colors hover:bg-blue hover:text-white"
         >
           ← Povratak na početnu
         </a>
@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
           <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue-dark shadow-lg shadow-blue/10">
             <BiShieldQuarter size={34} />
           </div>
-          <span className="mb-3 inline-flex rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-dark">
+          <span className="policy-header-label mb-3 inline-flex rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-dark">
             Duga privatnost
           </span>
           <h1 className="text-4xl font-bold tracking-tight text-gray-950">Politika privatnosti</h1>

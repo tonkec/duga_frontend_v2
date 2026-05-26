@@ -101,7 +101,7 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
           className={clsx(
             'absolute right-3 top-3 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur',
             isOnlineState
-              ? 'bg-green text-white'
+              ? 'user-card-status-online bg-green text-white'
               : 'user-card-status-offline border border-[#dce4ff] bg-white/95 text-gray-600'
           )}
         >

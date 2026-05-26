@@ -64,7 +64,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
 
   return (
     <article
-      className="group cursor-pointer overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="latest-comment-card group cursor-pointer overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
       onClick={onClick}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -89,13 +89,13 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
           </div>
         </button>
 
-        <span className="rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-xs font-semibold text-blue-dark">
+        <span className="latest-comment-badge rounded-full border border-[#dce4ff] bg-[#f7f9ff] px-3 py-1 text-xs font-semibold text-blue-dark">
           Fotka
         </span>
       </div>
 
-      <div className="flex gap-3 rounded-2xl bg-[#f7f9ff] p-3">
-        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white">
+      <div className="latest-comment-preview flex gap-3 rounded-2xl bg-[#f7f9ff] p-3">
+        <div className="latest-comment-image grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white">
           {imageBlob ? (
             <Image
               src={URL.createObjectURL(imageBlob)}
@@ -114,7 +114,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
               <span className="text-gray-500">Komentar s fotografijom</span>
             )}
           </div>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-blue-dark">
+          <p className="latest-comment-action mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-blue-dark">
             Otvori fotografiju
           </p>
         </div>
@@ -161,13 +161,13 @@ const LatestComments = () => {
             Najnovije reakcije i razgovori ispod korisničkih fotografija.
           </p>
         </div>
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm">
+        <span className="latest-comments-count inline-flex w-fit items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm">
           <BiCommentDetail />
           {comments.length} komentara
         </span>
       </div>
 
-      <div className="rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm md:p-5">
+      <div className="latest-comments-panel rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm md:p-5">
         <div className="grid gap-4 lg:grid-cols-3">
           {comments.map((comment: IComment) => (
             <LatestComment
