@@ -306,6 +306,13 @@ select:disabled {
   color: var(--duga-dark-base) !important;
 }
 
+[data-theme='dark'] .profile-views-pagination-button:disabled {
+  background-color: var(--duga-dark-base) !important;
+  border: 1px solid var(--duga-dark-border) !important;
+  color: var(--duga-dark-muted) !important;
+  opacity: 0.7;
+}
+
 [data-theme='dark'] .landing-page,
 [data-theme='dark'] .landing-how-section,
 [data-theme='dark'] .landing-reasons-section,
