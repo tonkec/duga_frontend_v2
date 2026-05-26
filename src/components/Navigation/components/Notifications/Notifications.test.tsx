@@ -115,6 +115,10 @@ describe('NotificationDropdown', () => {
     jest.useRealTimers();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('renders fetched notifications and marks all as read locally', async () => {
     renderNotifications();
 
