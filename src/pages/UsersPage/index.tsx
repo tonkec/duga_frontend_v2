@@ -77,39 +77,41 @@ const UsersPage = () => {
   const renderedUsers = showOnlyWithProfilePhoto
     ? filteredUsers.filter((user) => userIdsWithProfilePhoto.has(user.id))
     : filteredUsers;
+  const hasVisibleUsers = visibleUsers.length > 0;
   const itemsPerPage = windowSize.width < 1024 ? 4 : 8;
 
   return (
     <AppLayout>
-      <UserFilters
-        selectValue={selectValue}
-        setSelectValue={setSelectValue}
-        search={search}
-        setSearch={setSearch}
-      />
-
-      <div className="mt-4 rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 shadow-sm">
-        <label className="flex w-fit cursor-pointer items-center gap-3 text-sm font-semibold text-gray-800">
-          <input
-            type="checkbox"
-            checked={showOnlyWithProfilePhoto}
-            onChange={(event) => setShowOnlyWithProfilePhoto(event.target.checked)}
-            className="h-4 w-4 accent-blue"
+      {hasVisibleUsers && (
+        <>
+          <UserFilters
+            selectValue={selectValue}
+            setSelectValue={setSelectValue}
+            search={search}
+            setSearch={setSearch}
           />
-          Prikaži samo korisnike s profilnom
-        </label>
-      </div>
+
+          <div className="mt-4 rounded-3xl border border-[#dce4ff] bg-white px-4 py-3 shadow-sm">
+            <label className="flex w-fit cursor-pointer items-center gap-3 text-sm font-semibold text-gray-800">
+              <input
+                type="checkbox"
+                checked={showOnlyWithProfilePhoto}
+                onChange={(event) => setShowOnlyWithProfilePhoto(event.target.checked)}
+                className="h-4 w-4 accent-blue"
+              />
+              Prikaži samo korisnike s profilnom
+            </label>
+          </div>
+        </>
+      )}
 
       <div className="mt-4">
         {isProfilePhotoFilterLoading && (
           <p className="mb-3 text-sm font-medium text-gray-500">Provjeravam profilne slike...</p>
         )}
         {!renderedUsers.length && (
-          <section className="relative isolate mx-auto mt-8 max-w-2xl overflow-hidden rounded-3xl border border-dashed border-[#b9c6ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#eef3ff] px-6 py-10 text-center shadow-sm">
-            <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-blue/10 blur-3xl" />
-            <div className="pointer-events-none absolute -right-16 bottom-2 h-40 w-40 rounded-full bg-blue/10 blur-3xl" />
-
-            <div className="relative z-10 mx-auto flex max-w-md flex-col items-center">
+          <section className="mx-auto mt-8 max-w-2xl rounded-3xl border border-dashed border-[#b9c6ff] bg-white px-6 py-10 text-center shadow-sm">
+            <div className="mx-auto flex max-w-md flex-col items-center">
               <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue shadow-lg shadow-blue/10">
                 {search.trim() ? <BiSearch size={34} /> : <BiGroup size={34} />}
               </div>
