@@ -233,6 +233,22 @@ const OtherUserPage = () => {
     },
   ];
 
+  profileTabs.push({
+    id: 'share',
+    tab: (
+      <div className="flex items-center gap-2">
+        Podijeli profil <BiLink fontSize={20} />
+      </div>
+    ),
+    panel: (
+      <ProfileSharePanel
+        userId={otherUserInternalId ?? userId}
+        publicId={otherUser?.data?.publicId}
+        username={otherUser?.data?.username}
+      />
+    ),
+  });
+
   if (profileImages.length > 0) {
     profileTabs.push({
       id: 'photos',

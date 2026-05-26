@@ -187,6 +187,23 @@ const MyProfilePage = () => {
     },
   ];
 
+  profileTabs.push({
+    id: 'share',
+    tab: (
+      <div className="flex items-center gap-2">
+        Podijeli profil <BiLink fontSize={20} />
+      </div>
+    ),
+    panel: (
+      <ProfileSharePanel
+        userId={currentUserId}
+        publicId={currentUser?.data?.publicId}
+        username={currentUser?.data?.username}
+        isOwnProfile
+      />
+    ),
+  });
+
   if (profileImages.length > 0) {
     profileTabs.push({
       id: 'profile-photos',
