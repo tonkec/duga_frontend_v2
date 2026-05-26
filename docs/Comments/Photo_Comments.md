@@ -1,136 +1,158 @@
-# CHAT_PHOTO_COMMENTS_TESTS.md
+# PROFILE_PHOTO_COMMENTS_TESTS.md
 
-> User-story style manual test checklist for **photo comments** in chat.  
-> Stack: **Socket.IO** (real-time), **AWS S3** (multer-s3 + sharp) for stored media, local previews via **blob:** URLs.  
-> No admin roles.
-
----
-
-## Create & View Comments
-
-- As a **logged in user**, I must be able to **comment on my own photos**.
-- As a **logged in user**, I must be able to **comment on other users’ photos**
-- As a **logged in user**, I must be able to submit **text-only comments**.
-- As a **logged in user**, I must be able to submit comments with **images**, **GIFs**, and **emojis**.
-- As a **logged in user**, I must see each comment’s **commenter display name** and **comment text**.
-- As a **logged in user**, media in comments must be **parsed/rendered** (images inline, GIFs autoplay/loop muted, links unfurl or show a safe preview, youtube links become iframes).
+> Manual test checklist for **profile photo comments** on `/photo/:photoId`.
+> Stack: Socket.IO, AWS S3/private media, local blob previews, Giphy, emoji search, mention input.
+> Locale: hr-HR (Croatian). Auth and completed onboarding required.
 
 ---
 
-## Media Handling (Images/GIFs/Links)
+## Access & Photo Context
 
-- As a **logged in user**, when I attach an image to a new comment, I must see a **local preview** using a **blob:** URL of the form:  
-  `blob:<domain>/<uuid>`
-- As a **logged in user**, after upload, the server stores media in **S3** (private).
-- As a **logged in user**, unsupported file types or files **exceeding size limits** must be **blocked** with a clear error toast.
-- As a **logged in user**, image EXIF/metadata must be stripped and images resized/optimized via **sharp**.
-- As a **non-member**, I must **not** be able to fetch comment media (no public S3 URLs; presigned only).
-- As a **logged in user**, if I have more than maximum number of images, I must not be able to upload any more photos
-
----
-
-## Pagination & Ordering
-
-- As a **logged in user**, comments under a photo must be **paginated**.
-- As a **logged in user**, I must be able to **load older comments** (e.g. prev and next buttons).
-- As a **logged in user**, new comments appear **at the end** (chronological order)
+- As an **unlogged user**, I must be redirected to login before accessing photo comments.
+- As a **logged in user**, I must be able to open comments under a valid profile photo.
+- As a **logged in user**, if the photo is deleted or inaccessible, comments must not render as if the photo exists.
+- As a **logged in user**, the comments panel must be shown below the photo card.
+- As a **logged in user**, the comments header must show **Komentari** and either the comment count or **Budi prva osoba koja komentira**.
+- As a **logged in user**, the side panel must show conversation ideas such as reacting, tagging, and being supportive.
 
 ---
 
-## Real-Time (Sockets)
+## Create Comments
 
-- As a **logged in user**, when someone posts a comment, I must see it **in real time** without reloading.
-- As a **comment author**, when I **edit** my comment text, others must see the **updated text in real time**
-- As a **comment author**, when I **delete** my comment, it must **disappear** in real time for everyone.
-
----
-
-## Editing & Deleting (Author-only)
-
-- As a **comment author**, I must be able to **edit my comment text**.
-- As a **comment author**, if my comment **contains an image**, I must **not** be able to **edit the image** after posting (only text can be edited).
-- As a **comment author**, I must be able to **delete my comment**.
-- When a comment is deleted, its **images/GIFs/emojis and any associated media** must be **deleted/invalidated** (e.g., S3 object removed).
-- As a **non-author**, I must **not** be able to edit or delete someone else’s comment.
+- As a **logged in user**, I must be able to comment on my own photos.
+- As a **logged in user**, I must be able to comment on other users' photos.
+- As a **logged in user**, I must be able to submit a text-only comment.
+- As a **logged in user**, I must be able to submit a comment with only an image.
+- As a **logged in user**, I must be able to submit a comment with only a GIF.
+- As a **logged in user**, I must be able to submit text plus image or text plus GIF.
+- As a **logged in user**, submitting an empty comment with no image/GIF must be blocked with **Unesi komentar, dodaj sliku ili GIF**.
+- As a **logged in user**, while a comment is being sent, the submit button must show **Slanje** and the form must avoid duplicate submits.
+- As a **logged in user**, after a successful submit, the input, image, GIF, emoji suggestions, and tagged users must reset.
+- As a **logged in user**, the newly created comment must be added to the local list without waiting for a full page reload.
 
 ---
 
-## Emojis & Text
+## Comment Composer
 
-- As a **logged in user**, I must be able to insert **emojis** via picker and native keyboard into the comment input.
-- As a **logged in user**, emojis must render at appropriate size/line height and not break wrapping.
-- As a **logged in user**, I must be prevented from submitting **empty comments** (whitespace only).
-
----
-
-## Links & Safety
-
-- As a **logged in user**, pasted **links** in comments must be clickable
-- As a **logged in user**, potentially unsafe links or large previews must be **sanitized** and not execute script content.
-
----
-
-## Toasters & Feedback
-
-- As a **logged in user**, any **action** (create, edit, delete, upload start/finish/fail) must show a **toast message** (success or error).
+- As a **logged in user**, I must type comments in a mention-enabled textarea.
+- As a **logged in user**, typing `@` followed by username characters must show user suggestions.
+- As a **logged in user**, selecting a suggested user must insert `@username` and track the tagged user ID.
+- As a **logged in user**, typing `:` followed by an emoji name must show quick emoji suggestions.
+- As a **logged in user**, selecting a quick emoji must replace the emoji token in the comment text.
+- As a **logged in user**, clicking the emoji button must open the emoji search panel.
+- As a **logged in user**, clicking the GIF button must open the Giphy search panel.
+- As a **logged in user**, selecting a GIF must show a preview and include the GIF URL in the submitted comment.
+- As a **logged in user**, I must be able to remove a selected GIF before submit.
+- As a **logged in user**, selecting an image must show a local preview.
+- As a **logged in user**, I must be able to remove a selected image before submit.
 
 ---
 
-## Responsiveness
+## Image Handling
 
-- As a **mobile user**, I must be able to **compose**, **attach media**, and **submit** comments comfortably
-- As a **mobile user**, image previews and comment list must **resize** fluidly
-- As a **desktop user**, the comments panel should use available width and keep media within **safe aspect ratios**.
-
----
-
-## Security & Authorization
-
-- As a **non-member**, I must **not** be able to create, read, edit, or delete comments
-- As a **logged in user**, comment media must be stored **private** in S3; access only if I am logged in
+- As a **logged in user**, I must only be able to select allowed image types from the configured list.
+- As a **logged in user**, unsupported image types must show a toast such as **Dozvoljeni formati su ...** and must not be attached.
+- As a **logged in user**, selected image filenames should be normalized before upload.
+- As a **logged in user**, attached image previews must use local blob URLs before upload.
+- As a **logged in user**, while upload is pending, the preview must show **Slanje...** overlay.
+- As a **logged in user**, comment images must be stored privately and displayed through authorized secure/blob access.
+- As a **logged in user**, if the combined image count would exceed the app maximum, I must see **Ukupan maksimalan broj slika je 5**.
+- As a **logged in user**, upload/network failures must show an error and must not create a broken comment.
 
 ---
 
-## Error States
+## Comment List, Sorting & Pagination
 
-- As a **logged in user**, if image upload fails (network/size/MIME), I must see an **error toast** and the pending media must be **cleared**.
-- As a **logged in user**, if editing fails (conflict/permission), the text must **revert** and show an error toast.
-- As a **logged in user**, if deletion fails (network/permission), the comment must **remain** and show an error toast.
-
----
-
-## Data Model Constraints & Clean-up
-
-- As a **logged in user**, each comment is associated with a **photo message ID** and a **unique comment ID**.
-- As a **comment author**, deleting a comment must trigger **S3 cleanup** for its media
-- As a **logged in user**, the system must prevent **dangling media** (no orphaned S3 files after deletion).
+- As a **logged in user**, I must see existing comments under the photo.
+- As a **logged in user**, comments must be sorted newest first.
+- As a **logged in user**, comments must be paginated with 3 comments per page.
+- As a **logged in user**, pagination must use stable comment IDs as item keys.
+- As a **logged in user**, while comments are loading, I must see **Učitavanje komentara...**.
+- As a **logged in user**, if no comments exist, I must see **Još nema komentara.**
+- As a **logged in user**, comments returned by API must hydrate the local list once per photo load and not overwrite newer socket updates unexpectedly.
 
 ---
 
-## Non-Goals / Explicit Constraints
+## Comment Rendering
 
-- **Image editing for existing comments is not allowed.**
-- Local preview must use **blob:** URL at `blob:https://staging--dugaprod.netlify.app/<uuid>` prior to upload.
-- Full WCAG accessibility is **out of scope** right now (basic keyboard/contrast acceptable).
+- As a **logged in user**, each comment must show commenter avatar, display name, and timestamp.
+- As a **comment author**, my own comments must be labeled **Tvoj komentar**.
+- As a **viewer**, clicking another commenter's identity must navigate to that user's profile.
+- As a **viewer**, clicking my own comment identity must not navigate away unnecessarily.
+- As a **viewer**, comment text must be sanitized before rendering.
+- As a **viewer**, plain links, YouTube links, GIF URLs, and supported media links must render through the shared content formatter.
+- As a **viewer**, attached comment images must render under the comment text.
+- As a **viewer**, tagged users must render as blue underlined profile links.
+
+---
+
+## Editing Comments
+
+- As a **comment author**, I must see **Izmijeni** on my own comments.
+- As a **non-author**, I must not see edit controls for someone else's comment.
+- As a **comment author**, clicking **Izmijeni** must open a mention-enabled edit textarea.
+- As a **comment author**, I must be able to edit comment text and tagged users.
+- As a **comment author**, I must not be able to edit an already uploaded comment image from the edit form.
+- As a **comment author**, the save button must be disabled when text is unchanged.
+- As a **comment author**, saving an empty edit must show **Komentar je obavezan.**
+- As a **comment author**, successful edits must update the comment locally and via socket events.
+- As a **comment author**, failed edits must keep the old comment visible or recover to server state.
+
+---
+
+## Deleting Comments
+
+- As a **comment author**, I must see **Obriši** on my own comments.
+- As a **non-author**, I must not see delete controls for someone else's comment.
+- As a **comment author**, clicking delete must open a confirmation modal **Obrisati komentar?**
+- As a **comment author**, confirming delete must remove the comment locally.
+- As a **comment author**, deleting a comment with media must remove or invalidate associated media.
+- As a **comment author**, if deletion fails, the comment must remain visible or be restored.
+
+---
+
+## Real-Time Socket Behavior
+
+- As a **viewer**, `receive-comment` must add new comments without refresh.
+- As a **viewer**, duplicate `receive-comment` payloads must not duplicate a comment already in the list.
+- As a **viewer**, `remove-comment` must remove only comments for the currently open photo.
+- As a **viewer**, `update-comment` and `edit-comment` must update the matching comment text and tagged users.
+- As a **viewer**, malformed update payloads must not break the comments page.
+- As a **viewer**, leaving the page must unsubscribe comment socket listeners.
 
 ---
 
 ## Notifications
 
-- As a **photo owner**, I must receive an **in-app notification** when another user comments on my photo.
-- As a **photo owner**, the notification must show the **commenter’s name** and a **snippet** of the comment (e.g., first 50 chars).
-- As a **photo owner**, if the comment contains media (image, GIF, link), the notification must display a **media icon/preview**.
-- As a **photo owner**, notifications for new comments must arrive in **real time** (via Socket.IO event, e.g., `comment.notification`).
-- As a **photo owner**, clicking the notification must take me directly to the **photo and its comments thread**.
-- As a **non-owner**, I must **not** receive notifications for comments on photos that I did not upload.
-- As a **photo owner**, I must be able to **mute notifications** for comments on a specific photo (if product supports it).
-- As a **photo owner**, I must **not** receive duplicate notifications if a user edits their comment (notification should only trigger on **create**).
-- As a **photo owner**, I must receive a **toast** or visible error if the notification fails to load or link correctly.
+- As a **photo owner**, I should receive an in-app notification when another user comments on my photo.
+- As a **tagged user**, I should receive an in-app notification when I am tagged in a photo comment.
+- As a **photo owner**, comment edit events should not create duplicate "new comment" notifications.
+- As a **non-owner**, I must not receive owner notifications for photos I do not own.
+- As a **notification recipient**, clicking a comment notification should open the related photo page/comment context.
 
-## Tagging users in photo comments
+---
 
-- See file `Tagging_Users_In_Comments.md`
+## Security & Authorization
 
-## AWS Rekognition
+- As a **logged in user**, comment create/edit/delete requests must require a valid authenticated app session.
+- As a **non-author**, I must not be able to edit or delete another user's comments through direct API calls.
+- As a **logged in user**, comment media must remain private and only be served through authorized access.
+- As a **system**, text must be sanitized to prevent script injection.
+- As a **system**, media moderation must run before storing images; see `Comment_Uploads_Rekognition.md`.
+- As a **system**, comment tags must reference valid users and be enforced server-side.
 
-- See file `Comment_Uploads_Rekognition.md`
+---
+
+## Responsiveness & Accessibility
+
+- As a **mobile user**, composer buttons, previews, and pagination must be usable without horizontal scrolling.
+- As a **desktop user**, the comments list and idea panel should use the two-column layout.
+- As a **keyboard user**, I must be able to focus the textarea, submit button, media buttons, edit/delete actions, and pagination controls.
+- As a **screen-reader user**, media buttons should expose labels such as **Dodaj sliku**, **Dodaj GIF**, and **Dodaj emoji**.
+
+---
+
+## Related Docs
+
+- See `Tagging_Users_In_Comments.md` for detailed mention behavior.
+- See `Comment_Uploads_Rekognition.md` for image moderation behavior.

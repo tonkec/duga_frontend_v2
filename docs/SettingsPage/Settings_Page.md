@@ -1,14 +1,14 @@
 # SETTINGS_PAGE_TESTS.md
 
 > Manual test cases for **Postavke** (Settings) page.  
-> Scope: Online status (radio), Reject cookies, Delete profile.
+> Scope: Online status (radio), reject cookies, delete profile, and auth/session behavior.
 > Locale: **hr-HR** (Croatian). Auth required.
 
 ---
 
 ## 0) Preconditions
 
-- User is authenticated and viewing **/postavke** for **their own account**.
+- User is authenticated, verified, onboarded, and viewing **/settings** for **their own account**.
 - Network is available unless a test explicitly simulates failures.
 - Toast/notification component is available in the app.
 
@@ -19,8 +19,20 @@
 **ST-001 Access control**
 
 - **Given** I am **not logged in**
-- **When** I navigate to **/postavke**
+- **When** I navigate to **/settings**
 - **Then** I am redirected to **/login**, auth0 flow
+
+**ST-001a Verification and onboarding guards**
+
+- **Given** my email is not verified
+- **When** I navigate to **/settings**
+- **Then** I am redirected to **/verify-email**
+- **And** settings controls are not visible
+
+- **Given** I am verified but onboarding is not complete
+- **When** I navigate to **/settings**
+- **Then** I am redirected to **/post-login**
+- **And** settings controls are not visible
 
 **ST-002 Owner-only access**
 
@@ -30,7 +42,7 @@
 
 **ST-003 Basic UI**
 
-- **Given** I open **/postavke**
+- **Given** I open **/settings**
 - **Then** I see title **“Postavke”**, description **“Odaberi svoj trenutni online status.”**
 - **And** I see two radio options:
   - **“Želim biti online”**
@@ -193,6 +205,7 @@
 
 - **When** posting status/cookies/delete requests
 - **Then** requests require valid **JWT/session/CSRF**; unauthenticated attempts are rejected
+- **And** requests require the active Duga app session; revoked sessions are redirected to login
 
 **ST-051 No elevation**
 

@@ -1,50 +1,99 @@
-# CHAT_FUNCTIONALITY_TESTS_S3.md
+# CHAT_UPLOADS_REKOGNITION_TESTS.md
 
-> User-story style manual test checklist for chat features using **Socket.IO** and **AWS S3** (multer-s3 + sharp).
+> Manual test checklist for AWS Rekognition moderation on images attached to chat messages.
 
-...
+---
 
-## Security & Privacy (S3 + sockets)
+## Scope
 
-- As a **chat user**, S3 objects must be **private**
-- As a **chat user**, uploads must be validated for **MIME type** and **size** server-side before S3 write (multer-s3 filters).
-- As a **chat user**, images must be **sanitized/processed** (sharp) to mitigate malicious payloads and remove EXIF data.
+- Applies to images attached to one-to-one and group chat messages.
+- Applies before image messages are persisted, broadcast, or made visible to chat members.
+- Does not apply to text-only messages.
+- GIF picker URLs should follow separate Giphy/content rules unless product policy adds GIF moderation.
+- All behavior must respect chat membership and cookie-consent gating.
 
-## Image Moderation (AWS Rekognition)
+---
 
-### Scope
+## Happy Path
 
-- Applies to **images** attached to **chat messages**.
-- Moderation runs **before** any media is persisted in S3 or broadcast via sockets.
+- As a **chat member**, when I attach a clean image to a message, the system must scan it with AWS Rekognition DetectModerationLabels.
+- As a **chat member**, if no blocked labels are found above threshold, the upload must succeed.
+- As a **chat member**, the accepted image must be processed, stored privately, and rendered in the message bubble.
+- As a **chat member**, clean image messages must appear in real time for other members through sockets.
+- As a **chat member**, the image must keep a safe aspect ratio and be openable full-size where supported.
+- As a **chat member**, image messages must appear correctly in chat previews/recent messages.
 
-### Happy Path
+---
 
-- As a **chat user**, when I attach an **image** to a chat message, the system must **scan** it with **AWS Rekognition – DetectModerationLabels**.
-- As a **chat user**, if the media is **clean**, the upload must succeed, the file is stored **privately in S3**, and the message appears in chat with a **URL** for display.
+## Blocked Content
 
-### Blocked Content
+- As a **chat member**, explicit, sexual, suggestive, or otherwise blocked content at/above threshold must be rejected.
+- As a **chat member**, blocked files must not be stored permanently in S3.
+- As a **chat member**, if a file was staged before moderation, it must be deleted immediately after block.
+- As a **chat member**, no message record should be created for a blocked image.
+- As a **chat member**, no socket event should broadcast blocked content.
+- As a **chat member**, I must see a clear toast explaining that the photo cannot be uploaded.
+- As a **chat member**, my text input should remain available so I can retry without the blocked image.
 
-- As a **chat user**, if Rekognition flags **explicit content** (e.g., `Explicit Nudity`, `Sexual Activity`, `Sexual Content`, `Suggestive`) at or above the configured confidence threshold (e.g., **≥ 90%**), the upload must be **blocked**.
-- As a **chat user**, when blocked, I must see a **toast message** explaining:  
-  _“We couldn’t upload this photo because it may contain explicit content.”_
-- As a **chat user**, when blocked:
-  - The file must **not** be stored in S3 (or deleted if staged).
-  - No **socket event** (`message.created`) must be emitted.
-  - The **message is not created**; my text input remains so I can adjust or remove the image.
-- As a **chat user**, borderline results (below threshold) must **pass** (or follow your product policy; default here: **allow**).
+---
 
-### Failure Modes
+## Failure Modes
 
-- As a **chat user**, if moderation **fails** (timeout/API error), the system must **fail closed**: block the upload and show a toast:  
-  _“We couldn’t verify this photo right now. Please try again later.”_
-- As a **chat user**, if my network upload fails, I must see an **error toast** and the pending media must clear.
+- As a **chat member**, Rekognition timeout must fail closed.
+- As a **chat member**, Rekognition API errors must fail closed.
+- As a **chat member**, if moderation cannot verify the image, I must see a retry-later error.
+- As a **chat member**, network upload failure must show an error toast.
+- As a **chat member**, unsupported file type or file-size failures must block upload before moderation where possible.
+- As a **chat member**, failed moderation/upload must not leave a pending ghost message in the thread.
 
-### Security & Storage
+---
 
-- As a **chat user**, images must only be persisted in S3 after passing moderation; otherwise discard temp files.
-- As a **non-member**, I must **not** be able to access blocked or moderated content.
+## File Processing
 
-### Real-time Consistency
+- As a **system**, accepted images should be resized/compressed and have EXIF metadata stripped.
+- As a **system**, accepted image objects must be private.
+- As a **system**, object keys should use the expected environment/chat/message path convention.
+- As a **system**, files rejected by MIME, size, count, or moderation should not be processed further.
+- As a **system**, moderation should run independently for each image when multiple image uploads are supported.
 
-- As a **viewer in chat**, I must **never** see a blocked photo appear in the thread.
-- As a **viewer in chat**, clean uploads must still appear **in real time** via sockets
+---
+
+## Real-Time & Group Chat Consistency
+
+- As a **one-to-one chat member**, clean image messages must appear for both participants.
+- As a **group chat member**, clean image messages must appear for all current group members.
+- As a **new group member**, if product policy allows full history visibility, previously accepted images in history must be visible.
+- As a **removed group member**, I must not receive or fetch future chat image messages.
+- As a **non-member**, I must not access chat image URLs by guessing or reusing direct S3 links.
+
+---
+
+## Cookie Consent
+
+- As a **user who rejected cookies**, I must not be able to access chat image upload flows.
+- As a **user who rejected cookies**, deep-linked chat pages must be blocked before upload controls are usable.
+- As a **user who later accepts cookies**, chat image upload flows should work again after refresh/session recovery.
+
+---
+
+## Security & Privacy
+
+- As a **system**, upload and moderation endpoints must require a valid authenticated app session.
+- As a **system**, chat membership must be checked server-side before accepting uploads.
+- As a **system**, moderation decisions should be logged with labels, confidence, user ID, chat ID, and timestamp.
+- As a **system**, blocked image bytes must not be retained in logs.
+- As a **system**, secure/presigned URLs must only be issued to authorized chat members.
+
+---
+
+## QA Scenarios
+
+- Clean image in one-to-one chat passes and broadcasts.
+- Clean image in group chat passes and broadcasts to all members.
+- Explicit/nudity sample is blocked and never broadcasts.
+- Suggestive borderline sample below threshold follows product policy.
+- Unsupported MIME type is rejected before moderation.
+- Oversized image is rejected before or during upload according to backend limits.
+- Rekognition timeout/error fails closed.
+- Network disconnect during upload shows error and leaves the chat usable.
+- Removed/non-member user cannot fetch a previously shared chat image.
