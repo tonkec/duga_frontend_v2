@@ -153,7 +153,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="bg-[#f7f8ff] text-gray-900">
+    <div className="landing-page bg-[#f7f8ff] text-gray-900">
       <header className="gradient relative overflow-hidden">
         <CookieBanner />
         <nav className="fixed left-0 right-0 top-0 z-50 flex w-full items-center justify-between bg-blue-dark/85 px-5 py-4 shadow-lg shadow-blue-dark/10 backdrop-blur-md md:bg-blue-dark/20 md:px-8">
@@ -429,7 +429,7 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <section className="px-5 py-20 md:px-8">
+        <section className="landing-pricing-section px-5 py-20 md:px-8">
           <div className="container mx-auto grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Cijena</p>
@@ -441,7 +441,7 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <div className="max-w-xl rounded-[2rem] bg-white p-7 shadow-xl ring-1 ring-blue/10 md:p-9">
+            <div className="landing-pricing-card max-w-xl rounded-[2rem] bg-white p-7 shadow-xl ring-1 ring-blue/10 md:p-9">
               <div className="flex items-start justify-between gap-6">
                 <div>
                   <h3 className="text-3xl font-black text-blue-dark">Besplatni plan</h3>
@@ -475,7 +475,7 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <section className="bg-white px-5 py-20 md:px-8">
+        <section className="landing-faq-section bg-white px-5 py-20 md:px-8">
           <div className="container mx-auto max-w-4xl">
             <div className="mb-10 text-center">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">FAQ</p>
@@ -484,7 +484,7 @@ const LoginPage = () => {
               </h2>
             </div>
 
-            <div className="rounded-[2rem] border border-blue/10 bg-[#f7f8ff] p-5 shadow-sm md:p-8">
+            <div className="landing-faq-panel rounded-[2rem] border border-blue/10 bg-[#f7f8ff] p-5 shadow-sm md:p-8">
               <Accordion items={faqItems} />
             </div>
           </div>

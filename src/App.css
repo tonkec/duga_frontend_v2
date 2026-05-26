@@ -306,6 +306,38 @@ select:disabled {
   color: var(--duga-dark-base) !important;
 }
 
+[data-theme='dark'] .landing-page,
+[data-theme='dark'] .landing-pricing-section,
+[data-theme='dark'] .landing-faq-section {
+  background-color: var(--duga-dark-base) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .landing-pricing-card,
+[data-theme='dark'] .landing-faq-panel {
+  background-color: var(--duga-dark-surface) !important;
+  border-color: var(--duga-dark-border) !important;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35) !important;
+}
+
+[data-theme='dark'] .landing-pricing-card .text-gray-600,
+[data-theme='dark'] .landing-pricing-card .text-gray-700,
+[data-theme='dark'] .landing-faq-panel .text-gray-600,
+[data-theme='dark'] .landing-faq-panel .text-gray-800,
+[data-theme='dark'] .landing-pricing-section .text-gray-600 {
+  color: var(--duga-dark-muted) !important;
+}
+
+[data-theme='dark'] .landing-pricing-card .text-blue-dark,
+[data-theme='dark'] .landing-pricing-section .text-blue-dark,
+[data-theme='dark'] .landing-faq-section .text-blue-dark {
+  color: var(--duga-dark-accent) !important;
+}
+
+[data-theme='dark'] .landing-faq-panel .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--duga-dark-border) !important;
+}
+
 [data-theme='dark'] .profile-lifestyle-card {
   background-color: var(--duga-dark-base) !important;
   border-color: var(--duga-dark-border) !important;
