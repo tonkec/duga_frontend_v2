@@ -9,7 +9,7 @@ import { IChat } from '@app/pages/NewChatPage/hooks';
 import { IUser } from '@app/components/UserCard';
 import { useSocket } from '@app/context/useSocket';
 import data from '@emoji-mart/data';
-import { SyntheticEvent, useState, useRef, useEffect, useCallback } from 'react';
+import { SyntheticEvent, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { init } from 'emoji-mart';
 import EmojiPicker from '@app/components/EmojiPicker';
 import { debounce } from 'lodash';
@@ -83,6 +83,7 @@ const schema = z
 interface ISendMessageProps {
   chatId: string;
   otherUserId: number | undefined | null;
+  otherUserIds?: number[];
 }
 
 interface INotification {
@@ -97,7 +98,7 @@ export const getMessageImagePath = (chatId: string, timestamp: string, fileName:
   return `chat/${chatId}/${timestamp}/${cleanedName}`;
 };
 
-const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
+const SendMessage = ({ chatId, otherUserId, otherUserIds }: ISendMessageProps) => {
   init({ data });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -112,6 +113,15 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const currentUserId = currentUser?.data?.id;
   const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
+  const recipientIds = useMemo(
+    () =>
+      otherUserIds?.length && otherUserIds.length > 0
+        ? otherUserIds
+        : chat?.Users?.filter((user: IUser) => !!user?.id && user.id !== Number(currentUserId)).map(
+            (user: IUser) => user.id
+          ) || (otherUserId ? [otherUserId] : []),
+    [chat?.Users, currentUserId, otherUserId, otherUserIds]
+  );
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const currentUploadableImageRef = useRef<File[] | null>(null);
   const [imageTimestamp, setImageTimestamp] = useState('');
@@ -122,22 +132,22 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   const { allUserImages } = useGetAllUserImages();
 
   const emitStopTyping = useCallback(() => {
-    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
     socket.emit('stop-typing', {
       chatId,
       userId: currentUserId,
-      toUserId: [otherUserId],
+      toUserId: recipientIds,
     });
-  }, [socket, currentUserId, otherUserId, chatId]);
+  }, [socket, currentUserId, recipientIds, chatId]);
 
   const emitTyping = useCallback(() => {
-    if (!socket || !currentUserId || !otherUserId || !chatId) return;
+    if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
     socket.emit('typing', {
       chatId,
       userId: currentUserId,
-      toUserId: [otherUserId],
+      toUserId: recipientIds,
     });
-  }, [socket, currentUserId, otherUserId, chatId]);
+  }, [socket, currentUserId, recipientIds, chatId]);
 
   useEffect(() => {
     return () => {
@@ -150,7 +160,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
       type: 'gif',
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
-      toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+      toUserId: recipientIds,
       chatId,
       messagePhotoUrl: gifUrl,
     };
@@ -183,7 +193,7 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
           type: 'file',
           fromUserId: currentUserId,
           fromUser: currentUser?.data,
-          toUserId: chat.Users && chat.Users.map((user: IUser) => user.id),
+          toUserId: recipientIds,
           chatId,
           messagePhotoUrl: getMessageImagePath(chatId, imageTimestamp, file.name),
           message: null,
@@ -236,20 +246,16 @@ const SendMessage = ({ chatId, otherUserId }: ISendMessageProps) => {
   };
 
   const onMessageSubmit = (data: Inputs) => {
-    const toUserId = chat.Users?.filter(
-      (user: IUser) => !!user?.id && user.id !== Number(currentUserId)
-    ).map((user: IUser) => user.id);
-
     const msg = {
       type: 'text',
       fromUserId: currentUserId,
       fromUser: currentUser?.data,
-      toUserId,
+      toUserId: recipientIds,
       chatId,
       message: data.content,
     };
 
-    if (toUserId?.length) {
+    if (recipientIds.length) {
       socket?.emit('message', msg);
       refreshUserChatsList();
     }

@@ -12,6 +12,8 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { IChat, useCreateNewChat } from '@app/pages/NewChatPage/hooks';
 import { hasAlreadyChatted } from '@app/components/SendMessageButton/utils/hasAlreadyChatted';
+import { useSocket } from '@app/context/useSocket';
+import { setStoredGroupChatAdmin } from '@app/utils/chatMemberStorage';
 
 Modal.setAppElement('#root');
 
@@ -40,7 +42,9 @@ const modalStyles = {
 };
 
 const getChatWithOtherUser = (userChats: IChat[] | undefined, partnerId: number) =>
-  userChats?.find((chat) => chat.Users[0].id === partnerId);
+  userChats?.find(
+    (chat) => chat.type !== 'group' && chat.Users.some((user) => user.id === partnerId)
+  );
 
 interface INewMessageModalProps {
   isOpen: boolean;
@@ -49,7 +53,11 @@ interface INewMessageModalProps {
 
 const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
   const [search, setSearch] = useState('');
+  const [isGroupMode, setIsGroupMode] = useState(false);
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [groupName, setGroupName] = useState('');
   const navigate = useNavigate();
+  const socket = useSocket();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const { userChats, isUserChatsLoading } = useGetAllUserChats(isOpen);
@@ -71,11 +79,41 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
 
   const handleClose = () => {
     setSearch('');
+    setSelectedUserIds([]);
+    setGroupName('');
+    setIsGroupMode(false);
     onClose();
+  };
+
+  const emitGroupCreated = (data: IChat | IChat[]) => {
+    const chat = Array.isArray(data) ? data[0] : data;
+    if (chat.type !== 'group') return;
+
+    if (currentUserId) {
+      setStoredGroupChatAdmin(String(chat.id), Number(currentUserId));
+    }
+
+    if (!socket) return;
+
+    chat.Users.filter((user) => user.id !== Number(currentUserId)).forEach((newChatter) => {
+      socket.emit('add-user-to-group', {
+        chat,
+        newChatter,
+      });
+    });
   };
 
   const handleSelectUser = (partnerId: number) => {
     if (isCreatingChat) return;
+
+    if (isGroupMode) {
+      setSelectedUserIds((currentIds) =>
+        currentIds.includes(partnerId)
+          ? currentIds.filter((id) => id !== partnerId)
+          : [...currentIds, partnerId]
+      );
+      return;
+    }
 
     const existingChat = getChatWithOtherUser(userChats?.data, partnerId);
 
@@ -89,7 +127,23 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
     handleClose();
   };
 
+  const handleCreateGroup = () => {
+    const trimmedName = groupName.trim();
+    if (isCreatingChat || selectedUserIds.length < 2 || !trimmedName) return;
+
+    onCreateChat(
+      { userIds: selectedUserIds, name: trimmedName },
+      {
+        onSuccess: (data) => {
+          emitGroupCreated(data);
+          handleClose();
+        },
+      }
+    );
+  };
+
   const isLoading = isAllUsersLoading || isUserLoading || (isOpen && isUserChatsLoading);
+  const canCreateGroup = isGroupMode && selectedUserIds.length >= 2 && groupName.trim().length > 0;
 
   return (
     <Modal
@@ -105,9 +159,13 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
               <span className="mb-2 inline-flex rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
                 Nova poruka
               </span>
-              <h2 className="text-2xl font-bold tracking-tight text-gray-950">Pronađi korisnika</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-950">
+                {isGroupMode ? 'Nova grupa' : 'Pronađi korisnika'}
+              </h2>
               <p className="mt-1 text-sm leading-6 text-gray-600">
-                Pretraži verificirane korisnike i započni razgovor.
+                {isGroupMode
+                  ? 'Odaberi barem dvije osobe i dodaj naziv grupnog razgovora.'
+                  : 'Pretraži verificirane korisnike i započni razgovor.'}
               </p>
             </div>
             <button
@@ -122,6 +180,41 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
         </div>
 
         <div className="flex flex-1 flex-col gap-4 px-5 py-5 sm:px-6">
+          <div className="grid grid-cols-2 gap-2 rounded-2xl bg-[#f7f9ff] p-1">
+            <button
+              type="button"
+              onClick={() => {
+                setIsGroupMode(false);
+                setSelectedUserIds([]);
+                setGroupName('');
+              }}
+              className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+                !isGroupMode ? 'bg-white text-blue-dark shadow-sm' : 'text-gray-500'
+              }`}
+            >
+              1 na 1
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsGroupMode(true)}
+              className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+                isGroupMode ? 'bg-white text-blue-dark shadow-sm' : 'text-gray-500'
+              }`}
+            >
+              Grupa
+            </button>
+          </div>
+
+          {isGroupMode && (
+            <Input
+              type="text"
+              placeholder="Naziv grupe"
+              value={groupName}
+              onChange={(e) => setGroupName(e.currentTarget.value)}
+              className="w-full rounded-xl border-[#dce4ff] bg-[#f7f9ff] py-3"
+            />
+          )}
+
           <Input
             type="text"
             placeholder="Pretraži po korisničkom imenu..."
@@ -150,9 +243,14 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
                   <button
                     type="button"
                     role="option"
+                    aria-selected={selectedUserIds.includes(user.id)}
                     disabled={isCreatingChat}
                     onClick={() => handleSelectUser(user.id)}
-                    className="group flex w-full items-center gap-3 rounded-2xl border border-transparent bg-white px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:opacity-50"
+                    className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:opacity-50 ${
+                      selectedUserIds.includes(user.id)
+                        ? 'border-blue bg-blue/10'
+                        : 'border-transparent bg-white'
+                    }`}
                   >
                     <UserAvatar
                       color="#2D46B9"
@@ -164,16 +262,29 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
                       <span className="block truncate font-semibold text-gray-950">
                         {user.username}
                       </span>
-                      <span className="text-xs text-gray-500">Klikni za početak razgovora</span>
+                      <span className="text-xs text-gray-500">
+                        {isGroupMode ? 'Klikni za odabir u grupu' : 'Klikni za početak razgovora'}
+                      </span>
                     </div>
                     <span className="rounded-full bg-blue/10 px-3 py-1 text-xs font-semibold text-blue-dark opacity-0 transition-opacity group-hover:opacity-100">
-                      Odaberi
+                      {selectedUserIds.includes(user.id) ? 'Odabrano' : 'Odaberi'}
                     </span>
                   </button>
                 </li>
               ))
             )}
           </ul>
+
+          {isGroupMode && (
+            <Button
+              type="blue"
+              className="w-full rounded-full py-3"
+              onClick={handleCreateGroup}
+              disabled={!canCreateGroup || isCreatingChat}
+            >
+              Kreiraj grupu
+            </Button>
+          )}
 
           <Button type="black" className="w-full rounded-full py-3" onClick={handleClose}>
             Odustani

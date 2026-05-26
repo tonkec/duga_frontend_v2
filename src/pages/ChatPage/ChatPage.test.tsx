@@ -6,7 +6,12 @@ import ChatPage from '.';
 import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useSocket } from '../../context/useSocket';
-import { useDeleteCurrentChat, useGetAllMessages, useGetCurrentChat } from './hooks';
+import {
+  useDeleteCurrentChat,
+  useGetAllMessages,
+  useGetCurrentChat,
+  useLeaveCurrentChat,
+} from './hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('@app/components/AppLayout', () => ({
@@ -45,12 +50,27 @@ jest.mock('@app/pages/ChatPage/components/SendMessage', () => ({
   default: () => <div data-testid="send-message">Send message form</div>,
 }));
 
+jest.mock('@app/pages/ChatPage/components/AddChatMembersModal', () => ({
+  __esModule: true,
+  default: () => <div data-testid="add-chat-members-modal">Add members modal</div>,
+}));
+
 jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
 }));
 
 jest.mock('@app/hooks/useGetUserById', () => ({
   useGetUserById: jest.fn(),
+}));
+
+jest.mock('@app/hooks/useGetAllUsers', () => ({
+  useGetAllUsers: () => ({
+    allUsers: {
+      data: [],
+    },
+    allUsersError: null,
+    isAllUsersLoading: false,
+  }),
 }));
 
 jest.mock('@app/context/useSocket', () => ({
@@ -61,18 +81,21 @@ jest.mock('./hooks', () => ({
   useDeleteCurrentChat: jest.fn(),
   useGetAllMessages: jest.fn(),
   useGetCurrentChat: jest.fn(),
+  useLeaveCurrentChat: jest.fn(),
 }));
 
 jest.mock('@app/pages/ChatPage/hooks', () => ({
   useDeleteCurrentChat: jest.fn(),
   useGetAllMessages: jest.fn(),
   useGetCurrentChat: jest.fn(),
+  useLeaveCurrentChat: jest.fn(),
 }));
 
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
 const mockUseGetUserById = jest.mocked(useGetUserById);
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseDeleteCurrentChat = jest.mocked(useDeleteCurrentChat);
+const mockUseLeaveCurrentChat = jest.mocked(useLeaveCurrentChat);
 const mockUseGetAllMessages = jest.mocked(useGetAllMessages);
 const mockUseGetCurrentChat = jest.mocked(useGetCurrentChat);
 const socketHandlers = new Map<string, (payload: unknown) => void>();
@@ -175,6 +198,12 @@ describe('ChatPage integration', () => {
       isDeleteChatError: false,
       isDeleteChatSuccess: false,
     } as ReturnType<typeof useDeleteCurrentChat>);
+    mockUseLeaveCurrentChat.mockReturnValue({
+      leaveChat: jest.fn(),
+      isLeavingChat: false,
+      isLeaveChatError: false,
+      isLeaveChatSuccess: false,
+    } as ReturnType<typeof useLeaveCurrentChat>);
   });
 
   it('opens a chat and renders existing messages', () => {

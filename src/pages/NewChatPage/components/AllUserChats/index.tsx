@@ -6,6 +6,7 @@ import NewMessageModal from '@app/pages/NewChatPage/components/NewMessageModal';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
 import Card from '@app/components/Card';
 import Button from '@app/components/Button';
+import { mergeStoredChatMembers } from '@app/utils/chatMemberStorage';
 
 export interface IChat {
   id: number;
@@ -13,6 +14,7 @@ export interface IChat {
   Users: IUser[];
   createdAt: string;
   type: string;
+  name?: string;
   ChatUser: {
     userId: string;
     chatId: number;
@@ -41,6 +43,23 @@ const getChatSortTime = (chat: IChat) => {
 };
 
 const getChatId = (chat: IChat) => chat.id ?? chat.ChatUser?.chatId;
+const getChatUsers = (chat: IChat) => {
+  const chatId = getChatId(chat);
+  return chatId ? mergeStoredChatMembers(String(chatId), chat.Users) : chat.Users;
+};
+const isGroupChat = (chat: IChat) => chat.type === 'group' || getChatUsers(chat).length > 1;
+const getChatTitle = (chat: IChat) =>
+  isGroupChat(chat)
+    ? chat.name || 'Grupni razgovor'
+    : getChatUsers(chat)[0]?.username || 'Razgovor';
+const getChatMemberNames = (chat: IChat) =>
+  Array.from(
+    new Set(
+      getChatUsers(chat)
+        .map((user) => user.username)
+        .filter((username): username is string => Boolean(username))
+    )
+  );
 
 const AllUserChats = ({ userChats }: IAllUserChats) => {
   const navigate = useNavigate();
@@ -80,10 +99,15 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
         <ul role="list">
           {sortedChats.map((chat, index) => {
             const chatId = getChatId(chat);
+            const chatUsers = getChatUsers(chat);
             return (
               <li key={chatId}>
                 <UserChat
-                  user={chat.Users[0]}
+                  user={chatUsers[0] as IUser}
+                  title={getChatTitle(chat)}
+                  participantNames={getChatMemberNames(chat)}
+                  isGroup={isGroupChat(chat)}
+                  participantCount={chatUsers.length}
                   onClick={() => {
                     if (chatId) navigate(`/chat/${chatId}`);
                   }}

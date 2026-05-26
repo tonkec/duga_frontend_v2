@@ -3,10 +3,16 @@ import AppLayout from '@app/components/AppLayout';
 import Loader from '@app/components/Loader';
 import Card from '@app/components/Card';
 import SendMessage from './components/SendMessage';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import AddChatMembersModal from './components/AddChatMembersModal';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ChatGuard from './components/ChatGuard';
 import PaginatedMessages from './components/PaginatedMessages';
-import { useDeleteCurrentChat, useGetAllMessages, useGetCurrentChat } from './hooks';
+import {
+  useDeleteCurrentChat,
+  useGetAllMessages,
+  useGetCurrentChat,
+  useLeaveCurrentChat,
+} from './hooks';
 import { getOtherUser } from './utils/getOtherUser';
 import { useGetUserById } from '@app/hooks/useGetUserById';
 import Button from '@app/components/Button';
@@ -19,15 +25,55 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useQueryClient } from '@tanstack/react-query';
+import { IUser } from '@app/components/UserCard';
+import { BiGroup } from 'react-icons/bi';
+import {
+  addStoredAdditionalChatMembers,
+  getStoredGroupChatAdminId,
+  mergeChatMembers,
+  mergeStoredChatMembers,
+  removeStoredGroupChatAdmin,
+  removeStoredChatMember,
+  removeStoredChatMembers,
+  setStoredGroupChatAdmin,
+} from '@app/utils/chatMemberStorage';
 
 interface ITypingData {
   userId: number;
+}
+
+interface IChatParticipant {
+  id?: number;
+  userId?: number;
+  username?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  role?: string;
+  ChatUser?: {
+    role?: string;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+}
+
+interface IChatDetails {
+  id?: number;
+  type?: string;
+  name?: string;
+  Users?: IChatParticipant[];
 }
 
 interface IDeleteChatModalProps {
   setIsDeleteModalVisible: (value: boolean) => void;
   onDeleteChat: () => void;
   isDeleteModalVisible: boolean;
+}
+
+interface ILeaveChatModalProps {
+  setIsLeaveModalVisible: (value: boolean) => void;
+  onLeaveChat: () => void;
+  isLeaveModalVisible: boolean;
+  isLeavingChat: boolean;
 }
 
 type MessagesQueryData = {
@@ -192,6 +238,212 @@ const updateMessageInQueryData = (
   };
 };
 
+const getCurrentChatUsers = (chatData: IChatDetails | IChatParticipant[] | undefined) => {
+  if (Array.isArray(chatData)) {
+    return chatData.map((user) => ({
+      ...user,
+      id: user.id ?? user.userId,
+    }));
+  }
+
+  return (
+    chatData?.Users?.map((user) => ({
+      ...user,
+      id: user.id ?? user.userId,
+    })) ?? []
+  );
+};
+
+const getChatTitle = ({
+  isGroup,
+  chat,
+  otherUserName,
+  otherMembers,
+}: {
+  isGroup: boolean;
+  chat: IChatDetails | undefined;
+  otherUserName: string | undefined;
+  otherMembers: IChatParticipant[];
+}) => {
+  if (!isGroup) return otherUserName || 'Razgovor';
+  return (
+    chat?.name ||
+    otherMembers
+      .map((user) => user.username)
+      .filter(Boolean)
+      .join(', ') ||
+    'Grupa'
+  );
+};
+
+const getMemberJoinedAt = (member: IChatParticipant) => {
+  const timestamp =
+    member.ChatUser?.createdAt ??
+    member.createdAt ??
+    member.ChatUser?.updatedAt ??
+    member.updatedAt;
+  const joinedAt = timestamp ? new Date(timestamp).getTime() : Number.NaN;
+  return Number.isFinite(joinedAt) ? joinedAt : undefined;
+};
+
+const getOldestMemberUserId = (members: IChatParticipant[]) => {
+  const oldestMember = members
+    .map((member, index) => ({
+      member,
+      index,
+      joinedAt: getMemberJoinedAt(member),
+    }))
+    .sort((a, b) => {
+      if (a.joinedAt !== undefined && b.joinedAt !== undefined) return a.joinedAt - b.joinedAt;
+      if (a.joinedAt !== undefined) return -1;
+      if (b.joinedAt !== undefined) return 1;
+      return a.index - b.index;
+    })[0]?.member;
+
+  const userId = Number(oldestMember?.id ?? oldestMember?.userId);
+  return Number.isFinite(userId) ? userId : undefined;
+};
+
+const getNextAdminUserId = (members: IChatParticipant[], removedUserId: number) =>
+  getOldestMemberUserId(
+    members.filter((member) => Number(member.id ?? member.userId) !== Number(removedUserId))
+  );
+
+const getAdminUserIdFromMembers = (members: IChatParticipant[]) => {
+  const adminUserId = members.find(
+    (member) => member.role === 'admin' || member.ChatUser?.role === 'admin'
+  )?.id;
+
+  if (adminUserId !== undefined) return adminUserId;
+
+  return getOldestMemberUserId(members);
+};
+
+const addUsersToChatData = (chatData: unknown, chatId: string, usersToAdd: IUser[]): unknown => {
+  if (Array.isArray(chatData)) {
+    return mergeChatMembers(chatData as IChatParticipant[], usersToAdd);
+  }
+
+  if (!isRecord(chatData)) return chatData;
+
+  return {
+    ...chatData,
+    id: chatData.id ?? Number(chatId),
+    type: 'group',
+    Users: mergeChatMembers(
+      Array.isArray(chatData.Users) ? (chatData.Users as IChatParticipant[]) : [],
+      usersToAdd
+    ),
+  };
+};
+
+const addUsersToChatCollection = (
+  collectionData: unknown,
+  chatId: string,
+  usersToAdd: IUser[]
+): unknown => {
+  if (Array.isArray(collectionData)) {
+    return collectionData.map((chat) => {
+      if (!isRecord(chat)) return chat;
+      const currentChatId = Number(
+        chat.id ?? (isRecord(chat.ChatUser) ? chat.ChatUser.chatId : undefined)
+      );
+
+      return currentChatId === Number(chatId) ? addUsersToChatData(chat, chatId, usersToAdd) : chat;
+    });
+  }
+
+  if (!isRecord(collectionData)) return collectionData;
+
+  return ['data', 'chats', 'Chats'].reduce<Record<string, unknown>>((nextData, key) => {
+    if (!Array.isArray(nextData[key])) return nextData;
+
+    return {
+      ...nextData,
+      [key]: addUsersToChatCollection(nextData[key], chatId, usersToAdd),
+    };
+  }, collectionData);
+};
+
+const addUsersToQueryResponseData = (
+  queryData: unknown,
+  updateData: (data: unknown) => unknown
+): unknown => {
+  if (!isRecord(queryData)) return queryData;
+
+  return {
+    ...queryData,
+    data: updateData(queryData.data),
+  };
+};
+
+const removeUserFromChatData = (chatData: unknown, userId: number): unknown => {
+  if (Array.isArray(chatData)) {
+    return chatData.filter((user) => Number(user.id ?? user.userId) !== Number(userId));
+  }
+
+  if (!isRecord(chatData)) return chatData;
+
+  return {
+    ...chatData,
+    Users: Array.isArray(chatData.Users)
+      ? chatData.Users.filter((user) => Number(user.id ?? user.userId) !== Number(userId))
+      : chatData.Users,
+  };
+};
+
+const removeChatFromCollection = (collectionData: unknown, chatId: string): unknown => {
+  if (Array.isArray(collectionData)) {
+    return collectionData.filter((chat) => {
+      if (!isRecord(chat)) return true;
+      const currentChatId = Number(
+        chat.id ?? (isRecord(chat.ChatUser) ? chat.ChatUser.chatId : undefined)
+      );
+
+      return currentChatId !== Number(chatId);
+    });
+  }
+
+  if (!isRecord(collectionData)) return collectionData;
+
+  return ['data', 'chats', 'Chats'].reduce<Record<string, unknown>>((nextData, key) => {
+    if (!Array.isArray(nextData[key])) return nextData;
+
+    return {
+      ...nextData,
+      [key]: removeChatFromCollection(nextData[key], chatId),
+    };
+  }, collectionData);
+};
+
+const removeUserFromChatCollection = (
+  collectionData: unknown,
+  chatId: string,
+  userId: number
+): unknown => {
+  if (Array.isArray(collectionData)) {
+    return collectionData.map((chat) => {
+      if (!isRecord(chat)) return chat;
+      const currentChatId = Number(
+        chat.id ?? (isRecord(chat.ChatUser) ? chat.ChatUser.chatId : undefined)
+      );
+
+      return currentChatId === Number(chatId) ? removeUserFromChatData(chat, userId) : chat;
+    });
+  }
+
+  if (!isRecord(collectionData)) return collectionData;
+
+  return ['data', 'chats', 'Chats'].reduce<Record<string, unknown>>((nextData, key) => {
+    if (!Array.isArray(nextData[key])) return nextData;
+
+    return {
+      ...nextData,
+      [key]: removeUserFromChatCollection(nextData[key], chatId, userId),
+    };
+  }, collectionData);
+};
+
 const DeleteChatModal = ({
   setIsDeleteModalVisible,
   onDeleteChat,
@@ -209,9 +461,31 @@ const DeleteChatModal = ({
   );
 };
 
+const LeaveChatModal = ({
+  setIsLeaveModalVisible,
+  onLeaveChat,
+  isLeaveModalVisible,
+  isLeavingChat,
+}: ILeaveChatModalProps) => {
+  return (
+    <ConfirmModal
+      isOpen={isLeaveModalVisible}
+      onConfirm={onLeaveChat}
+      onClose={() => setIsLeaveModalVisible(false)}
+    >
+      <h2 className="text-xl text-center">Želiš li izaći iz ovog grupnog razgovora?</h2>
+      <p className="text-center">
+        {isLeavingChat ? 'Izlazak iz razgovora...' : 'Razgovor će biti maknut iz tvoje liste.'}
+      </p>
+    </ConfirmModal>
+  );
+};
+
 const ChatPage = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
+  const [isAddMembersModalOpen, setIsAddMembersModalOpen] = useState(false);
   const deletedBySelfRef = useRef(false);
   const socket = useSocket();
   const navigate = useNavigate();
@@ -225,12 +499,61 @@ const ChatPage = () => {
   );
   const { messages, fetchNextPage } = useGetAllMessages(chatId as string);
   const hasMessages = messages.length + receivedMessages.length > 0;
-  const otherUserId = getOtherUser(currentChat?.data, currentUserId as string)?.userId;
+  const currentChatData = currentChat?.data as IChatDetails | IChatParticipant[] | undefined;
+  const backendChatUsers = useMemo(() => getCurrentChatUsers(currentChatData), [currentChatData]);
+  const chatUsers = useMemo(
+    () => (chatId ? mergeStoredChatMembers(chatId, backendChatUsers) : backendChatUsers),
+    [backendChatUsers, chatId]
+  );
+  const otherMembers = useMemo(
+    () => chatUsers.filter((user) => Number(user.id) !== Number(currentUserId)),
+    [chatUsers, currentUserId]
+  );
+  const otherMemberIds = useMemo(
+    () => otherMembers.map((user) => Number(user.id)).filter((userId) => Number.isFinite(userId)),
+    [otherMembers]
+  );
+  const memberIds = useMemo(
+    () => chatUsers.map((user) => Number(user.id)).filter((userId) => Number.isFinite(userId)),
+    [chatUsers]
+  );
+  const fallbackOtherUserId = getOtherUser(
+    chatUsers.map((user) => ({ userId: Number(user.id) })),
+    currentUserId as string
+  )?.userId;
+  const otherUserId = otherMemberIds[0] ?? fallbackOtherUserId;
+  const isGroupChat =
+    !Array.isArray(currentChatData) && (currentChatData?.type === 'group' || chatUsers.length > 1);
+  const groupAdminUserId =
+    (chatId ? getStoredGroupChatAdminId(chatId) : undefined) ??
+    getAdminUserIdFromMembers(chatUsers);
+  const isCurrentUserGroupAdmin =
+    Boolean(isGroupChat) &&
+    groupAdminUserId !== undefined &&
+    Number(groupAdminUserId) === Number(currentUserId);
   const { deleteChat } = useDeleteCurrentChat(socket);
+  const { leaveChat, isLeavingChat } = useLeaveCurrentChat();
 
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
   const otherUserName = otherUser?.data.username;
+  const chatTitle = getChatTitle({
+    isGroup: Boolean(isGroupChat),
+    chat: !Array.isArray(currentChatData) ? currentChatData : undefined,
+    otherUserName,
+    otherMembers,
+  });
   const currentUserName = currentUser?.data.username;
+  const chatMemberNames = useMemo(() => {
+    const names = chatUsers.map((user) => {
+      const userId = Number(user.id);
+      if (user.username) return user.username;
+      if (userId === Number(currentUserId) && currentUserName) return currentUserName;
+      if (userId === Number(otherUserId) && otherUserName) return otherUserName;
+      return `Korisnik #${userId}`;
+    });
+
+    return Array.from(new Set(names));
+  }, [chatUsers, currentUserId, currentUserName, otherUserId, otherUserName]);
 
   const [isOnlineState, setIsOnlineState] = useState<boolean>(otherUser?.data?.status === 'online');
 
@@ -247,6 +570,130 @@ const ChatPage = () => {
       );
     },
     [chatId, queryClient]
+  );
+
+  const applyUserRemovedFromChat = useCallback(
+    ({
+      removedChatId,
+      removedUserId,
+      eventCurrentUserId,
+      newAdminUserId,
+      showCurrentUserToast = false,
+    }: {
+      removedChatId: string;
+      removedUserId: number;
+      eventCurrentUserId?: number;
+      newAdminUserId?: number;
+      showCurrentUserToast?: boolean;
+    }) => {
+      if (!removedChatId) return;
+      const isCurrentUserLeaving =
+        Number(eventCurrentUserId ?? removedUserId) === Number(currentUserId);
+      const isRemovedUserAdmin = Number(removedUserId) === Number(groupAdminUserId);
+      const nextAdminUserId =
+        newAdminUserId ??
+        (isRemovedUserAdmin ? getNextAdminUserId(chatUsers, removedUserId) : undefined);
+
+      if (isCurrentUserLeaving) {
+        removeStoredChatMembers(removedChatId);
+        removeStoredGroupChatAdmin(removedChatId);
+        queryClient.removeQueries({ queryKey: ['chat', removedChatId] });
+        queryClient.removeQueries({ queryKey: ['messages', removedChatId] });
+        queryClient.setQueryData(['userChats'], (data) =>
+          addUsersToQueryResponseData(data, (userChatsData) =>
+            removeChatFromCollection(userChatsData, removedChatId)
+          )
+        );
+        if (showCurrentUserToast) {
+          toast.success('Izašao_la si iz razgovora.', toastConfig);
+        }
+        navigate('/new-chat', { replace: true });
+        return;
+      }
+
+      removeStoredChatMember(removedChatId, removedUserId);
+      if (nextAdminUserId !== undefined) {
+        setStoredGroupChatAdmin(removedChatId, Number(nextAdminUserId));
+      }
+      queryClient.setQueryData(['chat', removedChatId], (data) =>
+        addUsersToQueryResponseData(data, (chatData) =>
+          removeUserFromChatData(chatData, removedUserId)
+        )
+      );
+      queryClient.setQueryData(['userChats'], (data) =>
+        addUsersToQueryResponseData(data, (userChatsData) =>
+          removeUserFromChatCollection(userChatsData, removedChatId, removedUserId)
+        )
+      );
+    },
+    [chatUsers, currentUserId, groupAdminUserId, navigate, queryClient]
+  );
+
+  const handleLeaveChat = useCallback(() => {
+    if (!chatId || !currentUserId) return;
+
+    leaveChat(
+      { chatId },
+      {
+        onSuccess: (response) => {
+          const payload = response.data;
+          if (payload.newAdminUserId !== undefined) {
+            setStoredGroupChatAdmin(String(payload.chatId), Number(payload.newAdminUserId));
+          }
+          applyUserRemovedFromChat({
+            removedChatId: String(payload.chatId),
+            removedUserId: Number(payload.userId),
+            eventCurrentUserId: Number(payload.userId),
+            newAdminUserId: payload.newAdminUserId,
+            showCurrentUserToast: true,
+          });
+        },
+      }
+    );
+    setIsLeaveModalVisible(false);
+  }, [applyUserRemovedFromChat, chatId, currentUserId, leaveChat]);
+
+  const handleAddMembers = useCallback(
+    (users: IUser[]) => {
+      if (!socket || !chatId || !users.length) return;
+
+      const chatForSocket = Array.isArray(currentChatData)
+        ? {
+            id: Number(chatId),
+            type: 'group',
+            name: chatTitle,
+            Users: chatUsers,
+          }
+        : {
+            ...currentChatData,
+            id: currentChatData?.id ?? Number(chatId),
+            type: 'group',
+            name: currentChatData?.name || chatTitle,
+          };
+      const nextUsers = [...chatUsers, ...users];
+
+      users.forEach((newChatter) => {
+        socket.emit('add-user-to-group', {
+          chat: {
+            ...chatForSocket,
+            Users: nextUsers,
+          },
+          newChatter,
+        });
+      });
+
+      addStoredAdditionalChatMembers(chatId, users);
+      queryClient.setQueryData(['chat', chatId], (data) =>
+        addUsersToQueryResponseData(data, (chatData) => addUsersToChatData(chatData, chatId, users))
+      );
+      queryClient.setQueryData(['userChats'], (data) =>
+        addUsersToQueryResponseData(data, (userChatsData) =>
+          addUsersToChatCollection(userChatsData, chatId, users)
+        )
+      );
+      toast.success('Osobe su dodane u razgovor.', toastConfig);
+    },
+    [chatId, chatTitle, chatUsers, currentChatData, queryClient, socket]
   );
 
   const handleReactionToggle = useCallback(
@@ -269,6 +716,7 @@ const ChatPage = () => {
     if (!socket) return;
 
     const handleReceived = (data: IMessage) => {
+      if (Number(data.chatId) !== Number(chatId)) return;
       setReceivedMessages((prev) => [...prev, data]);
     };
 
@@ -277,7 +725,60 @@ const ChatPage = () => {
     return () => {
       socket.off('received', handleReceived);
     };
-  }, [socket]);
+  }, [chatId, socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleRemoveUserFromChat = ({
+      chatId: removedChatId,
+      userId: removedUserId,
+      currentUserId: eventCurrentUserId,
+      newAdminUserId,
+    }: {
+      chatId: number | string;
+      userId: number;
+      currentUserId?: number;
+      newAdminUserId?: number;
+    }) => {
+      applyUserRemovedFromChat({
+        removedChatId: String(removedChatId),
+        removedUserId: Number(removedUserId),
+        eventCurrentUserId,
+        newAdminUserId,
+      });
+    };
+
+    socket.on('remove-user-from-chat', handleRemoveUserFromChat);
+
+    return () => {
+      socket.off('remove-user-from-chat', handleRemoveUserFromChat);
+    };
+  }, [applyUserRemovedFromChat, socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleMessageError = () => {
+      toast.error('Poruku nije moguće poslati. Probaj opet.', toastConfig);
+      queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+    };
+
+    const handleMessageRejected = () => {
+      toast.error('Poruka je odbijena.', toastConfig);
+      queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+    };
+
+    socket.on('message_error', handleMessageError);
+    socket.on('message_rejected', handleMessageRejected);
+
+    return () => {
+      socket.off('message_error', handleMessageError);
+      socket.off('message_rejected', handleMessageRejected);
+    };
+  }, [chatId, queryClient, socket]);
 
   useEffect(() => {
     if (!socket) return;
@@ -313,13 +814,13 @@ const ChatPage = () => {
     if (!socket) return;
 
     socket.on('typing', (data: ITypingData) => {
-      if (data.userId === Number(otherUserId)) {
+      if (otherMemberIds.includes(Number(data.userId))) {
         setIsTyping(true);
       }
     });
 
     socket.on('stop-typing', (data: ITypingData) => {
-      if (data.userId === Number(otherUserId)) {
+      if (otherMemberIds.includes(Number(data.userId))) {
         setIsTyping(false);
       }
     });
@@ -329,7 +830,7 @@ const ChatPage = () => {
       socket.off('stop-typing');
       setIsTyping(false);
     };
-  }, [socket, otherUserId]);
+  }, [socket, otherMemberIds]);
 
   useEffect(() => {
     if (!socket || !otherUserId) return;
@@ -388,6 +889,14 @@ const ChatPage = () => {
   return (
     <ChatGuard>
       <AppLayout>
+        {isAddMembersModalOpen && (
+          <AddChatMembersModal
+            isOpen={isAddMembersModalOpen}
+            memberIds={memberIds}
+            onClose={() => setIsAddMembersModalOpen(false)}
+            onAddMembers={handleAddMembers}
+          />
+        )}
         <DeleteChatModal
           isDeleteModalVisible={isDeleteModalVisible}
           setIsDeleteModalVisible={setIsDeleteModalVisible}
@@ -398,38 +907,103 @@ const ChatPage = () => {
             setIsDeleteModalVisible(false);
           }}
         />
+        <LeaveChatModal
+          isLeaveModalVisible={isLeaveModalVisible}
+          setIsLeaveModalVisible={setIsLeaveModalVisible}
+          onLeaveChat={handleLeaveChat}
+          isLeavingChat={isLeavingChat}
+        />
         <Card className="!overflow-hidden !rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
           <header className="flex items-center justify-between gap-3 border-b border-[#e8eeff] px-4 py-3">
             <button
               type="button"
-              className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-80"
-              onClick={() => navigate(`/user/${otherUserId}`)}
+              className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-80 disabled:cursor-default disabled:hover:opacity-100"
+              onClick={() => {
+                if (!isGroupChat && otherUserId) navigate(`/user/${otherUserId}`);
+              }}
+              disabled={Boolean(isGroupChat)}
             >
-              <UserAvatar
-                color="#eef3ff"
-                fgColor="#2D46B9"
-                avatarFallbackName={otherUserName ?? ''}
-                userId={String(otherUserId ?? '')}
-                className="h-11 w-11 shrink-0 rounded-full border border-[#dce4ff]"
-              />
+              {isGroupChat ? (
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dce4ff] bg-[#eef3ff] text-blue-dark">
+                  <BiGroup size={22} />
+                </span>
+              ) : (
+                <UserAvatar
+                  color="#eef3ff"
+                  fgColor="#2D46B9"
+                  avatarFallbackName={chatTitle}
+                  userId={String(otherUserId ?? '')}
+                  className="h-11 w-11 shrink-0 rounded-full border border-[#dce4ff]"
+                />
+              )}
               <div className="min-w-0">
-                <h1 className="truncate text-lg font-semibold text-gray-900">{otherUserName}</h1>
-                <p className="text-xs text-gray-500">{isOnlineState ? 'Na mreži' : 'Offline'}</p>
+                <h1 className="truncate text-lg font-semibold text-gray-900">{chatTitle}</h1>
+                <p className="text-xs text-gray-500">
+                  {isGroupChat
+                    ? `${otherMembers.length + 1} članova`
+                    : isOnlineState
+                      ? 'Na mreži'
+                      : 'Offline'}
+                </p>
               </div>
             </button>
-            {hasMessages && (
-              <Button
-                type="danger"
-                className="shrink-0 !py-1.5 !px-3 !text-xs"
-                onClick={(e) => {
-                  e?.preventDefault();
-                  setIsDeleteModalVisible(true);
-                }}
-              >
-                Izbriši
-              </Button>
-            )}
+            <div className="flex shrink-0 items-center gap-2">
+              {(!isGroupChat || isCurrentUserGroupAdmin) && (
+                <Button
+                  type="blue"
+                  className="!py-1.5 !px-3 !text-xs"
+                  onClick={(e) => {
+                    e?.preventDefault();
+                    setIsAddMembersModalOpen(true);
+                  }}
+                  disabled={!socket}
+                >
+                  Dodaj osobe
+                </Button>
+              )}
+              {isGroupChat && (
+                <Button
+                  type="danger"
+                  className="!py-1.5 !px-3 !text-xs"
+                  onClick={(e) => {
+                    e?.preventDefault();
+                    setIsLeaveModalVisible(true);
+                  }}
+                  disabled={isLeavingChat}
+                >
+                  Izađi
+                </Button>
+              )}
+              {hasMessages && (!isGroupChat || isCurrentUserGroupAdmin) && (
+                <Button
+                  type="danger"
+                  className="!py-1.5 !px-3 !text-xs"
+                  onClick={(e) => {
+                    e?.preventDefault();
+                    setIsDeleteModalVisible(true);
+                  }}
+                >
+                  Izbriši
+                </Button>
+              )}
+            </div>
           </header>
+
+          <section className="border-b border-[#e8eeff] bg-white px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
+                Članovi
+              </span>
+              {chatMemberNames.map((memberName) => (
+                <span
+                  key={memberName}
+                  className="rounded-full bg-[#f0f4ff] px-3 py-1 text-xs font-semibold text-gray-700"
+                >
+                  {memberName}
+                </span>
+              ))}
+            </div>
+          </section>
 
           <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
             <PaginatedMessages
@@ -452,7 +1026,11 @@ const ChatPage = () => {
 
           {chatId && (
             <div className="border-t border-[#e8eeff] bg-white px-4 py-3">
-              <SendMessage otherUserId={otherUserId} chatId={chatId} />
+              <SendMessage
+                otherUserId={otherUserId}
+                otherUserIds={otherMemberIds}
+                chatId={chatId}
+              />
             </div>
           )}
         </Card>

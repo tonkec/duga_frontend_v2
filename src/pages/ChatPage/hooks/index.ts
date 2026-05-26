@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { getChatMessages } from '@app/api/chatMessages';
-import { deleteCurrentChat, getCurrentChat } from '@app/api/chats';
+import { deleteCurrentChat, getCurrentChat, leaveCurrentChat } from '@app/api/chats';
 import { toastConfig } from '@app/configs/toast.config';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
@@ -74,8 +74,11 @@ export const useDeleteCurrentChat = (socket: Socket<DefaultEventsMap, DefaultEve
     isSuccess: isDeleteChatSuccess,
   } = useMutation({
     mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
-    onSuccess: (_data, { chatId: deletedChatId }) => {
-      socket?.emit('deleteChat', { chatId: deletedChatId });
+    onSuccess: (data, { chatId: deletedChatId }) => {
+      socket?.emit('deleteChat', {
+        chatId: deletedChatId,
+        users: data?.data?.users ?? data?.data,
+      });
       queryClient.removeQueries({ queryKey: ['chat', deletedChatId] });
       queryClient.removeQueries({ queryKey: ['messages', deletedChatId] });
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
@@ -88,4 +91,20 @@ export const useDeleteCurrentChat = (socket: Socket<DefaultEventsMap, DefaultEve
   });
 
   return { deleteChat, isDeletingChat, isDeleteChatError, isDeleteChatSuccess };
+};
+
+export const useLeaveCurrentChat = () => {
+  const {
+    mutate: leaveChat,
+    isPending: isLeavingChat,
+    isError: isLeaveChatError,
+    isSuccess: isLeaveChatSuccess,
+  } = useMutation({
+    mutationFn: ({ chatId }: { chatId: string }) => leaveCurrentChat(chatId),
+    onError: () => {
+      toast.error('Nije moguće izaći iz razgovora. Probaj opet.', toastConfig);
+    },
+  });
+
+  return { leaveChat, isLeavingChat, isLeaveChatError, isLeaveChatSuccess };
 };

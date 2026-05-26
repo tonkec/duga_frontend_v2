@@ -304,12 +304,10 @@ const MyProfilePage = () => {
         onSelect={handleTabSelect}
         selectedTabClassName={selectedTabClassName}
       >
-        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Moj profil</h1>
-          </div>
+        <div className="mb-5 flex flex-col items-start gap-4">
+          <h1 className="text-3xl font-bold text-gray-900">Moj profil</h1>
 
-          <label className="block lg:hidden">
+          <label className="block w-full lg:hidden">
             <span className="sr-only">Odaberi sekciju profila</span>
             <Select
               value={profileTabOptions[selectedTabIndex]}
@@ -325,7 +323,7 @@ const MyProfilePage = () => {
             />
           </label>
 
-          <TabList className="hidden w-full max-w-full flex-nowrap gap-2 overflow-x-auto rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm lg:flex lg:w-auto lg:flex-wrap">
+          <TabList className="hidden w-full max-w-full flex-nowrap justify-start gap-2 overflow-x-auto rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm lg:flex lg:flex-wrap">
             {profileTabs.map((tab) => (
               <Tab key={tab.id} className={tabClassName}>
                 {tab.tab}

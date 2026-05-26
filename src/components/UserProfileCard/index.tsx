@@ -148,10 +148,6 @@ const UserProfileCard = ({
     cityOptions.find((cityOption) => cityOption.value === user.location)?.label || 'N/A';
   const lookingForLabel = getLookingForTranslation(user.lookingFor);
   const relationshipStatusLabel = getRelationshipStatusTranslation(user.relationshipStatus);
-  const profileSummary = [
-    hasDisplayValue(locationLabel) ? locationLabel : null,
-    hasDisplayValue(user.age) ? `${user.age} godina` : null,
-  ].filter(Boolean);
   const primaryDetails = [
     {
       icon: <BiSolidMap />,
@@ -235,9 +231,6 @@ const UserProfileCard = ({
                 {isOnlineState ? 'Online' : 'Offline'}
               </span>
             </div>
-            {profileSummary.length > 0 && (
-              <p className="mt-2 text-gray-600">{profileSummary.join(', ')}</p>
-            )}
             {shouldRenderField(user.bio) && (
               <div className="mt-4 max-w-3xl text-gray-700">
                 <ContentFormatter text={user.bio} />

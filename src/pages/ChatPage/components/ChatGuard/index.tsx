@@ -4,6 +4,7 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Loader from '@app/components/Loader';
 
 interface IChatUser {
+  id?: number;
   userId: number;
 }
 
@@ -20,8 +21,10 @@ const ChatGuard = ({ children }: IChatGuardProps) => {
   );
   const currentChatUsersId = Array.isArray(currentChat?.data)
     ? currentChat.data.map((user: IChatUser) => user.userId)
-    : [];
-  const shouldRender = currentChatUsersId?.includes(Number(currentUserId));
+    : (currentChat?.data?.Users ?? []).map((user: IChatUser) => user.id ?? user.userId);
+  const shouldRender =
+    Boolean(currentChat?.data) &&
+    (!Array.isArray(currentChat?.data) || currentChatUsersId.includes(Number(currentUserId)));
 
   if (isCurrentChatLoading || isUserLoading) {
     return <Loader />;

@@ -204,10 +204,12 @@ const ImdbMovieSearch = ({
   value,
   error,
   onChange,
+  onClear,
 }: {
   value: string;
   error?: string;
   onChange: (value: string) => void;
+  onClear: () => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -232,6 +234,12 @@ const ImdbMovieSearch = ({
   const handleMovieSelect = (movie: ImdbTitle) => {
     onChange(movie.url);
     setSearchTerm(movie.year ? `${movie.title} (${movie.year})` : movie.title);
+  };
+
+  const handleClear = () => {
+    onClear();
+    setSearchTerm('');
+    setDebouncedSearchTerm('');
   };
 
   return (
@@ -263,11 +271,21 @@ const ImdbMovieSearch = ({
       {error && <FieldError message={error} />}
 
       {value && (
-        <div className="mt-2 rounded-xl border border-[#dce4ff] bg-white px-3 py-2 text-sm text-gray-700">
-          Odabrani IMDb film:{' '}
-          <a href={value} target="_blank" rel="noreferrer" className="font-semibold text-blue">
-            {value}
-          </a>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#dce4ff] bg-white px-3 py-2 text-sm text-gray-700">
+          <span className="min-w-0">
+            Odabrani IMDb film:{' '}
+            <a
+              href={value}
+              target="_blank"
+              rel="noreferrer"
+              className="break-all font-semibold text-blue"
+            >
+              {value}
+            </a>
+          </span>
+          <button type="button" onClick={handleClear} className="font-semibold text-red-500">
+            Ukloni
+          </button>
         </div>
       )}
 
@@ -937,6 +955,12 @@ const EditMyProfilePage = () => {
                   error={errors.favoriteMovie?.message}
                   onChange={(movieUrl) =>
                     setValue('favoriteMovie', movieUrl, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  onClear={() =>
+                    setValue('favoriteMovie', '', {
                       shouldDirty: true,
                       shouldValidate: true,
                     })

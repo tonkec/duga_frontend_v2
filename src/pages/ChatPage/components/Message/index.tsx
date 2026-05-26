@@ -39,6 +39,7 @@ export interface IMessage {
   type: MessageType;
   User: {
     id: number;
+    username?: string;
   };
   id: number;
   securePhotoUrl: string;
@@ -398,7 +399,9 @@ const Message = ({
   isCurrentUserLoading,
   onReactionToggle,
 }: IMessageProps) => {
-  const isFromCurrentUser = getMessageSenderId(message) === Number(currentUserId);
+  const senderId = getMessageSenderId(message);
+  const isFromCurrentUser = senderId === Number(currentUserId);
+  const senderName = message.User?.username || otherUserName;
 
   if (isCurrentUserLoading) {
     return (
@@ -436,9 +439,9 @@ const Message = ({
     />
   ) : (
     <OtherUserMessageTemplate
-      userName={otherUserName}
+      userName={senderName}
       message={message.message}
-      otherUserId={otherUserId}
+      otherUserId={senderId || otherUserId}
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}

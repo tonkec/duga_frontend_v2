@@ -20,6 +20,17 @@ export const getChatMessages = async (chatId: string, page: number) => {
   });
 };
 
+export const sendChatMessage = async (data: {
+  chatId: number;
+  message?: string | null;
+  type: MessageType;
+  messagePhotoUrl?: string;
+  securePhotoUrl?: string;
+}) => {
+  const client = apiClient();
+  return client.post('/messages', data);
+};
+
 export const markMessagesAsRead = async (messageId: string) => {
   const client = apiClient();
   return client.post(
