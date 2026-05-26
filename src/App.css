@@ -66,9 +66,23 @@ body {
 }
 
 [data-theme='dark'] .bg-blue,
-[data-theme='dark'] [class*='bg-blue'],
 [data-theme='dark'] [class*='bg-[#2D46B9]'] {
   background-color: var(--duga-dark-accent) !important;
+}
+
+[data-theme='dark'] .bg-blue\/10,
+[data-theme='dark'] .hover\:bg-blue\/10:hover {
+  background-color: rgba(0, 173, 181, 0.14) !important;
+}
+
+[data-theme='dark'] .border-blue\/20,
+[data-theme='dark'] .hover\:border-blue:hover {
+  border-color: rgba(0, 173, 181, 0.42) !important;
+}
+
+[data-theme='dark'] .hover\:bg-blue-dark:hover {
+  background-color: #2bd5dc !important;
+  color: var(--duga-dark-base) !important;
 }
 
 [data-theme='dark'] .text-blue,
@@ -244,6 +258,24 @@ select:disabled {
 
 [data-theme='dark'] .user-chat-item:hover {
   background-color: rgba(0, 173, 181, 0.16) !important;
+}
+
+[data-theme='dark'] .community-tip-icon {
+  background-color: rgba(0, 173, 181, 0.14) !important;
+  color: var(--duga-dark-accent) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 173, 181, 0.28);
+}
+
+[data-theme='dark'] .empty-homepage-users-secondary-action {
+  background-color: var(--duga-dark-base) !important;
+  border-color: var(--duga-dark-border) !important;
+  color: var(--duga-dark-text) !important;
+}
+
+[data-theme='dark'] .empty-homepage-users-secondary-action:hover {
+  background-color: var(--duga-dark-accent) !important;
+  border-color: var(--duga-dark-accent) !important;
+  color: var(--duga-dark-base) !important;
 }
 
 @media (min-width: 1000px) {

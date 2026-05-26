@@ -139,7 +139,7 @@ const CommunityTips = () => (
 
     <div className="grid gap-4 md:grid-cols-3">
       <article className="rounded-3xl border border-[#dce4ff] bg-white px-5 py-5 shadow-sm">
-        <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue">
+        <div className="community-tip-icon mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue">
           <BiUserPlus size={24} />
         </div>
         <h3 className="text-base font-bold text-gray-950">Dodaj jasnu profilnu sliku</h3>
@@ -149,7 +149,7 @@ const CommunityTips = () => (
       </article>
 
       <article className="rounded-3xl border border-[#dce4ff] bg-white px-5 py-5 shadow-sm">
-        <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue">
+        <div className="community-tip-icon mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue">
           <BiHeart size={24} />
         </div>
         <h3 className="text-base font-bold text-gray-950">Napiši nešto osobno</h3>
@@ -159,7 +159,7 @@ const CommunityTips = () => (
       </article>
 
       <article className="rounded-3xl border border-[#dce4ff] bg-white px-5 py-5 shadow-sm">
-        <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
+        <div className="community-tip-icon mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-blue/10 text-blue-dark">
           <BiMessageRoundedDots size={24} />
         </div>
         <h3 className="text-base font-bold text-gray-950">Počni razgovor jednostavnim pitanjem</h3>
@@ -199,11 +199,8 @@ interface EmptyHomepageUsersProps {
 }
 
 const EmptyHomepageUsers = ({ onEditProfile, onBrowseUsers }: EmptyHomepageUsersProps) => (
-  <div className="relative isolate mx-auto mt-6 overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-5 py-10 text-center shadow-sm sm:px-8">
-    <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-blue/10 blur-3xl" />
-    <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
-
-    <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center">
+  <div className="mx-auto mt-6 rounded-3xl border border-[#dce4ff] bg-white px-5 py-10 text-center shadow-sm sm:px-8">
+    <div className="mx-auto flex max-w-2xl flex-col items-center">
       <div className="mb-5 grid h-20 w-20 place-items-center rounded-3xl bg-white text-blue-dark shadow-lg shadow-blue/10">
         <BiUserPlus size={40} />
       </div>
@@ -220,19 +217,19 @@ const EmptyHomepageUsers = ({ onEditProfile, onBrowseUsers }: EmptyHomepageUsers
       </p>
 
       <div className="mt-8 grid w-full gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-[#e8eeff] bg-white/80 px-4 py-4 text-left shadow-sm">
+        <div className="rounded-2xl border border-[#e8eeff] bg-white px-4 py-4 text-left shadow-sm">
           <BiSearch className="mb-2 text-blue" size={22} />
           <h3 className="text-sm font-bold text-gray-950">Pretraživanje</h3>
           <p className="mt-1 text-xs leading-5 text-gray-500">Novi profili pojavit će se ovdje.</p>
         </div>
-        <div className="rounded-2xl border border-[#e8eeff] bg-white/80 px-4 py-4 text-left shadow-sm">
+        <div className="rounded-2xl border border-[#e8eeff] bg-white px-4 py-4 text-left shadow-sm">
           <BiHeart className="mb-2 text-blue" size={22} />
           <h3 className="text-sm font-bold text-gray-950">Duga zajednica</h3>
           <p className="mt-1 text-xs leading-5 text-gray-500">
             Prikazujemo samo verificirane osobe.
           </p>
         </div>
-        <div className="rounded-2xl border border-[#e8eeff] bg-white/80 px-4 py-4 text-left shadow-sm">
+        <div className="rounded-2xl border border-[#e8eeff] bg-white px-4 py-4 text-left shadow-sm">
           <BiUserPlus className="mb-2 text-blue-dark" size={22} />
           <h3 className="text-sm font-bold text-gray-950">Tvoj profil</h3>
           <p className="mt-1 text-xs leading-5 text-gray-500">
@@ -251,7 +248,7 @@ const EmptyHomepageUsers = ({ onEditProfile, onBrowseUsers }: EmptyHomepageUsers
         </Button>
         <Button
           type="secondary"
-          className="rounded-full border border-[#dce4ff] px-6 py-3"
+          className="empty-homepage-users-secondary-action rounded-full border border-[#dce4ff] px-6 py-3"
           onClick={onBrowseUsers}
         >
           Pogledaj sve ljudeke

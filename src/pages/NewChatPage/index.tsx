@@ -15,11 +15,8 @@ const EmptyChats = () => {
 
   return (
     <>
-      <section className="relative isolate mx-auto mt-8 flex min-h-[28rem] w-full max-w-4xl items-center justify-center overflow-hidden rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff] px-6 py-14 text-center shadow-sm">
-        <div className="absolute -left-16 top-10 h-40 w-40 rounded-full bg-blue/10 blur-3xl" />
-        <div className="absolute -right-16 bottom-6 h-48 w-48 rounded-full bg-blue/10 blur-3xl" />
-
-        <div className="relative z-10 flex max-w-xl flex-col items-center">
+      <section className="mx-auto mt-8 flex min-h-[28rem] w-full max-w-4xl items-center justify-center rounded-3xl border border-[#dce4ff] bg-white px-6 py-14 text-center shadow-sm">
+        <div className="flex max-w-xl flex-col items-center">
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-4xl shadow-md shadow-blue/10">
             <span role="img" aria-hidden>
               💬
