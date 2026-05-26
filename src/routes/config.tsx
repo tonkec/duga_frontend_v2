@@ -14,6 +14,7 @@ import OnlineStatusWrapper from '@app/components/OnlineStatusWrapper';
 import PrivacyPolicyPage from '@app/pages/PrivacyPolicyPage';
 import TermsOfUsePage from '@app/pages/RulesPage';
 import ReportPage from '@app/pages/ReportPage';
+import HelpPage from '@app/pages/HelpPage';
 import NotificationsPage from '@app/pages/NotificationsPage';
 import PostLoginPage from '@app/pages/PostLoginPage';
 import UsersPage from '@app/pages/UsersPage';
@@ -187,6 +188,14 @@ export const onboardedRoutes = [
     element: (
       <PageTitle title="Prijavi problem">
         <ReportPage />
+      </PageTitle>
+    ),
+  },
+  {
+    path: '/help',
+    element: (
+      <PageTitle title="Pomoć">
+        <HelpPage />
       </PageTitle>
     ),
   },
