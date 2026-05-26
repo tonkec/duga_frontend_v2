@@ -197,7 +197,7 @@ const LoginPage = () => {
 
                 <Button
                   type="tertiary"
-                  className="w-full !rounded-full !bg-white/95 !px-7 !py-4 !text-lg font-bold shadow-xl hover:!bg-[#f0f4ff] sm:w-auto"
+                  className="landing-hero-secondary-action w-full !rounded-full !bg-white/95 !px-7 !py-4 !text-lg font-bold shadow-xl hover:!bg-[#f0f4ff] sm:w-auto"
                   onClick={scrollToLearnMore}
                 >
                   Saznaj više
@@ -235,7 +235,7 @@ const LoginPage = () => {
       </header>
 
       <FadeInSection>
-        <section className="bg-white px-5 py-20 md:px-8" ref={learnMoreRef}>
+        <section className="landing-how-section bg-white px-5 py-20 md:px-8" ref={learnMoreRef}>
           <div className="container mx-auto">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Kako radi</p>
@@ -253,9 +253,9 @@ const LoginPage = () => {
                 return (
                   <div
                     key={item.title}
-                    className="rounded-[1.75rem] border border-blue/10 bg-[#f7f8ff] p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+                    className="landing-info-card rounded-[1.75rem] border border-blue/10 bg-[#f7f8ff] p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
                   >
-                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue/10 text-blue">
+                    <div className="landing-info-card-icon mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue/10 text-blue">
                       <Icon fontSize={34} />
                     </div>
                     <h3 className="text-2xl font-bold text-blue-dark">{item.title}</h3>
@@ -269,7 +269,7 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <section className="px-5 py-20 md:px-8">
+        <section className="landing-reasons-section px-5 py-20 md:px-8">
           <div className="container mx-auto grid items-start gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="lg:sticky lg:top-28">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Zašto Duga</p>
@@ -285,7 +285,7 @@ const LoginPage = () => {
               {reasonItems.map((item) => (
                 <div
                   key={item.number}
-                  className="group rounded-[1.75rem] border border-blue/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl md:p-8"
+                  className="landing-info-card group rounded-[1.75rem] border border-blue/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl md:p-8"
                 >
                   <div className="flex flex-col gap-5 sm:flex-row">
                     <span className="text-5xl font-black leading-none text-blue/80">
@@ -304,7 +304,7 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <section className="bg-white px-5 py-20 md:px-8">
+        <section className="landing-forum-section bg-white px-5 py-20 md:px-8">
           <div className="container mx-auto grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="max-w-xl">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Forum</p>
@@ -318,7 +318,7 @@ const LoginPage = () => {
               </p>
               <Button
                 type="blue"
-                className="mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
+                className="landing-primary-action mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
                 onClick={onLogin}
               >
                 Pridruži se forumu
@@ -329,7 +329,7 @@ const LoginPage = () => {
               {forumItems.map((item) => (
                 <div
                   key={item.value}
-                  className="rounded-[1.5rem] border border-blue/10 bg-[#f7f9ff] p-6 shadow-sm"
+                  className="landing-info-card rounded-[1.5rem] border border-blue/10 bg-[#f7f9ff] p-6 shadow-sm"
                 >
                   <p className="text-sm font-black uppercase tracking-[0.18em] text-blue">
                     {item.value}
@@ -345,7 +345,7 @@ const LoginPage = () => {
 
       <FadeInSection>
         <section className="px-5 py-20 md:px-8">
-          <div className="container mx-auto overflow-hidden rounded-[2rem] bg-[#f7f9ff] p-6 shadow-sm md:p-10 lg:p-14">
+          <div className="landing-stats-panel container mx-auto overflow-hidden rounded-[2rem] bg-[#f7f9ff] p-6 shadow-sm md:p-10 lg:p-14">
             <div className="mx-auto mb-12 max-w-2xl text-center">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Zajednica</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight text-blue-dark md:text-5xl">
@@ -360,7 +360,10 @@ const LoginPage = () => {
               {statItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.title} className="rounded-[1.5rem] bg-white p-7 shadow-sm">
+                  <div
+                    key={item.title}
+                    className="landing-info-card rounded-[1.5rem] bg-white p-7 shadow-sm"
+                  >
                     <Icon className="text-blue" fontSize="2.2rem" />
                     <p className="mt-6 text-5xl font-black text-blue-dark">{item.value}</p>
                     <h3 className="mt-2 text-2xl font-bold text-blue-dark">{item.title}</h3>
@@ -374,7 +377,7 @@ const LoginPage = () => {
       </FadeInSection>
 
       <FadeInSection>
-        <section className="bg-white px-5 py-20 md:px-8">
+        <section className="landing-safety-section bg-white px-5 py-20 md:px-8">
           <div className="container mx-auto grid items-center gap-10 lg:grid-cols-2">
             <div className="max-w-xl">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue">Sigurnost</p>
@@ -387,7 +390,7 @@ const LoginPage = () => {
               </p>
               <Button
                 type="blue"
-                className="mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
+                className="landing-primary-action mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
                 onClick={() => {
                   window.open('https://aws.amazon.com/rekognition/', '_blank');
                 }}
@@ -395,7 +398,7 @@ const LoginPage = () => {
                 Saznaj više
               </Button>
             </div>
-            <div className="rounded-[2rem] bg-[#f7f8ff] p-8 shadow-sm">
+            <div className="landing-illustration-card rounded-[2rem] bg-[#f7f8ff] p-8 shadow-sm">
               <Image src={AI} alt="AI sigurnost" className="w-full h-auto" />
             </div>
           </div>
