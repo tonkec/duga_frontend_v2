@@ -1,22 +1,9 @@
-import { clearDugaApiToken } from './authToken';
-
-const SESSION_ID_KEY = 'dugaSessionId';
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 const SESSION_REVOKED_NOTICE_KEY = 'dugaSessionRevokedNotice';
 
 export const SESSION_REVOKED_EVENT = 'duga:session-revoked';
 export const SESSION_REVOKED_CODE = 'SESSION_REVOKED';
 export const SESSION_CONFLICT_CODE = 'SESSION_CONFLICT';
-
-const clearLegacyAppSessionId = () => {
-  localStorage.removeItem(SESSION_ID_KEY);
-  sessionStorage.removeItem(SESSION_ID_KEY);
-};
-
-export const clearAppSessionId = () => {
-  clearLegacyAppSessionId();
-  clearDugaApiToken();
-};
 
 export const clearAppSessionRevoked = () => {
   sessionStorage.removeItem(SESSION_REVOKED_KEY);
@@ -60,6 +47,5 @@ export const isAppSessionConflictError = (error: unknown) => {
 export const markSessionRevoked = () => {
   sessionStorage.setItem(SESSION_REVOKED_KEY, 'true');
   sessionStorage.setItem(SESSION_REVOKED_NOTICE_KEY, 'true');
-  clearAppSessionId();
   window.dispatchEvent(new Event(SESSION_REVOKED_EVENT));
 };

@@ -1,43 +1,51 @@
-import { clearAppSessionId } from './appSession';
-import { clearDugaApiToken } from './authToken';
+import {
+  clearAppSessionRevoked,
+  consumeAppSessionRevokedNotice,
+  isAppSessionRevoked,
+  markSessionRevoked,
+  SESSION_REVOKED_EVENT,
+} from './appSession';
 
-describe('appSession storage', () => {
+describe('appSession state', () => {
   beforeEach(() => {
-    localStorage.clear();
     sessionStorage.clear();
-    clearDugaApiToken();
   });
 
   afterEach(() => {
-    localStorage.clear();
     sessionStorage.clear();
-    clearDugaApiToken();
   });
 
-  it('does not reuse browser-created localStorage session ids', () => {
-    localStorage.setItem('dugaSessionId', 'browser-generated-session-id');
+  it('tracks revoked app session state', () => {
+    expect(isAppSessionRevoked()).toBe(false);
 
-    clearAppSessionId();
+    markSessionRevoked();
 
-    expect(localStorage.getItem('dugaSessionId')).toBeNull();
+    expect(isAppSessionRevoked()).toBe(true);
   });
 
-  it('does not keep server session ids in sessionStorage', () => {
-    sessionStorage.setItem('dugaSessionId', 'server-issued-session-id');
+  it('clears revoked app session state', () => {
+    markSessionRevoked();
 
-    clearAppSessionId();
+    clearAppSessionRevoked();
 
-    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
-    expect(localStorage.getItem('dugaSessionId')).toBeNull();
+    expect(isAppSessionRevoked()).toBe(false);
   });
 
-  it('clears session ids from both legacy and current storage', () => {
-    localStorage.setItem('dugaSessionId', 'legacy-session-id');
-    sessionStorage.setItem('dugaSessionId', 'server-issued-session-id');
+  it('consumes revoked notice once', () => {
+    markSessionRevoked();
 
-    clearAppSessionId();
+    expect(consumeAppSessionRevokedNotice()).toBe(true);
+    expect(consumeAppSessionRevokedNotice()).toBe(false);
+  });
 
-    expect(localStorage.getItem('dugaSessionId')).toBeNull();
-    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
+  it('dispatches a session revoked event', () => {
+    const onSessionRevoked = jest.fn();
+    window.addEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
+
+    markSessionRevoked();
+
+    expect(onSessionRevoked).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
   });
 });

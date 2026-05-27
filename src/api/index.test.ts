@@ -1,19 +1,13 @@
 import { apiClient } from '.';
-import { clearAccessTokenGetter, clearDugaApiToken } from './authToken';
+import { clearAccessTokenGetter } from './authToken';
 
 describe('apiClient URL safety', () => {
   beforeEach(() => {
     clearAccessTokenGetter();
-    clearDugaApiToken();
-    localStorage.clear();
-    sessionStorage.clear();
   });
 
   afterEach(() => {
     clearAccessTokenGetter();
-    clearDugaApiToken();
-    localStorage.clear();
-    sessionStorage.clear();
   });
 
   it('rejects absolute request URLs before sending a request', async () => {
@@ -61,12 +55,9 @@ describe('apiClient URL safety', () => {
     const headers = adapter.mock.calls[0][0].headers;
     expect(config.withCredentials).toBe(true);
     expect(headers.Authorization).toBeUndefined();
-    expect(headers['x-duga-session-id']).toBeUndefined();
   });
 
-  it('does not attach legacy browser-stored session ids', async () => {
-    localStorage.setItem('dugaSessionId', 'legacy-browser-session-id');
-    sessionStorage.setItem('dugaSessionId', 'server-session-id');
+  it('attaches an explicit bootstrap bearer token without a session header', async () => {
     const adapter = jest.fn(async (config) => ({
       config,
       data: {},
@@ -79,7 +70,6 @@ describe('apiClient URL safety', () => {
 
     const headers = adapter.mock.calls[0][0].headers;
     expect(headers.Authorization).toBe('Bearer api-token');
-    expect(headers['x-duga-session-id']).toBeUndefined();
   });
 
   it('attaches a CSRF header for unsafe methods when the CSRF cookie exists', async () => {

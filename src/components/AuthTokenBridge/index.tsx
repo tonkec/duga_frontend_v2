@@ -1,22 +1,14 @@
 import { useLayoutEffect, ReactNode } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import {
-  clearAccessTokenGetter,
-  clearDugaApiToken,
-  clearTokenCookie,
-  setAccessTokenGetter,
-} from '@app/api/authToken';
+import { clearAccessTokenGetter, setAccessTokenGetter } from '@app/api/authToken';
 import { getEnv } from '@app/configs/env';
 
 const AuthTokenBridge = ({ children }: { children: ReactNode }) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   useLayoutEffect(() => {
-    clearTokenCookie();
-
     if (!isAuthenticated) {
       clearAccessTokenGetter();
-      clearDugaApiToken();
       return;
     }
 

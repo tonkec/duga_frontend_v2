@@ -4,7 +4,6 @@ import {
   SESSION_REVOKED_CODE,
   SESSION_CONFLICT_CODE,
 } from './appSession';
-import { clearDugaApiToken } from './authToken';
 
 type ApiError = {
   config?: {
@@ -22,11 +21,6 @@ type ApiError = {
 
 const ERROR_ROUTES = ['/broken', '/record-not-found', '/network-error'];
 
-/** Clears only app API token remnants — never Auth0 session storage. */
-const clearAllAuthData = () => {
-  clearDugaApiToken();
-};
-
 export const handleGlobalApiError = (error: ApiError) => {
   const cfg = error.config || {};
 
@@ -42,7 +36,6 @@ export const handleGlobalApiError = (error: ApiError) => {
   }
 
   if (isAppSessionConflictError(error)) {
-    clearAllAuthData();
     markSessionRevoked();
     return;
   }
@@ -58,7 +51,6 @@ export const handleGlobalApiError = (error: ApiError) => {
   }
 
   if (error.code === 'ERR_NETWORK') {
-    clearAllAuthData();
     window.location.replace('/network-error');
   }
 };
