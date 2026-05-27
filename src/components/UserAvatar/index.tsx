@@ -28,7 +28,19 @@ const UserAvatar = ({
   fgColor,
 }: IUserAvatarProps) => {
   const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
-  const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
+  const profilePhotoSources = [
+    profilePhoto?.data?.securePhotoUrl,
+    profilePhoto?.data?.url,
+    profilePhoto?.data?.imageUrl,
+    profilePhoto?.data?.messagePhotoUrl,
+  ].filter((source): source is string => Boolean(source));
+  const firstImageQuery = useGetImageBlob(profilePhotoSources[0] || '');
+  const secondImageQuery = useGetImageBlob(profilePhotoSources[1] || '');
+  const thirdImageQuery = useGetImageBlob(profilePhotoSources[2] || '');
+  const fourthImageQuery = useGetImageBlob(profilePhotoSources[3] || '');
+  const imageBlob = [firstImageQuery, secondImageQuery, thirdImageQuery, fourthImageQuery].find(
+    (query) => query.data
+  )?.data;
   const imageBlobUrl = useObjectUrl(imageBlob);
   const hasValidUserId = Boolean(userId && userId !== 'undefined' && userId !== 'null');
   const isDarkMode = getStoredThemePreference() === 'dark';

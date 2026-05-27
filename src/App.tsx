@@ -425,7 +425,7 @@ function App() {
         )}
 
         {!!lastOnlineUsers.length && (
-          <ul className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {lastOnlineUsers.map((user: IUser) => (
               <li className="h-full" key={user.id}>
                 <UserCard

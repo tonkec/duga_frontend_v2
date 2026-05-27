@@ -16,6 +16,7 @@ type CypressWindow = Window &
 
 const CYPRESS_AUTH_USER_KEY = 'duga:cypress-auth-user';
 const DEFAULT_AUTH_REDIRECT_PATH = '/';
+export const AUTH0_IDENTITY_SCOPE = 'openid profile email';
 
 export const getSafeAuthReturnTo = (returnTo: string | undefined, fallbackPath: string) => {
   if (!returnTo) return fallbackPath || DEFAULT_AUTH_REDIRECT_PATH;
@@ -101,6 +102,7 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
       authorizationParams={{
         redirect_uri: redirectUri,
         audience: getEnv('VITE_AUTH0_AUDIENCE'),
+        scope: AUTH0_IDENTITY_SCOPE,
       }}
       onRedirectCallback={onRedirectCallback}
     >

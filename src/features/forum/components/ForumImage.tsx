@@ -1,7 +1,11 @@
 import Image from '@app/components/Image';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import { getForumImageUrl } from '../utils/forumImages';
-import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
+import {
+  getSafeBackendMediaPath,
+  getSafeRemoteImageUrl,
+  getSafeS3BackendMediaPath,
+} from '@app/utils/mediaSafety';
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface ForumImageProps {
@@ -12,12 +16,16 @@ interface ForumImageProps {
 }
 
 const ForumImage = ({ alt, className, imageUrl, securePhotoUrl }: ForumImageProps) => {
-  const { data: imageBlob } = useGetImageBlob(securePhotoUrl || '');
+  const imageSource = securePhotoUrl || imageUrl || '';
+  const { data: imageBlob } = useGetImageBlob(imageSource);
   const imageBlobUrl = useObjectUrl(imageBlob);
   const fallbackImageUrl = getForumImageUrl(undefined, imageUrl);
+  const isBlobOnlySource = Boolean(
+    getSafeBackendMediaPath(imageSource) || getSafeS3BackendMediaPath(imageSource)
+  );
   const src = imageBlobUrl || getSafeRemoteImageUrl(fallbackImageUrl);
 
-  if (!src) {
+  if (!src || (isBlobOnlySource && !imageBlobUrl)) {
     return null;
   }
 

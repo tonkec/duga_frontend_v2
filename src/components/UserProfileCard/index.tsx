@@ -348,7 +348,7 @@ const UserProfileCard = ({
                 title="Najdraža YouTube pjesma"
                 allow="encrypted-media; picture-in-picture"
                 sandbox="allow-scripts allow-same-origin allow-presentation"
-                referrerPolicy="no-referrer"
+                referrerPolicy="strict-origin-when-cross-origin"
                 loading="lazy"
                 allowFullScreen
               />

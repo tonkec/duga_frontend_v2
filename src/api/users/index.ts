@@ -1,4 +1,5 @@
 import { apiClient } from '..';
+import { IUser } from '@app/components/UserCard';
 
 export interface IUserUpdateProps {
   bio: string;
@@ -56,9 +57,68 @@ export interface ProfileViewsResponse {
   };
 }
 
-export const getAllUsers = async () => {
+type UsersResponse =
+  | IUser[]
+  | {
+      data?: IUser[] | { data?: IUser[]; users?: IUser[]; rows?: IUser[]; items?: IUser[] };
+      users?: IUser[];
+      rows?: IUser[];
+      items?: IUser[];
+    };
+
+type RawUser = IUser & {
+  emailVerified?: boolean;
+  email_verified?: boolean;
+  is_verified?: boolean;
+  verified?: boolean;
+};
+
+const getNormalizedVerification = (user: RawUser) =>
+  user.isVerified ??
+  user.is_verified ??
+  user.emailVerified ??
+  user.email_verified ??
+  user.verified ??
+  true;
+
+const normalizeUser = (user: RawUser): IUser => ({
+  ...user,
+  isVerified: Boolean(getNormalizedVerification(user)),
+});
+
+const getUsersFromResponse = (response: UsersResponse): IUser[] => {
+  const users = (() => {
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response.data)) return response.data;
+    if (response.data && !Array.isArray(response.data)) {
+      if (Array.isArray(response.data.data)) return response.data.data;
+      if (Array.isArray(response.data.users)) return response.data.users;
+      if (Array.isArray(response.data.rows)) return response.data.rows;
+      if (Array.isArray(response.data.items)) return response.data.items;
+    }
+    if (Array.isArray(response.users)) return response.users;
+    if (Array.isArray(response.rows)) return response.rows;
+    if (Array.isArray(response.items)) return response.items;
+
+    return [];
+  })();
+
+  return users.map((user) => normalizeUser(user as RawUser));
+};
+
+export const getAllUsers = async ({
+  page = 1,
+  limit = 100,
+}: { page?: number; limit?: number } = {}) => {
   const client = apiClient();
-  return client.get(`/users/get-users/`);
+  const response = await client.get<UsersResponse>(`/users/get-users/`, {
+    params: { page, limit },
+  });
+
+  return {
+    ...response,
+    data: getUsersFromResponse(response.data),
+  };
 };
 
 export const getCurrentUser = () => {

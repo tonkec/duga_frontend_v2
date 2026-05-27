@@ -348,7 +348,7 @@ const PhotoUploader = () => {
   };
 
   const onDeletePhoto = (image: IImage) => {
-    deletePhoto({ photoId: image.id });
+    deletePhoto({ url: image.securePhotoUrl || image.url || image.imageUrl || '' });
   };
 
   const onSubmitUpdatePhotos = (e: SyntheticEvent) => {
@@ -425,7 +425,12 @@ const PhotoUploader = () => {
                   >
                     <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
                       <BlobImage
-                        imageUrl={image.securePhotoUrl}
+                        imageUrls={[
+                          image.securePhotoUrl,
+                          image.url,
+                          image.imageUrl || '',
+                          image.messagePhotoUrl || '',
+                        ]}
                         name={image.name}
                         className="h-full w-full object-cover"
                       />

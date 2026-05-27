@@ -13,6 +13,7 @@ import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
 import { clearAppSessionRevoked } from '@app/api/appSession';
+import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
 
 const howItWorksItems = [
   {
@@ -144,6 +145,7 @@ const LoginPage = () => {
       },
       authorizationParams: {
         redirect_uri: window.location.origin,
+        scope: AUTH0_IDENTITY_SCOPE,
       },
     });
   };

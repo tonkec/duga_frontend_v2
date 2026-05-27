@@ -3,11 +3,9 @@ import { IImage } from '@app/components/Photos';
 import Photo from '@app/components/Photos/components/Photo';
 import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
-import notFound from '@app/assets/not_found.svg';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { useState } from 'react';
 import { MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
-import Image from '@app/components/Image';
 import Loader from '@app/components/Loader';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useQuestionDetails, useQuestions } from '@app/features/forum/hooks/useForum';
@@ -19,6 +17,7 @@ import {
 import type { Answer, Question } from '@app/features/forum/types/forum.types';
 import { getForumImageItems } from '@app/features/forum/utils/forumImages';
 import { Link } from 'react-router-dom';
+import { BiImage } from 'react-icons/bi';
 
 const photoTypeLabels = {
   answer: 'Slika iz odgovora',
@@ -178,7 +177,7 @@ const AllUserPhotos = () => {
   const isForumDetailsLoading = forumDetailQueries.some((query) => query.isPending);
   const { deletePhoto, isDeleting } = useDeletePhoto(['uploads', 'user-photos']);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [photoId, setPhotoId] = useState<number | string>('');
+  const [photoUrl, setPhotoUrl] = useState('');
   const uploadPhotos: AllUserPhoto[] = Array.isArray(allUserImages?.data)
     ? allUserImages.data
     : allUserImages?.data?.images || [];
@@ -188,9 +187,9 @@ const AllUserPhotos = () => {
   const photos = [...uploadPhotos, ...forumPhotos];
 
   const handleDelete = () => {
-    if (!photoId) return;
+    if (!photoUrl) return;
 
-    deletePhoto({ photoId });
+    deletePhoto({ url: photoUrl });
     setIsDeleteModalVisible(false);
   };
 
@@ -204,10 +203,12 @@ const AllUserPhotos = () => {
 
   if (!photos.length) {
     return (
-      <>
-        <Image src={notFound} alt="Nema fotografija" className="mx-auto block max-w-[300px]" />
+      <div className="mx-auto flex max-w-md flex-col items-center rounded-3xl border border-dashed border-[#b9c6ff] bg-[#f7f9ff] px-6 py-10 text-center">
+        <div className="mb-4 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue shadow-lg shadow-blue/10">
+          <BiImage size={34} />
+        </div>
         <h2 className="font-bold mt-5 mb-2 text-center">Nema fotografija</h2>
-      </>
+      </div>
     );
   }
 
@@ -261,7 +262,7 @@ const AllUserPhotos = () => {
               <Button
                 onClick={() => {
                   setIsDeleteModalVisible(true);
-                  setPhotoId(image.id);
+                  setPhotoUrl(image.securePhotoUrl || image.url || image.imageUrl || '');
                 }}
                 disabled={isDeleting}
                 type="danger"

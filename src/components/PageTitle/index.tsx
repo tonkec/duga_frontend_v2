@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet';
+import { useEffect } from 'react';
 
 interface LayoutProps {
   title: string;
@@ -6,12 +6,9 @@ interface LayoutProps {
 }
 
 export const PageTitle: React.FC<LayoutProps> = ({ title, children }) => {
-  return (
-    <>
-      <Helmet>
-        <title>Duga | {title}</title>
-      </Helmet>
-      {children}
-    </>
-  );
+  useEffect(() => {
+    document.title = `Duga | ${title}`;
+  }, [title]);
+
+  return <>{children}</>;
 };

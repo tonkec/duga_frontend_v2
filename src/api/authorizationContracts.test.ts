@@ -201,7 +201,7 @@ describe('authorization API contracts', () => {
 
     await uploadPhotos(uploadFormData);
     await uploadMessagePhotos(messagePhotoFormData);
-    await deleteImage(42);
+    await deleteImage('development/user/54/photo.png');
     await addUploadComment(commentFormData);
     await editUploadComment(101, 'Edited comment', [7, 8]);
     await deleteUploadComment(101);
@@ -217,7 +217,12 @@ describe('authorization API contracts', () => {
     );
     expectNoForbiddenAuthorizationKeys(put.mock.calls[0][1]);
     post.mock.calls.forEach(([, payload]) => expectNoForbiddenAuthorizationKeys(payload));
-    expect(deleteRequest).toHaveBeenCalledWith('/uploads/photo/42');
+    expect(deleteRequest).toHaveBeenCalledWith('/uploads/delete-photo', {
+      data: {
+        url: 'development/user/54/photo.png',
+      },
+      skipGlobalErrorHandler: true,
+    });
     expect(deleteRequest).toHaveBeenCalledWith('/comments/delete-comment/101');
     expect(deleteRequest).toHaveBeenCalledWith('/chats/55');
   });

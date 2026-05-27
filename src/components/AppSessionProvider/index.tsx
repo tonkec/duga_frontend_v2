@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import Loader from '@app/components/Loader';
 import { register } from '@app/api/auth/register';
 import { startSession } from '@app/api/sessions';
+import { getCurrentUser } from '@app/api/users';
 import {
   clearAppSessionRevoked,
   consumeAppSessionRevokedNotice,
@@ -26,6 +27,11 @@ const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
 const SESSION_REVOKED_MESSAGE = 'Odjavljeni ste jer je račun otvoren u drugoj sesiji.';
 
 const getBootstrapSessionKey = (userSub: string) => userSub;
+
+const isUnauthenticatedSessionError = (error: unknown) => {
+  const apiError = error as { response?: { status?: number } };
+  return apiError.response?.status === 401;
+};
 
 const AppSessionProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading, logout, user } = useAuth0();
@@ -107,6 +113,17 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
     if (startingSessionKeyRef.current !== sessionKey || !startingSessionPromiseRef.current) {
       startingSessionKeyRef.current = sessionKey;
       startingSessionPromiseRef.current = (async () => {
+        try {
+          const existingSessionUser = await getCurrentUser();
+          queryClient.setQueryData(['current-user'], existingSessionUser.data);
+          startedSessionKeyRef.current = sessionKey;
+          return;
+        } catch (error) {
+          if (!isUnauthenticatedSessionError(error)) {
+            throw error;
+          }
+        }
+
         await register(
           user.sub!,
           user.email!,

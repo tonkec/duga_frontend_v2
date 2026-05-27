@@ -3,13 +3,19 @@ import Image from '@app/components/Image';
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IExsitingImageProps {
-  imageUrl: string;
+  imageUrls: string[];
   name: string;
   className?: string;
 }
 
-const BlobImage = ({ imageUrl, name, className }: IExsitingImageProps) => {
-  const { data: imageBlob } = useGetImageBlob(imageUrl || '');
+const BlobImage = ({ imageUrls, name, className }: IExsitingImageProps) => {
+  const firstImageQuery = useGetImageBlob(imageUrls[0] || '');
+  const secondImageQuery = useGetImageBlob(imageUrls[1] || '');
+  const thirdImageQuery = useGetImageBlob(imageUrls[2] || '');
+  const fourthImageQuery = useGetImageBlob(imageUrls[3] || '');
+  const imageBlob = [firstImageQuery, secondImageQuery, thirdImageQuery, fourthImageQuery].find(
+    (query) => query.data
+  )?.data;
   const imageBlobUrl = useObjectUrl(imageBlob);
 
   if (!imageBlobUrl) {

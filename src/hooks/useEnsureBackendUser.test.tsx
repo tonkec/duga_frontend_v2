@@ -37,6 +37,22 @@ const renderUseCurrentBackendUser = () => {
   return renderHook(() => useCurrentBackendUser(), { wrapper });
 };
 
+const renderUseCurrentBackendUserWithoutAuth0Requirement = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+
+  return renderHook(() => useCurrentBackendUser({ requireAuth0: false }), { wrapper });
+};
+
 const renderUseCurrentBackendUserDisabled = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -114,6 +130,19 @@ describe('useCurrentBackendUser', () => {
 
     await waitFor(() => expect(result.current.fetchStatus).toBe('idle'));
     expect(mockApiClient).not.toHaveBeenCalled();
+  });
+
+  it('can fetch using only the backend cookie session when Auth0 is not authenticated', async () => {
+    mockUseAuth0.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      user: undefined,
+    } as unknown as ReturnType<typeof useAuth0>);
+
+    const { result } = renderUseCurrentBackendUserWithoutAuth0Requirement();
+
+    await waitFor(() => expect(result.current.data).toEqual({ id: 1, username: 'current-user' }));
+    expect(mockApiClient).toHaveBeenCalledWith();
   });
 
   it('does not register or fetch when the app session is revoked', async () => {

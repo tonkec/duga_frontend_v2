@@ -60,7 +60,7 @@ describe('ContentFormatter media rendering', () => {
     );
   });
 
-  it('renders YouTube embeds with sandbox and no referrer', () => {
+  it('renders YouTube embeds with sandbox and origin referrer', () => {
     render(
       <MemoryRouter>
         <ContentFormatter text="https://www.youtube.com/watch?v=abc123DEF45" />
@@ -71,7 +71,7 @@ describe('ContentFormatter media rendering', () => {
 
     expect(iframe).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/abc123DEF45');
     expect(iframe).toHaveAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
-    expect(iframe).toHaveAttribute('referrerpolicy', 'no-referrer');
+    expect(iframe).toHaveAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     expect(iframe).toHaveAttribute('loading', 'lazy');
     expect(iframe).toHaveAttribute('allow', 'encrypted-media; picture-in-picture');
   });

@@ -177,7 +177,12 @@ describe('UsersPage dating flow integration', () => {
   it('filters users by profile photo', async () => {
     mockGetProfilePhoto.mockImplementation((userId) =>
       Promise.resolve({
-        data: userId === '2' ? { securePhotoUrl: '/uploads/avatar.jpg' } : {},
+        data:
+          userId === '2'
+            ? { securePhotoUrl: '/uploads/avatar.jpg' }
+            : userId === '3'
+              ? { securePhotoUrl: 'http://placekitten.com/200/300' }
+              : {},
       } as Awaited<ReturnType<typeof getProfilePhoto>>)
     );
     mockUseGetAllUsers.mockReturnValue({
@@ -189,7 +194,7 @@ describe('UsersPage dating flow integration', () => {
           }),
           apiUser({
             id: 3,
-            username: 'user_without_photo',
+            username: 'user_with_placeholder_avatar',
           }),
         ],
       },
@@ -205,7 +210,9 @@ describe('UsersPage dating flow integration', () => {
       expect(screen.getByRole('heading', { name: 'user_with_photo' })).toBeVisible()
     );
     await waitFor(() =>
-      expect(screen.queryByRole('heading', { name: 'user_without_photo' })).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('heading', { name: 'user_with_placeholder_avatar' })
+      ).not.toBeInTheDocument()
     );
   });
 

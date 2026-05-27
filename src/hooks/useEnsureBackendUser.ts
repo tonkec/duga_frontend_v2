@@ -11,8 +11,12 @@ export const generateUniqueUsername = (): string => {
   return username;
 };
 
-export const useCurrentBackendUser = ({ enabled = true }: { enabled?: boolean } = {}) => {
+export const useCurrentBackendUser = ({
+  enabled = true,
+  requireAuth0 = true,
+}: { enabled?: boolean; requireAuth0?: boolean } = {}) => {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth0();
+  const auth0Ready = requireAuth0 ? isAuthenticated && !isAuthLoading : !isAuthLoading;
 
   return useQuery({
     queryKey: ['current-user'],
@@ -23,7 +27,7 @@ export const useCurrentBackendUser = ({ enabled = true }: { enabled?: boolean } 
       });
       return res.data;
     },
-    enabled: enabled && !isAppSessionRevoked() && isAuthenticated && !isAuthLoading,
+    enabled: enabled && !isAppSessionRevoked() && auth0Ready,
     throwOnError: false,
   });
 };

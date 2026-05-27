@@ -6,6 +6,7 @@ import {
   getSafeBackendMediaPath,
   getSafeGiphyEmbedUrl,
   getSafeRemoteImageUrl,
+  getSafeS3BackendMediaPath,
   getSafeYouTubeEmbedUrl,
 } from '@app/utils/mediaSafety';
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
@@ -91,7 +92,7 @@ const ContentFormatter = ({
                 title="YouTube video"
                 allow="encrypted-media; picture-in-picture"
                 sandbox="allow-scripts allow-same-origin allow-presentation"
-                referrerPolicy="no-referrer"
+                referrerPolicy="strict-origin-when-cross-origin"
                 loading="lazy"
                 allowFullScreen
               ></iframe>
@@ -150,6 +151,11 @@ const ContentFormatter = ({
           if (match) {
             if (!renderRichContent) {
               return <span key={i}>Slika</span>;
+            }
+
+            const safeS3MediaPath = getSafeS3BackendMediaPath(match[1]);
+            if (safeS3MediaPath) {
+              return <SecureInlineImage key={i} secureUrl={safeS3MediaPath} />;
             }
 
             const safeImageUrl = getSafeRemoteImageUrl(match[1]);

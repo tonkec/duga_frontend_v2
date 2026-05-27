@@ -3,7 +3,6 @@ import { ALLOWED_IMAGE_MIME_TYPES } from './consts';
 const YOUTUBE_VIDEO_ID_REGEX = /^[\w-]{11}$/;
 
 const ALLOWED_REMOTE_IMAGE_HOSTS = new Set([
-  'duga-user-photo.s3.eu-north-1.amazonaws.com',
   'm.media-amazon.com',
   'media.giphy.com',
   'media0.giphy.com',
@@ -15,9 +14,12 @@ const ALLOWED_REMOTE_IMAGE_HOSTS = new Set([
   'i.ytimg.com',
 ]);
 
+const DUGA_S3_IMAGE_HOST = 'duga-user-photo.s3.eu-north-1.amazonaws.com';
 const isAllowedRemoteImageHost = (hostname: string) => ALLOWED_REMOTE_IMAGE_HOSTS.has(hostname);
 
 const BACKEND_MEDIA_PATH_REGEX = /^\/?(?:uploads|chat)\/[^\s]+$/i;
+const S3_OBJECT_KEY_PATH_REGEX =
+  /^\/?(?:development|staging|production)\/(?:user|chat|forum)\/[^\s\\]+$/i;
 const URL_SCHEME_REGEX = /^[a-z][a-z\d+\-.]*:/i;
 
 const normalizeMimeType = (value: string | null | undefined) =>
@@ -41,6 +43,40 @@ export const getSafeBackendMediaPath = (value: string | null | undefined) => {
   }
 
   return `/${trimmedValue.replace(/^\/+/, '')}`;
+};
+
+export const getSafeS3BackendMediaPath = (value: string | null | undefined) => {
+  if (!value) return '';
+
+  const trimmedValue = value.trim();
+  if (!URL_SCHEME_REGEX.test(trimmedValue)) {
+    if (
+      trimmedValue.startsWith('//') ||
+      trimmedValue.includes('\\') ||
+      trimmedValue.includes('..') ||
+      !S3_OBJECT_KEY_PATH_REGEX.test(trimmedValue)
+    ) {
+      return '';
+    }
+
+    return `/uploads/files/${trimmedValue.replace(/^\/+/, '')}`;
+  }
+
+  try {
+    const url = new URL(trimmedValue);
+    if (
+      url.protocol !== 'https:' ||
+      url.hostname !== DUGA_S3_IMAGE_HOST ||
+      !S3_OBJECT_KEY_PATH_REGEX.test(url.pathname) ||
+      url.pathname.includes('..')
+    ) {
+      return '';
+    }
+
+    return `/uploads/files${url.pathname}`;
+  } catch {
+    return '';
+  }
 };
 
 export const getSafeRemoteImageUrl = (value: string | null | undefined) => {

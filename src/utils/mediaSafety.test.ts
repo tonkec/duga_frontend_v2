@@ -2,6 +2,7 @@ import {
   getSafeBackendMediaPath,
   getSafeGiphyEmbedUrl,
   getSafeRemoteImageUrl,
+  getSafeS3BackendMediaPath,
   getSafeYouTubeEmbedUrl,
   isAllowedRasterImageMimeType,
 } from './mediaSafety';
@@ -19,6 +20,11 @@ describe('mediaSafety', () => {
   it('rejects untrusted or non-HTTPS remote image URLs', () => {
     expect(getSafeRemoteImageUrl('https://example.com/tracker.png')).toBe('');
     expect(getSafeRemoteImageUrl('http://media.giphy.com/media/example/giphy.gif')).toBe('');
+    expect(
+      getSafeRemoteImageUrl(
+        'https://duga-user-photo.s3.eu-north-1.amazonaws.com/development/user/54/photo.png'
+      )
+    ).toBe('');
   });
 
   it('normalizes relative backend media paths', () => {
@@ -34,6 +40,34 @@ describe('mediaSafety', () => {
     expect(getSafeBackendMediaPath('data:image/png;base64,AAAA')).toBe('');
     expect(getSafeBackendMediaPath('/uploads\\evil.png')).toBe('');
     expect(getSafeBackendMediaPath('/users/1')).toBe('');
+  });
+
+  it('converts trusted private S3 image URLs to backend media paths', () => {
+    expect(
+      getSafeS3BackendMediaPath(
+        'https://duga-user-photo.s3.eu-north-1.amazonaws.com/development/user/54/photo.png'
+      )
+    ).toBe('/uploads/files/development/user/54/photo.png');
+  });
+
+  it('converts trusted private S3 object keys to backend media paths', () => {
+    expect(getSafeS3BackendMediaPath('development/user/54/photo.png')).toBe(
+      '/uploads/files/development/user/54/photo.png'
+    );
+  });
+
+  it('rejects untrusted S3 backend media paths', () => {
+    expect(getSafeS3BackendMediaPath('https://example.com/development/user/54/photo.png')).toBe('');
+    expect(
+      getSafeS3BackendMediaPath(
+        'https://duga-user-photo.s3.eu-north-1.amazonaws.com/development/../secret.png'
+      )
+    ).toBe('');
+    expect(
+      getSafeS3BackendMediaPath(
+        'http://duga-user-photo.s3.eu-north-1.amazonaws.com/development/user/54/photo.png'
+      )
+    ).toBe('');
   });
 
   it('allows only raster image content types', () => {
