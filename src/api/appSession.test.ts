@@ -1,4 +1,4 @@
-import { clearAppSessionId, getAppSessionId, setAppSessionId } from './appSession';
+import { clearAppSessionId } from './appSession';
 import { clearDugaApiToken } from './authToken';
 
 describe('appSession storage', () => {
@@ -14,18 +14,20 @@ describe('appSession storage', () => {
     clearDugaApiToken();
   });
 
-  it('does not generate or reuse browser-created localStorage session ids', () => {
+  it('does not reuse browser-created localStorage session ids', () => {
     localStorage.setItem('dugaSessionId', 'browser-generated-session-id');
 
-    expect(getAppSessionId()).toBeNull();
+    clearAppSessionId();
+
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 
-  it('stores and reads only server-issued session ids from sessionStorage', () => {
-    setAppSessionId('server-issued-session-id');
+  it('does not keep server session ids in sessionStorage', () => {
+    sessionStorage.setItem('dugaSessionId', 'server-issued-session-id');
 
-    expect(getAppSessionId()).toBe('server-issued-session-id');
-    expect(sessionStorage.getItem('dugaSessionId')).toBe('server-issued-session-id');
+    clearAppSessionId();
+
+    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 

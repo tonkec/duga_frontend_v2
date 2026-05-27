@@ -1,11 +1,5 @@
 import { apiClient } from '.';
-import {
-  clearAccessTokenGetter,
-  clearDugaApiToken,
-  getDugaApiToken,
-  setAccessTokenGetter,
-} from './authToken';
-import { SESSION_HEADER } from './appSession';
+import { clearAccessTokenGetter, clearDugaApiToken, setAccessTokenGetter } from './authToken';
 import { startSession } from './sessions';
 
 jest.mock('.', () => ({
@@ -23,7 +17,7 @@ describe('startSession', () => {
     clearAccessTokenGetter();
     clearDugaApiToken();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
-    post.mockResolvedValue({ data: { token: 'backend-api-token' } });
+    post.mockResolvedValue({ data: {} });
   });
 
   afterEach(() => {
@@ -33,24 +27,14 @@ describe('startSession', () => {
     sessionStorage.clear();
   });
 
-  it('starts a backend session with the Auth0 token and stored session id', async () => {
+  it('starts a backend cookie session with the Auth0 token', async () => {
     sessionStorage.setItem('dugaSessionId', 'existing-session-id');
     setAccessTokenGetter(async () => 'auth0-access-token');
 
     await startSession();
 
     expect(mockApiClient).toHaveBeenCalledWith('auth0-access-token');
-    expect(post).toHaveBeenCalledWith(
-      '/sessions/start',
-      { sessionId: 'existing-session-id' },
-      {
-        headers: {
-          Authorization: 'Bearer auth0-access-token',
-          [SESSION_HEADER]: 'existing-session-id',
-        },
-      }
-    );
-    expect(getDugaApiToken()).toBe('backend-api-token');
+    expect(post).toHaveBeenCalledWith('/sessions/start', {});
     expect(localStorage.getItem('dugaApiToken')).toBeNull();
   });
 
@@ -59,20 +43,12 @@ describe('startSession', () => {
 
     await startSession();
 
-    expect(post).toHaveBeenCalledWith(
-      '/sessions/start',
-      {},
-      {
-        headers: {
-          Authorization: 'Bearer auth0-access-token',
-        },
-      }
-    );
+    expect(post).toHaveBeenCalledWith('/sessions/start', {});
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
     expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
   });
 
-  it('stores the server-issued session id returned from session start', async () => {
+  it('does not store server-issued session data returned from session start', async () => {
     post.mockResolvedValue({
       data: { token: 'backend-api-token', sessionId: 'server-session-id' },
     });
@@ -80,7 +56,8 @@ describe('startSession', () => {
 
     await startSession();
 
-    expect(sessionStorage.getItem('dugaSessionId')).toBe('server-session-id');
+    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
+    expect(localStorage.getItem('dugaApiToken')).toBeNull();
   });
 });

@@ -39,7 +39,6 @@ const mockGenerateUniqueUsername = jest.mocked(generateUniqueUsername);
 const mockToastInfo = jest.mocked(toast.info);
 const logout = jest.fn();
 
-const SESSION_ID_KEY = 'dugaSessionId';
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
 
@@ -89,10 +88,7 @@ describe('AppSessionProvider login/session start integration', () => {
     sessionStorage.clear();
     delete (window as CypressWindow).Cypress;
     mockRegister.mockResolvedValue({} as Awaited<ReturnType<typeof register>>);
-    mockStartSession.mockImplementation(async () => {
-      sessionStorage.setItem(SESSION_ID_KEY, 'server-session-id');
-      return {} as Awaited<ReturnType<typeof startSession>>;
-    });
+    mockStartSession.mockResolvedValue({} as Awaited<ReturnType<typeof startSession>>);
     mockGenerateUniqueUsername.mockReturnValue('generated-user');
   });
 
@@ -326,29 +322,6 @@ describe('AppSessionProvider login/session start integration', () => {
       'generated-user',
       true
     );
-    consoleErrorSpy.mockRestore();
-  });
-
-  it('does not mark the app session active when startup omits a server-issued session id', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    mockStartSession.mockResolvedValue({} as Awaited<ReturnType<typeof startSession>>);
-    mockUseAuth0.mockReturnValue(
-      auth0State({
-        isAuthenticated: true,
-        user: {
-          sub: 'auth0|missing-session-id-user',
-          email: 'missing-session-id@example.com',
-          email_verified: true,
-        },
-      })
-    );
-
-    renderAppSessionProvider();
-
-    expect(await screen.findByTestId('session-status')).toHaveTextContent('error');
-    expect(mockRegister).toHaveBeenCalledTimes(1);
-    expect(mockStartSession).toHaveBeenCalledTimes(1);
-    expect(sessionStorage.getItem(SESSION_ID_KEY)).toBeNull();
     consoleErrorSpy.mockRestore();
   });
 

@@ -24,7 +24,7 @@ describe('register', () => {
     clearAccessTokenGetter();
   });
 
-  it('stores the backend session id returned from register', async () => {
+  it('does not store backend session ids returned from register', async () => {
     post.mockResolvedValue({ data: { sessionId: 'registered-session-id' } });
     setAccessTokenGetter(async () => 'auth0-access-token');
 
@@ -37,17 +37,17 @@ describe('register', () => {
       isVerified: true,
       username: 'generated-user',
     });
-    expect(sessionStorage.getItem('dugaSessionId')).toBe('registered-session-id');
+    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 
-  it('stores a nested backend session id returned from register', async () => {
+  it('does not store a nested backend session id returned from register', async () => {
     post.mockResolvedValue({ data: { data: { sessionId: 'nested-session-id' } } });
 
     await register('auth0|user', 'user@example.com', 'generated-user', true, 'explicit-token');
 
     expect(mockApiClient).toHaveBeenCalledWith('explicit-token');
-    expect(sessionStorage.getItem('dugaSessionId')).toBe('nested-session-id');
+    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 });

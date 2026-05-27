@@ -12,7 +12,6 @@ import {
   isAppSessionRevoked,
   markSessionRevoked,
   SESSION_REVOKED_EVENT,
-  getAppSessionId,
 } from '@app/api/appSession';
 import { AppSessionContext, AppSessionStatus } from '@app/context/AppSessionContext';
 import { generateUniqueUsername } from '@app/hooks/useEnsureBackendUser';
@@ -26,12 +25,7 @@ type CypressWindow = Window &
 const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
 const SESSION_REVOKED_MESSAGE = 'Odjavljeni ste jer je račun otvoren u drugoj sesiji.';
 
-const getBootstrapSessionKey = (userSub: string) => `${userSub}:${getAppSessionId() ?? 'pending'}`;
-
-const getStartedSessionKey = (userSub: string) => {
-  const sessionId = getAppSessionId();
-  return sessionId ? `${userSub}:${sessionId}` : null;
-};
+const getBootstrapSessionKey = (userSub: string) => userSub;
 
 const AppSessionProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading, logout, user } = useAuth0();
@@ -90,13 +84,12 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const startedSessionKey = getStartedSessionKey(user.sub);
-    if (startedSessionKey && startedSessionKeyRef.current === startedSessionKey) {
+    const sessionKey = getBootstrapSessionKey(user.sub);
+    if (startedSessionKeyRef.current === sessionKey) {
       setStatus('active');
       return;
     }
 
-    const sessionKey = getBootstrapSessionKey(user.sub);
     let cancelled = false;
     setStatus('loading');
 
@@ -122,11 +115,7 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
           Boolean(user.email_verified)
         );
         await startSession();
-        const nextStartedSessionKey = getStartedSessionKey(user.sub!);
-        if (!nextStartedSessionKey) {
-          throw new Error('Backend session id not available');
-        }
-        startedSessionKeyRef.current = nextStartedSessionKey;
+        startedSessionKeyRef.current = sessionKey;
       })().finally(() => {
         if (startingSessionKeyRef.current === sessionKey) {
           startingSessionKeyRef.current = null;

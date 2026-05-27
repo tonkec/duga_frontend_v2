@@ -1,6 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import { resolveAccessToken } from './authToken';
-import { getAppSessionId, SESSION_HEADER } from './appSession';
 import { handleGlobalApiError } from './globalErrorHandler';
 import { getEnv } from '@app/configs/env';
 
@@ -24,6 +22,10 @@ const absoluteUrlRejection = {
   },
 };
 
+const CSRF_COOKIE_NAME = 'duga_csrf';
+const CSRF_HEADER = 'x-csrf-token';
+const UNSAFE_METHODS = new Set(['post', 'put', 'patch', 'delete']);
+
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
   for (const cookie of cookies) {
@@ -43,6 +45,7 @@ export const getCookie = (name: string): string | null => {
 export const apiClient = (token?: string): AxiosInstance => {
   const instance = axios.create({
     baseURL: getEnv('VITE_BASE_URL'),
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -55,22 +58,16 @@ export const apiClient = (token?: string): AxiosInstance => {
         return Promise.reject(absoluteUrlRejection);
       }
 
-      const authToken = await resolveAccessToken(token);
-
-      if (!authToken) {
-        return Promise.reject({
-          response: {
-            status: 401,
-            data: { message: 'Not authenticated: token missing' },
-          },
-        });
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
 
-      const sessionId = getAppSessionId();
-      config.headers.Authorization = `Bearer ${authToken}`;
-      if (sessionId) {
-        config.headers[SESSION_HEADER] = sessionId;
+      const method = config.method?.toLowerCase();
+      const csrfToken = getCookie(CSRF_COOKIE_NAME);
+      if (method && UNSAFE_METHODS.has(method) && csrfToken) {
+        config.headers[CSRF_HEADER] = csrfToken;
       }
+
       return config;
     },
     (error) => Promise.reject(error)
