@@ -392,7 +392,11 @@ const LoginPage = () => {
                 type="blue"
                 className="landing-primary-action mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
                 onClick={() => {
-                  window.open('https://aws.amazon.com/rekognition/', '_blank');
+                  window.open(
+                    'https://aws.amazon.com/rekognition/',
+                    '_blank',
+                    'noopener,noreferrer'
+                  );
                 }}
               >
                 Saznaj više

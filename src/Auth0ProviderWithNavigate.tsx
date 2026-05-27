@@ -15,6 +15,16 @@ type CypressWindow = Window &
   };
 
 const CYPRESS_AUTH_USER_KEY = 'duga:cypress-auth-user';
+const DEFAULT_AUTH_REDIRECT_PATH = '/';
+
+export const getSafeAuthReturnTo = (returnTo: string | undefined, fallbackPath: string) => {
+  if (!returnTo) return fallbackPath || DEFAULT_AUTH_REDIRECT_PATH;
+  if (!returnTo.startsWith('/') || returnTo.startsWith('//') || returnTo.includes('\\')) {
+    return DEFAULT_AUTH_REDIRECT_PATH;
+  }
+
+  return returnTo;
+};
 
 const createCypressUser = () => ({
   sub: 'auth0|cypress-signup-user',
@@ -77,7 +87,7 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
   const redirectUri = getEnv('VITE_AUTH0_CALLBACK_URL');
 
   const onRedirectCallback = (appState: AppState | undefined) => {
-    navigate(appState?.returnTo || window.location.pathname);
+    navigate(getSafeAuthReturnTo(appState?.returnTo, window.location.pathname));
   };
 
   if (!(domain && clientId && redirectUri)) {

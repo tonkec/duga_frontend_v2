@@ -99,7 +99,6 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      console.error('Error starting app session:', error);
       if (!cancelled) {
         setStatus('error');
       }

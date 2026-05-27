@@ -25,6 +25,9 @@ export default defineConfig({
       '@app': path.resolve(__dirname, 'src'),
     },
   },
+  build: {
+    sourcemap: false,
+  },
   define: {
     'import.meta.env.STAGING': JSON.stringify(Boolean(process.env.STAGING)),
     'import.meta.env.PRODUCTION': JSON.stringify(Boolean(process.env.PRODUCTION)),

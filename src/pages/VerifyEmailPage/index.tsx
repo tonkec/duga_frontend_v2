@@ -28,9 +28,8 @@ const VerifyEmailPage = () => {
     try {
       await apiClient().post('/send-verification-email');
       toast.success('E-mail je uspješno poslan.', toastConfig);
-    } catch (error) {
+    } catch {
       toast.error('Došlo je do greške prilikom slanja e-maila.', toastConfig);
-      console.error('Failed to resend verification email:', error);
     } finally {
       setIsSending(false);
     }

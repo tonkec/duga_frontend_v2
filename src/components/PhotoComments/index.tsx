@@ -20,7 +20,11 @@ import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { toast } from 'react-toastify';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
-import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import {
+  ALLOWED_FILE_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  MAXIMUM_NUMBER_OF_IMAGES,
+} from '@app/utils/consts';
 import { init } from 'emoji-mart';
 import { debounce } from 'lodash';
 import EmojiPicker from '../EmojiPicker';
@@ -65,6 +69,8 @@ const schema = z
       path: ['comment'],
     }
   );
+
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 interface Inputs {
   comment: string;
@@ -193,6 +199,14 @@ const PhotoComments = () => {
       return;
     }
 
+    if (data.image?.length && !areValidImageTypes(data.image)) {
+      toast.error(
+        `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
+        toastConfig
+      );
+      return;
+    }
+
     const formData = new FormData();
     formData.append('uploadId', photoId);
     const trimmedComment = data?.comment.trim() || '';
@@ -270,8 +284,7 @@ const PhotoComments = () => {
     const handleCommentUpdate = (payload: unknown) => {
       try {
         applyCommentUpdate(payload);
-      } catch (error) {
-        console.error('Error updating comment:', error);
+      } catch {
         toast.error('Greška prilikom ažuriranja komentara');
       }
     };
@@ -382,7 +395,7 @@ const PhotoComments = () => {
 
                                 if (!areValidImageTypes(e.target.files)) {
                                   toast.error(
-                                    `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`,
+                                    `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
                                     toastConfig
                                   );
                                   return;

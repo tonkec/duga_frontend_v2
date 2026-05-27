@@ -72,7 +72,9 @@ jest.mock('@app/components/GiphySearch', () => ({
 }));
 
 jest.mock('@app/utils/consts', () => ({
+  ALLOWED_IMAGE_MIME_TYPES: ['image/png', 'image/jpeg'],
   ALLOWED_FILE_TYPES: 'image/png,image/jpeg',
+  MAX_IMAGE_FILE_SIZE_BYTES: 5 * 1024 * 1024,
   MAXIMUM_NUMBER_OF_IMAGES: 5,
 }));
 

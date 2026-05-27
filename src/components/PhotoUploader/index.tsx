@@ -11,7 +11,11 @@ import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import ConfirmModal from '@app/components/ConfirmModal';
-import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import {
+  ALLOWED_FILE_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  MAXIMUM_NUMBER_OF_IMAGES,
+} from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import BlobImage from './components/BlobImage';
@@ -51,6 +55,7 @@ interface IPhotoActionButtonsProps {
 }
 
 const DESCRIPTION_MAX_LENGTH = 100;
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 const DeleteButtonModal = ({
   onDelete,
@@ -258,7 +263,9 @@ const PhotoUploader = () => {
     if (!files || files.length === 0) return;
 
     if (!areValidImageTypes(files)) {
-      toast.error(`Možeš odabrati samo ${ALLOWED_FILE_TYPES} formate`);
+      toast.error(
+        `Možeš odabrati samo ${ALLOWED_FILE_TYPES} formate do ${MAX_IMAGE_FILE_SIZE_MB} MB`
+      );
       return;
     }
 
@@ -615,7 +622,7 @@ const PhotoUploader = () => {
               multiple
               accept={ALLOWED_FILE_TYPES}
               label="Odaberi fotografije"
-              helperText={`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}. Maksimalno ${MAXIMUM_NUMBER_OF_IMAGES} fotografija.`}
+              helperText={`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}. Maksimalno ${MAXIMUM_NUMBER_OF_IMAGES} fotografija, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici.`}
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
@@ -634,7 +641,10 @@ const PhotoUploader = () => {
                   }
 
                   if (!areValidImageTypes(files)) {
-                    toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+                    toast.error(
+                      `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
+                      toastConfig
+                    );
                     return;
                   }
 

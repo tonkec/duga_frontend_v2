@@ -21,7 +21,11 @@ import EmojiSearch from '@app/components/EmojiSearch';
 import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { toast } from 'react-toastify';
-import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import {
+  ALLOWED_FILE_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  MAXIMUM_NUMBER_OF_IMAGES,
+} from '@app/utils/consts';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
@@ -57,17 +61,19 @@ const schema = z
           if (!files) return true;
           return (
             Array.isArray(files) &&
-            files.every((file) => file instanceof File && file.size <= 5 * 1024 * 1024)
+            files.every((file) => file instanceof File && file.size <= MAX_IMAGE_FILE_SIZE_BYTES)
           );
         },
-        { message: 'Datoteka mora biti manja od 5MB.' }
+        { message: `Datoteka mora biti manja od ${MAX_IMAGE_FILE_SIZE_MB} MB.` }
       )
       .refine(
         (files) => {
           if (!files) return true;
           return (
             Array.isArray(files) &&
-            files.every((file) => ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type))
+            files.every((file) =>
+              ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)
+            )
           );
         },
         { message: 'Podržani formati su JPG i PNG.' }
@@ -106,6 +112,7 @@ export const getMessageImagePath = (chatId: string, timestamp: string, fileName:
 
 const mentionQueryRegex = /(^|\s)@([\w\d_]*)$/;
 const messageMentionRegex = /@([\w\d_]+)/g;
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 const getMentionQuery = (value: string) => value.match(mentionQueryRegex)?.[2]?.toLowerCase();
 
@@ -266,6 +273,20 @@ const SendMessage = ({
       return;
     }
 
+    if (!files.every((file) => file.size <= MAX_IMAGE_FILE_SIZE_BYTES)) {
+      toast.error(`Datoteka mora biti manja od ${MAX_IMAGE_FILE_SIZE_MB} MB.`, toastConfig);
+      return;
+    }
+
+    if (
+      !files.every((file) =>
+        ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)
+      )
+    ) {
+      toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('chatId', chatId);
     formData.append('timestamp', imageTimestamp);
@@ -346,7 +367,10 @@ const SendMessage = ({
             const files = e.target.files as FileList;
 
             if (!areValidImageTypes(files)) {
-              toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+              toast.error(
+                `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
+                toastConfig
+              );
               return;
             }
 

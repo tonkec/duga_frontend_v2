@@ -21,8 +21,7 @@ export const useCreateUser = () => {
   } = useMutation({
     mutationFn: ({ auth0Id, email, username, isVerified }: ISignupProps) =>
       register(auth0Id, email, username, isVerified),
-    onError: (err: Error) => {
-      console.log(err);
+    onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
       navigate('/login');
     },

@@ -21,4 +21,11 @@ describe('areValidImageTypes', () => {
 
     expect(areValidImageTypes(files)).toBe(false);
   });
+
+  it('rejects oversized image files', () => {
+    const oversizedBytes = new Uint8Array(5 * 1024 * 1024 + 1);
+    const files = createFileList([new File([oversizedBytes], 'large.png', { type: 'image/png' })]);
+
+    expect(areValidImageTypes(files)).toBe(false);
+  });
 });
