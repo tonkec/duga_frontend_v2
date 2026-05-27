@@ -1,5 +1,10 @@
 import { apiClient } from '.';
-import { clearAccessTokenGetter, clearDugaApiToken, setAccessTokenGetter } from './authToken';
+import {
+  clearAccessTokenGetter,
+  clearDugaApiToken,
+  getDugaApiToken,
+  setAccessTokenGetter,
+} from './authToken';
 import { SESSION_HEADER } from './appSession';
 import { startSession } from './sessions';
 
@@ -43,7 +48,8 @@ describe('startSession', () => {
         },
       }
     );
-    expect(localStorage.getItem('dugaApiToken')).toBe('backend-api-token');
+    expect(getDugaApiToken()).toBe('backend-api-token');
+    expect(localStorage.getItem('dugaApiToken')).toBeNull();
   });
 
   it('creates and reuses a session id when none exists', async () => {

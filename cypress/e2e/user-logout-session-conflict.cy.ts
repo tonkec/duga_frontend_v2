@@ -19,7 +19,6 @@ const authUser = {
 };
 
 const sessionId = 'cypress-logout-session';
-const apiToken = 'cypress-api-token';
 
 const setupAuthenticatedUser = () => {
   cy.clearLocalStorage();
@@ -56,7 +55,6 @@ const setupAuthenticatedUser = () => {
   });
 
   cy.setCookie('cookieAccepted', 'true');
-  cy.setCookie('token', 'cypress-access-token');
   cy.visit('/settings', {
     onBeforeLoad(win) {
       win.localStorage.clear();
@@ -66,8 +64,6 @@ const setupAuthenticatedUser = () => {
       win.localStorage.setItem('duga:cypress-auth-user', JSON.stringify(authUser));
       win.localStorage.setItem('duga:cypress-skip-session-start', 'true');
       win.localStorage.setItem('dugaSessionId', sessionId);
-      win.localStorage.setItem('dugaApiToken', apiToken);
-      win.document.cookie = 'token=cypress-access-token;path=/';
     },
   });
 };

@@ -1,5 +1,6 @@
 let accessTokenGetter: (() => Promise<string>) | null = null;
-const API_TOKEN_KEY = 'dugaApiToken';
+const LEGACY_API_TOKEN_KEY = 'dugaApiToken';
+let dugaApiToken: string | null = null;
 
 export const setAccessTokenGetter = (getter: () => Promise<string>) => {
   accessTokenGetter = getter;
@@ -13,14 +14,16 @@ export const clearTokenCookie = () => {
   document.cookie = `token=;expires=${new Date(0).toUTCString()};path=/`;
 };
 
-export const getDugaApiToken = () => localStorage.getItem(API_TOKEN_KEY);
+export const getDugaApiToken = () => dugaApiToken;
 
 export const setDugaApiToken = (token: string) => {
-  localStorage.setItem(API_TOKEN_KEY, token);
+  dugaApiToken = token;
 };
 
 export const clearDugaApiToken = () => {
-  localStorage.removeItem(API_TOKEN_KEY);
+  dugaApiToken = null;
+  localStorage.removeItem(LEGACY_API_TOKEN_KEY);
+  clearTokenCookie();
 };
 
 export const resolveAuth0AccessToken = async (): Promise<string | null> => {
@@ -43,16 +46,5 @@ export const resolveAccessToken = async (explicitToken?: string): Promise<string
     return resolveAuth0AccessToken();
   }
 
-  return getCookie('token');
-};
-
-const getCookie = (name: string): string | null => {
-  const cookies = document.cookie.split('; ');
-  for (const cookie of cookies) {
-    const [key, value] = cookie.split('=');
-    if (key === name) {
-      return decodeURIComponent(value);
-    }
-  }
   return null;
 };
