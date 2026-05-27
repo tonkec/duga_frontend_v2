@@ -18,6 +18,7 @@ import { getYouTubeEmbedUrl, isYouTubeUrl } from '@app/utils/youtube';
 import { useQuery } from '@tanstack/react-query';
 import { searchImdbTitles } from '@app/api/imdb';
 import Image from '../Image';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 const hasEmbeddableContent = (value: string) =>
   /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/.test(value) ||
@@ -211,6 +212,7 @@ const UserProfileCard = ({
   );
   const favoriteSongEmbedUrl = getYouTubeEmbedUrl(user.favoriteSong);
   const favoriteMovieUrl = getImdbTitleUrl(user.favoriteMovie);
+  const favoriteMovieImageUrl = getSafeRemoteImageUrl(favoriteMoviePreview?.imageUrl);
 
   return (
     <Card className="rounded-2xl p-5 md:p-7">
@@ -342,7 +344,10 @@ const UserProfileCard = ({
                 src={favoriteSongEmbedUrl}
                 className="aspect-video w-full rounded-xl"
                 title="Najdraža YouTube pjesma"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="encrypted-media; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-presentation"
+                referrerPolicy="no-referrer"
+                loading="lazy"
                 allowFullScreen
               />
             ) : (
@@ -357,15 +362,18 @@ const UserProfileCard = ({
               <a
                 href={favoriteMovieUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer nofollow"
+                referrerPolicy="no-referrer"
                 className="group grid w-full overflow-hidden rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue/10 sm:grid-cols-2"
               >
                 <span className="flex min-h-[260px] w-full items-center justify-center bg-[#f5c518] text-xl font-black tracking-tight text-black">
-                  {favoriteMoviePreview?.imageUrl ? (
+                  {favoriteMovieImageUrl ? (
                     <Image
-                      src={favoriteMoviePreview.imageUrl}
+                      src={favoriteMovieImageUrl}
                       alt={favoriteMoviePreview.title}
                       className="h-full w-full object-cover"
+                      loading
+                      referrerPolicy="no-referrer"
                     />
                   ) : (
                     'IMDb'

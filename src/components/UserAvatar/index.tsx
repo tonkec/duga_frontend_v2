@@ -5,6 +5,7 @@ import Loader from '../Loader';
 import { useGetImageBlob } from '../LatestUploads/hooks';
 import Image from '../Image';
 import { getStoredThemePreference } from '@app/hooks/useThemePreference';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IUserAvatarProps {
   avatarFallbackName: string;
@@ -28,6 +29,7 @@ const UserAvatar = ({
 }: IUserAvatarProps) => {
   const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
   const { data: imageBlob } = useGetImageBlob(profilePhoto?.data.securePhotoUrl);
+  const imageBlobUrl = useObjectUrl(imageBlob);
   const hasValidUserId = Boolean(userId && userId !== 'undefined' && userId !== 'null');
   const isDarkMode = getStoredThemePreference() === 'dark';
   const fallbackBackgroundColor = isDarkMode ? '#222831' : color;
@@ -42,10 +44,10 @@ const UserAvatar = ({
   );
 
   const renderAvatar = () => {
-    if (imageBlob) {
+    if (imageBlobUrl) {
       return (
         <Image
-          src={URL.createObjectURL(imageBlob)}
+          src={imageBlobUrl}
           alt="Avatar"
           className={clsx('h-full w-full object-cover', className)}
         />

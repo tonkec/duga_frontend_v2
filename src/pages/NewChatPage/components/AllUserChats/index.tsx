@@ -6,7 +6,6 @@ import NewMessageModal from '@app/pages/NewChatPage/components/NewMessageModal';
 import { IMessage } from '@app/pages/ChatPage/components/Message';
 import Card from '@app/components/Card';
 import Button from '@app/components/Button';
-import { mergeStoredChatMembers } from '@app/utils/chatMemberStorage';
 
 export interface IChat {
   id: number;
@@ -43,10 +42,7 @@ const getChatSortTime = (chat: IChat) => {
 };
 
 const getChatId = (chat: IChat) => chat.id ?? chat.ChatUser?.chatId;
-const getChatUsers = (chat: IChat) => {
-  const chatId = getChatId(chat);
-  return chatId ? mergeStoredChatMembers(String(chatId), chat.Users) : chat.Users;
-};
+const getChatUsers = (chat: IChat) => chat.Users;
 const isGroupChat = (chat: IChat) => chat.type === 'group' || getChatUsers(chat).length > 1;
 const getChatTitle = (chat: IChat) =>
   isGroupChat(chat)

@@ -8,6 +8,7 @@ import Image from '@app/components/Image';
 import { useEffect, useRef, useState } from 'react';
 import { BiSmile } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -142,13 +143,14 @@ const MessageContent = ({
   const { data: imageBlob, error } = useGetImageBlob(
     !isGiphy && isS3File ? messagePhotoUrl || '' : ''
   );
+  const imageBlobUrl = useObjectUrl(imageBlob);
 
   return (
     <div>
       {isGiphy && messagePhotoUrl && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
-      {!isGiphy && isS3File && imageBlob && (
-        <Image src={URL.createObjectURL(imageBlob)} alt="slika" style={{ maxWidth: '30vw' }} />
+      {!isGiphy && isS3File && imageBlobUrl && (
+        <Image src={imageBlobUrl} alt="slika" style={{ maxWidth: '30vw' }} />
       )}
 
       {!isGiphy && !isS3File && (

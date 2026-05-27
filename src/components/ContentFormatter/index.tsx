@@ -2,7 +2,12 @@ import Image from '@app/components/Image';
 import { Link } from 'react-router-dom';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
-import { useEffect, useMemo } from 'react';
+import {
+  getSafeGiphyEmbedUrl,
+  getSafeRemoteImageUrl,
+  getSafeYouTubeEmbedUrl,
+} from '@app/utils/mediaSafety';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IContentFormatterProps {
   text: string;
@@ -13,13 +18,7 @@ interface IContentFormatterProps {
 
 const SecureInlineImage = ({ secureUrl }: { secureUrl: string }) => {
   const { data: imageBlob } = useGetImageBlob(secureUrl);
-  const imageUrl = useMemo(() => (imageBlob ? URL.createObjectURL(imageBlob) : ''), [imageBlob]);
-
-  useEffect(() => {
-    return () => {
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
-    };
-  }, [imageUrl]);
+  const imageUrl = useObjectUrl(imageBlob);
 
   if (!imageUrl) {
     return <span>Slika</span>;
@@ -50,7 +49,7 @@ const ContentFormatter = ({
   const urlRegex = /(https?:\/\/[^\s]+)/;
   const internalProfilePathRegex =
     /^\/user\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const secureImagePathRegex = /^(?:https?:\/\/[^/\s]+)?\/uploads\/[^\s]+$/;
+  const secureImagePathRegex = /^\/?uploads\/[^\s]+$/;
 
   return (
     <>
@@ -78,14 +77,22 @@ const ContentFormatter = ({
               return <span key={i}>YouTube video</span>;
             }
 
+            const embedUrl = getSafeYouTubeEmbedUrl(match[1]);
+            if (!embedUrl) {
+              return <span key={i}>{part}</span>;
+            }
+
             return (
               <iframe
                 key={i}
                 width="360"
                 height="200"
-                src={`https://www.youtube.com/embed/${match[1]}`}
+                src={embedUrl}
                 title="YouTube video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="encrypted-media; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-presentation"
+                referrerPolicy="no-referrer"
+                loading="lazy"
                 allowFullScreen
               ></iframe>
             );
@@ -101,12 +108,20 @@ const ContentFormatter = ({
               return <span key={i}>GIF</span>;
             }
 
+            const embedUrl = getSafeGiphyEmbedUrl(giphyId);
+            if (!embedUrl) {
+              return <span key={i}>{part}</span>;
+            }
+
             return (
               <iframe
                 key={i}
-                src={`https://giphy.com/embed/${giphyId}`}
+                src={embedUrl}
                 width="280"
                 height="170"
+                sandbox="allow-scripts allow-same-origin"
+                referrerPolicy="no-referrer"
+                loading="lazy"
                 allowFullScreen
               ></iframe>
             );
@@ -136,8 +151,31 @@ const ContentFormatter = ({
               return <span key={i}>Slika</span>;
             }
 
+            const safeImageUrl = getSafeRemoteImageUrl(match[1]);
+            if (!safeImageUrl) {
+              return (
+                <a
+                  key={i}
+                  href={match[1]}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  referrerPolicy="no-referrer"
+                  className="underline"
+                >
+                  {match[1]}
+                </a>
+              );
+            }
+
             return (
-              <Image src={match[1]} alt="content" style={{ display: 'inline-block' }} key={i} />
+              <Image
+                src={safeImageUrl}
+                alt="content"
+                style={{ display: 'inline-block' }}
+                loading
+                referrerPolicy="no-referrer"
+                key={i}
+              />
             );
           }
         }
@@ -150,7 +188,8 @@ const ContentFormatter = ({
                 key={i}
                 href={match[1]}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
+                referrerPolicy="no-referrer"
                 className="underline"
               >
                 {match[1]}

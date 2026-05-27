@@ -8,6 +8,7 @@ const Image = ({
   style,
   loading,
   onClick,
+  referrerPolicy,
 }: {
   src: string;
   alt: string;
@@ -15,6 +16,7 @@ const Image = ({
   style?: React.CSSProperties;
   loading?: boolean;
   onClick?: () => void;
+  referrerPolicy?: React.HTMLAttributeReferrerPolicy;
 }) => {
   const isImageLoading = useImage(src);
   return isImageLoading ? (
@@ -27,6 +29,7 @@ const Image = ({
       style={style}
       loading={loading ? 'lazy' : undefined}
       onClick={onClick}
+      referrerPolicy={referrerPolicy}
     />
   );
 };

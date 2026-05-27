@@ -1,5 +1,6 @@
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import Image from '@app/components/Image';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IExsitingImageProps {
   imageUrl: string;
@@ -9,12 +10,13 @@ interface IExsitingImageProps {
 
 const BlobImage = ({ imageUrl, name, className }: IExsitingImageProps) => {
   const { data: imageBlob } = useGetImageBlob(imageUrl || '');
+  const imageBlobUrl = useObjectUrl(imageBlob);
 
-  if (!imageBlob) {
+  if (!imageBlobUrl) {
     return null;
   }
 
-  return <Image src={URL.createObjectURL(imageBlob)} alt={name} className={className} />;
+  return <Image src={imageBlobUrl} alt={name} className={className} />;
 };
 
 export default BlobImage;

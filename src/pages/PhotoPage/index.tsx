@@ -14,6 +14,7 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
 import ContentFormatter from '@app/components/ContentFormatter';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 const PhotoPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const PhotoPage = () => {
   const { data: imageBlob } = useGetImageBlob(
     singleImage?.data?.securePhotoUrl || singleImage?.data?.url || ''
   );
+  const imageBlobUrl = useObjectUrl(imageBlob);
 
   const { user: userData } = useGetUserById(singleImage?.data?.userId || '');
   const { user: currentUser } = useGetCurrentUser();
@@ -95,11 +97,11 @@ const PhotoPage = () => {
       <div className="grid gap-6">
         <Card className="rounded-2xl p-4 md:p-5">
           <div>
-            {imageBlob ? (
+            {imageBlobUrl ? (
               <>
                 <div className="overflow-hidden rounded-2xl bg-black">
                   <Image
-                    src={URL.createObjectURL(imageBlob)}
+                    src={imageBlobUrl}
                     alt="Korisnikova slika"
                     className="mx-auto max-h-[75vh] w-full object-contain"
                   />

@@ -2,6 +2,7 @@ import { getImageUrl } from '@app/utils/getImageUrl';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import { IImage } from '../..';
 import Image from '@app/components/Image';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IPhotoProps {
   image: IImage;
@@ -10,10 +11,11 @@ interface IPhotoProps {
 
 const Photo = ({ image, onClick }: IPhotoProps) => {
   const { data: imageBlob } = useGetImageBlob(image?.securePhotoUrl || '');
+  const imageBlobUrl = useObjectUrl(imageBlob);
 
   return (
     <Image
-      src={imageBlob ? URL.createObjectURL(imageBlob) : getImageUrl(image)}
+      src={imageBlobUrl || getImageUrl(image)}
       alt="fotografija"
       onClick={onClick}
       className={`h-full w-full rounded-2xl object-cover transition-transform duration-300 ${

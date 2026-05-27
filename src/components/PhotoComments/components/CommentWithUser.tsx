@@ -18,6 +18,7 @@ import RecordCreatedAt from '@app/components/RecordCreatedAt';
 import UserAvatar from '@app/components/UserAvatar';
 import ConfirmModal from '@app/components/ConfirmModal';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface Inputs {
   comment: string;
@@ -44,6 +45,7 @@ const CommentWithUser: React.FC<{
   const { mutateDeleteUploadComment } = useDeleteUploadComment(onCommentDeleted);
   const { mutateEditUploadComment } = useEditUploadComment(onCommentUpdated);
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || '');
+  const imageBlobUrl = useObjectUrl(imageBlob);
 
   const {
     handleSubmit,
@@ -142,9 +144,9 @@ const CommentWithUser: React.FC<{
               {renderFormattedComment(comment.comment)}
             </div>
           )}
-          {imageBlob && (
+          {imageBlobUrl && (
             <Image
-              src={URL.createObjectURL(imageBlob)}
+              src={imageBlobUrl}
               alt="Slika"
               className="mt-3 max-h-48 w-full max-w-sm rounded-xl object-cover"
             />

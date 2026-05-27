@@ -33,6 +33,7 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import UserAvatar from '@app/components/UserAvatar';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
 
 type Inputs = {
   content: string;
@@ -155,6 +156,7 @@ const SendMessage = ({
   );
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const currentUploadableImageRef = useRef<File[] | null>(null);
+  const currentUploadableImageUrls = useObjectUrls(currentUploadableImage);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
@@ -544,11 +546,14 @@ const SendMessage = ({
 
       {currentUploadableImage && (
         <div className="flex items-end gap-2 flex-wrap">
-          {currentUploadableImage.map((image: File) => {
+          {currentUploadableImage.map((image: File, index) => {
+            const previewUrl = currentUploadableImageUrls[index];
+            if (!previewUrl) return null;
+
             return (
               <div key={image.name} className="relative">
                 <Image
-                  src={URL.createObjectURL(image)}
+                  src={previewUrl}
                   alt={image.name}
                   style={{ width: 150, height: 150 }}
                   className="border mt-2"

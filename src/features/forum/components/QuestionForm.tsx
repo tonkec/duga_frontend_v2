@@ -16,8 +16,13 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import ForumImageGallery from './ForumImageGallery';
-import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
+import {
+  FORUM_ALLOWED_IMAGE_TYPES,
+  FORUM_MAX_BODY_LENGTH,
+  validateForumImages,
+} from '../utils/forumValidation';
 import { getForumImageItems } from '../utils/forumImages';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
 
 type QuestionFormPayload = CreateQuestionPayload & Pick<UpdateQuestionPayload, 'removeImage'>;
 
@@ -96,7 +101,7 @@ const QuestionForm = ({
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [selectedGifUrl, setSelectedGifUrl] = useState('');
   const [errors, setErrors] = useState<QuestionFormErrors>({});
-  const imagePreviewUrls = images.map((image) => URL.createObjectURL(image));
+  const imagePreviewUrls = useObjectUrls(images);
   const hasExistingImage = Boolean(
     initialQuestion?.securePhotoUrl ||
       initialQuestion?.imageUrl ||
@@ -261,11 +266,11 @@ const QuestionForm = ({
         </label>
         <FileUploadInput
           id="question-image"
-          accept="image/*"
+          accept={FORUM_ALLOWED_IMAGE_TYPES}
           containerClassName="py-5"
           multiple
           label="Odaberi slike"
-          helperText="Podržane su slikovne datoteke. Maksimalno 5 slika, do 1 MB po slici."
+          helperText={`Podržani formati su ${FORUM_ALLOWED_IMAGE_TYPES}. Maksimalno 5 slika, do 1 MB po slici.`}
           onChange={(event) => {
             const selectedImages = Array.from(event.target.files ?? []);
             const currentExistingImageCount = initialQuestion

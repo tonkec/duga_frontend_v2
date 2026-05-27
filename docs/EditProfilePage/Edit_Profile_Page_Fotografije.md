@@ -36,7 +36,7 @@
 - As a **profile owner**, selected files must render local previews before upload.
 - As a **profile owner**, I must be able to remove a selected local preview before saving.
 - As a **profile owner**, the file input must accept only configured allowed image types.
-- As a **profile owner**, selecting unsupported formats must show **Dozvoljeni formati su .png,.jpg,.jpeg,.svg!**
+- As a **profile owner**, selecting unsupported formats must show **Dozvoljeni formati su .png,.jpg,.jpeg,.webp!**
 - As a **profile owner**, selecting more than the total max must show **Maksimalan broj fotografija je 5!**
 - As a **profile owner**, submitting beyond the max must show **Maksimalan broj svih slika je 5**.
 - As a **profile owner**, filenames should be normalized before upload.

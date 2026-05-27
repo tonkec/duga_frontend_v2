@@ -26,8 +26,10 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import MentionInput from '@app/components/MentionInput';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
 
 type TaggedUser = { id: number; username: string };
+type NewImage = IImage & { file: File };
 
 export interface ImageDescription {
   description: string;
@@ -170,7 +172,9 @@ const PhotoUploader = () => {
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
   const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos();
-  const [newImages, setNewImages] = useState<IImage[]>();
+  const [newImages, setNewImages] = useState<NewImage[]>();
+  const newImageFiles = useMemo(() => newImages?.map((image) => image.file), [newImages]);
+  const newImagePreviewUrls = useObjectUrls(newImageFiles);
   const existingImages = useMemo<IImage[]>(
     () => allExistingImages?.data?.images || [],
     [allExistingImages]
@@ -552,9 +556,12 @@ const PhotoUploader = () => {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {newImages &&
-              newImages.map((image) => {
+              newImages.map((image, index) => {
                 const imageId = removeSpacesAndDashes(image.name);
                 const inputValue = getDescriptionInputValue(imageId, image.description);
+                const previewUrl = newImagePreviewUrls[index];
+
+                if (!previewUrl) return null;
 
                 return (
                   <div
@@ -563,7 +570,7 @@ const PhotoUploader = () => {
                   >
                     <div className="relative w-full aspect-[1/1] overflow-hidden rounded-xl">
                       <Image
-                        src={image.url}
+                        src={previewUrl}
                         alt={image.name}
                         className="absolute top-0 left-0 w-full h-full object-cover"
                       />
@@ -635,7 +642,8 @@ const PhotoUploader = () => {
 
                   const images = Array.from(files).map((file) => {
                     return {
-                      url: URL.createObjectURL(file),
+                      url: '',
+                      file,
                       name: file.name,
                       fileType: file.type,
                       description: '',
@@ -644,7 +652,7 @@ const PhotoUploader = () => {
                     };
                   });
 
-                  setNewImages((prev) => [...(prev || []), ...(images as IImage[])]);
+                  setNewImages((prev) => [...(prev || []), ...(images as NewImage[])]);
                 }
               }}
               disabled={isUploadingPhotos}

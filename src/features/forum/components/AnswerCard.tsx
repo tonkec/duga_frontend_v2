@@ -27,9 +27,14 @@ import type {
 } from '../types/forum.types';
 import ContentFormatter from '@app/components/ContentFormatter';
 import ForumImageGallery from './ForumImageGallery';
-import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
+import {
+  FORUM_ALLOWED_IMAGE_TYPES,
+  FORUM_MAX_BODY_LENGTH,
+  validateForumImages,
+} from '../utils/forumValidation';
 import { getForumImageItems } from '../utils/forumImages';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
 
 interface AnswerCardProps {
   answer: Answer;
@@ -139,7 +144,7 @@ const AnswerCard = ({
   const [replyIdPendingDelete, setReplyIdPendingDelete] = useState<number | null>(null);
   const [isRepliesCollapsed, setIsRepliesCollapsed] = useState(false);
   const [replyReactionDropdownId, setReplyReactionDropdownId] = useState<number | null>(null);
-  const draftImagePreviewUrls = draftImages.map((image) => URL.createObjectURL(image));
+  const draftImagePreviewUrls = useObjectUrls(draftImages);
   const hasExistingImage = Boolean(
     answer.securePhotoUrl ||
       answer.imageUrl ||
@@ -466,10 +471,10 @@ const AnswerCard = ({
             </label>
             <FileUploadInput
               id={`answer-edit-image-${answer.id}`}
-              accept="image/*"
+              accept={FORUM_ALLOWED_IMAGE_TYPES}
               multiple
               label="Odaberi slike"
-              helperText="Odaberi nove slike ako želiš zamijeniti postojeće. Maksimalno 5 slika, do 1 MB po slici."
+              helperText={`Podržani formati su ${FORUM_ALLOWED_IMAGE_TYPES}. Maksimalno 5 slika, do 1 MB po slici.`}
               onChange={(event) => {
                 const selectedImages = Array.from(event.target.files ?? []);
                 const currentExistingImageCount = getForumImageItems(answer).length;

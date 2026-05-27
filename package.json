@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
-    "@emailjs/browser": "^4.4.1",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@hookform/resolvers": "^3.9.1",
