@@ -1,3 +1,5 @@
+import { clearDugaApiToken } from './authToken';
+
 const SESSION_ID_KEY = 'dugaSessionId';
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 const SESSION_REVOKED_NOTICE_KEY = 'dugaSessionRevokedNotice';
@@ -13,6 +15,7 @@ const clearLegacyAppSessionId = () => {
 
 export const clearAppSessionId = () => {
   clearLegacyAppSessionId();
+  clearDugaApiToken();
 };
 
 export const clearAppSessionRevoked = () => {
