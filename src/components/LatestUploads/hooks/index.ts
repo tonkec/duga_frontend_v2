@@ -34,7 +34,8 @@ export const useGetImageBlob = (secureUrl: string) => {
           skipGlobalErrorHandler: true,
         });
 
-        const contentType = response.headers?.['content-type'];
+        const contentTypeHeader = response.headers?.['content-type'];
+        const contentType = typeof contentTypeHeader === 'string' ? contentTypeHeader : undefined;
         if (!isAllowedRasterImageMimeType(contentType)) {
           return null;
         }

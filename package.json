@@ -24,7 +24,6 @@
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
     "@emoji-mart/data": "^1.2.1",
-    "@emoji-mart/react": "^1.1.1",
     "@hookform/resolvers": "^3.9.1",
     "@tanstack/react-query": "^5.62.9",
     "@tanstack/react-query-devtools": "^5.62.9",
@@ -35,7 +34,6 @@
     "dompurify": "^3.2.5",
     "emoji-mart": "^5.6.0",
     "framer-motion": "^12.23.12",
-    "history": "^5.3.0",
     "lodash": "^4.17.21",
     "random-words": "^2.0.1",
     "react": "^18.3.1",
@@ -66,15 +64,10 @@
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@types/react-modal": "^3.16.3",
-    "@typescript-eslint/eslint-plugin": "^8.18.2",
-    "@typescript-eslint/parser": "^8.18.2",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
-    "cypress": "^14.3.0",
+    "cypress": "^15.16.0",
     "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.13.0",
@@ -100,5 +93,9 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "qs": "6.15.2",
+    "uuid": "11.1.1"
   }
 }

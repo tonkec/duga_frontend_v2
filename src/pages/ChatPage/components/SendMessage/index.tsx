@@ -47,6 +47,8 @@ type Inputs = {
 
 type MentionableUser = Pick<IUser, 'id' | 'username'>;
 
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
+
 const schema = z
   .object({
     content: z
@@ -112,7 +114,6 @@ export const getMessageImagePath = (chatId: string, timestamp: string, fileName:
 
 const mentionQueryRegex = /(^|\s)@([\w\d_]*)$/;
 const messageMentionRegex = /@([\w\d_]+)/g;
-const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 const getMentionQuery = (value: string) => value.match(mentionQueryRegex)?.[2]?.toLowerCase();
 
