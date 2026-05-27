@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { isAllowedRasterImageMimeType } from '@app/utils/mediaSafety';
 
-export const useObjectUrl = (source: Blob | MediaSource | null | undefined) => {
+export const useObjectUrl = (source: Blob | null | undefined) => {
   const [objectUrl, setObjectUrl] = useState('');
 
   useEffect(() => {
@@ -10,6 +11,11 @@ export const useObjectUrl = (source: Blob | MediaSource | null | undefined) => {
     }
 
     if (typeof URL.createObjectURL !== 'function') {
+      setObjectUrl('');
+      return;
+    }
+
+    if (!isAllowedRasterImageMimeType(source.type)) {
       setObjectUrl('');
       return;
     }
@@ -27,7 +33,7 @@ export const useObjectUrl = (source: Blob | MediaSource | null | undefined) => {
   return objectUrl;
 };
 
-export const useObjectUrls = (sources: Array<Blob | MediaSource> | null | undefined) => {
+export const useObjectUrls = (sources: Blob[] | null | undefined) => {
   const [objectUrls, setObjectUrls] = useState<string[]>([]);
 
   useEffect(() => {
@@ -41,12 +47,14 @@ export const useObjectUrls = (sources: Array<Blob | MediaSource> | null | undefi
       return;
     }
 
-    const nextObjectUrls = sources.map((source) => URL.createObjectURL(source));
+    const nextObjectUrls = sources.map((source) =>
+      isAllowedRasterImageMimeType(source.type) ? URL.createObjectURL(source) : ''
+    );
     setObjectUrls(nextObjectUrls);
 
     return () => {
       if (typeof URL.revokeObjectURL === 'function') {
-        nextObjectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
+        nextObjectUrls.filter(Boolean).forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
       }
     };
   }, [sources]);

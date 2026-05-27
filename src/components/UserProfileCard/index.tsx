@@ -110,14 +110,16 @@ const UserProfileCard = ({
   useEffect(() => {
     if (!socket || !user?.id) return;
 
-    socket.on('status-update', (data) => {
+    const handleStatusUpdate = (data: { userId?: number | string; status?: string }) => {
       if (Number(data.userId) === Number(user.id)) {
         setIsOnlineState(data.status === 'online');
       }
-    });
+    };
+
+    socket.on('status-update', handleStatusUpdate);
 
     return () => {
-      socket.off('status-update');
+      socket.off('status-update', handleStatusUpdate);
     };
   }, [socket, user?.id]);
 

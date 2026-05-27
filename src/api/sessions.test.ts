@@ -19,6 +19,7 @@ describe('startSession', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
+    sessionStorage.clear();
     clearAccessTokenGetter();
     clearDugaApiToken();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
@@ -29,10 +30,11 @@ describe('startSession', () => {
     clearAccessTokenGetter();
     clearDugaApiToken();
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('starts a backend session with the Auth0 token and stored session id', async () => {
-    localStorage.setItem('dugaSessionId', 'existing-session-id');
+    sessionStorage.setItem('dugaSessionId', 'existing-session-id');
     setAccessTokenGetter(async () => 'auth0-access-token');
 
     await startSession();
@@ -52,22 +54,33 @@ describe('startSession', () => {
     expect(localStorage.getItem('dugaApiToken')).toBeNull();
   });
 
-  it('creates and reuses a session id when none exists', async () => {
+  it('does not create a browser session id when none exists', async () => {
     setAccessTokenGetter(async () => 'auth0-access-token');
 
     await startSession();
 
-    const sessionId = localStorage.getItem('dugaSessionId');
-    expect(sessionId).toEqual(expect.any(String));
     expect(post).toHaveBeenCalledWith(
       '/sessions/start',
-      { sessionId },
+      {},
       {
         headers: {
           Authorization: 'Bearer auth0-access-token',
-          [SESSION_HEADER]: sessionId,
         },
       }
     );
+    expect(localStorage.getItem('dugaSessionId')).toBeNull();
+    expect(sessionStorage.getItem('dugaSessionId')).toBeNull();
+  });
+
+  it('stores the server-issued session id returned from session start', async () => {
+    post.mockResolvedValue({
+      data: { token: 'backend-api-token', sessionId: 'server-session-id' },
+    });
+    setAccessTokenGetter(async () => 'auth0-access-token');
+
+    await startSession();
+
+    expect(sessionStorage.getItem('dugaSessionId')).toBe('server-session-id');
+    expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 });

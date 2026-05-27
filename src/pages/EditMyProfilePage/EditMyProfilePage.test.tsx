@@ -257,7 +257,7 @@ describe('EditMyProfilePage integration', () => {
     await waitFor(() =>
       expect(updateUserMutation).toHaveBeenCalledWith(
         expect.objectContaining({
-          favoriteSong: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          favoriteSong: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
         })
       )
     );

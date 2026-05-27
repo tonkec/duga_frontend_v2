@@ -5,9 +5,9 @@ export const getAllImages = async (id: string) => {
   return client.get(`/uploads/user/${id}`);
 };
 
-export const deleteImage = async (url: string) => {
+export const deleteImage = async (photoId: number | string) => {
   const client = apiClient();
-  return client.delete(`/uploads/delete-photo`, { data: { url } });
+  return client.delete(`/uploads/photo/${photoId}`);
 };
 
 export const getSingleImage = async (id: string) => {

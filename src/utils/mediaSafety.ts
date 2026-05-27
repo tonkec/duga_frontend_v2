@@ -1,3 +1,5 @@
+import { ALLOWED_IMAGE_MIME_TYPES } from './consts';
+
 const YOUTUBE_VIDEO_ID_REGEX = /^[\w-]{11}$/;
 
 const ALLOWED_REMOTE_IMAGE_HOSTS = new Set([
@@ -14,6 +16,32 @@ const ALLOWED_REMOTE_IMAGE_HOSTS = new Set([
 ]);
 
 const isAllowedRemoteImageHost = (hostname: string) => ALLOWED_REMOTE_IMAGE_HOSTS.has(hostname);
+
+const BACKEND_MEDIA_PATH_REGEX = /^\/?(?:uploads|chat)\/[^\s]+$/i;
+const URL_SCHEME_REGEX = /^[a-z][a-z\d+\-.]*:/i;
+
+const normalizeMimeType = (value: string | null | undefined) =>
+  value?.split(';')[0]?.trim().toLowerCase() ?? '';
+
+export const isAllowedRasterImageMimeType = (value: string | null | undefined) =>
+  ALLOWED_IMAGE_MIME_TYPES.includes(normalizeMimeType(value));
+
+export const getSafeBackendMediaPath = (value: string | null | undefined) => {
+  if (!value) return '';
+
+  const trimmedValue = value.trim();
+  if (
+    !trimmedValue ||
+    URL_SCHEME_REGEX.test(trimmedValue) ||
+    trimmedValue.startsWith('//') ||
+    trimmedValue.includes('\\') ||
+    !BACKEND_MEDIA_PATH_REGEX.test(trimmedValue)
+  ) {
+    return '';
+  }
+
+  return `/${trimmedValue.replace(/^\/+/, '')}`;
+};
 
 export const getSafeRemoteImageUrl = (value: string | null | undefined) => {
   if (!value) return '';

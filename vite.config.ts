@@ -13,6 +13,10 @@ export default defineConfig({
           src: 'public/_redirects',
           dest: '',
         },
+        {
+          src: 'public/_headers',
+          dest: '',
+        },
       ],
     }),
   ],

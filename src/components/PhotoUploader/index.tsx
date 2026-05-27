@@ -277,7 +277,6 @@ const PhotoUploader = () => {
         }))
       )
     );
-    formData.append('userId', userId as string);
 
     for (let i = 0; i < files.length; i++) {
       const originalFile = files[i];
@@ -341,8 +340,8 @@ const PhotoUploader = () => {
     );
   };
 
-  const onDeleteFromS3 = (image: IImage) => {
-    deletePhoto({ url: image.url });
+  const onDeletePhoto = (image: IImage) => {
+    deletePhoto({ photoId: image.id });
   };
 
   const onSubmitUpdatePhotos = (e: SyntheticEvent) => {
@@ -370,7 +369,6 @@ const PhotoUploader = () => {
 
     const formData = new FormData();
     formData.append('text', JSON.stringify(imagesPayload));
-    formData.append('userId', userId as string);
     onUploadPhotos(formData);
   };
 
@@ -455,7 +453,7 @@ const PhotoUploader = () => {
                         onTagUsersChange={(users) =>
                           setDescriptionTaggedUsersForImage(imageId, users)
                         }
-                        onDelete={() => onDeleteFromS3(image)}
+                        onDelete={() => onDeletePhoto(image)}
                         inputValue={inputValue}
                         initialTaggedUsers={getDescriptionTaggedUsers(imageId, image.taggedUsers)}
                         isChecked={

@@ -604,6 +604,7 @@ const ChatPage = () => {
         updateMessageReactionLocally(currentMessage, emoji, nextHasReacted)
       );
       socket.emit(nextHasReacted ? 'react-message' : 'remove-message-reaction', {
+        chatId,
         messageId: message.id,
         emoji,
       });
@@ -658,7 +659,9 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleMessageError = (error?: { message?: string }) => {
+    const handleMessageError = (error?: { message?: string; chatId?: number | string }) => {
+      if (error?.chatId && String(error.chatId) !== String(chatId)) return;
+
       if (error?.message === 'Mentions must be chat members') {
         toast.error('Mention možeš poslati samo osobi koja je član ovog razgovora.', toastConfig);
       } else {
@@ -669,7 +672,9 @@ const ChatPage = () => {
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
     };
 
-    const handleMessageRejected = () => {
+    const handleMessageRejected = (payload?: { chatId?: number | string }) => {
+      if (payload?.chatId && String(payload.chatId) !== String(chatId)) return;
+
       toast.error('Poruka je odbijena.', toastConfig);
       queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
@@ -688,6 +693,15 @@ const ChatPage = () => {
     if (!socket) return;
 
     const handleReactionUpdate = (payload: unknown) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        'chatId' in payload &&
+        String((payload as { chatId?: number | string }).chatId) !== String(chatId)
+      ) {
+        return;
+      }
+
       const messageId = getReactionPayloadMessageId(payload);
       if (!messageId) {
         queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
@@ -699,7 +713,9 @@ const ChatPage = () => {
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
     };
 
-    const handleReactionError = () => {
+    const handleReactionError = (payload?: { chatId?: number | string }) => {
+      if (payload?.chatId && String(payload.chatId) !== String(chatId)) return;
+
       toast.error('Reakciju nije moguće spremiti. Probaj opet.', toastConfig);
       queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
@@ -717,39 +733,44 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('typing', (data: ITypingData) => {
-      if (otherMemberIds.includes(Number(data.userId))) {
+    const handleTyping = (data: ITypingData & { chatId?: number | string }) => {
+      if (String(data.chatId) === String(chatId) && otherMemberIds.includes(Number(data.userId))) {
         setIsTyping(true);
       }
-    });
+    };
 
-    socket.on('stop-typing', (data: ITypingData) => {
-      if (otherMemberIds.includes(Number(data.userId))) {
+    const handleStopTyping = (data: ITypingData & { chatId?: number | string }) => {
+      if (String(data.chatId) === String(chatId) && otherMemberIds.includes(Number(data.userId))) {
         setIsTyping(false);
       }
-    });
+    };
+
+    socket.on('typing', handleTyping);
+    socket.on('stop-typing', handleStopTyping);
 
     return () => {
-      socket.off('typing');
-      socket.off('stop-typing');
+      socket.off('typing', handleTyping);
+      socket.off('stop-typing', handleStopTyping);
       setIsTyping(false);
     };
-  }, [socket, otherMemberIds]);
+  }, [chatId, socket, otherMemberIds]);
 
   useEffect(() => {
     if (!socket || !otherUserId) return;
 
-    socket.on('status-update', (data) => {
+    const handleStatusUpdate = (data: { userId?: number | string; status?: string }) => {
       if (Number(data.userId) === Number(otherUserId)) {
         setIsOnlineState(data.status === 'online');
         return;
       }
 
       setIsOnlineState(otherUser?.data.status === 'online');
-    });
+    };
+
+    socket.on('status-update', handleStatusUpdate);
 
     return () => {
-      socket.off('status-update');
+      socket.off('status-update', handleStatusUpdate);
     };
   }, [socket, otherUserId, otherUser]);
 
@@ -762,16 +783,18 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
+    const handleChatDeleted = ({ chatId: deletedChatId }: { chatId?: number | string }) => {
       if (String(deletedChatId) !== String(chatId)) return;
       if (!deletedBySelfRef.current) {
         toast.info('Razgovor je obrisan.', toastConfig);
       }
       navigate('/new-chat', { replace: true });
-    });
+    };
+
+    socket.on('chatDeleted', handleChatDeleted);
 
     return () => {
-      socket.off('chatDeleted');
+      socket.off('chatDeleted', handleChatDeleted);
     };
   }, [chatId, navigate, socket]);
 

@@ -3,6 +3,7 @@ import { debounce } from 'lodash';
 import Input from '@app/components/Input';
 import { useGIFS } from './hooks';
 import Image from '@app/components/Image';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 interface GiphyResult {
   id: string;
@@ -35,7 +36,10 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
   };
 
   const handleGifSelect = (gifUrl: string) => {
-    onGifSelect(gifUrl);
+    const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+    if (!safeGifUrl) return;
+
+    onGifSelect(safeGifUrl);
     setSearchTerm('');
     setPage(1);
     onClose();
@@ -72,23 +76,29 @@ const GiphySearch = ({ onGifSelect, isOpen, onClose }: GiphySearchProps) => {
         </div>
       ) : allGIFS && allGIFS.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto">
-          {allGIFS.map((gif: GiphyResult) => (
-            <button
-              key={gif.id}
-              type="button"
-              onClick={() => handleGifSelect(gif.images.original.url)}
-              className="relative group rounded overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all"
-            >
-              <Image
-                src={gif.images.fixed_height.url}
-                alt={gif.title}
-                className="w-full h-full object-cover"
-                loading
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all" />
-            </button>
-          ))}
+          {allGIFS.map((gif: GiphyResult) => {
+            const safePreviewUrl = getSafeRemoteImageUrl(gif.images.fixed_height.url);
+            const safeOriginalUrl = getSafeRemoteImageUrl(gif.images.original.url);
+            if (!safePreviewUrl || !safeOriginalUrl) return null;
+
+            return (
+              <button
+                key={gif.id}
+                type="button"
+                onClick={() => handleGifSelect(safeOriginalUrl)}
+                className="relative group rounded overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all"
+              >
+                <Image
+                  src={safePreviewUrl}
+                  alt={gif.title}
+                  className="w-full h-full object-cover"
+                  loading
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all" />
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className="flex items-center justify-center h-20 text-gray-500">

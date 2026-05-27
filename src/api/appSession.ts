@@ -9,30 +9,19 @@ export const SESSION_REVOKED_CODE = 'SESSION_REVOKED';
 export const SESSION_CONFLICT_CODE = 'SESSION_CONFLICT';
 export const SESSION_HEADER = 'x-duga-session-id';
 
-const createSessionId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-};
-
 export const getAppSessionId = () => {
-  let sessionId = localStorage.getItem(SESSION_ID_KEY);
-  if (!sessionId) {
-    sessionId = createSessionId();
-    localStorage.setItem(SESSION_ID_KEY, sessionId);
-  }
-
-  return sessionId;
+  localStorage.removeItem(SESSION_ID_KEY);
+  return sessionStorage.getItem(SESSION_ID_KEY);
 };
 
 export const setAppSessionId = (sessionId: string) => {
-  localStorage.setItem(SESSION_ID_KEY, sessionId);
+  localStorage.removeItem(SESSION_ID_KEY);
+  sessionStorage.setItem(SESSION_ID_KEY, sessionId);
 };
 
 export const clearAppSessionId = () => {
   localStorage.removeItem(SESSION_ID_KEY);
+  sessionStorage.removeItem(SESSION_ID_KEY);
   clearDugaApiToken();
 };
 

@@ -4,7 +4,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReportPage from '.';
 import { submitProblemReport } from '@app/api/reports';
-import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
@@ -13,10 +12,6 @@ jest.mock('@app/components/AppLayout', () => ({
 
 jest.mock('@app/api/reports', () => ({
   submitProblemReport: jest.fn(),
-}));
-
-jest.mock('@app/hooks/useGetCurrentUser', () => ({
-  useGetCurrentUser: jest.fn(),
 }));
 
 jest.mock('react-select', () => ({
@@ -48,7 +43,6 @@ jest.mock('react-select', () => ({
 }));
 
 const mockSubmitProblemReport = jest.mocked(submitProblemReport);
-const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
 
 const renderReportPage = () => {
   const queryClient = new QueryClient({
@@ -68,9 +62,6 @@ const renderReportPage = () => {
 describe('ReportPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseGetCurrentUser.mockReturnValue({
-      user: { data: { id: 42 } },
-    } as ReturnType<typeof useGetCurrentUser>);
   });
 
   it('submits reports through the backend report API', async () => {
@@ -92,7 +83,6 @@ describe('ReportPage', () => {
       expect(mockSubmitProblemReport).toHaveBeenCalledWith({
         problemType: 'abuse',
         message: 'Korisnik šalje uznemirujuće poruke.',
-        userId: 42,
       })
     );
     expect(await screen.findByText('Hvala! Tvoja prijava je poslana.')).toBeVisible();

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 
 interface DeletePhotoParams {
-  url: string;
+  photoId: number | string;
 }
 
 export const useDeletePhoto = (queryKey: string[] = ['uploads']) => {
@@ -15,7 +15,7 @@ export const useDeletePhoto = (queryKey: string[] = ['uploads']) => {
     isError: isDeleteError,
     isSuccess,
   } = useMutation({
-    mutationFn: (params: DeletePhotoParams) => deleteImage(params.url),
+    mutationFn: (params: DeletePhotoParams) => deleteImage(params.photoId),
     onSuccess: () => {
       toast.success('Fotografija uspješno obrisana.', toastConfig);
       queryClient.invalidateQueries({ queryKey });

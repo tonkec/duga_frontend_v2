@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { resolveAccessToken } from '@app/api/authToken';
 import { getAppSessionId, markSessionRevoked, SESSION_HEADER } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
@@ -77,7 +77,7 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
   const socketRef = useRef<Socket | null>(null);
   const appSessionStatus = useAppSessionStatus();
   const isAppSessionActive = appSessionStatus === 'active';
-  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser({
+  const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser({
     enabled: isAppSessionActive,
   });
 

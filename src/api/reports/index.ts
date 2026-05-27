@@ -5,7 +5,6 @@ export type ReportProblemType = 'bug' | 'abuse' | 'inappropriate' | 'account' | 
 export interface ReportProblemPayload {
   problemType: ReportProblemType;
   message: string;
-  userId?: number;
 }
 
 export const submitProblemReport = async (payload: ReportProblemPayload) => {

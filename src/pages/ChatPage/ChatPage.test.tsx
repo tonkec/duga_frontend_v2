@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import ChatPage from '.';
 import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
@@ -52,7 +52,18 @@ jest.mock('@app/pages/ChatPage/components/SendMessage', () => ({
 
 jest.mock('@app/pages/ChatPage/components/AddChatMembersModal', () => ({
   __esModule: true,
-  default: () => <div data-testid="add-chat-members-modal">Add members modal</div>,
+  default: ({
+    onAddMembers,
+  }: {
+    onAddMembers: (users: Array<{ id: number; publicId?: string }>) => void;
+  }) => (
+    <button
+      type="button"
+      onClick={() => onAddMembers([{ id: 4, publicId: 'new-member-public-id' }])}
+    >
+      Confirm mocked add members
+    </button>
+  ),
 }));
 
 jest.mock('@app/hooks/useGetCurrentUser', () => ({
@@ -279,16 +290,87 @@ describe('ChatPage integration', () => {
     renderChatPage();
 
     act(() => {
-      socketHandlers.get('typing')?.({ userId: otherUser.id });
+      socketHandlers.get('typing')?.({ chatId: '123', userId: otherUser.id });
     });
 
     expect(screen.getByRole('status', { name: 'Druga osoba piše' })).toBeVisible();
 
     act(() => {
-      socketHandlers.get('stop-typing')?.({ userId: otherUser.id });
+      socketHandlers.get('stop-typing')?.({ chatId: '123', userId: otherUser.id });
     });
 
     expect(screen.queryByRole('status', { name: 'Druga osoba piše' })).not.toBeInTheDocument();
+  });
+
+  it('ignores typing and message socket events outside the current authorized chat context', () => {
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    act(() => {
+      socketHandlers.get('typing')?.({ chatId: '999', userId: otherUser.id });
+      socketHandlers.get('typing')?.({ chatId: '123', userId: currentUser.id });
+      socketHandlers.get('received')?.({
+        ...message(99, otherUser.id, 'Cross-chat injected message', '2026-05-23T08:09:00.000Z'),
+        chatId: 999,
+      });
+    });
+
+    expect(screen.queryByRole('status', { name: 'Druga osoba piše' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Cross-chat injected message')).not.toBeInTheDocument();
+  });
+
+  it('emits group member additions without browser-supplied actor or admin fields', () => {
+    mockUseGetCurrentChat.mockReturnValue({
+      currentChat: {
+        data: {
+          id: 123,
+          type: 'group',
+          name: 'Admin group',
+          Users: [
+            { id: currentUser.id, username: currentUser.username, role: 'admin' },
+            { id: otherUser.id, username: otherUser.username },
+          ],
+        },
+      },
+      currentChatError: null,
+      isCurrentChatLoading: false,
+      isCurrentChatSuccess: true,
+      isCurrentChatError: false,
+    } as ReturnType<typeof useGetCurrentChat>);
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dodaj osobe' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm mocked add members' }));
+
+    expect(socketEmit).toHaveBeenCalledWith('add-user-to-group', {
+      chatId: 123,
+      userId: 4,
+      userPublicId: 'new-member-public-id',
+    });
+    const addMemberPayloads = socketEmit.mock.calls
+      .filter(([event]) => event === 'add-user-to-group')
+      .map(([, payload]) => payload);
+
+    addMemberPayloads.forEach((payload) => {
+      ['currentUserId', 'fromUserId', 'role', 'isAdmin'].forEach((key) => {
+        expect(payload).toEqual(expect.not.objectContaining({ [key]: expect.anything() }));
+      });
+    });
   });
 
   it('emits a socket event when reacting to a message', async () => {
@@ -306,8 +388,30 @@ describe('ChatPage integration', () => {
     (await screen.findByRole('button', { name: 'Odaberi emoji 👍' })).click();
 
     expect(socketEmit).toHaveBeenCalledWith('react-message', {
+      chatId: '123',
       messageId: 1,
       emoji: '👍',
+    });
+  });
+
+  it('cleans up socket listeners with the exact registered handler references', () => {
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    const { unmount } = renderChatPage();
+    const registeredHandlers = new Map(
+      socketOn.mock.calls.map(([event, handler]) => [event, handler])
+    );
+
+    unmount();
+
+    registeredHandlers.forEach((handler, event) => {
+      expect(socketOff).toHaveBeenCalledWith(event, handler);
     });
   });
 

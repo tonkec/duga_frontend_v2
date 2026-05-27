@@ -23,6 +23,7 @@ import {
 } from '../utils/forumValidation';
 import { getForumImageItems } from '../utils/forumImages';
 import { useObjectUrls } from '@app/hooks/useObjectUrl';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 type QuestionFormPayload = CreateQuestionPayload & Pick<UpdateQuestionPayload, 'removeImage'>;
 
@@ -239,7 +240,10 @@ const QuestionForm = ({
       <GiphySearch
         isOpen={showGiphySearch}
         onClose={() => setShowGiphySearch(false)}
-        onGifSelect={(gifUrl) => setSelectedGifUrl(gifUrl)}
+        onGifSelect={(gifUrl) => {
+          const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+          if (safeGifUrl) setSelectedGifUrl(safeGifUrl);
+        }}
       />
 
       {selectedGifUrl && (

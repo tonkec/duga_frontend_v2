@@ -18,7 +18,7 @@ const Image = ({
   onClick?: () => void;
   referrerPolicy?: React.HTMLAttributeReferrerPolicy;
 }) => {
-  const isImageLoading = useImage(src);
+  const isImageLoading = useImage(src, referrerPolicy);
   return isImageLoading ? (
     <Loader variant="inline" size="sm" label="Učitavanje slike..." />
   ) : (

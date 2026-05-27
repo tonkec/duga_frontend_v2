@@ -34,6 +34,7 @@ import {
 } from '@app/utils/emojis';
 import UserAvatar from '@app/components/UserAvatar';
 import { useObjectUrls } from '@app/hooks/useObjectUrl';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 type Inputs = {
   content: string;
@@ -173,22 +174,18 @@ const SendMessage = ({
   }, [mentionQuery, mentionableUsers]);
 
   const emitStopTyping = useCallback(() => {
-    if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
+    if (!socket || !chatId) return;
     socket.emit('stop-typing', {
       chatId,
-      userId: currentUserId,
-      toUserId: recipientIds,
     });
-  }, [socket, currentUserId, recipientIds, chatId]);
+  }, [socket, chatId]);
 
   const emitTyping = useCallback(() => {
-    if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
+    if (!socket || !chatId) return;
     socket.emit('typing', {
       chatId,
-      userId: currentUserId,
-      toUserId: recipientIds,
     });
-  }, [socket, currentUserId, recipientIds, chatId]);
+  }, [socket, chatId]);
 
   useEffect(() => {
     return () => {
@@ -197,13 +194,13 @@ const SendMessage = ({
   }, [emitStopTyping]);
 
   const sendGif = (gifUrl: string) => {
+    const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+    if (!safeGifUrl) return;
+
     const msg = {
       type: 'gif',
-      fromUserId: currentUserId,
-      fromUser: currentUser?.data,
-      toUserId: recipientIds,
       chatId,
-      messagePhotoUrl: gifUrl,
+      messagePhotoUrl: safeGifUrl,
     };
     socket?.emit('message', msg);
     refreshUserChatsList();
@@ -232,9 +229,6 @@ const SendMessage = ({
       uploadableImages.forEach((file: File) => {
         socket?.emit('message', {
           type: 'file',
-          fromUserId: currentUserId,
-          fromUser: currentUser?.data,
-          toUserId: recipientIds,
           chatId,
           messagePhotoUrl: getMessageImagePath(chatId, imageTimestamp, file.name),
           message: null,
@@ -274,7 +268,6 @@ const SendMessage = ({
 
     const formData = new FormData();
     formData.append('chatId', chatId);
-    formData.append('fromUserId', currentUserId as string);
     formData.append('timestamp', imageTimestamp);
 
     files.forEach((file: File) => {
@@ -291,9 +284,6 @@ const SendMessage = ({
     const mentions = getMentionIds(message, mentionableUsers);
     const msg = {
       type: 'text',
-      fromUserId: currentUserId,
-      fromUser: currentUser?.data,
-      toUserId: recipientIds,
       chatId,
       message,
       mentions,
@@ -447,7 +437,6 @@ const SendMessage = ({
                       setMentionQuery(getMentionQuery(field.value ?? ''));
                       emitTyping();
                       socket?.emit('markAsRead', {
-                        userId: currentUserId,
                         chatId: Number(chatId),
                       });
 

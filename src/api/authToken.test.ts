@@ -45,6 +45,36 @@ describe('resolveAccessToken', () => {
     await expect(resolveAccessToken()).resolves.toBe('fresh-auth0-token');
   });
 
+  it('returns null when no explicit, backend, or Auth0 token is available', async () => {
+    await expect(resolveAccessToken()).resolves.toBeNull();
+  });
+
+  it('does not call the Auth0 getter when an explicit token is provided', async () => {
+    const getter = jest.fn(async () => 'auth0-token');
+    setAccessTokenGetter(getter);
+
+    await expect(resolveAccessToken('explicit-token')).resolves.toBe('explicit-token');
+
+    expect(getter).not.toHaveBeenCalled();
+  });
+
+  it('does not call the Auth0 getter when a backend API token exists', async () => {
+    const getter = jest.fn(async () => 'auth0-token');
+    setAccessTokenGetter(getter);
+    setDugaApiToken('duga-api-token');
+
+    await expect(resolveAccessToken()).resolves.toBe('duga-api-token');
+
+    expect(getter).not.toHaveBeenCalled();
+  });
+
+  it('stops using Auth0 after the token getter is cleared', async () => {
+    setAccessTokenGetter(async () => 'auth0-token');
+    clearAccessTokenGetter();
+
+    await expect(resolveAccessToken()).resolves.toBeNull();
+  });
+
   it('does not reuse a legacy cookie token when the Auth0 getter fails', async () => {
     document.cookie = `token=${encodeURIComponent('cookie-token')};path=/`;
     setAccessTokenGetter(async () => {

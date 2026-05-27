@@ -16,7 +16,7 @@ describe('global API session conflict handling', () => {
     const onSessionRevoked = jest.fn();
     window.addEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
     document.cookie = 'token=stale-token;path=/';
-    localStorage.setItem(SESSION_ID_KEY, 'existing-session-id');
+    sessionStorage.setItem(SESSION_ID_KEY, 'existing-session-id');
 
     handleGlobalApiError({
       response: {
@@ -29,6 +29,7 @@ describe('global API session conflict handling', () => {
 
     expect(sessionStorage.getItem(SESSION_REVOKED_KEY)).toBe('true');
     expect(localStorage.getItem(SESSION_ID_KEY)).toBeNull();
+    expect(sessionStorage.getItem(SESSION_ID_KEY)).toBeNull();
     expect(document.cookie).not.toContain('token=');
     expect(onSessionRevoked).toHaveBeenCalledTimes(1);
 
@@ -38,7 +39,7 @@ describe('global API session conflict handling', () => {
   it('forces logout when session startup returns a conflict', () => {
     const onSessionRevoked = jest.fn();
     window.addEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
-    localStorage.setItem(SESSION_ID_KEY, 'conflicting-session-id');
+    sessionStorage.setItem(SESSION_ID_KEY, 'conflicting-session-id');
 
     handleGlobalApiError({
       config: {
@@ -52,6 +53,7 @@ describe('global API session conflict handling', () => {
 
     expect(sessionStorage.getItem(SESSION_REVOKED_KEY)).toBe('true');
     expect(localStorage.getItem(SESSION_ID_KEY)).toBeNull();
+    expect(sessionStorage.getItem(SESSION_ID_KEY)).toBeNull();
     expect(onSessionRevoked).toHaveBeenCalledTimes(1);
 
     window.removeEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);

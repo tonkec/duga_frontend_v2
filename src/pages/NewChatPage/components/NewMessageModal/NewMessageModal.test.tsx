@@ -55,6 +55,7 @@ const mockUseSocket = jest.mocked(useSocket);
 
 const onCreateChat = jest.fn();
 const socketEmit = jest.fn();
+const forbiddenSocketActorKeys = ['currentUserId', 'fromUserId', 'fromUser', 'role', 'isAdmin'];
 
 const currentUser = {
   id: 1,
@@ -85,6 +86,8 @@ const renderModal = () =>
 describe('NewMessageModal creating chat disabled state', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    onCreateChat.mockReset();
+    socketEmit.mockReset();
 
     mockUseGetAllUsers.mockReturnValue({
       allUsers: {
@@ -176,6 +179,13 @@ describe('NewMessageModal creating chat disabled state', () => {
     fireEvent.click(screen.getByRole('option', { name: /second_match/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Kreiraj grupu' }));
 
+    expect(onCreateChat).toHaveBeenCalledWith(
+      {
+        userPublicIds: [availableUser.publicId, secondAvailableUser.publicId],
+        name: 'Test grupa',
+      },
+      expect.any(Object)
+    );
     expect(socketEmit).toHaveBeenCalledWith('add-user-to-group', {
       chatId: 123,
       userId: availableUser.id,
@@ -192,5 +202,34 @@ describe('NewMessageModal creating chat disabled state', () => {
         chat: expect.anything(),
       })
     );
+    socketEmit.mock.calls
+      .filter(([event]) => event === 'add-user-to-group')
+      .forEach(([, payload]) => {
+        forbiddenSocketActorKeys.forEach((key) => {
+          expect(payload).toEqual(expect.not.objectContaining({ [key]: expect.anything() }));
+        });
+      });
+  });
+
+  it('does not emit group membership socket events before the create call succeeds', () => {
+    mockUseCreateNewChat.mockReturnValue({
+      onCreateChat,
+      isCreatingChat: false,
+      isCreateChatError: false,
+      isCreateChatSuccess: false,
+    } as ReturnType<typeof useCreateNewChat>);
+
+    renderModal();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Grupa' }));
+    fireEvent.change(screen.getByPlaceholderText('Naziv grupe'), {
+      target: { value: 'Test grupa' },
+    });
+    fireEvent.click(screen.getByRole('option', { name: /available_match/ }));
+    fireEvent.click(screen.getByRole('option', { name: /second_match/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Kreiraj grupu' }));
+
+    expect(onCreateChat).toHaveBeenCalled();
+    expect(socketEmit).not.toHaveBeenCalledWith('add-user-to-group', expect.anything());
   });
 });

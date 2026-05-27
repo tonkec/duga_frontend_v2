@@ -66,6 +66,13 @@ const socketEmit = jest.fn();
 const mutateMarkAsRead = jest.fn();
 const uploadMessageImage = jest.fn();
 const messageInputPlaceholder = 'Napiši poruku… ( @ za mention, : za emoji )';
+const forbiddenSocketActorKeys = ['userId', 'fromUserId', 'fromUser', 'toUserId'];
+
+const expectNoForbiddenSocketActorKeys = (payload: unknown) => {
+  forbiddenSocketActorKeys.forEach((key) => {
+    expect(payload).toEqual(expect.not.objectContaining({ [key]: expect.anything() }));
+  });
+};
 
 const renderSendMessage = () => {
   const queryClient = new QueryClient({
@@ -156,11 +163,8 @@ describe('SendMessage integration', () => {
 
     expect(socketEmit).toHaveBeenCalledWith('typing', {
       chatId: '123',
-      userId: 1,
-      toUserId: [2],
     });
     expect(socketEmit).toHaveBeenCalledWith('markAsRead', {
-      userId: 1,
       chatId: 123,
     });
     expect(mutateMarkAsRead).toHaveBeenCalledWith('55');
@@ -175,12 +179,6 @@ describe('SendMessage integration', () => {
     await waitFor(() =>
       expect(socketEmit).toHaveBeenCalledWith('message', {
         type: 'text',
-        fromUserId: 1,
-        fromUser: {
-          id: 1,
-          username: 'current_user',
-        },
-        toUserId: [2],
         chatId: '123',
         message: 'Hello from the integration test',
         mentions: [],
@@ -189,9 +187,8 @@ describe('SendMessage integration', () => {
     expect(input).toHaveValue('');
     expect(socketEmit).toHaveBeenCalledWith('stop-typing', {
       chatId: '123',
-      userId: 1,
-      toUserId: [2],
     });
+    socketEmit.mock.calls.forEach(([, payload]) => expectNoForbiddenSocketActorKeys(payload));
   });
 
   it('emits typing while the draft changes and stops when it is cleared', () => {
@@ -207,8 +204,6 @@ describe('SendMessage integration', () => {
 
     expect(socketEmit).toHaveBeenCalledWith('typing', {
       chatId: '123',
-      userId: 1,
-      toUserId: [2],
     });
 
     fireEvent.change(input, {
@@ -219,8 +214,6 @@ describe('SendMessage integration', () => {
 
     expect(socketEmit).toHaveBeenCalledWith('stop-typing', {
       chatId: '123',
-      userId: 1,
-      toUserId: [2],
     });
   });
 

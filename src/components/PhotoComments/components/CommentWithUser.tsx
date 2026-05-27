@@ -186,7 +186,7 @@ const CommentWithUser: React.FC<{
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           setIsDeleteModalOpen(false);
-          mutateDeleteUploadComment(Number(comment.id));
+          mutateDeleteUploadComment({ commentId: Number(comment.id), uploadId: comment.uploadId });
         }}
       >
         <div>

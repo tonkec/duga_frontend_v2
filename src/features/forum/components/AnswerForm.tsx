@@ -21,6 +21,7 @@ import {
   validateForumImages,
 } from '../utils/forumValidation';
 import { useObjectUrls } from '@app/hooks/useObjectUrl';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 interface AnswerFormProps {
   isSubmitting: boolean;
@@ -201,7 +202,10 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
       <GiphySearch
         isOpen={showGiphySearch}
         onClose={() => setShowGiphySearch(false)}
-        onGifSelect={(gifUrl) => setSelectedGifUrl(gifUrl)}
+        onGifSelect={(gifUrl) => {
+          const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+          if (safeGifUrl) setSelectedGifUrl(safeGifUrl);
+        }}
       />
 
       {selectedGifUrl && (

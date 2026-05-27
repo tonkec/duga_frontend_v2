@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import {
+  getSafeBackendMediaPath,
   getSafeGiphyEmbedUrl,
   getSafeRemoteImageUrl,
   getSafeYouTubeEmbedUrl,
@@ -49,7 +50,6 @@ const ContentFormatter = ({
   const urlRegex = /(https?:\/\/[^\s]+)/;
   const internalProfilePathRegex =
     /^\/user\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const secureImagePathRegex = /^\/?uploads\/[^\s]+$/;
 
   return (
     <>
@@ -128,12 +128,13 @@ const ContentFormatter = ({
           }
         }
 
-        if (secureImagePathRegex.test(part)) {
+        const safeMediaPath = getSafeBackendMediaPath(part);
+        if (safeMediaPath) {
           if (!renderRichContent) {
             return <span key={i}>Slika</span>;
           }
 
-          return <SecureInlineImage key={i} secureUrl={part} />;
+          return <SecureInlineImage key={i} secureUrl={safeMediaPath} />;
         }
 
         if (internalProfilePathRegex.test(part)) {

@@ -70,14 +70,16 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
   useEffect(() => {
     if (!socket || !user.id) return;
 
-    socket.on('status-update', (data: { userId: number; status: 'online' | 'offline' }) => {
+    const handleStatusUpdate = (data: { userId: number; status: 'online' | 'offline' }) => {
       if (Number(data.userId) === Number(user.id)) {
         setIsOnlineState(data.status === 'online');
       }
-    });
+    };
+
+    socket.on('status-update', handleStatusUpdate);
 
     return () => {
-      socket.off('status-update');
+      socket.off('status-update', handleStatusUpdate);
     };
   }, [socket, user.id]);
 

@@ -13,12 +13,14 @@ describe('register', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
+    sessionStorage.clear();
     clearAccessTokenGetter();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
   });
 
   afterEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     clearAccessTokenGetter();
   });
 
@@ -35,7 +37,8 @@ describe('register', () => {
       isVerified: true,
       username: 'generated-user',
     });
-    expect(localStorage.getItem('dugaSessionId')).toBe('registered-session-id');
+    expect(sessionStorage.getItem('dugaSessionId')).toBe('registered-session-id');
+    expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 
   it('stores a nested backend session id returned from register', async () => {
@@ -44,6 +47,7 @@ describe('register', () => {
     await register('auth0|user', 'user@example.com', 'generated-user', true, 'explicit-token');
 
     expect(mockApiClient).toHaveBeenCalledWith('explicit-token');
-    expect(localStorage.getItem('dugaSessionId')).toBe('nested-session-id');
+    expect(sessionStorage.getItem('dugaSessionId')).toBe('nested-session-id');
+    expect(localStorage.getItem('dugaSessionId')).toBeNull();
   });
 });

@@ -15,13 +15,11 @@ describe('submitProblemReport', () => {
     await submitProblemReport({
       problemType: 'abuse',
       message: 'Neprimjerena poruka u chatu.',
-      userId: 42,
     });
 
     expect(post).toHaveBeenCalledWith('/reports', {
       problemType: 'abuse',
       message: 'Neprimjerena poruka u chatu.',
-      userId: 42,
     });
   });
 });

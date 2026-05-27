@@ -6,7 +6,6 @@ import AppLayout from '@app/components/AppLayout';
 import Card from '@app/components/Card';
 import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
-import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
 import FieldError from '@app/components/FieldError';
 import { submitProblemReport } from '@app/api/reports';
@@ -56,7 +55,6 @@ const FormSchema = z.object({
     invalid_type_error: 'Odaberi vrstu problema.',
   }),
   message: z.string().trim().min(10, 'Poruka mora imati barem 10 znakova.'),
-  userId: z.number().optional(),
 });
 
 type FormValues = z.infer<typeof FormSchema>;
@@ -72,8 +70,6 @@ const getReportErrorMessage = (error: unknown) => {
 };
 
 export default function ReportPage() {
-  const { user: currentUser } = useGetCurrentUser();
-  const userId = currentUser?.data?.id;
   const {
     register,
     handleSubmit,
@@ -89,12 +85,11 @@ export default function ReportPage() {
       submitProblemReport({
         problemType: data.problem_type,
         message: data.message.trim(),
-        userId: data.userId,
       }),
   });
 
   const onSubmit = (data: FormValues) => {
-    mutate({ ...data, userId });
+    mutate(data);
   };
 
   return (

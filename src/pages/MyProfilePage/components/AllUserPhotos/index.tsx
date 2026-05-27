@@ -178,7 +178,7 @@ const AllUserPhotos = () => {
   const isForumDetailsLoading = forumDetailQueries.some((query) => query.isPending);
   const { deletePhoto, isDeleting } = useDeletePhoto(['uploads', 'user-photos']);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState('');
+  const [photoId, setPhotoId] = useState<number | string>('');
   const uploadPhotos: AllUserPhoto[] = Array.isArray(allUserImages?.data)
     ? allUserImages.data
     : allUserImages?.data?.images || [];
@@ -188,7 +188,9 @@ const AllUserPhotos = () => {
   const photos = [...uploadPhotos, ...forumPhotos];
 
   const handleDelete = () => {
-    deletePhoto({ url: photoUrl });
+    if (!photoId) return;
+
+    deletePhoto({ photoId });
     setIsDeleteModalVisible(false);
   };
 
@@ -259,7 +261,7 @@ const AllUserPhotos = () => {
               <Button
                 onClick={() => {
                   setIsDeleteModalVisible(true);
-                  setPhotoUrl(image.url);
+                  setPhotoId(image.id);
                 }}
                 disabled={isDeleting}
                 type="danger"

@@ -10,6 +10,20 @@ declare module 'axios' {
   }
 }
 
+const URL_SCHEME_REGEX = /^[a-z][a-z\d+\-.]*:/i;
+
+const isAbsoluteOrProtocolRelativeUrl = (url: string) => {
+  const trimmedUrl = url.trim();
+  return URL_SCHEME_REGEX.test(trimmedUrl) || trimmedUrl.startsWith('//');
+};
+
+const absoluteUrlRejection = {
+  response: {
+    status: 400,
+    data: { message: 'Absolute API request URLs are not allowed' },
+  },
+};
+
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
   for (const cookie of cookies) {
@@ -37,6 +51,10 @@ export const apiClient = (token?: string): AxiosInstance => {
 
   instance.interceptors.request.use(
     async (config) => {
+      if (config.url && isAbsoluteOrProtocolRelativeUrl(config.url)) {
+        return Promise.reject(absoluteUrlRejection);
+      }
+
       const authToken = await resolveAccessToken(token);
 
       if (!authToken) {
@@ -48,8 +66,11 @@ export const apiClient = (token?: string): AxiosInstance => {
         });
       }
 
+      const sessionId = getAppSessionId();
       config.headers.Authorization = `Bearer ${authToken}`;
-      config.headers[SESSION_HEADER] = getAppSessionId();
+      if (sessionId) {
+        config.headers[SESSION_HEADER] = sessionId;
+      }
       return config;
     },
     (error) => Promise.reject(error)

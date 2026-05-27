@@ -26,10 +26,19 @@ type CypressWindow = Window &
 const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
 const SESSION_REVOKED_MESSAGE = 'Odjavljeni ste jer je račun otvoren u drugoj sesiji.';
 
+const getBootstrapSessionKey = (userSub: string) => `${userSub}:${getAppSessionId() ?? 'pending'}`;
+
+const getStartedSessionKey = (userSub: string) => {
+  const sessionId = getAppSessionId();
+  return sessionId ? `${userSub}:${sessionId}` : null;
+};
+
 const AppSessionProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading, logout, user } = useAuth0();
   const queryClient = useQueryClient();
   const startedSessionKeyRef = useRef<string | null>(null);
+  const startingSessionKeyRef = useRef<string | null>(null);
+  const startingSessionPromiseRef = useRef<Promise<void> | null>(null);
   const [status, setStatus] = useState<AppSessionStatus>(() =>
     isAppSessionRevoked() ? 'revoked' : 'loading'
   );
@@ -81,43 +90,58 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const sessionKey = `${user.sub}:${getAppSessionId()}`;
-    if (startedSessionKeyRef.current === sessionKey) {
+    const startedSessionKey = getStartedSessionKey(user.sub);
+    if (startedSessionKey && startedSessionKeyRef.current === startedSessionKey) {
       setStatus('active');
       return;
     }
 
+    const sessionKey = getBootstrapSessionKey(user.sub);
     let cancelled = false;
-    startedSessionKeyRef.current = sessionKey;
     setStatus('loading');
 
-    const startAppSession = async () => {
-      try {
+    const handleBootstrapError = (error: unknown) => {
+      if (isAppSessionConflictError(error)) {
+        markSessionRevoked();
+        return;
+      }
+
+      console.error('Error starting app session:', error);
+      if (!cancelled) {
+        setStatus('error');
+      }
+    };
+
+    if (startingSessionKeyRef.current !== sessionKey || !startingSessionPromiseRef.current) {
+      startingSessionKeyRef.current = sessionKey;
+      startingSessionPromiseRef.current = (async () => {
         await register(
           user.sub!,
           user.email!,
           generateUniqueUsername(),
           Boolean(user.email_verified)
         );
-        startedSessionKeyRef.current = `${user.sub}:${getAppSessionId()}`;
         await startSession();
+        const nextStartedSessionKey = getStartedSessionKey(user.sub!);
+        if (!nextStartedSessionKey) {
+          throw new Error('Backend session id not available');
+        }
+        startedSessionKeyRef.current = nextStartedSessionKey;
+      })().finally(() => {
+        if (startingSessionKeyRef.current === sessionKey) {
+          startingSessionKeyRef.current = null;
+          startingSessionPromiseRef.current = null;
+        }
+      });
+    }
+
+    startingSessionPromiseRef.current
+      .then(() => {
         if (!cancelled) {
           setStatus('active');
         }
-      } catch (error) {
-        if (isAppSessionConflictError(error)) {
-          markSessionRevoked();
-          return;
-        }
-
-        console.error('Error starting app session:', error);
-        if (!cancelled) {
-          setStatus('error');
-        }
-      }
-    };
-
-    startAppSession();
+      })
+      .catch(handleBootstrapError);
 
     return () => {
       cancelled = true;

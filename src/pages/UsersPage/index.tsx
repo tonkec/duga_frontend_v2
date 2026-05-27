@@ -4,7 +4,7 @@ import Loader from '@app/components/Loader';
 import Paginated from '@app/components/Paginated';
 import UserCard, { IUser } from '@app/components/UserCard';
 import UserFilters from '@app/components/UserFilters';
-import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
 import { useGetWindowSize } from '@app/hooks/useGetWindowSize';
 import { filterUsers, getVisibleVerifiedUsers } from '@app/utils/userDirectory';
@@ -20,7 +20,7 @@ const defaultSelectValue = {
 };
 
 const UsersPage = () => {
-  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
+  const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
