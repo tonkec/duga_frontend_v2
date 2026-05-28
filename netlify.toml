@@ -1,46 +1,6 @@
 [build]
-  command = "npm run build"
+  command = "bash -lc 'if [ \"$CONTEXT\" = \"deploy-preview\" ]; then export VITE_APP_ENV=preview VITE_S3_ENVIRONMENT=preview; elif [ \"$BRANCH\" = \"staging\" ] || [ \"$CONTEXT\" = \"branch-deploy\" ]; then export VITE_APP_ENV=staging VITE_S3_ENVIRONMENT=staging; else export VITE_APP_ENV=production VITE_S3_ENVIRONMENT=production; fi; npm run build'"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
-
-# =========================
-# Production
-# =========================
-
-[context.production]
-  command = "npm run build"
-
-[context.production.environment]
-  VITE_APP_ENV = "production"
-
-# =========================
-# Staging branch
-# =========================
-
-[context.staging]
-  command = "npm run build"
-
-[context.staging.environment]
-  VITE_APP_ENV = "staging"
-
-# =========================
-# Generic branch deploys
-# =========================
-
-[context.branch-deploy]
-  command = "npm run build"
-
-[context.branch-deploy.environment]
-  VITE_APP_ENV = "staging"
-
-# =========================
-# Deploy previews (PRs)
-# =========================
-
-[context.deploy-preview]
-  command = "npm run build"
-
-[context.deploy-preview.environment]
-  VITE_APP_ENV = "preview"
