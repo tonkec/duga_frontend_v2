@@ -50,7 +50,7 @@ const AddChatMembersModal = ({
 }: IAddChatMembersModalProps) => {
   const [search, setSearch] = useState('');
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
-  const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const { allUsers, isAllUsersLoading } = useGetAllUsers({ enabled: isOpen });
 
   const memberIdSet = useMemo(() => new Set(memberIds.map(Number)), [memberIds]);
   const remainingMemberSlots = Math.max(0, MAX_GROUP_CHAT_MEMBERS - memberIdSet.size);

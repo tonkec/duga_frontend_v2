@@ -41,7 +41,7 @@ const hasRenderableProfilePhoto = (profilePhoto: ProfilePhotoResponse | null | u
 
 const UsersPage = () => {
   const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser();
-  const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const { allUsers, isAllUsersLoading } = useGetAllUsers({ enabled: Boolean(currentUser) });
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
