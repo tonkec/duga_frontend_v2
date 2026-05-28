@@ -8,6 +8,7 @@ const Image = ({
   style,
   loading,
   onClick,
+  referrerPolicy,
 }: {
   src: string;
   alt: string;
@@ -15,8 +16,9 @@ const Image = ({
   style?: React.CSSProperties;
   loading?: boolean;
   onClick?: () => void;
+  referrerPolicy?: React.HTMLAttributeReferrerPolicy;
 }) => {
-  const isImageLoading = useImage(src);
+  const isImageLoading = useImage(src, referrerPolicy);
   return isImageLoading ? (
     <Loader variant="inline" size="sm" label="Učitavanje slike..." />
   ) : (
@@ -27,6 +29,7 @@ const Image = ({
       style={style}
       loading={loading ? 'lazy' : undefined}
       onClick={onClick}
+      referrerPolicy={referrerPolicy}
     />
   );
 };

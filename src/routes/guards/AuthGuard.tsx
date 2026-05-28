@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import Loader from '@app/components/Loader';
 import { useAppSessionStatus } from '@app/context/AppSessionContext';
-import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 
 interface IAuthGuardProps {
   children: React.ReactNode;
@@ -11,25 +11,27 @@ interface IAuthGuardProps {
 export const AuthGuard = ({ children }: IAuthGuardProps) => {
   const { isAuthenticated, isLoading, user } = useAuth0();
   const appSessionStatus = useAppSessionStatus();
-  const shouldLoadBackendUser = isAuthenticated && appSessionStatus === 'active';
-  const { data: backendUser, isLoading: isBackendUserLoading } = useEnsureBackendUser({
+  const shouldLoadBackendUser = appSessionStatus === 'active';
+  const { data: backendUser, isLoading: isBackendUserLoading } = useCurrentBackendUser({
     enabled: shouldLoadBackendUser,
+    requireAuth0: false,
   });
+  const hasBackendSession = Boolean(backendUser);
   const isUserVerified = Boolean(user?.email_verified || backendUser?.isVerified);
 
   if (isLoading) return <Loader />;
 
-  if (isAuthenticated && appSessionStatus === 'loading') return <Loader />;
+  if (appSessionStatus === 'loading') return <Loader />;
 
-  if (isAuthenticated && appSessionStatus !== 'active') {
-    return <Navigate to="/login" />;
-  }
-
-  if (!isAuthenticated) {
+  if (appSessionStatus !== 'active') {
     return <Navigate to="/login" />;
   }
 
   if (shouldLoadBackendUser && isBackendUserLoading) return <Loader />;
+
+  if (!isAuthenticated && !hasBackendSession) {
+    return <Navigate to="/login" />;
+  }
 
   if (!isUserVerified) {
     return <Navigate to="/verify-email" replace />;

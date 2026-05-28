@@ -28,16 +28,20 @@ export const StatusProvider = ({
 
   useEffect(() => {
     if (socket && onlineUserId) {
-      socket.on('status-update', (userId: number, status: 'online' | 'offline') => {
+      const handleStatusUpdate = (userId: number, status: 'online' | 'offline') => {
+        if (Number(userId) !== Number(onlineUserId)) return;
+
         setStatusMap((prev) => {
           const newMap = new Map(prev);
           newMap.set(userId, status);
           return newMap;
         });
-      });
+      };
+
+      socket.on('status-update', handleStatusUpdate);
 
       return () => {
-        socket.off('status-update');
+        socket.off('status-update', handleStatusUpdate);
       };
     }
   }, [socket, onlineUserId]);

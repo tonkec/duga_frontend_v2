@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import UsersPage from '.';
 import { getProfilePhoto } from '@app/api/uploads';
 import { useSocket } from '../../context/useSocket';
-import { useEnsureBackendUser } from '../../hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '../../hooks/useEnsureBackendUser';
 import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 
 jest.mock('@app/components/AppLayout', () => ({
@@ -30,7 +30,7 @@ jest.mock('@app/context/useSocket', () => ({
 }));
 
 jest.mock('@app/hooks/useEnsureBackendUser', () => ({
-  useEnsureBackendUser: jest.fn(),
+  useCurrentBackendUser: jest.fn(),
 }));
 
 jest.mock('@app/hooks/useGetAllUsers', () => ({
@@ -45,7 +45,7 @@ jest.mock('@app/hooks/useGetWindowSize', () => ({
 }));
 
 const mockUseSocket = jest.mocked(useSocket);
-const mockUseEnsureBackendUser = jest.mocked(useEnsureBackendUser);
+const mockUseCurrentBackendUser = jest.mocked(useCurrentBackendUser);
 const mockUseGetAllUsers = jest.mocked(useGetAllUsers);
 const mockGetProfilePhoto = jest.mocked(getProfilePhoto);
 
@@ -120,13 +120,13 @@ describe('UsersPage dating flow integration', () => {
       on: jest.fn(),
       off: jest.fn(),
     } as unknown as ReturnType<typeof useSocket>);
-    mockUseEnsureBackendUser.mockReturnValue({
+    mockUseCurrentBackendUser.mockReturnValue({
       data: {
         id: 1,
         username: 'current_user',
       },
       isLoading: false,
-    } as ReturnType<typeof useEnsureBackendUser>);
+    } as ReturnType<typeof useCurrentBackendUser>);
     mockGetProfilePhoto.mockResolvedValue({ data: {} } as Awaited<
       ReturnType<typeof getProfilePhoto>
     >);
@@ -177,7 +177,12 @@ describe('UsersPage dating flow integration', () => {
   it('filters users by profile photo', async () => {
     mockGetProfilePhoto.mockImplementation((userId) =>
       Promise.resolve({
-        data: userId === '2' ? { securePhotoUrl: '/uploads/avatar.jpg' } : {},
+        data:
+          userId === '2'
+            ? { securePhotoUrl: '/uploads/avatar.jpg' }
+            : userId === '3'
+              ? { securePhotoUrl: 'http://placekitten.com/200/300' }
+              : {},
       } as Awaited<ReturnType<typeof getProfilePhoto>>)
     );
     mockUseGetAllUsers.mockReturnValue({
@@ -189,7 +194,7 @@ describe('UsersPage dating flow integration', () => {
           }),
           apiUser({
             id: 3,
-            username: 'user_without_photo',
+            username: 'user_with_placeholder_avatar',
           }),
         ],
       },
@@ -205,7 +210,9 @@ describe('UsersPage dating flow integration', () => {
       expect(screen.getByRole('heading', { name: 'user_with_photo' })).toBeVisible()
     );
     await waitFor(() =>
-      expect(screen.queryByRole('heading', { name: 'user_without_photo' })).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('heading', { name: 'user_with_placeholder_avatar' })
+      ).not.toBeInTheDocument()
     );
   });
 

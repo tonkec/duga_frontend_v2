@@ -15,6 +15,7 @@ import axios from 'axios';
 import { isSessionConflictCode } from './api/appSession.ts';
 import ScrollToTop from './components/ScrollToTop/index.tsx';
 import ThemePreferenceSync from './components/ThemePreferenceSync/index.tsx';
+import ErrorBoundary from './components/ErrorBoundary/index.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,21 +34,23 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CookiesProvider>
       <BrowserRouter>
-        <ScrollToTop />
-        <ThemePreferenceSync />
-        <QueryClientProvider client={queryClient}>
-          <Auth0ProviderWithNavigate>
-            <AuthTokenBridge>
-              <AppSessionProvider>
-                <SocketProvider>
-                  <DugaRoutes />
-                </SocketProvider>
-              </AppSessionProvider>
-            </AuthTokenBridge>
-          </Auth0ProviderWithNavigate>
-          <ReactQueryDevtools />
-          <ToastContainer position="top-right" autoClose={3000} />
-        </QueryClientProvider>
+        <ErrorBoundary>
+          <ScrollToTop />
+          <ThemePreferenceSync />
+          <QueryClientProvider client={queryClient}>
+            <Auth0ProviderWithNavigate>
+              <AuthTokenBridge>
+                <AppSessionProvider>
+                  <SocketProvider>
+                    <DugaRoutes />
+                  </SocketProvider>
+                </AppSessionProvider>
+              </AuthTokenBridge>
+            </Auth0ProviderWithNavigate>
+            <ReactQueryDevtools />
+            <ToastContainer position="top-right" autoClose={3000} />
+          </QueryClientProvider>
+        </ErrorBoundary>
       </BrowserRouter>
     </CookiesProvider>
   </StrictMode>

@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import PhotoComments, { IComment } from '.';
 import {
@@ -72,7 +72,9 @@ jest.mock('@app/components/GiphySearch', () => ({
 }));
 
 jest.mock('@app/utils/consts', () => ({
+  ALLOWED_IMAGE_MIME_TYPES: ['image/png', 'image/jpeg'],
   ALLOWED_FILE_TYPES: 'image/png,image/jpeg',
+  MAX_IMAGE_FILE_SIZE_BYTES: 5 * 1024 * 1024,
   MAXIMUM_NUMBER_OF_IMAGES: 5,
 }));
 
@@ -117,6 +119,9 @@ const mutateAddUploadComment = jest.fn();
 const mutateEditUploadComment = jest.fn();
 const mutateDeleteUploadComment = jest.fn();
 const socketEmit = jest.fn();
+const socketOn = jest.fn();
+const socketOff = jest.fn();
+const socketHandlers = new Map<string, (payload: unknown) => void>();
 
 const existingComment: IComment = {
   id: 101,
@@ -138,9 +143,12 @@ const renderPhotoComments = () =>
 describe('PhotoComments integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    socketHandlers.clear();
     mockUseSocket.mockReturnValue({
-      on: jest.fn(),
-      off: jest.fn(),
+      on: socketOn.mockImplementation((event: string, handler: (payload: unknown) => void) => {
+        socketHandlers.set(event, handler);
+      }),
+      off: socketOff,
       emit: socketEmit,
     } as unknown as ReturnType<typeof useSocket>);
     mockUseGetCurrentUser.mockReturnValue({
@@ -201,8 +209,8 @@ describe('PhotoComments integration', () => {
       isEditUploadCommentSuccess: false,
     }));
     mockUseDeleteUploadComment.mockImplementation((onCommentDeleted) => ({
-      mutateDeleteUploadComment: (commentId) => {
-        mutateDeleteUploadComment(commentId);
+      mutateDeleteUploadComment: ({ commentId }) => {
+        mutateDeleteUploadComment({ commentId, uploadId: '42' });
         onCommentDeleted?.(commentId);
       },
       isDeletingUploadComment: false,
@@ -252,9 +260,45 @@ describe('PhotoComments integration', () => {
     expect(screen.getByRole('heading', { name: 'Obrisati komentar?' })).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Potvrđujem' }));
 
-    await waitFor(() => expect(mutateDeleteUploadComment).toHaveBeenCalledWith(101));
+    await waitFor(() =>
+      expect(mutateDeleteUploadComment).toHaveBeenCalledWith({ commentId: 101, uploadId: '42' })
+    );
     expect(screen.queryByText('Updated comment')).not.toBeInTheDocument();
     expect(screen.getByText('Još nema komentara.')).toBeVisible();
+  });
+
+  it('ignores comment socket events for a different photo and cleans up by handler', async () => {
+    const { unmount } = renderPhotoComments();
+
+    expect(await screen.findByText('Original comment')).toBeVisible();
+
+    act(() => {
+      socketHandlers.get('receive-comment')?.({
+        data: {
+          id: 202,
+          comment: 'Foreign comment',
+          userId: '7',
+          uploadId: '999',
+          createdAt: '2026-05-23T12:01:00.000Z',
+        },
+      });
+      socketHandlers.get('remove-comment')?.({
+        data: {
+          id: 101,
+          uploadId: '999',
+        },
+      });
+    });
+
+    expect(screen.queryByText('Foreign comment')).not.toBeInTheDocument();
+    expect(screen.getByText('Original comment')).toBeVisible();
+
+    const receiveHandler = socketHandlers.get('receive-comment');
+    const removeHandler = socketHandlers.get('remove-comment');
+    unmount();
+
+    expect(socketOff).toHaveBeenCalledWith('receive-comment', receiveHandler);
+    expect(socketOff).toHaveBeenCalledWith('remove-comment', removeHandler);
   });
 
   it('creates a GIF-only photo comment', async () => {

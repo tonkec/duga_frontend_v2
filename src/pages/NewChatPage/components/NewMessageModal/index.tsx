@@ -13,7 +13,6 @@ import { useGetAllUserChats } from '@app/hooks/useGetAllUserChats';
 import { IChat, useCreateNewChat } from '@app/pages/NewChatPage/hooks';
 import { hasAlreadyChatted } from '@app/components/SendMessageButton/utils/hasAlreadyChatted';
 import { useSocket } from '@app/context/useSocket';
-import { setStoredGroupChatAdmin } from '@app/utils/chatMemberStorage';
 import { MAX_GROUP_CHAT_MEMBERS } from '@app/utils/consts';
 
 Modal.setAppElement('#root');
@@ -91,16 +90,13 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
     const chat = Array.isArray(data) ? data[0] : data;
     if (chat.type !== 'group') return;
 
-    if (currentUserId) {
-      setStoredGroupChatAdmin(String(chat.id), Number(currentUserId));
-    }
-
     if (!socket) return;
 
     chat.Users.filter((user) => user.id !== Number(currentUserId)).forEach((newChatter) => {
       socket.emit('add-user-to-group', {
-        chat,
-        newChatter,
+        chatId: Number(chat.id),
+        userId: Number(newChatter.id),
+        userPublicId: newChatter.publicId,
       });
     });
   };

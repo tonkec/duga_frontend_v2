@@ -60,8 +60,7 @@ export const useUpdateUser = () => {
       toast.success('Uspješno spremljeni podaci!', toastConfig);
       navigate('/profile');
     },
-    onError: (err: Error) => {
-      console.log(err);
+    onError: () => {
       toast.error('Greška prilikom spremanja podataka!', toastConfig);
     },
   });
@@ -83,8 +82,7 @@ export const useDeleteUser = () => {
       toast.success('Uspješno izbrisan profil!', toastConfig);
       navigate('/login');
     },
-    onError: (err: Error) => {
-      console.log(err);
+    onError: () => {
       toast.error('Greška prilikom brisanja profila!', toastConfig);
     },
   });

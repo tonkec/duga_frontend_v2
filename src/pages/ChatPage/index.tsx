@@ -28,16 +28,6 @@ import { toastConfig } from '@app/configs/toast.config';
 import { useQueryClient } from '@tanstack/react-query';
 import { IUser } from '@app/components/UserCard';
 import { BiGroup, BiSearch } from 'react-icons/bi';
-import {
-  addStoredAdditionalChatMembers,
-  getStoredGroupChatAdminId,
-  mergeChatMembers,
-  mergeStoredChatMembers,
-  removeStoredGroupChatAdmin,
-  removeStoredChatMember,
-  removeStoredChatMembers,
-  setStoredGroupChatAdmin,
-} from '@app/utils/chatMemberStorage';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
 
 interface ITypingData {
@@ -286,93 +276,12 @@ const getChatTitle = ({
   );
 };
 
-const getMemberJoinedAt = (member: IChatParticipant) => {
-  const timestamp =
-    member.ChatUser?.createdAt ??
-    member.createdAt ??
-    member.ChatUser?.updatedAt ??
-    member.updatedAt;
-  const joinedAt = timestamp ? new Date(timestamp).getTime() : Number.NaN;
-  return Number.isFinite(joinedAt) ? joinedAt : undefined;
-};
-
-const getOldestMemberUserId = (members: IChatParticipant[]) => {
-  const oldestMember = members
-    .map((member, index) => ({
-      member,
-      index,
-      joinedAt: getMemberJoinedAt(member),
-    }))
-    .sort((a, b) => {
-      if (a.joinedAt !== undefined && b.joinedAt !== undefined) return a.joinedAt - b.joinedAt;
-      if (a.joinedAt !== undefined) return -1;
-      if (b.joinedAt !== undefined) return 1;
-      return a.index - b.index;
-    })[0]?.member;
-
-  const userId = Number(oldestMember?.id ?? oldestMember?.userId);
-  return Number.isFinite(userId) ? userId : undefined;
-};
-
-const getNextAdminUserId = (members: IChatParticipant[], removedUserId: number) =>
-  getOldestMemberUserId(
-    members.filter((member) => Number(member.id ?? member.userId) !== Number(removedUserId))
-  );
-
 const getAdminUserIdFromMembers = (members: IChatParticipant[]) => {
   const adminUserId = members.find(
     (member) => member.role === 'admin' || member.ChatUser?.role === 'admin'
   )?.id;
 
-  if (adminUserId !== undefined) return adminUserId;
-
-  return getOldestMemberUserId(members);
-};
-
-const addUsersToChatData = (chatData: unknown, chatId: string, usersToAdd: IUser[]): unknown => {
-  if (Array.isArray(chatData)) {
-    return mergeChatMembers(chatData as IChatParticipant[], usersToAdd);
-  }
-
-  if (!isRecord(chatData)) return chatData;
-
-  return {
-    ...chatData,
-    id: chatData.id ?? Number(chatId),
-    type: 'group',
-    Users: mergeChatMembers(
-      Array.isArray(chatData.Users) ? (chatData.Users as IChatParticipant[]) : [],
-      usersToAdd
-    ),
-  };
-};
-
-const addUsersToChatCollection = (
-  collectionData: unknown,
-  chatId: string,
-  usersToAdd: IUser[]
-): unknown => {
-  if (Array.isArray(collectionData)) {
-    return collectionData.map((chat) => {
-      if (!isRecord(chat)) return chat;
-      const currentChatId = Number(
-        chat.id ?? (isRecord(chat.ChatUser) ? chat.ChatUser.chatId : undefined)
-      );
-
-      return currentChatId === Number(chatId) ? addUsersToChatData(chat, chatId, usersToAdd) : chat;
-    });
-  }
-
-  if (!isRecord(collectionData)) return collectionData;
-
-  return ['data', 'chats', 'Chats'].reduce<Record<string, unknown>>((nextData, key) => {
-    if (!Array.isArray(nextData[key])) return nextData;
-
-    return {
-      ...nextData,
-      [key]: addUsersToChatCollection(nextData[key], chatId, usersToAdd),
-    };
-  }, collectionData);
+  return adminUserId !== undefined ? Number(adminUserId) : undefined;
 };
 
 const addUsersToQueryResponseData = (
@@ -511,11 +420,7 @@ const ChatPage = () => {
   const { messages, fetchNextPage } = useGetAllMessages(chatId as string);
   const hasMessages = messages.length + receivedMessages.length > 0;
   const currentChatData = currentChat?.data as IChatDetails | IChatParticipant[] | undefined;
-  const backendChatUsers = useMemo(() => getCurrentChatUsers(currentChatData), [currentChatData]);
-  const chatUsers = useMemo(
-    () => (chatId ? mergeStoredChatMembers(chatId, backendChatUsers) : backendChatUsers),
-    [backendChatUsers, chatId]
-  );
+  const chatUsers = useMemo(() => getCurrentChatUsers(currentChatData), [currentChatData]);
   const otherMembers = useMemo(
     () => chatUsers.filter((user) => Number(user.id) !== Number(currentUserId)),
     [chatUsers, currentUserId]
@@ -535,9 +440,7 @@ const ChatPage = () => {
   const otherUserId = otherMemberIds[0] ?? fallbackOtherUserId;
   const isGroupChat =
     !Array.isArray(currentChatData) && (currentChatData?.type === 'group' || chatUsers.length > 1);
-  const groupAdminUserId =
-    (chatId ? getStoredGroupChatAdminId(chatId) : undefined) ??
-    getAdminUserIdFromMembers(chatUsers);
+  const groupAdminUserId = getAdminUserIdFromMembers(chatUsers);
   const isCurrentUserGroupAdmin =
     Boolean(isGroupChat) &&
     groupAdminUserId !== undefined &&
@@ -618,14 +521,8 @@ const ChatPage = () => {
       if (!removedChatId) return;
       const isCurrentUserLeaving =
         Number(eventCurrentUserId ?? removedUserId) === Number(currentUserId);
-      const isRemovedUserAdmin = Number(removedUserId) === Number(groupAdminUserId);
-      const nextAdminUserId =
-        newAdminUserId ??
-        (isRemovedUserAdmin ? getNextAdminUserId(chatUsers, removedUserId) : undefined);
 
       if (isCurrentUserLeaving) {
-        removeStoredChatMembers(removedChatId);
-        removeStoredGroupChatAdmin(removedChatId);
         queryClient.removeQueries({ queryKey: ['chat', removedChatId] });
         queryClient.removeQueries({ queryKey: ['messages', removedChatId] });
         queryClient.setQueryData(['userChats'], (data) =>
@@ -640,10 +537,6 @@ const ChatPage = () => {
         return;
       }
 
-      removeStoredChatMember(removedChatId, removedUserId);
-      if (nextAdminUserId !== undefined) {
-        setStoredGroupChatAdmin(removedChatId, Number(nextAdminUserId));
-      }
       queryClient.setQueryData(['chat', removedChatId], (data) =>
         addUsersToQueryResponseData(data, (chatData) =>
           removeUserFromChatData(chatData, removedUserId)
@@ -654,8 +547,12 @@ const ChatPage = () => {
           removeUserFromChatCollection(userChatsData, removedChatId, removedUserId)
         )
       );
+      if (newAdminUserId !== undefined) {
+        queryClient.invalidateQueries({ queryKey: ['chat', removedChatId] });
+        queryClient.invalidateQueries({ queryKey: ['userChats'] });
+      }
     },
-    [chatUsers, currentUserId, groupAdminUserId, navigate, queryClient]
+    [currentUserId, navigate, queryClient]
   );
 
   const handleLeaveChat = useCallback(() => {
@@ -666,9 +563,6 @@ const ChatPage = () => {
       {
         onSuccess: (response) => {
           const payload = response.data;
-          if (payload.newAdminUserId !== undefined) {
-            setStoredGroupChatAdmin(String(payload.chatId), Number(payload.newAdminUserId));
-          }
           applyUserRemovedFromChat({
             removedChatId: String(payload.chatId),
             removedUserId: Number(payload.userId),
@@ -686,43 +580,19 @@ const ChatPage = () => {
     (users: IUser[]) => {
       if (!socket || !chatId || !users.length) return;
 
-      const chatForSocket = Array.isArray(currentChatData)
-        ? {
-            id: Number(chatId),
-            type: 'group',
-            name: chatTitle,
-            Users: chatUsers,
-          }
-        : {
-            ...currentChatData,
-            id: currentChatData?.id ?? Number(chatId),
-            type: 'group',
-            name: currentChatData?.name || chatTitle,
-          };
-      const nextUsers = [...chatUsers, ...users];
-
       users.forEach((newChatter) => {
         socket.emit('add-user-to-group', {
-          chat: {
-            ...chatForSocket,
-            Users: nextUsers,
-          },
-          newChatter,
+          chatId: Number(chatId),
+          userId: Number(newChatter.id),
+          userPublicId: newChatter.publicId,
         });
       });
 
-      addStoredAdditionalChatMembers(chatId, users);
-      queryClient.setQueryData(['chat', chatId], (data) =>
-        addUsersToQueryResponseData(data, (chatData) => addUsersToChatData(chatData, chatId, users))
-      );
-      queryClient.setQueryData(['userChats'], (data) =>
-        addUsersToQueryResponseData(data, (userChatsData) =>
-          addUsersToChatCollection(userChatsData, chatId, users)
-        )
-      );
-      toast.success('Osobe su dodane u razgovor.', toastConfig);
+      queryClient.invalidateQueries({ queryKey: ['chat', chatId] });
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+      toast.success('Zahtjev za dodavanje osoba je poslan.', toastConfig);
     },
-    [chatId, chatTitle, chatUsers, currentChatData, queryClient, socket]
+    [chatId, queryClient, socket]
   );
 
   const handleReactionToggle = useCallback(
@@ -734,6 +604,7 @@ const ChatPage = () => {
         updateMessageReactionLocally(currentMessage, emoji, nextHasReacted)
       );
       socket.emit(nextHasReacted ? 'react-message' : 'remove-message-reaction', {
+        chatId,
         messageId: message.id,
         emoji,
       });
@@ -788,7 +659,9 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleMessageError = (error?: { message?: string }) => {
+    const handleMessageError = (error?: { message?: string; chatId?: number | string }) => {
+      if (error?.chatId && String(error.chatId) !== String(chatId)) return;
+
       if (error?.message === 'Mentions must be chat members') {
         toast.error('Mention možeš poslati samo osobi koja je član ovog razgovora.', toastConfig);
       } else {
@@ -799,7 +672,9 @@ const ChatPage = () => {
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
     };
 
-    const handleMessageRejected = () => {
+    const handleMessageRejected = (payload?: { chatId?: number | string }) => {
+      if (payload?.chatId && String(payload.chatId) !== String(chatId)) return;
+
       toast.error('Poruka je odbijena.', toastConfig);
       queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
@@ -818,6 +693,15 @@ const ChatPage = () => {
     if (!socket) return;
 
     const handleReactionUpdate = (payload: unknown) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        'chatId' in payload &&
+        String((payload as { chatId?: number | string }).chatId) !== String(chatId)
+      ) {
+        return;
+      }
+
       const messageId = getReactionPayloadMessageId(payload);
       if (!messageId) {
         queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
@@ -829,7 +713,9 @@ const ChatPage = () => {
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
     };
 
-    const handleReactionError = () => {
+    const handleReactionError = (payload?: { chatId?: number | string }) => {
+      if (payload?.chatId && String(payload.chatId) !== String(chatId)) return;
+
       toast.error('Reakciju nije moguće spremiti. Probaj opet.', toastConfig);
       queryClient.invalidateQueries({ queryKey: ['messages', chatId] });
       queryClient.invalidateQueries({ queryKey: ['userChats'] });
@@ -847,39 +733,44 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('typing', (data: ITypingData) => {
-      if (otherMemberIds.includes(Number(data.userId))) {
+    const handleTyping = (data: ITypingData & { chatId?: number | string }) => {
+      if (String(data.chatId) === String(chatId) && otherMemberIds.includes(Number(data.userId))) {
         setIsTyping(true);
       }
-    });
+    };
 
-    socket.on('stop-typing', (data: ITypingData) => {
-      if (otherMemberIds.includes(Number(data.userId))) {
+    const handleStopTyping = (data: ITypingData & { chatId?: number | string }) => {
+      if (String(data.chatId) === String(chatId) && otherMemberIds.includes(Number(data.userId))) {
         setIsTyping(false);
       }
-    });
+    };
+
+    socket.on('typing', handleTyping);
+    socket.on('stop-typing', handleStopTyping);
 
     return () => {
-      socket.off('typing');
-      socket.off('stop-typing');
+      socket.off('typing', handleTyping);
+      socket.off('stop-typing', handleStopTyping);
       setIsTyping(false);
     };
-  }, [socket, otherMemberIds]);
+  }, [chatId, socket, otherMemberIds]);
 
   useEffect(() => {
     if (!socket || !otherUserId) return;
 
-    socket.on('status-update', (data) => {
+    const handleStatusUpdate = (data: { userId?: number | string; status?: string }) => {
       if (Number(data.userId) === Number(otherUserId)) {
         setIsOnlineState(data.status === 'online');
         return;
       }
 
       setIsOnlineState(otherUser?.data.status === 'online');
-    });
+    };
+
+    socket.on('status-update', handleStatusUpdate);
 
     return () => {
-      socket.off('status-update');
+      socket.off('status-update', handleStatusUpdate);
     };
   }, [socket, otherUserId, otherUser]);
 
@@ -892,16 +783,18 @@ const ChatPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('chatDeleted', ({ chatId: deletedChatId }) => {
+    const handleChatDeleted = ({ chatId: deletedChatId }: { chatId?: number | string }) => {
       if (String(deletedChatId) !== String(chatId)) return;
       if (!deletedBySelfRef.current) {
         toast.info('Razgovor je obrisan.', toastConfig);
       }
       navigate('/new-chat', { replace: true });
-    });
+    };
+
+    socket.on('chatDeleted', handleChatDeleted);
 
     return () => {
-      socket.off('chatDeleted');
+      socket.off('chatDeleted', handleChatDeleted);
     };
   }, [chatId, navigate, socket]);
 

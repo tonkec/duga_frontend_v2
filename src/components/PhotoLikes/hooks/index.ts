@@ -14,8 +14,7 @@ export const useUpvoteUpload = () => {
     onSuccess: () => {
       toast.success('Fotografija je lajkana', toastConfig);
     },
-    onError: (e) => {
-      console.log(e);
+    onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
     },
   });
@@ -39,8 +38,7 @@ export const useDownvoteUpload = () => {
     onSuccess: () => {
       toast.success('Fotografija je odlajkana', toastConfig);
     },
-    onError: (e) => {
-      console.log(e);
+    onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
     },
   });

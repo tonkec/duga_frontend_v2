@@ -1,6 +1,11 @@
 import { IImage } from '@app/components/Photos';
-import { S3_URL } from './consts';
+import { getSafeRemoteImageUrl } from './mediaSafety';
 
 export const getImageUrl = (image: IImage) => {
-  return `${S3_URL}/${image.url}`;
+  return (
+    getSafeRemoteImageUrl(image.imageUrl) ||
+    getSafeRemoteImageUrl(image.url) ||
+    getSafeRemoteImageUrl(image.securePhotoUrl) ||
+    getSafeRemoteImageUrl(image.messagePhotoUrl)
+  );
 };

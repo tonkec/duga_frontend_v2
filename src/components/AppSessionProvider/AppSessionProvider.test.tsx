@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import AppSessionProvider from '.';
 import { register } from '../../api/auth/register';
 import { startSession } from '../../api/sessions';
+import { getCurrentUser } from '../../api/users';
 import { useAppSessionStatus } from '../../context/AppSessionContext';
 import { generateUniqueUsername } from '../../hooks/useEnsureBackendUser';
 
@@ -28,6 +29,10 @@ jest.mock('@app/api/sessions', () => ({
   startSession: jest.fn(),
 }));
 
+jest.mock('@app/api/users', () => ({
+  getCurrentUser: jest.fn(),
+}));
+
 jest.mock('@app/hooks/useEnsureBackendUser', () => ({
   generateUniqueUsername: jest.fn(),
 }));
@@ -35,11 +40,18 @@ jest.mock('@app/hooks/useEnsureBackendUser', () => ({
 const mockUseAuth0 = jest.mocked(useAuth0);
 const mockRegister = jest.mocked(register);
 const mockStartSession = jest.mocked(startSession);
+const mockGetCurrentUser = jest.mocked(getCurrentUser);
 const mockGenerateUniqueUsername = jest.mocked(generateUniqueUsername);
 const mockToastInfo = jest.mocked(toast.info);
 const logout = jest.fn();
 
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
+const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
+
+type CypressWindow = Window &
+  typeof globalThis & {
+    Cypress?: unknown;
+  };
 
 const auth0State = (overrides: Record<string, unknown>) =>
   ({
@@ -80,9 +92,21 @@ describe('AppSessionProvider login/session start integration', () => {
     jest.clearAllMocks();
     localStorage.clear();
     sessionStorage.clear();
+    delete (window as CypressWindow).Cypress;
     mockRegister.mockResolvedValue({} as Awaited<ReturnType<typeof register>>);
     mockStartSession.mockResolvedValue({} as Awaited<ReturnType<typeof startSession>>);
+    mockGetCurrentUser.mockRejectedValue({
+      response: {
+        status: 401,
+      },
+    });
     mockGenerateUniqueUsername.mockReturnValue('generated-user');
+  });
+
+  afterEach(() => {
+    delete (window as CypressWindow).Cypress;
+    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('does not register or start a session before Auth0 login', async () => {
@@ -93,6 +117,7 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
     expect(mockRegister).not.toHaveBeenCalled();
     expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockGetCurrentUser).not.toHaveBeenCalled();
   });
 
   it('registers the backend user before starting an app session after Auth0 login', async () => {
@@ -121,6 +146,33 @@ describe('AppSessionProvider login/session start integration', () => {
     );
     expect(mockStartSession).toHaveBeenCalledTimes(1);
     expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+  });
+
+  it('reuses an existing cookie-backed app session on refresh', async () => {
+    mockGetCurrentUser.mockResolvedValue({
+      data: {
+        id: 1,
+        username: 'existing-user',
+        isVerified: true,
+      },
+    } as Awaited<ReturnType<typeof getCurrentUser>>);
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|existing-session-user',
+          email: 'existing-session@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(mockGetCurrentUser).toHaveBeenCalledTimes(1);
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).not.toHaveBeenCalled();
   });
 
   it('registers and starts an app session for unverified Auth0 users', async () => {
@@ -184,6 +236,48 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(await screen.findByTestId('session-status')).toHaveTextContent('revoked');
     expect(mockRegister).not.toHaveBeenCalled();
     expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockGetCurrentUser).not.toHaveBeenCalled();
+  });
+
+  it('reports an auth setup error when Auth0 identity is incomplete', async () => {
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|missing-email-user',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('error');
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockGetCurrentUser).not.toHaveBeenCalled();
+  });
+
+  it('skips backend auth startup only for Cypress when explicitly requested', async () => {
+    (window as CypressWindow).Cypress = {};
+    localStorage.setItem(CYPRESS_SKIP_SESSION_START_KEY, 'true');
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|cypress-user',
+          email: 'cypress@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockGetCurrentUser).not.toHaveBeenCalled();
   });
 
   it('logs out the Auth0 session when the app session is revoked', async () => {
@@ -271,5 +365,47 @@ describe('AppSessionProvider login/session start integration', () => {
       true
     );
     consoleErrorSpy.mockRestore();
+  });
+
+  it('reports an error when backend registration fails and does not start a session', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    mockRegister.mockRejectedValue(new Error('register failed'));
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|register-failing-user',
+          email: 'register-failing@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('error');
+    expect(mockRegister).toHaveBeenCalledTimes(1);
+    expect(mockStartSession).not.toHaveBeenCalled();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('reports an error when the existing session check fails unexpectedly', async () => {
+    mockGetCurrentUser.mockRejectedValue(new Error('current user failed'));
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|current-user-failing-user',
+          email: 'current-user-failing@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('error');
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).not.toHaveBeenCalled();
   });
 });

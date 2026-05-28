@@ -21,7 +21,11 @@ import EmojiSearch from '@app/components/EmojiSearch';
 import { useGetAllNotifcations, useMarkAsReadNotification } from '@app/components/Navigation/hooks';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { toast } from 'react-toastify';
-import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import {
+  ALLOWED_FILE_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  MAXIMUM_NUMBER_OF_IMAGES,
+} from '@app/utils/consts';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import { toastConfig } from '@app/configs/toast.config';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
@@ -33,6 +37,8 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import UserAvatar from '@app/components/UserAvatar';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 type Inputs = {
   content: string;
@@ -40,6 +46,8 @@ type Inputs = {
 };
 
 type MentionableUser = Pick<IUser, 'id' | 'username'>;
+
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 const schema = z
   .object({
@@ -55,17 +63,19 @@ const schema = z
           if (!files) return true;
           return (
             Array.isArray(files) &&
-            files.every((file) => file instanceof File && file.size <= 5 * 1024 * 1024)
+            files.every((file) => file instanceof File && file.size <= MAX_IMAGE_FILE_SIZE_BYTES)
           );
         },
-        { message: 'Datoteka mora biti manja od 5MB.' }
+        { message: `Datoteka mora biti manja od ${MAX_IMAGE_FILE_SIZE_MB} MB.` }
       )
       .refine(
         (files) => {
           if (!files) return true;
           return (
             Array.isArray(files) &&
-            files.every((file) => ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type))
+            files.every((file) =>
+              ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)
+            )
           );
         },
         { message: 'Podržani formati su JPG i PNG.' }
@@ -155,6 +165,7 @@ const SendMessage = ({
   );
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const currentUploadableImageRef = useRef<File[] | null>(null);
+  const currentUploadableImageUrls = useObjectUrls(currentUploadableImage);
   const [imageTimestamp, setImageTimestamp] = useState('');
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [showEmojiSearch, setShowEmojiSearch] = useState(false);
@@ -171,22 +182,18 @@ const SendMessage = ({
   }, [mentionQuery, mentionableUsers]);
 
   const emitStopTyping = useCallback(() => {
-    if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
+    if (!socket || !chatId) return;
     socket.emit('stop-typing', {
       chatId,
-      userId: currentUserId,
-      toUserId: recipientIds,
     });
-  }, [socket, currentUserId, recipientIds, chatId]);
+  }, [socket, chatId]);
 
   const emitTyping = useCallback(() => {
-    if (!socket || !currentUserId || !recipientIds.length || !chatId) return;
+    if (!socket || !chatId) return;
     socket.emit('typing', {
       chatId,
-      userId: currentUserId,
-      toUserId: recipientIds,
     });
-  }, [socket, currentUserId, recipientIds, chatId]);
+  }, [socket, chatId]);
 
   useEffect(() => {
     return () => {
@@ -195,13 +202,13 @@ const SendMessage = ({
   }, [emitStopTyping]);
 
   const sendGif = (gifUrl: string) => {
+    const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+    if (!safeGifUrl) return;
+
     const msg = {
       type: 'gif',
-      fromUserId: currentUserId,
-      fromUser: currentUser?.data,
-      toUserId: recipientIds,
       chatId,
-      messagePhotoUrl: gifUrl,
+      messagePhotoUrl: safeGifUrl,
     };
     socket?.emit('message', msg);
     refreshUserChatsList();
@@ -230,9 +237,6 @@ const SendMessage = ({
       uploadableImages.forEach((file: File) => {
         socket?.emit('message', {
           type: 'file',
-          fromUserId: currentUserId,
-          fromUser: currentUser?.data,
-          toUserId: recipientIds,
           chatId,
           messagePhotoUrl: getMessageImagePath(chatId, imageTimestamp, file.name),
           message: null,
@@ -270,9 +274,22 @@ const SendMessage = ({
       return;
     }
 
+    if (!files.every((file) => file.size <= MAX_IMAGE_FILE_SIZE_BYTES)) {
+      toast.error(`Datoteka mora biti manja od ${MAX_IMAGE_FILE_SIZE_MB} MB.`, toastConfig);
+      return;
+    }
+
+    if (
+      !files.every((file) =>
+        ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)
+      )
+    ) {
+      toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('chatId', chatId);
-    formData.append('fromUserId', currentUserId as string);
     formData.append('timestamp', imageTimestamp);
 
     files.forEach((file: File) => {
@@ -289,9 +306,6 @@ const SendMessage = ({
     const mentions = getMentionIds(message, mentionableUsers);
     const msg = {
       type: 'text',
-      fromUserId: currentUserId,
-      fromUser: currentUser?.data,
-      toUserId: recipientIds,
       chatId,
       message,
       mentions,
@@ -354,7 +368,10 @@ const SendMessage = ({
             const files = e.target.files as FileList;
 
             if (!areValidImageTypes(files)) {
-              toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+              toast.error(
+                `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
+                toastConfig
+              );
               return;
             }
 
@@ -445,7 +462,6 @@ const SendMessage = ({
                       setMentionQuery(getMentionQuery(field.value ?? ''));
                       emitTyping();
                       socket?.emit('markAsRead', {
-                        userId: currentUserId,
                         chatId: Number(chatId),
                       });
 
@@ -544,11 +560,14 @@ const SendMessage = ({
 
       {currentUploadableImage && (
         <div className="flex items-end gap-2 flex-wrap">
-          {currentUploadableImage.map((image: File) => {
+          {currentUploadableImage.map((image: File, index) => {
+            const previewUrl = currentUploadableImageUrls[index];
+            if (!previewUrl) return null;
+
             return (
               <div key={image.name} className="relative">
                 <Image
-                  src={URL.createObjectURL(image)}
+                  src={previewUrl}
                   alt={image.name}
                   style={{ width: 150, height: 150 }}
                   className="border mt-2"

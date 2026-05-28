@@ -5,18 +5,18 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { AuthGuard } from './AuthGuard';
 import { AppSessionContext, AppSessionStatus } from '../../context/AppSessionContext';
-import { useEnsureBackendUser } from '../../hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '../../hooks/useEnsureBackendUser';
 
 jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
 }));
 
 jest.mock('@app/hooks/useEnsureBackendUser', () => ({
-  useEnsureBackendUser: jest.fn(),
+  useCurrentBackendUser: jest.fn(),
 }));
 
 const mockUseAuth0 = jest.mocked(useAuth0);
-const mockUseEnsureBackendUser = jest.mocked(useEnsureBackendUser);
+const mockUseCurrentBackendUser = jest.mocked(useCurrentBackendUser);
 const getAccessTokenSilently = jest.fn();
 
 const auth0State = (overrides: Record<string, unknown>) =>
@@ -58,10 +58,10 @@ describe('AuthGuard protected route redirects', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     getAccessTokenSilently.mockResolvedValue('test-token');
-    mockUseEnsureBackendUser.mockReturnValue({
+    mockUseCurrentBackendUser.mockReturnValue({
       data: undefined,
       isLoading: false,
-    } as ReturnType<typeof useEnsureBackendUser>);
+    } as ReturnType<typeof useCurrentBackendUser>);
   });
 
   it('redirects unauthenticated users from protected pages to login', async () => {
@@ -72,6 +72,27 @@ describe('AuthGuard protected route redirects', () => {
     expect(await screen.findByText('Login page')).toBeVisible();
     expect(screen.queryByText('Protected settings')).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
+  });
+
+  it('allows a valid backend cookie session after Auth0 memory state is lost on refresh', async () => {
+    mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
+    mockUseCurrentBackendUser.mockReturnValue({
+      data: {
+        id: 1,
+        username: 'cookie-session-user',
+        isVerified: true,
+      },
+      isLoading: false,
+    } as ReturnType<typeof useCurrentBackendUser>);
+
+    renderProtectedRoute();
+
+    expect(await screen.findByText('Protected settings')).toBeVisible();
+    expect(screen.getByTestId('location')).toHaveTextContent('/settings');
+    expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({
+      enabled: true,
+      requireAuth0: false,
+    });
   });
 
   it('allows authenticated verified users with an active app session', async () => {
@@ -116,12 +137,12 @@ describe('AuthGuard protected route redirects', () => {
         },
       })
     );
-    mockUseEnsureBackendUser.mockReturnValue({
+    mockUseCurrentBackendUser.mockReturnValue({
       data: {
         isVerified: true,
       },
       isLoading: false,
-    } as ReturnType<typeof useEnsureBackendUser>);
+    } as ReturnType<typeof useCurrentBackendUser>);
 
     renderProtectedRoute();
 
@@ -144,5 +165,18 @@ describe('AuthGuard protected route redirects', () => {
     expect(await screen.findByText('Login page')).toBeVisible();
     expect(screen.queryByText('Protected settings')).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
+  });
+
+  it('waits while checking the backend cookie session', async () => {
+    mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
+    mockUseCurrentBackendUser.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as ReturnType<typeof useCurrentBackendUser>);
+
+    renderProtectedRoute();
+
+    expect(await screen.findByText('Učitavanje...')).toBeVisible();
+    expect(screen.queryByText('Login page')).not.toBeInTheDocument();
   });
 });

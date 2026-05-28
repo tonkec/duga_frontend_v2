@@ -15,7 +15,13 @@ import {
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
-import { FORUM_MAX_BODY_LENGTH, validateForumImages } from '../utils/forumValidation';
+import {
+  FORUM_ALLOWED_IMAGE_TYPES,
+  FORUM_MAX_BODY_LENGTH,
+  validateForumImages,
+} from '../utils/forumValidation';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 interface AnswerFormProps {
   isSubmitting: boolean;
@@ -35,7 +41,7 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
   const [showGiphySearch, setShowGiphySearch] = useState(false);
   const [selectedGifUrl, setSelectedGifUrl] = useState('');
   const [images, setImages] = useState<File[]>([]);
-  const imagePreviewUrls = images.map((image) => URL.createObjectURL(image));
+  const imagePreviewUrls = useObjectUrls(images);
 
   const updateBody = async (value: string) => {
     setBody(value);
@@ -135,10 +141,10 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
         </label>
         <FileUploadInput
           id="answer-image"
-          accept="image/*"
+          accept={FORUM_ALLOWED_IMAGE_TYPES}
           multiple
           label="Odaberi slike"
-          helperText="Možeš dodati više slika uz odgovor. Maksimalno 5 slika, do 1 MB po slici."
+          helperText={`Podržani formati su ${FORUM_ALLOWED_IMAGE_TYPES}. Maksimalno 5 slika, do 1 MB po slici.`}
           onChange={(event) => {
             const selectedImages = Array.from(event.target.files ?? []);
             setImages(selectedImages);
@@ -196,7 +202,10 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
       <GiphySearch
         isOpen={showGiphySearch}
         onClose={() => setShowGiphySearch(false)}
-        onGifSelect={(gifUrl) => setSelectedGifUrl(gifUrl)}
+        onGifSelect={(gifUrl) => {
+          const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+          if (safeGifUrl) setSelectedGifUrl(safeGifUrl);
+        }}
       />
 
       {selectedGifUrl && (

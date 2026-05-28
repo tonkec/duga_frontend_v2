@@ -4,14 +4,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import VerifyEmailPage from '.';
-import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '../../hooks/useEnsureBackendUser';
 
 jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
 }));
 
 jest.mock('@app/hooks/useEnsureBackendUser', () => ({
-  useEnsureBackendUser: jest.fn(),
+  useCurrentBackendUser: jest.fn(),
 }));
 
 jest.mock('@app/api', () => ({
@@ -21,7 +21,7 @@ jest.mock('@app/api', () => ({
 }));
 
 const mockUseAuth0 = jest.mocked(useAuth0);
-const mockUseEnsureBackendUser = jest.mocked(useEnsureBackendUser);
+const mockUseCurrentBackendUser = jest.mocked(useCurrentBackendUser);
 
 const LocationProbe = () => {
   const location = useLocation();
@@ -43,10 +43,10 @@ const renderVerifyEmailPage = () =>
 describe('VerifyEmailPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseEnsureBackendUser.mockReturnValue({
+    mockUseCurrentBackendUser.mockReturnValue({
       data: undefined,
       isLoading: false,
-    } as ReturnType<typeof useEnsureBackendUser>);
+    } as ReturnType<typeof useCurrentBackendUser>);
   });
 
   it('leaves the verify email screen when the backend user is verified', async () => {
@@ -58,13 +58,13 @@ describe('VerifyEmailPage', () => {
         email_verified: false,
       },
     } as unknown as ReturnType<typeof useAuth0>);
-    mockUseEnsureBackendUser.mockReturnValue({
+    mockUseCurrentBackendUser.mockReturnValue({
       data: {
         id: 501,
         isVerified: true,
       },
       isLoading: false,
-    } as ReturnType<typeof useEnsureBackendUser>);
+    } as ReturnType<typeof useCurrentBackendUser>);
 
     renderVerifyEmailPage();
 
@@ -81,13 +81,13 @@ describe('VerifyEmailPage', () => {
         email_verified: false,
       },
     } as unknown as ReturnType<typeof useAuth0>);
-    mockUseEnsureBackendUser.mockReturnValue({
+    mockUseCurrentBackendUser.mockReturnValue({
       data: {
         id: 502,
         isVerified: false,
       },
       isLoading: false,
-    } as ReturnType<typeof useEnsureBackendUser>);
+    } as ReturnType<typeof useCurrentBackendUser>);
 
     renderVerifyEmailPage();
 

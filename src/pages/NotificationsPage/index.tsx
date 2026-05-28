@@ -24,11 +24,13 @@ const NotificationsPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('new_notification', (notification) => {
+    const handleNewNotification = (notification: INotification) => {
       setNotifications((prev) => [notification, ...prev]);
-    });
+    };
 
-    socket.on('markAsRead', (notificationFromSocket) => {
+    const handleMarkAsRead = (notificationFromSocket: { id?: number }) => {
+      if (!notificationFromSocket.id) return;
+
       setNotifications((prev) =>
         prev.map((notification) =>
           notification.id === notificationFromSocket.id
@@ -36,11 +38,14 @@ const NotificationsPage = () => {
             : notification
         )
       );
-    });
+    };
+
+    socket.on('new_notification', handleNewNotification);
+    socket.on('markAsRead', handleMarkAsRead);
 
     return () => {
-      socket.off('new_notification');
-      socket.off('markAsRead');
+      socket.off('new_notification', handleNewNotification);
+      socket.off('markAsRead', handleMarkAsRead);
     };
   }, [socket]);
 

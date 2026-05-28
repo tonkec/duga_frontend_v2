@@ -56,18 +56,27 @@ const NotificationDropdown = ({
 
   useEffect(() => {
     if (!socket) return;
-    socket.on('new_notification', (notification) => {
+
+    const handleNewNotification = (notification: INotification) => {
+      if (notification.userId !== userId) return;
+
       setNotifications((prev) => [notification, ...prev]);
-    });
+    };
+
+    socket.on('new_notification', handleNewNotification);
 
     return () => {
-      socket.off('new_notification');
+      socket.off('new_notification', handleNewNotification);
     };
   }, [userId, socket]);
 
   useEffect(() => {
     if (!socket) return;
-    socket.on('markAsRead', (notificationFromSocket) => {
+
+    const handleMarkAsRead = (notificationFromSocket: { id?: number; userId?: number }) => {
+      if (notificationFromSocket.userId && notificationFromSocket.userId !== userId) return;
+      if (!notificationFromSocket.id) return;
+
       setNotifications((prev) =>
         prev.map((notification: INotification) =>
           notification.id === notificationFromSocket.id
@@ -75,12 +84,14 @@ const NotificationDropdown = ({
             : notification
         )
       );
-    });
+    };
+
+    socket.on('markAsRead', handleMarkAsRead);
 
     return () => {
-      socket.off('markAsRead');
+      socket.off('markAsRead', handleMarkAsRead);
     };
-  }, [userId, socket, notifications]);
+  }, [userId, socket]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

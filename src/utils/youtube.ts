@@ -1,3 +1,5 @@
+import { getSafeYouTubeEmbedUrl } from './mediaSafety';
+
 const YOUTUBE_HOSTS = ['www.youtube.com', 'youtube.com', 'youtu.be'];
 
 export const isYouTubeUrl = (value: string) => {
@@ -15,15 +17,15 @@ export const getYouTubeEmbedUrl = (value: string) => {
 
     if (url.hostname === 'youtu.be') {
       const videoId = url.pathname.split('/').filter(Boolean)[0];
-      return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+      return getSafeYouTubeEmbedUrl(videoId) || null;
     }
 
     if (url.hostname === 'www.youtube.com' || url.hostname === 'youtube.com') {
       const embedMatch = url.pathname.match(/^\/embed\/([\w-]{11})/);
-      if (embedMatch?.[1]) return `https://www.youtube.com/embed/${embedMatch[1]}`;
+      if (embedMatch?.[1]) return getSafeYouTubeEmbedUrl(embedMatch[1]) || null;
 
       const videoId = url.searchParams.get('v');
-      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      if (videoId) return getSafeYouTubeEmbedUrl(videoId) || null;
     }
 
     return null;

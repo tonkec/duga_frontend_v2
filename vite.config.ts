@@ -13,6 +13,10 @@ export default defineConfig({
           src: 'public/_redirects',
           dest: '',
         },
+        {
+          src: 'public/_headers',
+          dest: '',
+        },
       ],
     }),
   ],
@@ -20,6 +24,9 @@ export default defineConfig({
     alias: {
       '@app': path.resolve(__dirname, 'src'),
     },
+  },
+  build: {
+    sourcemap: false,
   },
   define: {
     'import.meta.env.STAGING': JSON.stringify(Boolean(process.env.STAGING)),

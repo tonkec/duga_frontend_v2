@@ -56,8 +56,7 @@ export const useCreateNewChat = () => {
       toast.success('Razgovor uspješno kreiran', toastConfig);
       navigate(`/chat/${createdChat.id}`);
     },
-    onError: (error: unknown) => {
-      console.error(error);
+    onError: () => {
       toast.error('Došlo je do greške.', toastConfig);
     },
   });
@@ -76,9 +75,7 @@ export const useMarkMessagesAsRead = () => {
       if (!messageId) return;
       await markMessagesAsRead(messageId);
     },
-    onError: (error: unknown) => {
-      console.error(error);
-    },
+    onError: () => undefined,
   });
 
   return {

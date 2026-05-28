@@ -144,6 +144,36 @@ describe('NotificationDropdown', () => {
     expect(screen.getByText('3')).toBeVisible();
   });
 
+  it('ignores notification socket events for another user', async () => {
+    renderNotifications();
+
+    fireEvent.click(screen.getByRole('button', { name: /obavijesti/i }));
+    expect(await screen.findByText('Novo pitanje na forumu')).toBeVisible();
+
+    act(() => {
+      socketHandlers.new_notification(
+        notification({ id: 99, userId: 999, content: 'Tuđa obavijest' })
+      );
+      socketHandlers.markAsRead(notification({ id: 1, userId: 999, isRead: true }));
+    });
+
+    expect(screen.queryByText('Tuđa obavijest')).not.toBeInTheDocument();
+    const ownNotification = screen.getByText('Novo pitanje na forumu').closest('button');
+    expect(ownNotification).not.toBeNull();
+    expect(within(ownNotification as HTMLElement).getByText('Novo')).toBeVisible();
+  });
+
+  it('removes socket listeners by handler reference on cleanup', () => {
+    const { unmount } = renderNotifications();
+    const newNotificationHandler = socketHandlers.new_notification;
+    const markAsReadHandler = socketHandlers.markAsRead;
+
+    unmount();
+
+    expect(socketOff).toHaveBeenCalledWith('new_notification', newNotificationHandler);
+    expect(socketOff).toHaveBeenCalledWith('markAsRead', markAsReadHandler);
+  });
+
   it('updates a notification as read from socket events', async () => {
     renderNotifications();
 
