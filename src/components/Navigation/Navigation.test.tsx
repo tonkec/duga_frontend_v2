@@ -128,4 +128,21 @@ describe('Navigation', () => {
     expect(screen.queryByRole('status', { name: 'Nove obavijesti' })).not.toBeInTheDocument();
     expect(document.title).toBe('Duga | Poruke');
   });
+
+  it('keeps navigation available while the current user is loading', () => {
+    mockUseGetCurrentUser.mockReturnValue({
+      user: undefined,
+      userError: null,
+      isUserLoading: true,
+    } as ReturnType<typeof useGetCurrentUser>);
+    mockUseGetAllNotifications.mockReturnValue({
+      allNotifications: undefined,
+      allNotificationsError: null,
+      areAllNotificationsLoading: true,
+    } as ReturnType<typeof useGetAllNotifcations>);
+
+    render(<Navigation />);
+
+    expect(screen.getByRole('button', { name: 'Otvori navigaciju' })).toBeVisible();
+  });
 });

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiMenu, FiSidebar, FiX } from 'react-icons/fi';
 import { BiBell } from 'react-icons/bi';
-import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
 import { Link } from 'react-router-dom';
@@ -24,7 +23,7 @@ const Navigation = () => {
   const { width } = useWindowSize();
   const isMobile = width! < 1000;
   const { logout } = useAuth0();
-  const { user: currentUser, isUserLoading } = useGetCurrentUser();
+  const { user: currentUser } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const username = currentUser?.data?.username || 'Korisnik';
   const { allNotifications } = useGetAllNotifcations();
@@ -84,8 +83,6 @@ const Navigation = () => {
       },
     });
   };
-
-  if (isUserLoading) return <Loader />;
 
   return (
     <>
