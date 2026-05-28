@@ -8,12 +8,17 @@ import { useState } from 'react';
 import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { apiClient } from '@app/api';
 import Loader from '@app/components/Loader';
+import { isAppSessionConflictError } from '@app/api/appSession';
 
 const VerifyEmailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuth0();
   const [isSending, setIsSending] = useState(false);
-  const { data: currentUser, isLoading: isBackendUserLoading } = useCurrentBackendUser({
+  const {
+    data: currentUser,
+    error: currentUserError,
+    isLoading: isBackendUserLoading,
+  } = useCurrentBackendUser({
     enabled: Boolean(user && !user.email_verified),
   });
   const isUserVerified = Boolean(user?.email_verified || currentUser?.isVerified);
@@ -40,6 +45,10 @@ const VerifyEmailPage = () => {
   }
 
   if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (isAppSessionConflictError(currentUserError)) {
     return <Navigate to="/login" replace />;
   }
 
@@ -79,7 +88,7 @@ const VerifyEmailPage = () => {
 
       <Button
         type="secondary"
-        className="mt-3 w-full !rounded-full !py-4 font-bold shadow-sm"
+        className="mt-3 w-full !rounded-full !py-4 font-bold shadow-sm disabled:!bg-gray-200 disabled:!text-gray-600 disabled:!opacity-100 disabled:shadow-none"
         onClick={resendVerificationEmail}
         disabled={isSending || isBackendUserLoading || !currentUser?.id}
       >

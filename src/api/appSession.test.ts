@@ -1,6 +1,7 @@
 import {
   clearAppSessionRevoked,
   consumeAppSessionRevokedNotice,
+  isAppSessionConflictError,
   isAppSessionRevoked,
   markSessionRevoked,
   SESSION_REVOKED_EVENT,
@@ -47,5 +48,9 @@ describe('appSession state', () => {
     expect(onSessionRevoked).toHaveBeenCalledTimes(1);
 
     window.removeEventListener(SESSION_REVOKED_EVENT, onSessionRevoked);
+  });
+
+  it('does not treat missing errors as session conflicts', () => {
+    expect(isAppSessionConflictError(undefined)).toBe(false);
   });
 });
