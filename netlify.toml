@@ -2,18 +2,42 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  NODE_VERSION = "20"
+
+# =========================
+# Production
+# =========================
+
 [context.production]
   command = "npm run build"
 
 [context.production.environment]
-  NODE_VERSION = "20"
   VITE_APP_ENV = "production"
+
+# =========================
+# Staging branch
+# =========================
+
+[context.staging]
+  command = "npm run build"
+
+[context.staging.environment]
+  VITE_APP_ENV = "staging"
+
+# =========================
+# Generic branch deploys
+# =========================
 
 [context.branch-deploy]
   command = "npm run build"
 
 [context.branch-deploy.environment]
   VITE_APP_ENV = "staging"
+
+# =========================
+# Deploy previews (PRs)
+# =========================
 
 [context.deploy-preview]
   command = "npm run build"
