@@ -8,7 +8,7 @@ export const useGetAllUsers = () => {
     isPending: isAllUsersLoading,
   } = useQuery({
     queryKey: ['users'],
-    queryFn: getAllUsers,
+    queryFn: () => getAllUsers(),
   });
 
   return { allUsers, allUsersError, isAllUsersLoading };
