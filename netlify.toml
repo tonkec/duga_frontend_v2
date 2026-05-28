@@ -1,5 +1,5 @@
 [build]
-  command = "bash -lc 'if [ \"$CONTEXT\" = \"deploy-preview\" ]; then export VITE_APP_ENV=preview VITE_S3_ENVIRONMENT=preview; elif [ \"$BRANCH\" = \"staging\" ] || [ \"$CONTEXT\" = \"branch-deploy\" ]; then export VITE_APP_ENV=staging VITE_S3_ENVIRONMENT=staging; else export VITE_APP_ENV=production VITE_S3_ENVIRONMENT=production; fi; npm run build'"
+  command = "bash ./netlify-build.sh"
   publish = "dist"
 
 [build.environment]
