@@ -1,5 +1,10 @@
 import { apiClient } from '.';
+import { setAppCsrfToken } from './appSession';
 import { resolveAuth0AccessToken } from './authToken';
+
+type StartSessionResponse = {
+  csrfToken?: unknown;
+};
 
 export const startSession = async () => {
   const auth0AccessToken = await resolveAuth0AccessToken();
@@ -14,5 +19,10 @@ export const startSession = async () => {
 
   const client = apiClient(auth0AccessToken);
 
-  return client.post('/sessions/start', {});
+  const response = await client.post<StartSessionResponse>('/sessions/start', {});
+  if (typeof response.data.csrfToken === 'string' && response.data.csrfToken) {
+    setAppCsrfToken(response.data.csrfToken);
+  }
+
+  return response;
 };

@@ -2,6 +2,7 @@ const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 const SESSION_REVOKED_NOTICE_KEY = 'dugaSessionRevokedNotice';
 const APP_SESSION_ID_KEY = 'dugaSessionId';
 const APP_SESSION_TOKEN_KEY = 'dugaApiToken';
+const APP_CSRF_TOKEN_KEY = 'dugaCsrfToken';
 
 export const SESSION_REVOKED_EVENT = 'duga:session-revoked';
 export const SESSION_REVOKED_CODE = 'SESSION_REVOKED';
@@ -14,6 +15,13 @@ export const clearAppSessionRevoked = () => {
 export const clearAppSessionCredentials = () => {
   localStorage.removeItem(APP_SESSION_ID_KEY);
   sessionStorage.removeItem(APP_SESSION_TOKEN_KEY);
+  sessionStorage.removeItem(APP_CSRF_TOKEN_KEY);
+};
+
+export const getAppCsrfToken = () => sessionStorage.getItem(APP_CSRF_TOKEN_KEY);
+
+export const setAppCsrfToken = (csrfToken: string) => {
+  sessionStorage.setItem(APP_CSRF_TOKEN_KEY, csrfToken);
 };
 
 export const markAppSessionLoggedOut = () => {

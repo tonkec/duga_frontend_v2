@@ -511,6 +511,31 @@ select:disabled {
   color: var(--duga-dark-accent) !important;
 }
 
+[data-theme='dark'] .post-login-card {
+  background-color: rgba(57, 62, 70, 0.92) !important;
+  border-color: var(--duga-dark-border) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32) !important;
+}
+
+[data-theme='dark'] .post-login-consent {
+  background-color: var(--duga-dark-base) !important;
+  border-color: var(--duga-dark-border) !important;
+}
+
+[data-theme='dark'] .post-login-consent input[type='checkbox'] {
+  accent-color: var(--duga-dark-accent);
+}
+
+[data-theme='dark'] .post-login-submit {
+  background-color: var(--duga-dark-accent) !important;
+  color: var(--duga-dark-base) !important;
+}
+
+[data-theme='dark'] .post-login-submit:hover:not(:disabled) {
+  background-color: #2bd5dc !important;
+  color: var(--duga-dark-base) !important;
+}
+
 [data-theme='dark'] .pagination-controls {
   background-color: var(--duga-dark-surface) !important;
   border-color: var(--duga-dark-border) !important;

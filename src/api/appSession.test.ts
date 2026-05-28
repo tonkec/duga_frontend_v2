@@ -2,11 +2,13 @@ import {
   clearAppSessionCredentials,
   clearAppSessionRevoked,
   consumeAppSessionRevokedNotice,
+  getAppCsrfToken,
   isAppSessionConflictError,
   isAppSessionRevoked,
   markAppSessionLoggedOut,
   markSessionRevoked,
   SESSION_REVOKED_EVENT,
+  setAppCsrfToken,
 } from './appSession';
 
 describe('appSession state', () => {
@@ -57,21 +59,31 @@ describe('appSession state', () => {
   it('clears stale app session credentials', () => {
     localStorage.setItem('dugaSessionId', 'stale-session-id');
     sessionStorage.setItem('dugaApiToken', 'stale-api-token');
+    sessionStorage.setItem('dugaCsrfToken', 'stale-csrf-token');
 
     clearAppSessionCredentials();
 
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
     expect(sessionStorage.getItem('dugaApiToken')).toBeNull();
+    expect(sessionStorage.getItem('dugaCsrfToken')).toBeNull();
+  });
+
+  it('stores the CSRF token for the current browser session', () => {
+    setAppCsrfToken('csrf-token');
+
+    expect(getAppCsrfToken()).toBe('csrf-token');
   });
 
   it('clears app session credentials when the session is revoked', () => {
     localStorage.setItem('dugaSessionId', 'stale-session-id');
     sessionStorage.setItem('dugaApiToken', 'stale-api-token');
+    sessionStorage.setItem('dugaCsrfToken', 'stale-csrf-token');
 
     markSessionRevoked();
 
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
     expect(sessionStorage.getItem('dugaApiToken')).toBeNull();
+    expect(sessionStorage.getItem('dugaCsrfToken')).toBeNull();
   });
 
   it('marks a normal logout as inactive without showing a revoked notice', () => {

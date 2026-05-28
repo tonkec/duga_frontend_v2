@@ -114,7 +114,7 @@ describe('apiClient URL safety', () => {
   });
 
   it('attaches a CSRF header for unsafe methods when the CSRF cookie exists', async () => {
-    document.cookie = `duga_csrf=${encodeURIComponent('csrf-token')};path=/`;
+    document.cookie = `duga_csrf=${encodeURIComponent('csrf=token')};path=/`;
     const adapter = jest.fn(async (config) => ({
       config,
       data: {},
@@ -126,7 +126,26 @@ describe('apiClient URL safety', () => {
     await apiClient().post('/users/update-user', {}, { adapter });
 
     const headers = adapter.mock.calls[0][0].headers;
-    expect(headers['x-csrf-token']).toBe('csrf-token');
+    expect(headers['x-csrf-token']).toBe('csrf=token');
+
+    document.cookie = 'duga_csrf=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+  });
+
+  it('prefers the stored CSRF token over the CSRF cookie', async () => {
+    sessionStorage.setItem('dugaCsrfToken', 'stored-csrf-token');
+    document.cookie = `duga_csrf=${encodeURIComponent('cookie-csrf-token')};path=/`;
+    const adapter = jest.fn(async (config) => ({
+      config,
+      data: {},
+      headers: {},
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    await apiClient().delete('/uploads/delete-photo', { adapter });
+
+    const headers = adapter.mock.calls[0][0].headers;
+    expect(headers['x-csrf-token']).toBe('stored-csrf-token');
 
     document.cookie = 'duga_csrf=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
   });

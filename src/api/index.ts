@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { handleGlobalApiError } from './globalErrorHandler';
 import { getEnv } from '@app/configs/env';
+import { getAppCsrfToken } from './appSession';
 import { resolveAuth0AccessToken } from './authToken';
 
 declare module 'axios' {
@@ -30,7 +31,9 @@ const UNSAFE_METHODS = new Set(['post', 'put', 'patch', 'delete']);
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
   for (const cookie of cookies) {
-    const [key, value] = cookie.split('=');
+    const separatorIndex = cookie.indexOf('=');
+    const key = separatorIndex >= 0 ? cookie.slice(0, separatorIndex) : cookie;
+    const value = separatorIndex >= 0 ? cookie.slice(separatorIndex + 1) : '';
     if (key === name) {
       return decodeURIComponent(value);
     }
@@ -65,7 +68,7 @@ export const apiClient = (token?: string): AxiosInstance => {
       }
 
       const method = config.method?.toLowerCase();
-      const csrfToken = getCookie(CSRF_COOKIE_NAME);
+      const csrfToken = getAppCsrfToken() ?? getCookie(CSRF_COOKIE_NAME);
       if (method && UNSAFE_METHODS.has(method) && csrfToken) {
         config.headers[CSRF_HEADER] = csrfToken;
       }

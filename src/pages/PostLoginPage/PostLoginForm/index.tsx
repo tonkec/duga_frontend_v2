@@ -85,7 +85,7 @@ export default function PostLoginForm() {
         )}
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
+      <div className="post-login-consent space-y-3 rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
         <label className="flex items-start gap-3 text-sm text-gray-700">
           <input
             type="checkbox"
@@ -128,7 +128,7 @@ export default function PostLoginForm() {
         htmlType="submit"
         type="primary"
         disabled={isSubmitting || !isValid || isUpdateUserPending}
-        className="w-full !rounded-full !py-4 text-base font-bold shadow-lg"
+        className="post-login-submit w-full !rounded-full !py-4 text-base font-bold shadow-lg"
       >
         {isUpdateUserPending ? 'Spremam...' : 'Nastavi'}
       </Button>

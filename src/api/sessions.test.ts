@@ -41,7 +41,19 @@ describe('startSession', () => {
     expect(post).toHaveBeenCalledWith('/sessions/start', {});
   });
 
-  it('ignores any session credentials returned from session start', async () => {
+  it('stores the CSRF token returned from session start', async () => {
+    post.mockResolvedValue({
+      data: { csrfToken: 'csrf-token' },
+    });
+    setAccessTokenGetter(async () => 'auth0-access-token');
+
+    await startSession();
+
+    expect(post).toHaveBeenCalledWith('/sessions/start', {});
+    expect(sessionStorage.getItem('dugaCsrfToken')).toBe('csrf-token');
+  });
+
+  it('ignores legacy session credentials returned from session start', async () => {
     post.mockResolvedValue({
       data: { token: 'backend-api-token', sessionId: 'server-session-id' },
     });
