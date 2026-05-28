@@ -14,6 +14,7 @@ import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
 import { clearAppSessionCredentials, clearAppSessionRevoked } from '@app/api/appSession';
 import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
+import { getEnv } from '@app/configs/env';
 
 const howItWorksItems = [
   {
@@ -145,7 +146,8 @@ const LoginPage = () => {
         returnTo: '/post-login',
       },
       authorizationParams: {
-        redirect_uri: window.location.origin,
+        redirect_uri: getEnv('VITE_AUTH0_CALLBACK_URL'),
+        audience: getEnv('VITE_AUTH0_AUDIENCE'),
         scope: AUTH0_IDENTITY_SCOPE,
       },
     });
