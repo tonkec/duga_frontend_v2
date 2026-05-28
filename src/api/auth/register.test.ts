@@ -42,4 +42,17 @@ describe('register', () => {
 
     expect(mockApiClient).toHaveBeenCalledWith('explicit-token');
   });
+
+  it('rejects when no Auth0 token is available', async () => {
+    await expect(
+      register('auth0|user', 'user@example.com', 'generated-user', true)
+    ).rejects.toMatchObject({
+      response: {
+        status: 401,
+        data: { message: 'Not authenticated: Auth0 token missing' },
+      },
+    });
+
+    expect(mockApiClient).not.toHaveBeenCalled();
+  });
 });

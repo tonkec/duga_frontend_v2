@@ -12,7 +12,7 @@ import Image from '@app/components/Image';
 import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
-import { clearAppSessionRevoked } from '@app/api/appSession';
+import { clearAppSessionCredentials, clearAppSessionRevoked } from '@app/api/appSession';
 import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
 
 const howItWorksItems = [
@@ -138,6 +138,7 @@ const LoginPage = () => {
   const learnMoreRef = useRef<HTMLDivElement>(null);
 
   const onLogin = () => {
+    clearAppSessionCredentials();
     clearAppSessionRevoked();
     loginWithRedirect({
       appState: {

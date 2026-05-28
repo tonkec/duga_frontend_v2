@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { handleGlobalApiError } from './globalErrorHandler';
 import { getEnv } from '@app/configs/env';
+import { resolveAuth0AccessToken } from './authToken';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -58,8 +59,9 @@ export const apiClient = (token?: string): AxiosInstance => {
         return Promise.reject(absoluteUrlRejection);
       }
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      const authToken = token ?? (await resolveAuth0AccessToken());
+      if (authToken) {
+        config.headers.Authorization = `Bearer ${authToken}`;
       }
 
       const method = config.method?.toLowerCase();

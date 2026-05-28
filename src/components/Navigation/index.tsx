@@ -9,7 +9,7 @@ import { NavigationItems } from '../NavigationLinks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useSocket } from '@app/context/useSocket';
 import { setOfflineStatus } from '@app/utils/setOfflineStatus';
-import { clearAppSessionRevoked } from '@app/api/appSession';
+import { clearAppSessionCredentials, clearAppSessionRevoked } from '@app/api/appSession';
 import { useGetAllNotifcations } from './hooks';
 import NotificationDropdown from './components/Notifications';
 import UserAvatar from '../UserAvatar';
@@ -76,6 +76,7 @@ const Navigation = () => {
     if (socket) {
       await setOfflineStatus(socket);
     }
+    clearAppSessionCredentials();
     clearAppSessionRevoked();
     logout({
       logoutParams: {

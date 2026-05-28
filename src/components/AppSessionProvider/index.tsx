@@ -7,6 +7,7 @@ import { register } from '@app/api/auth/register';
 import { startSession } from '@app/api/sessions';
 import { getCurrentUser } from '@app/api/users';
 import {
+  clearAppSessionCredentials,
   clearAppSessionRevoked,
   consumeAppSessionRevokedNotice,
   isAppSessionConflictError,
@@ -45,6 +46,7 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const onRevoked = () => {
+      clearAppSessionCredentials();
       queryClient.clear();
       setStatus('revoked');
       toast.info(SESSION_REVOKED_MESSAGE, toastConfig);
@@ -63,6 +65,7 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
     if (isLoading) return;
 
     if (!isAuthenticated) {
+      clearAppSessionCredentials();
       startedSessionKeyRef.current = null;
       if (consumeAppSessionRevokedNotice()) {
         toast.info(SESSION_REVOKED_MESSAGE, toastConfig);
