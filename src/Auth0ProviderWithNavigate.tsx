@@ -17,7 +17,6 @@ type CypressWindow = Window &
 const CYPRESS_AUTH_USER_KEY = 'duga:cypress-auth-user';
 const DEFAULT_AUTH_REDIRECT_PATH = '/';
 export const AUTH0_IDENTITY_SCOPE = 'openid profile email';
-
 export const getSafeAuthReturnTo = (returnTo: string | undefined, fallbackPath: string) => {
   if (!returnTo) return fallbackPath || DEFAULT_AUTH_REDIRECT_PATH;
   if (!returnTo.startsWith('/') || returnTo.startsWith('//') || returnTo.includes('\\')) {
