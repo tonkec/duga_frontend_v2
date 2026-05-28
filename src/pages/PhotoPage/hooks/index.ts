@@ -34,12 +34,7 @@ export const useSetProfilePhoto = () => {
   const queryClient = useQueryClient();
 
   const { mutate: setProfilePhoto, isPending: isSettingProfilePhoto } = useMutation({
-    mutationFn: ({
-      imageName,
-      description = '',
-      taggedUserIds = [],
-      userId,
-    }: ISetProfilePhotoProps) => {
+    mutationFn: ({ imageName, description = '', taggedUserIds = [] }: ISetProfilePhotoProps) => {
       const formData = new FormData();
       formData.append(
         'text',
@@ -52,7 +47,6 @@ export const useSetProfilePhoto = () => {
           },
         ])
       );
-      formData.append('userId', userId);
 
       return uploadPhotos(formData);
     },

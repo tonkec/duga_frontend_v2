@@ -11,7 +11,11 @@ import { useDeletePhoto } from '@app/components/Photos/hooks';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import ConfirmModal from '@app/components/ConfirmModal';
-import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import {
+  ALLOWED_FILE_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  MAXIMUM_NUMBER_OF_IMAGES,
+} from '@app/utils/consts';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
 import { areValidImageTypes } from '@app/utils/areValidImageTypes';
 import BlobImage from './components/BlobImage';
@@ -26,8 +30,10 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import MentionInput from '@app/components/MentionInput';
+import { useObjectUrls } from '@app/hooks/useObjectUrl';
 
 type TaggedUser = { id: number; username: string };
+type NewImage = IImage & { file: File };
 
 export interface ImageDescription {
   description: string;
@@ -49,6 +55,7 @@ interface IPhotoActionButtonsProps {
 }
 
 const DESCRIPTION_MAX_LENGTH = 100;
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 const DeleteButtonModal = ({
   onDelete,
@@ -170,7 +177,9 @@ const PhotoUploader = () => {
   const { allImages: allExistingImages } = useGetAllImages(userId as string);
   const { deletePhoto } = useDeletePhoto();
   const { onUploadPhotos, isUploadingPhotos } = useUploadPhotos();
-  const [newImages, setNewImages] = useState<IImage[]>();
+  const [newImages, setNewImages] = useState<NewImage[]>();
+  const newImageFiles = useMemo(() => newImages?.map((image) => image.file), [newImages]);
+  const newImagePreviewUrls = useObjectUrls(newImageFiles);
   const existingImages = useMemo<IImage[]>(
     () => allExistingImages?.data?.images || [],
     [allExistingImages]
@@ -254,7 +263,9 @@ const PhotoUploader = () => {
     if (!files || files.length === 0) return;
 
     if (!areValidImageTypes(files)) {
-      toast.error(`Možeš odabrati samo ${ALLOWED_FILE_TYPES} formate`);
+      toast.error(
+        `Možeš odabrati samo ${ALLOWED_FILE_TYPES} formate do ${MAX_IMAGE_FILE_SIZE_MB} MB`
+      );
       return;
     }
 
@@ -273,7 +284,6 @@ const PhotoUploader = () => {
         }))
       )
     );
-    formData.append('userId', userId as string);
 
     for (let i = 0; i < files.length; i++) {
       const originalFile = files[i];
@@ -337,8 +347,8 @@ const PhotoUploader = () => {
     );
   };
 
-  const onDeleteFromS3 = (image: IImage) => {
-    deletePhoto({ url: image.url });
+  const onDeletePhoto = (image: IImage) => {
+    deletePhoto({ url: image.securePhotoUrl || image.url || image.imageUrl || '' });
   };
 
   const onSubmitUpdatePhotos = (e: SyntheticEvent) => {
@@ -366,7 +376,6 @@ const PhotoUploader = () => {
 
     const formData = new FormData();
     formData.append('text', JSON.stringify(imagesPayload));
-    formData.append('userId', userId as string);
     onUploadPhotos(formData);
   };
 
@@ -416,7 +425,12 @@ const PhotoUploader = () => {
                   >
                     <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
                       <BlobImage
-                        imageUrl={image.securePhotoUrl}
+                        imageUrls={[
+                          image.securePhotoUrl,
+                          image.url,
+                          image.imageUrl || '',
+                          image.messagePhotoUrl || '',
+                        ]}
                         name={image.name}
                         className="h-full w-full object-cover"
                       />
@@ -451,7 +465,7 @@ const PhotoUploader = () => {
                         onTagUsersChange={(users) =>
                           setDescriptionTaggedUsersForImage(imageId, users)
                         }
-                        onDelete={() => onDeleteFromS3(image)}
+                        onDelete={() => onDeletePhoto(image)}
                         inputValue={inputValue}
                         initialTaggedUsers={getDescriptionTaggedUsers(imageId, image.taggedUsers)}
                         isChecked={
@@ -552,9 +566,12 @@ const PhotoUploader = () => {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {newImages &&
-              newImages.map((image) => {
+              newImages.map((image, index) => {
                 const imageId = removeSpacesAndDashes(image.name);
                 const inputValue = getDescriptionInputValue(imageId, image.description);
+                const previewUrl = newImagePreviewUrls[index];
+
+                if (!previewUrl) return null;
 
                 return (
                   <div
@@ -563,7 +580,7 @@ const PhotoUploader = () => {
                   >
                     <div className="relative w-full aspect-[1/1] overflow-hidden rounded-xl">
                       <Image
-                        src={image.url}
+                        src={previewUrl}
                         alt={image.name}
                         className="absolute top-0 left-0 w-full h-full object-cover"
                       />
@@ -610,7 +627,7 @@ const PhotoUploader = () => {
               multiple
               accept={ALLOWED_FILE_TYPES}
               label="Odaberi fotografije"
-              helperText={`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}. Maksimalno ${MAXIMUM_NUMBER_OF_IMAGES} fotografija.`}
+              helperText={`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}. Maksimalno ${MAXIMUM_NUMBER_OF_IMAGES} fotografija, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici.`}
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
@@ -629,13 +646,17 @@ const PhotoUploader = () => {
                   }
 
                   if (!areValidImageTypes(files)) {
-                    toast.error(`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`, toastConfig);
+                    toast.error(
+                      `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
+                      toastConfig
+                    );
                     return;
                   }
 
                   const images = Array.from(files).map((file) => {
                     return {
-                      url: URL.createObjectURL(file),
+                      url: '',
+                      file,
                       name: file.name,
                       fileType: file.type,
                       description: '',
@@ -644,7 +665,7 @@ const PhotoUploader = () => {
                     };
                   });
 
-                  setNewImages((prev) => [...(prev || []), ...(images as IImage[])]);
+                  setNewImages((prev) => [...(prev || []), ...(images as NewImage[])]);
                 }
               }}
               disabled={isUploadingPhotos}

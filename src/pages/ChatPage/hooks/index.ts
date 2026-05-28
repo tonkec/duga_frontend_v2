@@ -74,10 +74,9 @@ export const useDeleteCurrentChat = (socket: Socket<DefaultEventsMap, DefaultEve
     isSuccess: isDeleteChatSuccess,
   } = useMutation({
     mutationFn: ({ chatId }: { chatId: string }) => deleteCurrentChat(chatId),
-    onSuccess: (data, { chatId: deletedChatId }) => {
+    onSuccess: (_data, { chatId: deletedChatId }) => {
       socket?.emit('deleteChat', {
         chatId: deletedChatId,
-        users: data?.data?.users ?? data?.data,
       });
       queryClient.removeQueries({ queryKey: ['chat', deletedChatId] });
       queryClient.removeQueries({ queryKey: ['messages', deletedChatId] });

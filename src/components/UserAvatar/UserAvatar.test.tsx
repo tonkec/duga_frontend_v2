@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import UserAvatar from '.';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import { useGetProfilePhoto } from './hooks/useGetProfilePhoto';
@@ -76,11 +76,60 @@ describe('UserAvatar integration', () => {
       <UserAvatar avatarFallbackName="Uploaded User" color="#2D46B9" userId="123" size="160" />
     );
 
-    expect(mockUseGetImageBlob).toHaveBeenCalledWith('/uploads/profile-image');
+    expect(mockUseGetImageBlob).toHaveBeenNthCalledWith(1, '/uploads/profile-image');
     expect(createObjectURLMock).toHaveBeenCalledWith(profileBlob);
     expect(screen.getByRole('img', { name: 'Avatar' })).toHaveAttribute(
       'src',
       'blob:uploaded-profile-image'
+    );
+  });
+
+  it('tries fallback profile photo fields when securePhotoUrl has no blob', async () => {
+    const profileBlob = new Blob(['profile image'], { type: 'image/png' });
+    mockUseGetProfilePhoto.mockReturnValue({
+      profilePhoto: {
+        data: {
+          securePhotoUrl:
+            'https://duga-user-photo.s3.eu-north-1.amazonaws.com/development/user/54/missing.png',
+          url: 'development/user/54/1779482229142/antonijasimic.png',
+        },
+      },
+      profilePhotoError: null,
+      isProfilePhotoLoading: false,
+    } as ReturnType<typeof useGetProfilePhoto>);
+    mockUseGetImageBlob.mockImplementation((source) => {
+      if (source === 'development/user/54/1779482229142/antonijasimic.png') {
+        return {
+          data: profileBlob,
+          error: null,
+          isLoading: false,
+        } as ReturnType<typeof useGetImageBlob>;
+      }
+
+      return {
+        data: null,
+        error: null,
+        isLoading: false,
+      } as ReturnType<typeof useGetImageBlob>;
+    });
+
+    render(
+      <UserAvatar avatarFallbackName="Fallback User" color="#2D46B9" userId="123" size="160" />
+    );
+
+    expect(mockUseGetImageBlob).toHaveBeenNthCalledWith(
+      1,
+      'https://duga-user-photo.s3.eu-north-1.amazonaws.com/development/user/54/missing.png'
+    );
+    expect(mockUseGetImageBlob).toHaveBeenNthCalledWith(
+      2,
+      'development/user/54/1779482229142/antonijasimic.png'
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: 'Avatar' })).toHaveAttribute(
+        'src',
+        'blob:uploaded-profile-image'
+      )
     );
   });
 
@@ -104,7 +153,7 @@ describe('UserAvatar integration', () => {
       <UserAvatar avatarFallbackName="Broken Image User" color="#2D46B9" userId="123" size="160" />
     );
 
-    expect(mockUseGetImageBlob).toHaveBeenCalledWith('/uploads/missing-profile-image');
+    expect(mockUseGetImageBlob).toHaveBeenNthCalledWith(1, '/uploads/missing-profile-image');
     expect(createObjectURLMock).not.toHaveBeenCalled();
     expect(screen.getByText('Broken Image User')).toBeVisible();
   });

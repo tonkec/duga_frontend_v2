@@ -32,6 +32,7 @@ import {
 } from '@app/utils/emojis';
 import { getImdbTitleUrl, isImdbTitleUrl } from '@app/utils/imdb';
 import { getYouTubeEmbedUrl } from '@app/utils/youtube';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -277,7 +278,8 @@ const ImdbMovieSearch = ({
             <a
               href={value}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer nofollow"
+              referrerPolicy="no-referrer"
               className="break-all font-semibold text-blue"
             >
               {value}
@@ -304,11 +306,13 @@ const ImdbMovieSearch = ({
                   onClick={() => handleMovieSelect(movie)}
                   className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-[#f0f4ff]"
                 >
-                  {movie.imageUrl && (
+                  {getSafeRemoteImageUrl(movie.imageUrl) && (
                     <Image
-                      src={movie.imageUrl}
+                      src={getSafeRemoteImageUrl(movie.imageUrl)}
                       alt={movie.title}
                       className="h-16 w-12 rounded object-cover"
+                      loading
+                      referrerPolicy="no-referrer"
                     />
                   )}
                   <span>
@@ -398,7 +402,13 @@ const YouTubeSongSearch = ({
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#dce4ff] bg-white px-3 py-2 text-sm text-gray-700">
           <span>
             Odabrana YouTube pjesma:{' '}
-            <a href={value} target="_blank" rel="noreferrer" className="font-semibold text-blue">
+            <a
+              href={value}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              referrerPolicy="no-referrer"
+              className="font-semibold text-blue"
+            >
               {value}
             </a>
           </span>
@@ -423,11 +433,13 @@ const YouTubeSongSearch = ({
                   onClick={() => handleSongSelect(video)}
                   className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-[#f0f4ff]"
                 >
-                  {video.thumbnailUrl && (
+                  {getSafeRemoteImageUrl(video.thumbnailUrl) && (
                     <Image
-                      src={video.thumbnailUrl}
+                      src={getSafeRemoteImageUrl(video.thumbnailUrl)}
                       alt={video.title}
                       className="h-16 w-24 rounded object-cover"
+                      loading
+                      referrerPolicy="no-referrer"
                     />
                   )}
                   <span>

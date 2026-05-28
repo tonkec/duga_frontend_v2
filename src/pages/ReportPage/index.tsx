@@ -2,19 +2,13 @@ import { useMutation } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import emailjs from '@emailjs/browser';
 import AppLayout from '@app/components/AppLayout';
 import Card from '@app/components/Card';
 import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
-import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
 import FieldError from '@app/components/FieldError';
-import { getEnv } from '@app/configs/env';
-
-const SERVICE_ID = getEnv('VITE_EMAILJS_SERVICE_ID') || '';
-const TEMPLATE_ID = getEnv('VITE_EMAILJS_TEMPLATE_ID') || '';
-const PUBLIC_KEY = getEnv('VITE_EMAILJS_PUBLIC_KEY') || '';
+import { submitProblemReport } from '@app/api/reports';
 
 type Option = { value: string; label: string };
 
@@ -52,35 +46,30 @@ const problemOptions: Option[] = [
   { value: 'abuse', label: 'Zlouporaba / uznemiravanje' },
   { value: 'inappropriate', label: 'Neprimjeren sadržaj' },
   { value: 'account', label: 'Račun / pristup' },
-  // { value: 'billing', label: 'Plaćanje / naplata' },
   { value: 'other', label: 'Ostalo' },
 ];
 
 const FormSchema = z.object({
-  problem_type: z.enum(['bug', 'abuse', 'inappropriate', 'account', 'billing', 'other'], {
+  problem_type: z.enum(['bug', 'abuse', 'inappropriate', 'account', 'other'], {
     required_error: 'Odaberi vrstu problema.',
     invalid_type_error: 'Odaberi vrstu problema.',
   }),
-  message: z.string().min(10, 'Poruka mora imati barem 10 znakova.'),
-  userId: z.number().optional(),
+  message: z.string().trim().min(10, 'Poruka mora imati barem 10 znakova.'),
 });
 
 type FormValues = z.infer<typeof FormSchema>;
 
-async function sendReport(data: FormValues) {
-  const label =
-    problemOptions.find((o) => o.value === data.problem_type)?.label ?? data.problem_type;
-  return emailjs.send(
-    SERVICE_ID,
-    TEMPLATE_ID,
-    { problem_type: label, message: data.message, user_id: data.userId ?? '' },
-    { publicKey: PUBLIC_KEY }
-  );
-}
+const getReportErrorMessage = (error: unknown) => {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+
+  if (status === 429) {
+    return 'Previše prijava u kratkom vremenu. Pokušaj ponovno malo kasnije.';
+  }
+
+  return 'Nešto nije u redu. Pokušaj ponovno.';
+};
 
 export default function ReportPage() {
-  const { user: currentUser } = useGetCurrentUser();
-  const userId = currentUser?.data?.id;
   const {
     register,
     handleSubmit,
@@ -92,11 +81,15 @@ export default function ReportPage() {
 
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationKey: ['report-problem'],
-    mutationFn: sendReport,
+    mutationFn: (data: FormValues) =>
+      submitProblemReport({
+        problemType: data.problem_type,
+        message: data.message.trim(),
+      }),
   });
 
   const onSubmit = (data: FormValues) => {
-    mutate({ ...data, userId });
+    mutate(data);
   };
 
   return (
@@ -176,11 +169,8 @@ export default function ReportPage() {
               )}
               {isError && (
                 <p className="rounded-2xl bg-red/10 px-4 py-3 font-semibold text-red">
-                  Nešto nije u redu. Pokušaj ponovno.
+                  {getReportErrorMessage(error)}
                 </p>
-              )}
-              {isError && error instanceof Error && (
-                <p className="mt-2 text-red">{error.message}</p>
               )}
             </div>
           </form>

@@ -13,6 +13,7 @@ import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
 import { clearAppSessionRevoked } from '@app/api/appSession';
+import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
 
 const howItWorksItems = [
   {
@@ -144,6 +145,7 @@ const LoginPage = () => {
       },
       authorizationParams: {
         redirect_uri: window.location.origin,
+        scope: AUTH0_IDENTITY_SCOPE,
       },
     });
   };
@@ -392,7 +394,11 @@ const LoginPage = () => {
                 type="blue"
                 className="landing-primary-action mt-8 !rounded-full !px-6 !py-3 !text-lg font-bold"
                 onClick={() => {
-                  window.open('https://aws.amazon.com/rekognition/', '_blank');
+                  window.open(
+                    'https://aws.amazon.com/rekognition/',
+                    '_blank',
+                    'noopener,noreferrer'
+                  );
                 }}
               >
                 Saznaj više

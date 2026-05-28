@@ -40,7 +40,13 @@ describe('forumValidation', () => {
 
   it('rejects non-image files', () => {
     expect(validateForumImages([createFile('document.pdf', 128, 'application/pdf')])).toBe(
-      'Možeš dodati samo slikovne datoteke.'
+      'Možeš dodati samo slike u formatima: .png,.jpg,.jpeg,.webp.'
+    );
+  });
+
+  it('rejects SVG files', () => {
+    expect(validateForumImages([createFile('vector.svg', 128, 'image/svg+xml')])).toBe(
+      'Možeš dodati samo slike u formatima: .png,.jpg,.jpeg,.webp.'
     );
   });
 

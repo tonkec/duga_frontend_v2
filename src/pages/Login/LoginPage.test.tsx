@@ -91,6 +91,7 @@ describe('LoginPage redirects', () => {
       },
       authorizationParams: {
         redirect_uri: window.location.origin,
+        scope: 'openid profile email',
       },
     });
   });

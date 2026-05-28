@@ -70,14 +70,16 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
   useEffect(() => {
     if (!socket || !user.id) return;
 
-    socket.on('status-update', (data: { userId: number; status: 'online' | 'offline' }) => {
+    const handleStatusUpdate = (data: { userId: number; status: 'online' | 'offline' }) => {
       if (Number(data.userId) === Number(user.id)) {
         setIsOnlineState(data.status === 'online');
       }
-    });
+    };
+
+    socket.on('status-update', handleStatusUpdate);
 
     return () => {
-      socket.off('status-update');
+      socket.off('status-update', handleStatusUpdate);
     };
   }, [socket, user.id]);
 
@@ -87,15 +89,15 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
 
   return (
     <Card
-      className="user-card group h-full rounded-3xl !bg-white p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+      className="user-card group flex h-full flex-col rounded-3xl !bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
       onClick={onButtonClick}
     >
-      <div className="user-card-avatar-wrap relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-[#f7f9ff] to-[#eef3ff]">
+      <div className="user-card-avatar-wrap relative w-full overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#f7f9ff] to-[#eef3ff]">
         <UserAvatar
           avatarFallbackName={`${user.username}`}
           color="#f7f9ff"
           userId={String(user.id)}
-          className="aspect-[4/3] w-full transition-transform duration-300 group-hover:scale-105"
+          className="aspect-[16/10] w-full transition-transform duration-300 group-hover:scale-105"
           fgColor="#1f2937"
         />
         <span
@@ -111,16 +113,16 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
       </div>
       <div className="flex flex-1 flex-col px-1 pb-1 pt-5 text-center">
         <div className="flex flex-1 flex-col">
-          <h3 className="truncate text-2xl font-bold tracking-tight text-gray-950">
+          <h3 className="min-w-0 truncate text-2xl font-bold tracking-tight text-gray-950">
             {user.username}
           </h3>
-          <div className="mx-auto mt-4 flex flex-col items-center gap-2 text-sm">
+          <div className="mx-auto mt-4 flex w-full max-w-[13rem] flex-col items-stretch gap-2 text-sm">
             {getUserLocation(user)}
             {getUserAge(user)}
           </div>
 
           <Button
-            className="user-card-button mt-5 w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
+            className="user-card-button mt-5 w-full rounded-full px-5 py-3 font-semibold shadow-md shadow-blue/15"
             onClick={onButtonClick}
             type="blue"
           >

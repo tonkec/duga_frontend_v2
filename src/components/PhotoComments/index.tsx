@@ -20,7 +20,11 @@ import { useSocket } from '@app/context/useSocket';
 import MentionInput from '@app/components/MentionInput';
 import { toast } from 'react-toastify';
 import { useGetAllUserImages } from '@app/hooks/useGetAllUserImages';
-import { ALLOWED_FILE_TYPES, MAXIMUM_NUMBER_OF_IMAGES } from '@app/utils/consts';
+import {
+  ALLOWED_FILE_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  MAXIMUM_NUMBER_OF_IMAGES,
+} from '@app/utils/consts';
 import { init } from 'emoji-mart';
 import { debounce } from 'lodash';
 import EmojiPicker from '../EmojiPicker';
@@ -39,6 +43,8 @@ import {
   replaceEmojiToken,
   searchEmojiNatives,
 } from '@app/utils/emojis';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
+import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 const schema = z
   .object({
@@ -63,6 +69,8 @@ const schema = z
       path: ['comment'],
     }
   );
+
+const MAX_IMAGE_FILE_SIZE_MB = Math.floor(MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024));
 
 interface Inputs {
   comment: string;
@@ -176,7 +184,7 @@ const PhotoComments = () => {
   const imageFileList = watch('image');
   const selectedImageFile = imageFileList?.[0];
   const selectedGifUrl = watch('gifUrl');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewUrl = useObjectUrl(selectedImageFile);
 
   const onSubmit = async (data: Inputs) => {
     if (!photoId) return;
@@ -188,6 +196,14 @@ const PhotoComments = () => {
 
     if (selectedImagesCount + existingImagesCount > MAXIMUM_NUMBER_OF_IMAGES) {
       toast.error(`Ukupan maksimalan broj slika je ${MAXIMUM_NUMBER_OF_IMAGES}`);
+      return;
+    }
+
+    if (data.image?.length && !areValidImageTypes(data.image)) {
+      toast.error(
+        `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
+        toastConfig
+      );
       return;
     }
 
@@ -226,7 +242,6 @@ const PhotoComments = () => {
   };
 
   const clearImage = () => {
-    setPreviewUrl(null);
     setValue('image', undefined);
   };
 
@@ -250,49 +265,42 @@ const PhotoComments = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('receive-comment', (data) => {
-      addCommentToState(data.data as IComment);
-    });
+    const handleReceiveComment = (data: { data?: IComment }) => {
+      const comment = data.data;
+      if (!comment?.uploadId || !photoId || String(comment.uploadId) !== String(photoId)) return;
 
-    socket.on('remove-comment', (payload) => {
+      addCommentToState(comment);
+    };
+
+    const handleRemoveComment = (payload: {
+      data?: { id?: number | string; uploadId?: string };
+    }) => {
       const { id, uploadId } = payload?.data ?? {};
-      if (!id) return;
-      if (uploadId && photoId && String(uploadId) !== String(photoId)) return;
+      if (!id || !uploadId || !photoId || String(uploadId) !== String(photoId)) return;
 
       removeComment(Number(id));
-    });
+    };
 
     const handleCommentUpdate = (payload: unknown) => {
       try {
         applyCommentUpdate(payload);
-      } catch (error) {
-        console.error('Error updating comment:', error);
+      } catch {
         toast.error('Greška prilikom ažuriranja komentara');
       }
     };
 
+    socket.on('receive-comment', handleReceiveComment);
+    socket.on('remove-comment', handleRemoveComment);
     socket.on('update-comment', handleCommentUpdate);
     socket.on('edit-comment', handleCommentUpdate);
 
     return () => {
-      socket.off('receive-comment');
-      socket.off('remove-comment');
+      socket.off('receive-comment', handleReceiveComment);
+      socket.off('remove-comment', handleRemoveComment);
       socket.off('update-comment', handleCommentUpdate);
       socket.off('edit-comment', handleCommentUpdate);
     };
   }, [addCommentToState, applyCommentUpdate, photoId, removeComment, socket]);
-
-  useEffect(() => {
-    if (!selectedImageFile) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const url = URL.createObjectURL(selectedImageFile);
-    setPreviewUrl(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [selectedImageFile]);
 
   const sortedComments = useMemo(
     () =>
@@ -387,7 +395,7 @@ const PhotoComments = () => {
 
                                 if (!areValidImageTypes(e.target.files)) {
                                   toast.error(
-                                    `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}!`,
+                                    `Dozvoljeni formati su ${ALLOWED_FILE_TYPES}, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici!`,
                                     toastConfig
                                   );
                                   return;
@@ -467,7 +475,10 @@ const PhotoComments = () => {
 
               <GiphySearch
                 onGifSelect={(gifUrl) => {
-                  setValue('gifUrl', gifUrl, { shouldValidate: true });
+                  const safeGifUrl = getSafeRemoteImageUrl(gifUrl);
+                  if (safeGifUrl) {
+                    setValue('gifUrl', safeGifUrl, { shouldValidate: true });
+                  }
                 }}
                 isOpen={showGiphySearch}
                 onClose={() => setShowGiphySearch(false)}

@@ -18,7 +18,7 @@ export const useDeletePhoto = (queryKey: string[] = ['uploads']) => {
     mutationFn: (params: DeletePhotoParams) => deleteImage(params.url),
     onSuccess: () => {
       toast.success('Fotografija uspješno obrisana.', toastConfig);
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey, exact: true });
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);

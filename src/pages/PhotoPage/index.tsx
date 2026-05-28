@@ -5,7 +5,6 @@ import Card from '@app/components/Card';
 import PhotoComments from '@app/components/PhotoComments';
 import PhotoLikes from '@app/components/PhotoLikes';
 import Loader from '@app/components/Loader';
-import notFound from '@app/assets/not_found.svg';
 import { useGetImageBlob } from '@app/components/LatestUploads/hooks';
 import Image from '@app/components/Image';
 import { useGetUserById } from '@app/hooks/useGetUserById';
@@ -14,6 +13,8 @@ import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import Button from '@app/components/Button';
 import ContentFormatter from '@app/components/ContentFormatter';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
+import { BiImageAlt } from 'react-icons/bi';
 
 const PhotoPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const PhotoPage = () => {
   const { data: imageBlob } = useGetImageBlob(
     singleImage?.data?.securePhotoUrl || singleImage?.data?.url || ''
   );
+  const imageBlobUrl = useObjectUrl(imageBlob);
 
   const { user: userData } = useGetUserById(singleImage?.data?.userId || '');
   const { user: currentUser } = useGetCurrentUser();
@@ -39,9 +41,11 @@ const PhotoPage = () => {
     return (
       <AppLayout>
         <Card>
-          <div className="flex flex-col justify-center items-center max-w-lg mx-auto">
-            <Image src={notFound} alt="Nije pronađena" />
-            <p className="text-center">Slika nije pronađena ili je obrisana.</p>
+          <div className="mx-auto flex max-w-lg flex-col items-center justify-center px-6 py-10 text-center">
+            <div className="mb-4 grid h-16 w-16 place-items-center rounded-3xl bg-blue/10 text-blue">
+              <BiImageAlt size={34} />
+            </div>
+            <p>Slika nije pronađena ili je obrisana.</p>
           </div>
         </Card>
       </AppLayout>
@@ -95,11 +99,11 @@ const PhotoPage = () => {
       <div className="grid gap-6">
         <Card className="rounded-2xl p-4 md:p-5">
           <div>
-            {imageBlob ? (
+            {imageBlobUrl ? (
               <>
                 <div className="overflow-hidden rounded-2xl bg-black">
                   <Image
-                    src={URL.createObjectURL(imageBlob)}
+                    src={imageBlobUrl}
                     alt="Korisnikova slika"
                     className="mx-auto max-h-[75vh] w-full object-contain"
                   />

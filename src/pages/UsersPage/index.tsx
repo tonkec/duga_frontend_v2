@@ -4,7 +4,7 @@ import Loader from '@app/components/Loader';
 import Paginated from '@app/components/Paginated';
 import UserCard, { IUser } from '@app/components/UserCard';
 import UserFilters from '@app/components/UserFilters';
-import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { useGetAllUsers } from '@app/hooks/useGetAllUsers';
 import { useGetWindowSize } from '@app/hooks/useGetWindowSize';
 import { filterUsers, getVisibleVerifiedUsers } from '@app/utils/userDirectory';
@@ -13,14 +13,34 @@ import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { BiGroup, BiSearch } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import {
+  getSafeBackendMediaPath,
+  getSafeRemoteImageUrl,
+  getSafeS3BackendMediaPath,
+} from '@app/utils/mediaSafety';
 
 const defaultSelectValue = {
   value: 'username',
   label: 'Ime',
 };
 
+type ProfilePhotoResponse = {
+  securePhotoUrl?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+};
+
+const hasRenderableProfilePhoto = (profilePhoto: ProfilePhotoResponse | null | undefined) => {
+  const imageSource = profilePhoto?.securePhotoUrl || profilePhoto?.imageUrl || profilePhoto?.url;
+  return Boolean(
+    getSafeBackendMediaPath(imageSource) ||
+      getSafeS3BackendMediaPath(imageSource) ||
+      getSafeRemoteImageUrl(imageSource)
+  );
+};
+
 const UsersPage = () => {
-  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
+  const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
@@ -47,7 +67,9 @@ const UsersPage = () => {
     () =>
       new Set(
         profilePhotoQueries
-          .map((query, index) => (query.data?.data?.securePhotoUrl ? visibleUsers[index].id : null))
+          .map((query, index) =>
+            hasRenderableProfilePhoto(query.data?.data) ? visibleUsers[index].id : null
+          )
           .filter((userId): userId is number => userId !== null)
       ),
     [profilePhotoQueries, visibleUsers]

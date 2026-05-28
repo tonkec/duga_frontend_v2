@@ -1,4 +1,7 @@
+import { ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_FILE_SIZE_BYTES } from './consts';
+
 export const areValidImageTypes = (files: FileList): boolean => {
-  const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml'];
-  return Array.from(files).every((file) => allowedTypes.includes(file.type));
+  return Array.from(files).every(
+    (file) => ALLOWED_IMAGE_MIME_TYPES.includes(file.type) && file.size <= MAX_IMAGE_FILE_SIZE_BYTES
+  );
 };

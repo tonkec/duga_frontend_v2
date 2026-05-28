@@ -1,4 +1,5 @@
 import { getEnv } from '@app/configs/env';
+import { getSafeYouTubeEmbedUrl } from '@app/utils/mediaSafety';
 
 export interface YouTubeVideo {
   id: string;
@@ -58,7 +59,7 @@ const normalizeYouTubeVideo = (item: YouTubeSearchItem): YouTubeVideo | null => 
       item.snippet?.thumbnails?.medium?.url ||
       item.snippet?.thumbnails?.high?.url ||
       item.snippet?.thumbnails?.default?.url,
-    url: `https://www.youtube.com/embed/${videoId}`,
+    url: getSafeYouTubeEmbedUrl(videoId),
   };
 };
 

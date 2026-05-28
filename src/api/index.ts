@@ -1,6 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import { resolveAccessToken } from './authToken';
-import { getAppSessionId, SESSION_HEADER } from './appSession';
 import { handleGlobalApiError } from './globalErrorHandler';
 import { getEnv } from '@app/configs/env';
 
@@ -9,6 +7,24 @@ declare module 'axios' {
     skipGlobalErrorHandler?: boolean;
   }
 }
+
+const URL_SCHEME_REGEX = /^[a-z][a-z\d+\-.]*:/i;
+
+const isAbsoluteOrProtocolRelativeUrl = (url: string) => {
+  const trimmedUrl = url.trim();
+  return URL_SCHEME_REGEX.test(trimmedUrl) || trimmedUrl.startsWith('//');
+};
+
+const absoluteUrlRejection = {
+  response: {
+    status: 400,
+    data: { message: 'Absolute API request URLs are not allowed' },
+  },
+};
+
+const CSRF_COOKIE_NAME = 'duga_csrf';
+const CSRF_HEADER = 'x-csrf-token';
+const UNSAFE_METHODS = new Set(['post', 'put', 'patch', 'delete']);
 
 export const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
@@ -29,6 +45,7 @@ export const getCookie = (name: string): string | null => {
 export const apiClient = (token?: string): AxiosInstance => {
   const instance = axios.create({
     baseURL: getEnv('VITE_BASE_URL'),
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -37,19 +54,20 @@ export const apiClient = (token?: string): AxiosInstance => {
 
   instance.interceptors.request.use(
     async (config) => {
-      const authToken = await resolveAccessToken(token);
-
-      if (!authToken) {
-        return Promise.reject({
-          response: {
-            status: 401,
-            data: { message: 'Not authenticated: token missing' },
-          },
-        });
+      if (config.url && isAbsoluteOrProtocolRelativeUrl(config.url)) {
+        return Promise.reject(absoluteUrlRejection);
       }
 
-      config.headers.Authorization = `Bearer ${authToken}`;
-      config.headers[SESSION_HEADER] = getAppSessionId();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      const method = config.method?.toLowerCase();
+      const csrfToken = getCookie(CSRF_COOKIE_NAME);
+      if (method && UNSAFE_METHODS.has(method) && csrfToken) {
+        config.headers[CSRF_HEADER] = csrfToken;
+      }
+
       return config;
     },
     (error) => Promise.reject(error)

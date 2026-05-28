@@ -10,6 +10,7 @@ import Image from '../Image';
 import ContentFormatter from '../ContentFormatter';
 import { BiCommentDetail, BiImage } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IComment {
   id: number;
@@ -27,6 +28,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
   const navigate = useNavigate();
   const { user } = useGetUserById(comment.userId.toString());
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || comment.imageUrl);
+  const imageBlobUrl = useObjectUrl(imageBlob);
   const username = user?.data.username || 'Korisnik';
 
   const renderFormattedComment = (text: string) => {
@@ -103,9 +105,9 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
 
       <div className="latest-comment-preview flex gap-3 rounded-2xl bg-[#f7f9ff] p-3">
         <div className="latest-comment-image grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white">
-          {imageBlob ? (
+          {imageBlobUrl ? (
             <Image
-              src={URL.createObjectURL(imageBlob)}
+              src={imageBlobUrl}
               alt="Slika iz komentara"
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />

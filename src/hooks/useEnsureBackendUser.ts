@@ -1,6 +1,4 @@
 import { apiClient } from '@app/api';
-import { register } from '@app/api/auth/register';
-import { resolveAuth0AccessToken } from '@app/api/authToken';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
@@ -13,32 +11,23 @@ export const generateUniqueUsername = (): string => {
   return username;
 };
 
-export const useEnsureBackendUser = ({ enabled = true }: { enabled?: boolean } = {}) => {
-  const { user: auth0User, isAuthenticated, isLoading: isAuthLoading } = useAuth0();
+export const useCurrentBackendUser = ({
+  enabled = true,
+  requireAuth0 = true,
+}: { enabled?: boolean; requireAuth0?: boolean } = {}) => {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth0();
+  const auth0Ready = requireAuth0 ? isAuthenticated && !isAuthLoading : !isAuthLoading;
 
   return useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
-      if (!auth0User) throw new Error('Auth0 user not available');
-      if (!auth0User.sub) throw new Error('Auth0 user id not available');
-      if (!auth0User.email) throw new Error('Auth0 email not available');
-
-      const auth0AccessToken = await resolveAuth0AccessToken();
-
-      await register(
-        auth0User.sub,
-        auth0User.email,
-        generateUniqueUsername(),
-        Boolean(auth0User.email_verified),
-        auth0AccessToken
-      );
-      const client = apiClient(auth0AccessToken ?? undefined);
+      const client = apiClient();
       const res = await client.get('/users/current-user', {
         skipGlobalErrorHandler: true,
       });
       return res.data;
     },
-    enabled: enabled && !isAppSessionRevoked() && isAuthenticated && !isAuthLoading && !!auth0User,
+    enabled: enabled && !isAppSessionRevoked() && auth0Ready,
     throwOnError: false,
   });
 };

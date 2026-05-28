@@ -55,9 +55,12 @@ export const useAddUploadComment = () => {
     isSuccess: isAddUploadCommentSuccess,
   } = useMutation({
     mutationFn: (formData: FormData) => addUploadComment(formData),
-    onSuccess: (data) => {
+    onSuccess: (data, formData) => {
       toast.success('Komentar uspješno dodan.', toastConfig);
-      socket?.emit('send-comment', data.data);
+      socket?.emit('send-comment', {
+        ...data.data,
+        uploadId: data.data?.uploadId ?? formData.get('uploadId'),
+      });
     },
     onError: (error: AxiosError<BackendError>) => {
       const errors = error?.response?.data?.errors;
@@ -81,10 +84,21 @@ export const useDeleteUploadComment = (onCommentDeleted?: (commentId: number) =>
     isError: isDeleteUploadCommentError,
     isSuccess: isDeleteUploadCommentSuccess,
   } = useMutation({
-    mutationFn: (commentId: number) => deleteUploadComment(commentId),
-    onSuccess: (data, commentId) => {
+    mutationFn: ({ commentId }: { commentId: number; uploadId: string | number }) =>
+      deleteUploadComment(commentId),
+    onSuccess: (data, { commentId, uploadId }) => {
       onCommentDeleted?.(commentId);
-      socket?.emit('delete-comment', data?.data?.id ? data : { data: { id: commentId } });
+      socket?.emit(
+        'delete-comment',
+        data?.data?.id
+          ? { data: { ...data.data, uploadId: data.data.uploadId ?? uploadId } }
+          : {
+              data: {
+                id: commentId,
+                uploadId,
+              },
+            }
+      );
       toast.success('Komentar uspiješno obrisan.', toastConfig);
     },
     onError: () => {

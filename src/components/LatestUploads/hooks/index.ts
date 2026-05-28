@@ -2,6 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { getLatestUploads } from '@app/api/uploads';
 import { apiClient } from '@app/api';
 import axios from 'axios';
+import {
+  getSafeBackendMediaPath,
+  getSafeRemoteImageUrl,
+  getSafeS3BackendMediaPath,
+  isAllowedRasterImageMimeType,
+} from '@app/utils/mediaSafety';
 
 export const useGetLatestUploads = () => {
   const {
@@ -17,22 +23,41 @@ export const useGetLatestUploads = () => {
 };
 
 export const useGetImageBlob = (secureUrl: string) => {
+  const safeMediaPath = getSafeBackendMediaPath(secureUrl) || getSafeS3BackendMediaPath(secureUrl);
+  const safeRemoteImageUrl = getSafeRemoteImageUrl(secureUrl);
+  const safeImageSource = safeMediaPath || safeRemoteImageUrl;
   const { data, error, isLoading } = useQuery({
-    queryKey: ['imageBlob', secureUrl],
-    enabled: !!secureUrl,
+    queryKey: ['imageBlob', safeImageSource],
+    enabled: !!safeImageSource,
     retry: false,
     queryFn: async () => {
-      if (!secureUrl) throw new Error('Missing secure URL');
+      if (!safeImageSource) return null;
 
-      const client = apiClient();
+      const getImage = () => {
+        if (safeMediaPath) {
+          const client = apiClient();
+          return client.get(safeMediaPath, {
+            responseType: 'blob',
+            skipGlobalErrorHandler: true,
+          });
+        }
+
+        return axios.get(safeRemoteImageUrl, {
+          responseType: 'blob',
+        });
+      };
 
       try {
-        const response = await client.get(secureUrl, {
-          responseType: 'blob',
-          skipGlobalErrorHandler: true,
-        });
+        const response = await getImage();
 
-        return response.data as Blob;
+        const contentTypeHeader = response.headers?.['content-type'];
+        const contentType = typeof contentTypeHeader === 'string' ? contentTypeHeader : undefined;
+        if (!isAllowedRasterImageMimeType(contentType)) {
+          return null;
+        }
+
+        const imageBlob = response.data as Blob;
+        return imageBlob.type ? imageBlob : new Blob([imageBlob], { type: contentType });
       } catch (error) {
         if (axios.isAxiosError(error) && [401, 403, 404].includes(error.response?.status || 0)) {
           return null;

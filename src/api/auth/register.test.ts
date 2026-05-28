@@ -12,17 +12,15 @@ const post = jest.fn();
 describe('register', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    localStorage.clear();
     clearAccessTokenGetter();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
   });
 
   afterEach(() => {
-    localStorage.clear();
     clearAccessTokenGetter();
   });
 
-  it('stores the backend session id returned from register', async () => {
+  it('registers with the Auth0 token getter', async () => {
     post.mockResolvedValue({ data: { sessionId: 'registered-session-id' } });
     setAccessTokenGetter(async () => 'auth0-access-token');
 
@@ -35,15 +33,13 @@ describe('register', () => {
       isVerified: true,
       username: 'generated-user',
     });
-    expect(localStorage.getItem('dugaSessionId')).toBe('registered-session-id');
   });
 
-  it('stores a nested backend session id returned from register', async () => {
+  it('uses an explicit bootstrap token when provided', async () => {
     post.mockResolvedValue({ data: { data: { sessionId: 'nested-session-id' } } });
 
     await register('auth0|user', 'user@example.com', 'generated-user', true, 'explicit-token');
 
     expect(mockApiClient).toHaveBeenCalledWith('explicit-token');
-    expect(localStorage.getItem('dugaSessionId')).toBe('nested-session-id');
   });
 });

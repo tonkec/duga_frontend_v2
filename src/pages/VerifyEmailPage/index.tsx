@@ -5,7 +5,7 @@ import Button from '@app/components/Button';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useState } from 'react';
-import { useEnsureBackendUser } from '@app/hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { apiClient } from '@app/api';
 import Loader from '@app/components/Loader';
 
@@ -13,7 +13,7 @@ const VerifyEmailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuth0();
   const [isSending, setIsSending] = useState(false);
-  const { data: currentUser, isLoading: isBackendUserLoading } = useEnsureBackendUser({
+  const { data: currentUser, isLoading: isBackendUserLoading } = useCurrentBackendUser({
     enabled: Boolean(user && !user.email_verified),
   });
   const isUserVerified = Boolean(user?.email_verified || currentUser?.isVerified);
@@ -26,11 +26,10 @@ const VerifyEmailPage = () => {
 
     setIsSending(true);
     try {
-      await apiClient().post('/send-verification-email', { userId: currentUser.id });
+      await apiClient().post('/send-verification-email');
       toast.success('E-mail je uspješno poslan.', toastConfig);
-    } catch (error) {
+    } catch {
       toast.error('Došlo je do greške prilikom slanja e-maila.', toastConfig);
-      console.error('Failed to resend verification email:', error);
     } finally {
       setIsSending(false);
     }

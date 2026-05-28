@@ -8,7 +8,7 @@ import Loader from './components/Loader';
 import Cta from './components/Cta';
 import LatestUploads from './components/LatestUploads';
 import LatestComments from './components/LatestComments';
-import { useEnsureBackendUser } from './hooks/useEnsureBackendUser';
+import { useCurrentBackendUser } from './hooks/useEnsureBackendUser';
 import { useGetAllUserChats } from './hooks/useGetAllUserChats';
 import Button from './components/Button';
 import { getLastOnlineUsers, getVisibleVerifiedUsers } from './utils/userDirectory';
@@ -364,7 +364,7 @@ function App() {
   const [isWelcomeHeroDismissed, setIsWelcomeHeroDismissed] = useState(
     () => localStorage.getItem(WELCOME_PROFILE_CARD_DISMISSED_KEY) === 'true'
   );
-  const { data: currentUser, isLoading: isUserLoading } = useEnsureBackendUser();
+  const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser();
   const navigate = useNavigate();
   const { allUsers, isAllUsersLoading } = useGetAllUsers();
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
@@ -425,7 +425,7 @@ function App() {
         )}
 
         {!!lastOnlineUsers.length && (
-          <ul className="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {lastOnlineUsers.map((user: IUser) => (
               <li className="h-full" key={user.id}>
                 <UserCard

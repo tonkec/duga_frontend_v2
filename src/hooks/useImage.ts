@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const useImage = (image: string) => {
+const useImage = (
+  image: string,
+  referrerPolicy: React.HTMLAttributeReferrerPolicy = 'no-referrer'
+) => {
   const [loading, setLoading] = useState(true);
 
   const getImage = useCallback(() => {
@@ -11,6 +14,7 @@ const useImage = (image: string) => {
 
     setLoading(true);
     const img = new Image();
+    img.referrerPolicy = referrerPolicy;
     img.src = image;
     img.onload = function () {
       setLoading(false);
@@ -18,7 +22,7 @@ const useImage = (image: string) => {
     img.onerror = function () {
       setLoading(false);
     };
-  }, [image]);
+  }, [image, referrerPolicy]);
 
   useEffect(() => {
     getImage();

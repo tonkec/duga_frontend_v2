@@ -1,7 +1,9 @@
 import { IUser } from '@app/components/UserCard';
 
 export const getVisibleVerifiedUsers = (users: IUser[] = [], currentUserId?: number | string) =>
-  users.filter((user) => user.isVerified && Number(user.id) !== Number(currentUserId));
+  (Array.isArray(users) ? users : []).filter(
+    (user) => user.isVerified && Number(user.id) !== Number(currentUserId)
+  );
 
 export const filterUsers = (
   users: IUser[],

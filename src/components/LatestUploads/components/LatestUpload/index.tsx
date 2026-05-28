@@ -4,6 +4,7 @@ import { useGetImageBlob } from '../../hooks';
 import UserAvatar from '@app/components/UserAvatar';
 import { BiImage } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IUpload {
   id: string;
@@ -17,6 +18,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
   const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl);
+  const imageBlobUrl = useObjectUrl(imageBlob);
   const username = user?.data.username || 'Korisnik';
 
   return (
@@ -26,10 +28,10 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
         className="relative block w-full overflow-hidden rounded-2xl bg-[#f7f9ff] text-left"
         onClick={() => navigate(`/photo/${upload.id}`)}
       >
-        {imageBlob ? (
+        {imageBlobUrl ? (
           <div
             className="aspect-[4/3] w-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
-            style={{ backgroundImage: `url(${URL.createObjectURL(imageBlob)})` }}
+            style={{ backgroundImage: `url(${imageBlobUrl})` }}
           />
         ) : (
           <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 text-sm text-gray-500">
