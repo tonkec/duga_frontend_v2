@@ -9,8 +9,7 @@ import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { useSocket } from '@app/context/useSocket';
 import { getUsersByUsernames } from '@app/api/users';
-import { AxiosError } from 'axios';
-import { BackendError } from '@app/pages/ChatPage/components/SendMessage/hooks';
+import { getApiErrorMessage } from '@app/utils/apiErrorMessage';
 import { toCommentUpdateSocketPayload } from '../utils/parseCommentUpdate';
 
 export const useEditUploadComment = (onCommentUpdated?: (payload: unknown) => void) => {
@@ -62,9 +61,8 @@ export const useAddUploadComment = () => {
         uploadId: data.data?.uploadId ?? formData.get('uploadId'),
       });
     },
-    onError: (error: AxiosError<BackendError>) => {
-      const errors = error?.response?.data?.errors;
-      toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, 'Komentar nije moguće dodati.'), toastConfig);
     },
   });
 

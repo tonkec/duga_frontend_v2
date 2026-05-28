@@ -220,6 +220,27 @@ select:disabled {
   color: var(--duga-dark-text) !important;
 }
 
+.Toastify__toast--error,
+.Toastify__toast--error .Toastify__toast-body {
+  color: #7f1d1d !important;
+}
+
+.Toastify__toast--success,
+.Toastify__toast--success .Toastify__toast-body,
+.Toastify__toast--info,
+.Toastify__toast--info .Toastify__toast-body {
+  color: #111827 !important;
+}
+
+[data-theme='dark'] .Toastify__toast--error,
+[data-theme='dark'] .Toastify__toast--error .Toastify__toast-body,
+[data-theme='dark'] .Toastify__toast--success,
+[data-theme='dark'] .Toastify__toast--success .Toastify__toast-body,
+[data-theme='dark'] .Toastify__toast--info,
+[data-theme='dark'] .Toastify__toast--info .Toastify__toast-body {
+  color: var(--duga-dark-text) !important;
+}
+
 [data-theme='dark'] .notification-mark-all-button {
   background-color: var(--duga-dark-base) !important;
   border-color: var(--duga-dark-border) !important;
