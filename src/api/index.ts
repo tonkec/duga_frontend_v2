@@ -68,7 +68,7 @@ export const apiClient = (token?: string): AxiosInstance => {
       }
 
       const method = config.method?.toLowerCase();
-      const csrfToken = getCookie(CSRF_COOKIE_NAME) ?? getAppCsrfToken();
+      const csrfToken = getAppCsrfToken() ?? getCookie(CSRF_COOKIE_NAME);
       if (method && UNSAFE_METHODS.has(method) && csrfToken) {
         config.headers[CSRF_HEADER] = csrfToken;
       }
