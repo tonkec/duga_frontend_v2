@@ -2,7 +2,11 @@ import { apiClient } from '@app/api';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
-import { isAppSessionRevoked } from '@app/api/appSession';
+import {
+  isAppSessionConflictError,
+  isAppSessionRevoked,
+  markSessionRevoked,
+} from '@app/api/appSession';
 
 export const generateUniqueUsername = (): string => {
   const [word] = generate({ exactly: 1, formatter: (w) => w.toLowerCase() });
@@ -22,10 +26,18 @@ export const useCurrentBackendUser = ({
     queryKey: ['current-user'],
     queryFn: async () => {
       const client = apiClient();
-      const res = await client.get('/users/current-user', {
-        skipGlobalErrorHandler: true,
-      });
-      return res.data;
+      try {
+        const res = await client.get('/users/current-user', {
+          skipGlobalErrorHandler: true,
+        });
+        return res.data;
+      } catch (error) {
+        if (isAppSessionConflictError(error)) {
+          markSessionRevoked();
+        }
+
+        throw error;
+      }
     },
     enabled: enabled && !isAppSessionRevoked() && auth0Ready,
     throwOnError: false,

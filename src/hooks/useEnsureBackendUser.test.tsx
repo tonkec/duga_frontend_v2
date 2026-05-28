@@ -163,6 +163,29 @@ describe('useCurrentBackendUser', () => {
     expect(mockApiClient).not.toHaveBeenCalled();
   });
 
+  it('marks the app session revoked when current-user reports a revoked session', async () => {
+    get.mockRejectedValueOnce({
+      response: {
+        status: 401,
+        data: { code: 'SESSION_REVOKED' },
+      },
+    });
+    mockUseAuth0.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: {
+        sub: 'auth0|revoked-current-user',
+        email: 'revoked-current@example.com',
+        email_verified: true,
+      },
+    } as unknown as ReturnType<typeof useAuth0>);
+
+    const { result } = renderUseCurrentBackendUser();
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(sessionStorage.getItem('dugaSessionRevoked')).toBe('true');
+  });
+
   it('does not require Auth0 profile fields beyond authentication state', async () => {
     mockUseAuth0.mockReturnValue({
       isAuthenticated: true,

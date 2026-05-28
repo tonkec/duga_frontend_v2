@@ -33,6 +33,10 @@ type AppSessionApiError = {
 };
 
 export const isAppSessionConflictError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
   const apiError = error as AppSessionApiError;
   const status = apiError.response?.status;
   const code = apiError.response?.data?.code;

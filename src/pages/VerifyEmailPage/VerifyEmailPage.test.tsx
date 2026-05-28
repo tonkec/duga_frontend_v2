@@ -64,7 +64,7 @@ describe('VerifyEmailPage', () => {
         isVerified: true,
       },
       isLoading: false,
-    } as ReturnType<typeof useCurrentBackendUser>);
+    } as unknown as ReturnType<typeof useCurrentBackendUser>);
 
     renderVerifyEmailPage();
 
@@ -87,7 +87,7 @@ describe('VerifyEmailPage', () => {
         isVerified: false,
       },
       isLoading: false,
-    } as ReturnType<typeof useCurrentBackendUser>);
+    } as unknown as ReturnType<typeof useCurrentBackendUser>);
 
     renderVerifyEmailPage();
 
@@ -95,5 +95,31 @@ describe('VerifyEmailPage', () => {
       await screen.findByRole('heading', { name: 'Potvrdi svoju e-mail adresu' })
     ).toBeVisible();
     expect(screen.getByTestId('location')).toHaveTextContent('/verify-email');
+  });
+
+  it('redirects to login when the backend session is revoked', async () => {
+    mockUseAuth0.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: {
+        email: 'revoked@example.com',
+        email_verified: false,
+      },
+    } as unknown as ReturnType<typeof useAuth0>);
+    mockUseCurrentBackendUser.mockReturnValue({
+      data: undefined,
+      error: {
+        response: {
+          status: 401,
+          data: { code: 'SESSION_REVOKED' },
+        },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useCurrentBackendUser>);
+
+    renderVerifyEmailPage();
+
+    expect(await screen.findByText('Login page')).toBeVisible();
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
   });
 });
