@@ -4,6 +4,7 @@ import {
   consumeAppSessionRevokedNotice,
   isAppSessionConflictError,
   isAppSessionRevoked,
+  markAppSessionLoggedOut,
   markSessionRevoked,
   SESSION_REVOKED_EVENT,
 } from './appSession';
@@ -71,6 +72,13 @@ describe('appSession state', () => {
 
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
     expect(sessionStorage.getItem('dugaApiToken')).toBeNull();
+  });
+
+  it('marks a normal logout as inactive without showing a revoked notice', () => {
+    markAppSessionLoggedOut();
+
+    expect(isAppSessionRevoked()).toBe(true);
+    expect(consumeAppSessionRevokedNotice()).toBe(false);
   });
 
   it('does not treat missing errors as session conflicts', () => {

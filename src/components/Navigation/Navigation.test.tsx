@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Navigation from '.';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
@@ -37,7 +37,11 @@ jest.mock('./hooks', () => ({
 }));
 
 jest.mock('../NavigationLinks', () => ({
-  NavigationItems: () => <div>Navigation items</div>,
+  NavigationItems: ({ onLogout }: { onLogout: () => void }) => (
+    <button type="button" onClick={onLogout}>
+      Odjava
+    </button>
+  ),
 }));
 
 jest.mock('./components/Notifications', () => ({
@@ -55,14 +59,16 @@ const mockUseWindowSize = jest.mocked(useWindowSize);
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseGetAllNotifications = jest.mocked(useGetAllNotifcations);
+const logout = jest.fn();
 
 describe('Navigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     document.title = 'Duga | Poruke';
 
+    sessionStorage.clear();
     mockUseAuth0.mockReturnValue({
-      logout: jest.fn(),
+      logout,
     } as unknown as ReturnType<typeof useAuth0>);
     mockUseWindowSize.mockReturnValue({ width: 390, height: 844 });
     mockUseGetCurrentUser.mockReturnValue({
@@ -144,5 +150,25 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     expect(screen.getByRole('button', { name: 'Otvori navigaciju' })).toBeVisible();
+  });
+
+  it('marks the app session inactive before logging out', async () => {
+    mockUseWindowSize.mockReturnValue({ width: 1280, height: 844 });
+    mockUseGetAllNotifications.mockReturnValue({
+      allNotifications: undefined,
+      allNotificationsError: null,
+      areAllNotificationsLoading: false,
+    } as ReturnType<typeof useGetAllNotifcations>);
+
+    render(<Navigation />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Odjava' }));
+
+    await waitFor(() => expect(sessionStorage.getItem('dugaSessionRevoked')).toBe('true'));
+    expect(logout).toHaveBeenCalledWith({
+      logoutParams: {
+        returnTo: 'http://localhost',
+      },
+    });
   });
 });

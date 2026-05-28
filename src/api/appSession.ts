@@ -16,6 +16,11 @@ export const clearAppSessionCredentials = () => {
   sessionStorage.removeItem(APP_SESSION_TOKEN_KEY);
 };
 
+export const markAppSessionLoggedOut = () => {
+  clearAppSessionCredentials();
+  sessionStorage.setItem(SESSION_REVOKED_KEY, 'true');
+};
+
 export const consumeAppSessionRevokedNotice = () => {
   const shouldShowNotice = sessionStorage.getItem(SESSION_REVOKED_NOTICE_KEY) === 'true';
   sessionStorage.removeItem(SESSION_REVOKED_NOTICE_KEY);
