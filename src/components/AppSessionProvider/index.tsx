@@ -10,6 +10,7 @@ import {
   clearAppSessionCredentials,
   clearAppSessionRevoked,
   consumeAppSessionRevokedNotice,
+  getAppCsrfToken,
   isAppSessionConflictError,
   isAppSessionRevoked,
   markSessionRevoked,
@@ -116,24 +117,35 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
     if (startingSessionKeyRef.current !== sessionKey || !startingSessionPromiseRef.current) {
       startingSessionKeyRef.current = sessionKey;
       startingSessionPromiseRef.current = (async () => {
+        let existingSessionData: unknown;
+
         try {
           const existingSessionUser = await getCurrentUser();
-          queryClient.setQueryData(['current-user'], existingSessionUser.data);
-          startedSessionKeyRef.current = sessionKey;
-          return;
+          existingSessionData = existingSessionUser.data;
+          if (getAppCsrfToken()) {
+            queryClient.setQueryData(['current-user'], existingSessionData);
+            startedSessionKeyRef.current = sessionKey;
+            return;
+          }
         } catch (error) {
           if (!isUnauthenticatedSessionError(error)) {
             throw error;
           }
         }
 
-        await register(
-          user.sub!,
-          user.email!,
-          generateUniqueUsername(),
-          Boolean(user.email_verified)
-        );
+        if (!existingSessionData) {
+          await register(
+            user.sub!,
+            user.email!,
+            generateUniqueUsername(),
+            Boolean(user.email_verified)
+          );
+        }
+
         await startSession();
+        if (existingSessionData) {
+          queryClient.setQueryData(['current-user'], existingSessionData);
+        }
         startedSessionKeyRef.current = sessionKey;
       })().finally(() => {
         if (startingSessionKeyRef.current === sessionKey) {

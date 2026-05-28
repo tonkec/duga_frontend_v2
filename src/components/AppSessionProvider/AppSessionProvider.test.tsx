@@ -149,6 +149,7 @@ describe('AppSessionProvider login/session start integration', () => {
   });
 
   it('reuses an existing cookie-backed app session on refresh', async () => {
+    sessionStorage.setItem('dugaCsrfToken', 'stored-csrf-token');
     mockGetCurrentUser.mockResolvedValue({
       data: {
         id: 1,
@@ -173,6 +174,33 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(mockGetCurrentUser).toHaveBeenCalledTimes(1);
     expect(mockRegister).not.toHaveBeenCalled();
     expect(mockStartSession).not.toHaveBeenCalled();
+  });
+
+  it('refreshes an existing cookie-backed app session when no csrf token is stored', async () => {
+    mockGetCurrentUser.mockResolvedValue({
+      data: {
+        id: 1,
+        username: 'existing-user',
+        isVerified: true,
+      },
+    } as Awaited<ReturnType<typeof getCurrentUser>>);
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          sub: 'auth0|existing-session-missing-csrf-user',
+          email: 'existing-session@example.com',
+          email_verified: true,
+        },
+      })
+    );
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(mockGetCurrentUser).toHaveBeenCalledTimes(1);
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).toHaveBeenCalledTimes(1);
   });
 
   it('registers and starts an app session for unverified Auth0 users', async () => {
