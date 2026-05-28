@@ -20,9 +20,19 @@ const PhotoPage = () => {
   const navigate = useNavigate();
   const { photoId } = useParams();
   const { singleImage, singleImageLoading } = useGetSingleImage(photoId as string);
-  const { data: imageBlob } = useGetImageBlob(
-    singleImage?.data?.securePhotoUrl || singleImage?.data?.url || ''
-  );
+  const imageSources = [
+    singleImage?.data?.securePhotoUrl,
+    singleImage?.data?.url,
+    singleImage?.data?.imageUrl,
+    singleImage?.data?.messagePhotoUrl,
+  ].filter((source): source is string => Boolean(source));
+  const firstImageQuery = useGetImageBlob(imageSources[0] || '');
+  const secondImageQuery = useGetImageBlob(imageSources[1] || '');
+  const thirdImageQuery = useGetImageBlob(imageSources[2] || '');
+  const fourthImageQuery = useGetImageBlob(imageSources[3] || '');
+  const imageBlob = [firstImageQuery, secondImageQuery, thirdImageQuery, fourthImageQuery].find(
+    (query) => query.data
+  )?.data;
   const imageBlobUrl = useObjectUrl(imageBlob);
 
   const { user: userData } = useGetUserById(singleImage?.data?.userId || '');

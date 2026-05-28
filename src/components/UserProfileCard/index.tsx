@@ -99,6 +99,7 @@ const hasDisplayValue = (value: string | number | null | undefined) =>
 
 const UserProfileCard = ({
   user,
+  allImages,
   allImagesLoading,
 }: {
   user?: IUserProfileCardProps;
@@ -215,6 +216,7 @@ const UserProfileCard = ({
   const favoriteSongEmbedUrl = getYouTubeEmbedUrl(user.favoriteSong);
   const favoriteMovieUrl = getImdbTitleUrl(user.favoriteMovie);
   const favoriteMovieImageUrl = getSafeRemoteImageUrl(favoriteMoviePreview?.imageUrl);
+  const profilePhoto = allImages?.find((image) => image.isProfilePhoto);
 
   return (
     <Card className="rounded-2xl p-5 md:p-7">
@@ -227,6 +229,7 @@ const UserProfileCard = ({
             size="160"
             round={false}
             className="h-[160px] w-[160px] rounded-2xl shadow-sm"
+            profilePhoto={profilePhoto}
           />
 
           <div className="min-w-0 flex-1">

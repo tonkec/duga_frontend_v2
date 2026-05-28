@@ -6,6 +6,7 @@ import { useGetImageBlob } from '../LatestUploads/hooks';
 import Image from '../Image';
 import { getStoredThemePreference } from '@app/hooks/useThemePreference';
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
+import type { IImage } from '../Photos';
 
 interface IUserAvatarProps {
   avatarFallbackName: string;
@@ -16,6 +17,7 @@ interface IUserAvatarProps {
   round?: boolean;
   className?: string;
   fgColor?: string;
+  profilePhoto?: Partial<IImage>;
 }
 
 const UserAvatar = ({
@@ -26,13 +28,15 @@ const UserAvatar = ({
   size,
   className,
   fgColor,
+  profilePhoto: profilePhotoOverride,
 }: IUserAvatarProps) => {
   const { profilePhoto, isProfilePhotoLoading } = useGetProfilePhoto(userId || '');
+  const resolvedProfilePhoto = profilePhotoOverride ?? profilePhoto?.data;
   const profilePhotoSources = [
-    profilePhoto?.data?.securePhotoUrl,
-    profilePhoto?.data?.url,
-    profilePhoto?.data?.imageUrl,
-    profilePhoto?.data?.messagePhotoUrl,
+    resolvedProfilePhoto?.securePhotoUrl,
+    resolvedProfilePhoto?.url,
+    resolvedProfilePhoto?.imageUrl,
+    resolvedProfilePhoto?.messagePhotoUrl,
   ].filter((source): source is string => Boolean(source));
   const firstImageQuery = useGetImageBlob(profilePhotoSources[0] || '');
   const secondImageQuery = useGetImageBlob(profilePhotoSources[1] || '');
@@ -78,7 +82,7 @@ const UserAvatar = ({
     );
   };
 
-  if (hasValidUserId && isProfilePhotoLoading) {
+  if (hasValidUserId && isProfilePhotoLoading && !profilePhotoOverride) {
     return (
       <div className={containerClassName} style={sizeStyle}>
         <Loader variant="inline" size="sm" label="Učitavanje avatara..." />
