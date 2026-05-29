@@ -174,7 +174,11 @@ const MessageContent = ({
       {isGiphy && messagePhotoUrl && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {hasImageAttachment && imageBlobUrl && (
-        <Image src={imageBlobUrl} alt="slika" style={{ maxWidth: '30vw' }} />
+        <Image
+          src={imageBlobUrl}
+          alt="Fotografija iz poruke"
+          className="max-h-[min(32rem,60vh)] w-full max-w-full rounded-xl object-contain"
+        />
       )}
 
       {!isGiphy && !hasImageAttachment && !hasMissingImageAttachment && (
