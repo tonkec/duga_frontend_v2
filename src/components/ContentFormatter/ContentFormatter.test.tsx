@@ -75,4 +75,14 @@ describe('ContentFormatter media rendering', () => {
     expect(iframe).toHaveAttribute('loading', 'lazy');
     expect(iframe).toHaveAttribute('allow', 'encrypted-media; picture-in-picture');
   });
+
+  it('renders emoji-only content larger', () => {
+    render(
+      <MemoryRouter>
+        <ContentFormatter text="🤗" />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('🤗').closest('span')).toHaveClass('text-3xl');
+  });
 });

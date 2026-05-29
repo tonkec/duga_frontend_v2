@@ -35,6 +35,13 @@ const SecureInlineImage = ({ secureUrl }: { secureUrl: string }) => {
   );
 };
 
+const isEmojiOnlyText = (text: string) => {
+  const trimmedText = text.trim();
+  if (!trimmedText) return false;
+
+  return /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u.test(trimmedText);
+};
+
 const ContentFormatter = ({
   text,
   renderRichContent = true,
@@ -43,6 +50,7 @@ const ContentFormatter = ({
 }: IContentFormatterProps) => {
   const safeText = typeof text === 'string' ? text : '';
   const parts = safeText.split(/(\s+)/);
+  const isEmojiOnly = isEmojiOnlyText(safeText);
 
   const youtubeRegex =
     /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
@@ -206,7 +214,11 @@ const ContentFormatter = ({
           }
         }
 
-        return <span key={i}>{part}</span>;
+        return (
+          <span key={i} className={isEmojiOnly ? 'text-3xl leading-none' : undefined}>
+            {part}
+          </span>
+        );
       })}
     </>
   );

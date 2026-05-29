@@ -14,8 +14,8 @@ const GiphyMessage = ({ messagePhotoUrl }: IGiphyMessageProps) => {
   return (
     <img
       src={safeGifUrl}
-      alt="gif"
-      style={{ maxWidth: '100px' }}
+      alt="GIF iz poruke"
+      className="max-h-[min(24rem,50vh)] w-full max-w-full rounded-xl object-contain"
       loading="lazy"
       referrerPolicy="no-referrer"
     />

@@ -142,6 +142,20 @@ const getImageSourceFromMessageText = (message: string) => {
   return /\.(png|jpe?g|gif|webp)(?:[?#].*)?$/i.test(trimmedMessage) ? trimmedMessage : '';
 };
 
+const isEmojiOnlyMessage = (message: string) => {
+  const trimmedMessage = message.trim();
+  if (!trimmedMessage) return false;
+
+  return /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u.test(trimmedMessage);
+};
+
+const openMediaInNewTab = (url: string) => {
+  const mediaWindow = window.open(url, '_blank', 'noopener,noreferrer');
+  if (mediaWindow) {
+    mediaWindow.opener = null;
+  }
+};
+
 const MessageContent = ({
   messagePhotoUrl,
   message,
@@ -168,27 +182,37 @@ const MessageContent = ({
   const imageBlobUrl = useObjectUrl(imageBlob);
   const shouldShowImageFallback =
     hasMissingImageAttachment || (hasImageAttachment && !imageBlobUrl && !isLoading && !error);
+  const isEmojiOnly = isEmojiOnlyMessage(messageText);
 
   return (
     <div>
       {isGiphy && messagePhotoUrl && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
       {hasImageAttachment && imageBlobUrl && (
-        <Image
-          src={imageBlobUrl}
-          alt="Fotografija iz poruke"
-          className="max-h-[min(32rem,60vh)] w-full max-w-full rounded-xl object-contain"
-        />
+        <button
+          type="button"
+          className="block w-full cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          onClick={() => openMediaInNewTab(imageBlobUrl)}
+          aria-label="Otvori fotografiju u novom tabu"
+        >
+          <Image
+            src={imageBlobUrl}
+            alt="Fotografija iz poruke"
+            className="max-h-[min(32rem,60vh)] w-full max-w-full rounded-xl object-contain"
+          />
+        </button>
       )}
 
       {!isGiphy && !hasImageAttachment && !hasMissingImageAttachment && (
-        <ContentFormatter
-          text={messageText}
-          taggedUsers={mentionedUsers}
-          linkClassName={
-            isOwnMessage ? 'font-semibold text-white underline' : 'text-blue underline'
-          }
-        />
+        <div className={isEmojiOnly ? 'text-3xl leading-none' : undefined}>
+          <ContentFormatter
+            text={messageText}
+            taggedUsers={mentionedUsers}
+            linkClassName={
+              isOwnMessage ? 'font-semibold text-white underline' : 'text-blue underline'
+            }
+          />
+        </div>
       )}
 
       {shouldShowImageFallback && (
