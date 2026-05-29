@@ -22,7 +22,7 @@ interface MentionedUser {
 
 interface BaseMessageTemplateProps {
   userName: string;
-  message: string;
+  message: string | null;
   createdAt: string;
   messagePhotoUrl: string;
   showAvatar: boolean;
@@ -45,7 +45,7 @@ export interface IMessageReaction {
 }
 
 export interface IMessage {
-  message: string;
+  message: string | null;
   createdAt: string;
   type: MessageType;
   User: {
@@ -95,7 +95,7 @@ interface CurrentUserMessageTemplateProps extends BaseMessageTemplateProps {
 
 interface IMessageContentProps {
   messagePhotoUrl: string;
-  message: string;
+  message: string | null;
   createdAt: string;
   messageType: string;
   isOwnMessage?: boolean;
@@ -135,6 +135,13 @@ const getMessageReactionCount = (reaction: IMessageReaction | undefined) =>
 
 const getMessageReactions = (message: IMessage) => message.reactions ?? message.Reactions ?? [];
 
+const getImageSourceFromMessageText = (message: string) => {
+  const trimmedMessage = message.trim();
+  if (!trimmedMessage || /\s/.test(trimmedMessage)) return '';
+
+  return /\.(png|jpe?g|gif|webp)(?:[?#].*)?$/i.test(trimmedMessage) ? trimmedMessage : '';
+};
+
 const MessageContent = ({
   messagePhotoUrl,
   message,
@@ -143,25 +150,36 @@ const MessageContent = ({
   isOwnMessage = false,
   mentionedUsers = [],
 }: IMessageContentProps) => {
-  const isS3File = messageType === 'file';
+  const messageText = typeof message === 'string' ? message : '';
   const isGiphy = messageType === 'gif';
+  const isFileMessage = messageType === 'file';
+  const isLegacyImagePlaceholder = messageText.trim().toLowerCase() === 'slika';
+  const messageImageSource = getImageSourceFromMessageText(messageText);
+  const imageSource = messagePhotoUrl || messageImageSource;
+  const hasImageAttachment = !isGiphy && Boolean(imageSource);
+  const hasMissingImageAttachment =
+    !isGiphy && !hasImageAttachment && (isFileMessage || isLegacyImagePlaceholder);
 
-  const { data: imageBlob, error } = useGetImageBlob(
-    !isGiphy && isS3File ? messagePhotoUrl || '' : ''
-  );
+  const {
+    data: imageBlob,
+    error,
+    isLoading,
+  } = useGetImageBlob(hasImageAttachment ? imageSource : '');
   const imageBlobUrl = useObjectUrl(imageBlob);
+  const shouldShowImageFallback =
+    hasMissingImageAttachment || (hasImageAttachment && !imageBlobUrl && !isLoading && !error);
 
   return (
     <div>
       {isGiphy && messagePhotoUrl && <GiphyMessage messagePhotoUrl={messagePhotoUrl} />}
 
-      {!isGiphy && isS3File && imageBlobUrl && (
+      {hasImageAttachment && imageBlobUrl && (
         <Image src={imageBlobUrl} alt="slika" style={{ maxWidth: '30vw' }} />
       )}
 
-      {!isGiphy && !isS3File && (
+      {!isGiphy && !hasImageAttachment && !hasMissingImageAttachment && (
         <ContentFormatter
-          text={message}
+          text={messageText}
           taggedUsers={mentionedUsers}
           linkClassName={
             isOwnMessage ? 'font-semibold text-white underline' : 'text-blue underline'
@@ -169,7 +187,16 @@ const MessageContent = ({
         />
       )}
 
-      {error && !isGiphy && <p className="text-red-500">❌ Error loading image</p>}
+      {shouldShowImageFallback && (
+        <p className={isOwnMessage ? 'text-sm font-medium text-white' : 'text-sm text-gray-500'}>
+          Fotografija se ne može učitati.
+        </p>
+      )}
+      {error && !isGiphy && (
+        <p className={isOwnMessage ? 'text-sm font-medium text-white' : 'text-sm text-red-500'}>
+          Greška pri učitavanju fotografije.
+        </p>
+      )}
       <RecordCreatedAt
         className={`text-right ${isOwnMessage ? '!text-blue-100' : ''}`}
         createdAt={createdAt}

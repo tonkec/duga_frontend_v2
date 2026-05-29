@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
 import { debounceScroll } from '@app/utils/debounceScroll';
 import type { IImage } from '@app/components/Photos';
+import Loader from '@app/components/Loader';
 
 const PaginatedMessages = ({
   otherUserName,
@@ -14,6 +15,7 @@ const PaginatedMessages = ({
   currentUserProfilePhoto,
   isCurrentUserLoading,
   messages,
+  isMessagesLoading,
   fetchNextPage,
   onReactionToggle,
   messageSearchQuery = '',
@@ -25,6 +27,7 @@ const PaginatedMessages = ({
   otherUserProfilePhoto?: Partial<IImage>;
   receivedMessages: IMessage[];
   messages: IMessage[];
+  isMessagesLoading?: boolean;
   fetchNextPage: () => void;
   currentUserId: number;
   currentUserProfilePhoto?: Partial<IImage>;
@@ -63,6 +66,14 @@ const PaginatedMessages = ({
       prevScrollHeightRef.current = scrollHeight;
     }
   }, [messages.length, receivedMessages.length, visibleMessages.length]);
+
+  if (isMessagesLoading) {
+    return (
+      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+        <Loader variant="inline" label="Učitavanje poruka..." />
+      </div>
+    );
+  }
 
   if (!messages.length && !receivedMessages.length) {
     return (

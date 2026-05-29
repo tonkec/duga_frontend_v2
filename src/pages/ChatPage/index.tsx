@@ -470,7 +470,7 @@ const ChatPage = () => {
   const { currentChat, isCurrentChatLoading, isCurrentChatError } = useGetCurrentChat(
     chatId as string
   );
-  const { messages, fetchNextPage } = useGetAllMessages(chatId as string);
+  const { messages, isAllMessagesLoading, fetchNextPage } = useGetAllMessages(chatId as string);
   const hasMessages = messages.length + receivedMessages.length > 0;
   const currentChatData = currentChat?.data as IChatDetails | IChatParticipant[] | undefined;
   const chatUsers = useMemo(() => getCurrentChatUsers(currentChatData), [currentChatData]);
@@ -498,6 +498,7 @@ const ChatPage = () => {
     Boolean(isGroupChat) &&
     groupAdminUserId !== undefined &&
     Number(groupAdminUserId) === Number(currentUserId);
+  const canAddMembers = Boolean(socket && isGroupChat && isCurrentUserGroupAdmin);
   const { deleteChat } = useDeleteCurrentChat(socket);
   const { leaveChat, isLeavingChat } = useLeaveCurrentChat();
 
@@ -872,7 +873,7 @@ const ChatPage = () => {
   return (
     <ChatGuard>
       <AppLayout>
-        {isAddMembersModalOpen && (
+        {canAddMembers && isAddMembersModalOpen && (
           <AddChatMembersModal
             isOpen={isAddMembersModalOpen}
             memberIds={memberIds}
@@ -936,7 +937,7 @@ const ChatPage = () => {
               </div>
             </button>
             <div className="flex shrink-0 items-center gap-2">
-              {(!isGroupChat || isCurrentUserGroupAdmin) && (
+              {canAddMembers && (
                 <Button
                   type="blue"
                   className="!py-1.5 !px-3 !text-xs"
@@ -944,7 +945,6 @@ const ChatPage = () => {
                     e?.preventDefault();
                     setIsAddMembersModalOpen(true);
                   }}
-                  disabled={!socket}
                 >
                   Dodaj osobe
                 </Button>
@@ -1018,6 +1018,7 @@ const ChatPage = () => {
               otherUserProfilePhoto={otherUserProfilePhoto}
               receivedMessages={receivedMessages}
               messages={messages}
+              isMessagesLoading={isAllMessagesLoading}
               fetchNextPage={fetchNextPage}
               currentUserId={currentUserId as number}
               currentUserProfilePhoto={currentUserProfilePhoto}

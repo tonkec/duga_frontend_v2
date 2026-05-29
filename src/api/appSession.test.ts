@@ -60,12 +60,14 @@ describe('appSession state', () => {
     localStorage.setItem('dugaSessionId', 'stale-session-id');
     sessionStorage.setItem('dugaApiToken', 'stale-api-token');
     sessionStorage.setItem('dugaCsrfToken', 'stale-csrf-token');
+    sessionStorage.setItem('dugaAuth0AccessToken', 'stale-auth0-access-token');
 
     clearAppSessionCredentials();
 
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
     expect(sessionStorage.getItem('dugaApiToken')).toBeNull();
     expect(sessionStorage.getItem('dugaCsrfToken')).toBeNull();
+    expect(sessionStorage.getItem('dugaAuth0AccessToken')).toBeNull();
   });
 
   it('stores the CSRF token for the current browser session', () => {
@@ -78,12 +80,14 @@ describe('appSession state', () => {
     localStorage.setItem('dugaSessionId', 'stale-session-id');
     sessionStorage.setItem('dugaApiToken', 'stale-api-token');
     sessionStorage.setItem('dugaCsrfToken', 'stale-csrf-token');
+    sessionStorage.setItem('dugaAuth0AccessToken', 'stale-auth0-access-token');
 
     markSessionRevoked();
 
     expect(localStorage.getItem('dugaSessionId')).toBeNull();
     expect(sessionStorage.getItem('dugaApiToken')).toBeNull();
     expect(sessionStorage.getItem('dugaCsrfToken')).toBeNull();
+    expect(sessionStorage.getItem('dugaAuth0AccessToken')).toBeNull();
   });
 
   it('marks a normal logout as inactive without showing a revoked notice', () => {

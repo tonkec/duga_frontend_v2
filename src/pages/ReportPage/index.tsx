@@ -8,9 +8,9 @@ import Select from 'react-select';
 import TextArea from '@app/components/Textarea';
 import Button from '@app/components/Button';
 import FieldError from '@app/components/FieldError';
-import { submitProblemReport } from '@app/api/reports';
+import { ReportProblemType, submitProblemReport } from '@app/api/reports';
 
-type Option = { value: string; label: string };
+type Option = { value: ReportProblemType; label: string };
 
 const reportSelectStyles = {
   control: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
@@ -42,18 +42,29 @@ const reportSelectStyles = {
 };
 
 const problemOptions: Option[] = [
-  { value: 'bug', label: 'Bug / tehnički problem' },
-  { value: 'abuse', label: 'Zlouporaba / uznemiravanje' },
-  { value: 'inappropriate', label: 'Neprimjeren sadržaj' },
-  { value: 'account', label: 'Račun / pristup' },
+  { value: 'bug_ui', label: 'Bug: izgled ili UI se ne prikazuje dobro' },
+  { value: 'bug_chat', label: 'Bug: poruke, chat ili notifikacije' },
+  { value: 'bug_upload', label: 'Bug: fotografije ili upload ne rade' },
+  { value: 'bug_forum', label: 'Bug: forum, pitanja ili odgovori' },
+  { value: 'login_access', label: 'Login, pristup računu ili odjava' },
+  { value: 'profile_issue', label: 'Profil, podaci ili profilna slika' },
+  { value: 'harassment', label: 'Uznemiravanje, prijetnje ili govor mržnje' },
+  { value: 'fake_profile', label: 'Lažan profil ili predstavljanje kao druga osoba' },
+  { value: 'inappropriate_photo', label: 'Neprimjerena fotografija' },
+  { value: 'inappropriate_message', label: 'Neprimjerena poruka ili komentar' },
+  { value: 'spam_scam', label: 'Spam, scam ili sumnjiv link' },
+  { value: 'safety_privacy', label: 'Sigurnost, privatnost ili osobni podaci' },
+  { value: 'suggestion', label: 'Prijedlog za poboljšanje' },
   { value: 'other', label: 'Ostalo' },
 ];
 
 const FormSchema = z.object({
-  problem_type: z.enum(['bug', 'abuse', 'inappropriate', 'account', 'other'], {
-    required_error: 'Odaberi vrstu problema.',
-    invalid_type_error: 'Odaberi vrstu problema.',
-  }),
+  problem_type: z.custom<ReportProblemType>(
+    (value) => problemOptions.some((option) => option.value === value),
+    {
+      message: 'Odaberi vrstu problema.',
+    }
+  ),
   message: z.string().trim().min(10, 'Poruka mora imati barem 10 znakova.'),
 });
 

@@ -401,6 +401,20 @@ describe('ChatPage integration', () => {
     expect(screen.queryByText('Cross-chat injected message')).not.toBeInTheDocument();
   });
 
+  it('does not show add members action in a dual chat without admin role', () => {
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    expect(screen.queryByRole('button', { name: 'Dodaj osobe' })).not.toBeInTheDocument();
+  });
+
   it('emits group member additions without browser-supplied actor or admin fields', () => {
     mockUseGetCurrentChat.mockReturnValue({
       currentChat: {

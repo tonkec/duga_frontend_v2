@@ -12,7 +12,7 @@ import {
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
 
 interface IContentFormatterProps {
-  text: string;
+  text?: string | null;
   renderRichContent?: boolean;
   taggedUsers?: { id: number; publicId?: string; username?: string }[];
   linkClassName?: string;
@@ -23,7 +23,7 @@ const SecureInlineImage = ({ secureUrl }: { secureUrl: string }) => {
   const imageUrl = useObjectUrl(imageBlob);
 
   if (!imageUrl) {
-    return <span>Slika</span>;
+    return <span>Fotografija se ne može učitati.</span>;
   }
 
   return (
@@ -41,7 +41,8 @@ const ContentFormatter = ({
   taggedUsers = [],
   linkClassName = 'text-blue underline',
 }: IContentFormatterProps) => {
-  const parts = text.split(/(\s+)/);
+  const safeText = typeof text === 'string' ? text : '';
+  const parts = safeText.split(/(\s+)/);
 
   const youtubeRegex =
     /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
@@ -132,7 +133,7 @@ const ContentFormatter = ({
         const safeMediaPath = getSafeBackendMediaPath(part);
         if (safeMediaPath) {
           if (!renderRichContent) {
-            return <span key={i}>Slika</span>;
+            return <span key={i}>Fotografija</span>;
           }
 
           return <SecureInlineImage key={i} secureUrl={safeMediaPath} />;
@@ -150,7 +151,7 @@ const ContentFormatter = ({
           const match = part.match(imageRegex);
           if (match) {
             if (!renderRichContent) {
-              return <span key={i}>Slika</span>;
+              return <span key={i}>Fotografija</span>;
             }
 
             const safeS3MediaPath = getSafeS3BackendMediaPath(match[1]);

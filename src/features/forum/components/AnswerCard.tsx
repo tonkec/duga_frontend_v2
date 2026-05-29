@@ -429,15 +429,17 @@ const AnswerCard = ({
                   </div>
                 </div>
 
-                <Link
-                  to="/report"
-                  role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
-                  onClick={() => setIsActionsOpen(false)}
-                >
-                  <BiFlag size={20} />
-                  Prijavi
-                </Link>
+                {!isOwnAnswer && (
+                  <Link
+                    to="/report"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
+                    onClick={() => setIsActionsOpen(false)}
+                  >
+                    <BiFlag size={20} />
+                    Prijavi
+                  </Link>
+                )}
               </div>
             )}
           </div>

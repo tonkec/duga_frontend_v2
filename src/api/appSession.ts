@@ -1,3 +1,5 @@
+import { clearCachedAccessToken } from './authToken';
+
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 const SESSION_REVOKED_NOTICE_KEY = 'dugaSessionRevokedNotice';
 const APP_SESSION_ID_KEY = 'dugaSessionId';
@@ -16,6 +18,7 @@ export const clearAppSessionCredentials = () => {
   localStorage.removeItem(APP_SESSION_ID_KEY);
   sessionStorage.removeItem(APP_SESSION_TOKEN_KEY);
   sessionStorage.removeItem(APP_CSRF_TOKEN_KEY);
+  clearCachedAccessToken();
 };
 
 export const getAppCsrfToken = () => sessionStorage.getItem(APP_CSRF_TOKEN_KEY);

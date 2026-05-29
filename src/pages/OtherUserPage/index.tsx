@@ -262,7 +262,7 @@ const OtherUserPage = () => {
           isError={isForumError}
           isLoading={isForumActivityLoading}
           questions={forumQuestionsWithDetails}
-          userId={userId}
+          userId={otherUserInternalId}
           type="questions"
         />
       ),
@@ -282,7 +282,7 @@ const OtherUserPage = () => {
           isError={isForumError}
           isLoading={isForumActivityLoading}
           questions={forumQuestionsWithDetails}
-          userId={userId}
+          userId={otherUserInternalId}
           type="answers"
         />
       ),
