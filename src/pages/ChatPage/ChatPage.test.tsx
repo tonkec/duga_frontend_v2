@@ -332,7 +332,7 @@ describe('ChatPage integration', () => {
 
     renderChatPage();
 
-    expect(screen.getByAltText('gif')).toHaveAttribute(
+    expect(screen.getByAltText('GIF iz poruke')).toHaveAttribute(
       'src',
       'https://media.giphy.com/media/example/giphy.gif'
     );

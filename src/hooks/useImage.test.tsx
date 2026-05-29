@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import useImage from './useImage';
 
 describe('useImage', () => {
@@ -40,7 +40,9 @@ describe('useImage', () => {
     expect(imageInstances[0].referrerPolicy).toBe('no-referrer');
     expect(imageInstances[0].src).toBe('https://example.com/photo.jpg');
 
-    imageInstances[0].onload?.();
+    act(() => {
+      imageInstances[0].onload?.();
+    });
     await waitFor(() => expect(result.current).toBe(false));
   });
 

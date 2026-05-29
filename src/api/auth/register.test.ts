@@ -1,5 +1,5 @@
 import { apiClient } from '..';
-import { clearAccessTokenGetter, setAccessTokenGetter } from '../authToken';
+import { clearAccessTokenGetter, clearCachedAccessToken, setAccessTokenGetter } from '../authToken';
 import { register } from './register';
 
 jest.mock('..', () => ({
@@ -13,11 +13,13 @@ describe('register', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     clearAccessTokenGetter();
+    clearCachedAccessToken();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
   });
 
   afterEach(() => {
     clearAccessTokenGetter();
+    clearCachedAccessToken();
   });
 
   it('registers with the Auth0 token getter', async () => {
