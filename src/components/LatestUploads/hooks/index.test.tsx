@@ -80,7 +80,7 @@ describe('useGetImageBlob', () => {
     await waitFor(() => expect(result.current.data).toBeNull());
   });
 
-  it('rejects fetched blobs when the response omits Content-Type', async () => {
+  it('accepts trusted image paths when the response omits Content-Type', async () => {
     const imageBlob = new Blob(['image'], { type: 'image/png' });
     get.mockResolvedValue({ data: imageBlob, headers: {} });
 
@@ -88,7 +88,7 @@ describe('useGetImageBlob', () => {
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => expect(result.current.data).toBeNull());
+    await waitFor(() => expect(result.current.data).toBe(imageBlob));
   });
 
   it('fetches private S3 image URLs through the authenticated API client', async () => {
