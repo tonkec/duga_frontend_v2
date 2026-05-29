@@ -41,6 +41,7 @@ import ForumImageGallery from '../components/ForumImageGallery';
 import type { Answer } from '../types/forum.types';
 import { getVoteLabel } from '../utils/forumLabels';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { getForumUserAvatarProfilePhoto } from '../utils/forumUserAvatar';
 
 interface CurrentUserData {
   id?: number;
@@ -100,10 +101,14 @@ const sortAnswers = (answers: Answer[], sortOption: AnswerSortOption) => {
   return [...answers].sort((firstAnswer, secondAnswer) => {
     const firstCreatedAt = new Date(firstAnswer.createdAt).getTime();
     const secondCreatedAt = new Date(secondAnswer.createdAt).getTime();
+    const acceptedDifference = Number(secondAnswer.isAccepted) - Number(firstAnswer.isAccepted);
+
+    if (acceptedDifference) {
+      return acceptedDifference;
+    }
 
     if (sortOption === 'accepted') {
-      const acceptedDifference = Number(secondAnswer.isAccepted) - Number(firstAnswer.isAccepted);
-      return acceptedDifference || secondCreatedAt - firstCreatedAt;
+      return secondCreatedAt - firstCreatedAt;
     }
 
     if (sortOption === 'oldest') {
@@ -181,6 +186,7 @@ const ForumQuestionDetailsPage = () => {
   const authorName = question?.User?.name || question?.User?.username || 'Korisnik';
   const authorId = question?.User?.id ?? question?.userId;
   const authorPublicId = question?.User?.publicId ?? question?.user?.publicId;
+  const authorProfilePhoto = getForumUserAvatarProfilePhoto(question?.User || question?.user);
   const isQuestionVotePending =
     voteQuestionMutation.isPending || deleteQuestionVoteMutation.isPending;
   const isAnswerReactionPending =
@@ -393,6 +399,7 @@ const ForumQuestionDetailsPage = () => {
                   userId={String(authorId)}
                   size="32"
                   className="h-8 w-8 rounded-full"
+                  profilePhoto={authorProfilePhoto}
                 />
                 <span className="text-blue">{authorName}</span>
               </Link>

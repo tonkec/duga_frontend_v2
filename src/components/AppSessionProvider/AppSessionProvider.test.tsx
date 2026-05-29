@@ -120,6 +120,19 @@ describe('AppSessionProvider login/session start integration', () => {
     expect(mockGetCurrentUser).not.toHaveBeenCalled();
   });
 
+  it('preserves cookie-backed session credentials when Auth0 memory state is lost on refresh', async () => {
+    sessionStorage.setItem('dugaCsrfToken', 'stored-csrf-token');
+    mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
+
+    renderAppSessionProvider();
+
+    expect(await screen.findByTestId('session-status')).toHaveTextContent('active');
+    expect(sessionStorage.getItem('dugaCsrfToken')).toBe('stored-csrf-token');
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockGetCurrentUser).not.toHaveBeenCalled();
+  });
+
   it('registers the backend user before starting an app session after Auth0 login', async () => {
     mockUseAuth0.mockReturnValue(
       auth0State({

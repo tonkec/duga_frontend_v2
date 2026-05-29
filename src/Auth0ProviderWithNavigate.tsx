@@ -103,6 +103,9 @@ export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactN
         audience: getEnv('VITE_AUTH0_AUDIENCE'),
         scope: AUTH0_IDENTITY_SCOPE,
       }}
+      cacheLocation="memory"
+      useRefreshTokens
+      useRefreshTokensFallback
       onRedirectCallback={onRedirectCallback}
     >
       {children}

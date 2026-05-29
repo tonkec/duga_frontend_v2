@@ -19,6 +19,7 @@ export const useDeletePhoto = (queryKey: string[] = ['uploads']) => {
     onSuccess: () => {
       toast.success('Fotografija uspješno obrisana.', toastConfig);
       queryClient.invalidateQueries({ queryKey, exact: true });
+      queryClient.invalidateQueries({ queryKey: ['profilePhoto'] });
     },
     onError: () => {
       toast.error('Došlo je do greške.', toastConfig);

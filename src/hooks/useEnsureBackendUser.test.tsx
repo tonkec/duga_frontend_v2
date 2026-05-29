@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth0 } from '@auth0/auth0-react';
 import { apiClient } from '@app/api';
+import { startSession } from '@app/api/sessions';
 import { useCurrentBackendUser } from './useEnsureBackendUser';
 
 jest.mock('@auth0/auth0-react', () => ({
@@ -13,12 +14,17 @@ jest.mock('@app/api', () => ({
   apiClient: jest.fn(),
 }));
 
+jest.mock('@app/api/sessions', () => ({
+  startSession: jest.fn(),
+}));
+
 jest.mock('random-words', () => ({
   generate: jest.fn(() => ['generated']),
 }));
 
 const mockUseAuth0 = jest.mocked(useAuth0);
 const mockApiClient = jest.mocked(apiClient);
+const mockStartSession = jest.mocked(startSession);
 const get = jest.fn();
 
 const renderUseCurrentBackendUser = () => {
@@ -75,6 +81,7 @@ describe('useCurrentBackendUser', () => {
     localStorage.clear();
     sessionStorage.clear();
     mockApiClient.mockReturnValue({ get } as unknown as ReturnType<typeof apiClient>);
+    mockStartSession.mockResolvedValue({} as Awaited<ReturnType<typeof startSession>>);
     get.mockResolvedValue({ data: { id: 1, username: 'current-user' } });
   });
 
@@ -145,6 +152,28 @@ describe('useCurrentBackendUser', () => {
     expect(mockApiClient).toHaveBeenCalledWith();
   });
 
+  it('refreshes the backend session and retries current-user after a plain 401', async () => {
+    get
+      .mockRejectedValueOnce({
+        response: {
+          status: 401,
+          data: { message: 'Unauthorized' },
+        },
+      })
+      .mockResolvedValueOnce({ data: { id: 1, username: 'current-user' } });
+    mockUseAuth0.mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      user: undefined,
+    } as unknown as ReturnType<typeof useAuth0>);
+
+    const { result } = renderUseCurrentBackendUserWithoutAuth0Requirement();
+
+    await waitFor(() => expect(result.current.data).toEqual({ id: 1, username: 'current-user' }));
+    expect(mockStartSession).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledTimes(2);
+  });
+
   it('does not register or fetch when the app session is revoked', async () => {
     sessionStorage.setItem('dugaSessionRevoked', 'true');
     mockUseAuth0.mockReturnValue({
@@ -184,6 +213,7 @@ describe('useCurrentBackendUser', () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(sessionStorage.getItem('dugaSessionRevoked')).toBe('true');
+    expect(mockStartSession).not.toHaveBeenCalled();
   });
 
   it('does not require Auth0 profile fields beyond authentication state', async () => {

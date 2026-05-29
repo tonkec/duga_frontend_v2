@@ -7,6 +7,7 @@ import type { Question } from '../types/forum.types';
 import { getVoteScore } from './VoteControls';
 import { getVoteLabel } from '../utils/forumLabels';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { getForumUserAvatarProfilePhoto } from '../utils/forumUserAvatar';
 
 interface QuestionCardProps {
   question: Question;
@@ -43,6 +44,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const isHotQuestion = answerCount >= HOT_QUESTION_ANSWER_COUNT;
   const authorId = getAuthorId(question);
   const authorName = getAuthorName(question);
+  const authorProfilePhoto = getForumUserAvatarProfilePhoto(question.User || question.user);
   const isResolved = hasAcceptedAnswer(question);
 
   return (
@@ -91,6 +93,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
             userId={String(authorId)}
             size="28"
             className="h-7 w-7 rounded-full"
+            profilePhoto={authorProfilePhoto}
           />
           {authorName}
         </Link>

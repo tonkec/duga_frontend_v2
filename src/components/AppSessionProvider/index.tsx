@@ -66,7 +66,6 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
     if (isLoading) return;
 
     if (!isAuthenticated) {
-      clearAppSessionCredentials();
       startedSessionKeyRef.current = null;
       if (consumeAppSessionRevokedNotice()) {
         toast.info(SESSION_REVOKED_MESSAGE, toastConfig);

@@ -7,6 +7,7 @@ import { useWindowSize } from '@uidotdev/usehooks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useSocket } from '@app/context/useSocket';
 import { useGetAllNotifcations } from './hooks';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 
 jest.mock('@auth0/auth0-react', () => ({
   useAuth0: jest.fn(),
@@ -26,6 +27,10 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
+}));
+
+jest.mock('@app/hooks/useGetAllImages', () => ({
+  useGetAllImages: jest.fn(),
 }));
 
 jest.mock('@app/context/useSocket', () => ({
@@ -51,12 +56,15 @@ jest.mock('./components/Notifications', () => ({
 
 jest.mock('@app/components/UserAvatar', () => ({
   __esModule: true,
-  default: () => <div>Avatar</div>,
+  default: ({ profilePhoto }: { profilePhoto?: { securePhotoUrl?: string } }) => (
+    <div>{profilePhoto?.securePhotoUrl || 'Avatar'}</div>
+  ),
 }));
 
 const mockUseAuth0 = jest.mocked(useAuth0);
 const mockUseWindowSize = jest.mocked(useWindowSize);
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
+const mockUseGetAllImages = jest.mocked(useGetAllImages);
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseGetAllNotifications = jest.mocked(useGetAllNotifcations);
 const logout = jest.fn();
@@ -75,11 +83,17 @@ describe('Navigation', () => {
       user: {
         data: {
           id: 7,
+          username: 'navigation_user',
         },
       },
       userError: null,
       isUserLoading: false,
     } as ReturnType<typeof useGetCurrentUser>);
+    mockUseGetAllImages.mockReturnValue({
+      allImages: undefined,
+      allImagesError: null,
+      allImagesLoading: false,
+    } as ReturnType<typeof useGetAllImages>);
     mockUseSocket.mockReturnValue({
       on: jest.fn(),
       off: jest.fn(),
@@ -150,6 +164,30 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     expect(screen.getByRole('button', { name: 'Otvori navigaciju' })).toBeVisible();
+  });
+
+  it('passes the current user profile photo from uploads to the avatar', () => {
+    mockUseGetAllNotifications.mockReturnValue({
+      allNotifications: undefined,
+      allNotificationsError: null,
+      areAllNotificationsLoading: false,
+    } as ReturnType<typeof useGetAllNotifcations>);
+    mockUseGetAllImages.mockReturnValue({
+      allImages: {
+        data: {
+          images: [
+            { id: 1, isProfilePhoto: false, securePhotoUrl: '/uploads/other-photo.png' },
+            { id: 2, isProfilePhoto: true, securePhotoUrl: '/uploads/profile-photo.png' },
+          ],
+        },
+      },
+      allImagesError: null,
+      allImagesLoading: false,
+    } as ReturnType<typeof useGetAllImages>);
+
+    render(<Navigation />);
+
+    expect(screen.getByText('/uploads/profile-photo.png')).toBeVisible();
   });
 
   it('marks the app session inactive before logging out', async () => {

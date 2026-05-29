@@ -1,4 +1,5 @@
 import { apiClient } from '@app/api';
+import { startSession } from '@app/api/sessions';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import { generate } from 'random-words';
@@ -22,18 +23,29 @@ export const useCurrentBackendUser = ({
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth0();
   const auth0Ready = requireAuth0 ? isAuthenticated && !isAuthLoading : !isAuthLoading;
 
+  const fetchCurrentUser = async () => {
+    const client = apiClient();
+    const res = await client.get('/users/current-user', {
+      skipGlobalErrorHandler: true,
+    });
+    return res.data;
+  };
+
   return useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
-      const client = apiClient();
       try {
-        const res = await client.get('/users/current-user', {
-          skipGlobalErrorHandler: true,
-        });
-        return res.data;
+        return await fetchCurrentUser();
       } catch (error) {
         if (isAppSessionConflictError(error)) {
           markSessionRevoked();
+          throw error;
+        }
+
+        const apiError = error as { response?: { status?: number } };
+        if (apiError.response?.status === 401) {
+          await startSession();
+          return fetchCurrentUser();
         }
 
         throw error;

@@ -165,7 +165,7 @@ const UsersPage = () => {
         )}
 
         <Paginated<IUser>
-          gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          gridClassName="users-page-grid"
           data={renderedUsers}
           itemsPerPage={itemsPerPage}
           getItemKey={(user) => user.id}

@@ -133,6 +133,27 @@ describe('useGetImageBlob', () => {
     );
   });
 
+  it('fetches local absolute backend media URLs through the authenticated API client', async () => {
+    const imageBlob = new Blob(['image'], { type: 'image/png' });
+    get.mockResolvedValue({ data: imageBlob, headers: { 'content-type': 'image/png' } });
+
+    const { result } = renderHook(
+      () =>
+        useGetImageBlob('http://localhost:8080/uploads/files/development%2Fuser%2F54%2Fphoto.png'),
+      {
+        wrapper: createWrapper(),
+      }
+    );
+
+    await waitFor(() => expect(result.current.data).toBe(imageBlob));
+
+    expect(get).toHaveBeenCalledWith('/uploads/files/development%2Fuser%2F54%2Fphoto.png', {
+      responseType: 'blob',
+      skipGlobalErrorHandler: true,
+    });
+    expect(mockAxiosGet).not.toHaveBeenCalled();
+  });
+
   it('adds a verified content type to blobs that omit type metadata', async () => {
     const imageBlob = new Blob(['image']);
     get.mockResolvedValue({ data: imageBlob, headers: { 'content-type': 'image/png' } });

@@ -29,6 +29,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { IUser } from '@app/components/UserCard';
 import { BiGroup, BiSearch } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import type { IImage } from '@app/components/Photos';
 
 interface ITypingData {
   userId: number;
@@ -39,6 +41,16 @@ interface IChatParticipant {
   userId?: number;
   publicId?: string;
   username?: string;
+  avatar?: string | null;
+  picture?: string | null;
+  securePhotoUrl?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+  profilePhoto?: {
+    securePhotoUrl?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  } | null;
   createdAt?: string;
   updatedAt?: string;
   role?: string;
@@ -62,6 +74,19 @@ interface ChatMemberLink {
   label: string;
   username?: string;
 }
+
+type UserAvatarSource = {
+  avatar?: string | null;
+  picture?: string | null;
+  securePhotoUrl?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+  profilePhoto?: {
+    securePhotoUrl?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  } | null;
+};
 
 interface IDeleteChatModalProps {
   setIsDeleteModalVisible: (value: boolean) => void;
@@ -284,6 +309,28 @@ const getAdminUserIdFromMembers = (members: IChatParticipant[]) => {
   return adminUserId !== undefined ? Number(adminUserId) : undefined;
 };
 
+const getProfilePhotoOverride = (
+  user: UserAvatarSource | null | undefined
+): Partial<IImage> | undefined => {
+  const imageSource =
+    user?.profilePhoto?.securePhotoUrl ||
+    user?.profilePhoto?.imageUrl ||
+    user?.profilePhoto?.url ||
+    user?.securePhotoUrl ||
+    user?.imageUrl ||
+    user?.avatar ||
+    user?.picture ||
+    '';
+
+  if (!imageSource) return undefined;
+
+  return {
+    securePhotoUrl: imageSource,
+    imageUrl: imageSource,
+    url: imageSource,
+  };
+};
+
 const addUsersToQueryResponseData = (
   queryData: unknown,
   updateData: (data: unknown) => unknown
@@ -412,6 +459,12 @@ const ChatPage = () => {
   const queryClient = useQueryClient();
   const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
   const currentUserId = currentUser?.data?.id;
+  const { allImages: currentUserImages } = useGetAllImages(
+    currentUserId ? String(currentUserId) : ''
+  );
+  const currentUserProfilePhoto = Array.isArray(currentUserImages?.data?.images)
+    ? currentUserImages.data.images.find((image: IImage) => image.isProfilePhoto)
+    : undefined;
   const { chatId } = useParams();
   const [receivedMessages, setReceivedMessages] = useState<IMessage[]>([]);
   const { currentChat, isCurrentChatLoading, isCurrentChatError } = useGetCurrentChat(
@@ -449,6 +502,9 @@ const ChatPage = () => {
   const { leaveChat, isLeavingChat } = useLeaveCurrentChat();
 
   const { user: otherUser } = useGetUserById(String(otherUserId || ''));
+  const otherMember = otherMembers.find((user) => Number(user.id) === Number(otherUserId));
+  const otherUserProfilePhoto =
+    getProfilePhotoOverride(otherUser?.data) ?? getProfilePhotoOverride(otherMember);
   const otherUserName = otherUser?.data.username;
   const chatTitle = getChatTitle({
     isGroup: Boolean(isGroupChat),
@@ -865,6 +921,7 @@ const ChatPage = () => {
                   avatarFallbackName={chatTitle}
                   userId={String(otherUserId ?? '')}
                   className="h-11 w-11 shrink-0 rounded-full border border-[#dce4ff]"
+                  profilePhoto={otherUserProfilePhoto}
                 />
               )}
               <div className="min-w-0">
@@ -958,10 +1015,12 @@ const ChatPage = () => {
               otherUserName={otherUserName}
               otherUserId={otherUserId as number}
               otherUserPublicId={otherUser?.data?.publicId}
+              otherUserProfilePhoto={otherUserProfilePhoto}
               receivedMessages={receivedMessages}
               messages={messages}
               fetchNextPage={fetchNextPage}
               currentUserId={currentUserId as number}
+              currentUserProfilePhoto={currentUserProfilePhoto}
               isCurrentUserLoading={isCurrentUserLoading}
               onReactionToggle={handleReactionToggle}
               messageSearchQuery={messageSearchQuery}

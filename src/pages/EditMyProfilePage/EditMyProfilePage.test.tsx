@@ -201,6 +201,41 @@ describe('EditMyProfilePage integration', () => {
     );
   });
 
+  it('preserves an existing encoded favorite song when saving other profile values', async () => {
+    mockUseGetCurrentUser.mockReturnValue({
+      user: {
+        data: {
+          ...currentUser,
+          favoriteSong: 'v1:K021IGuB8Dx6r12B:yk7KAGG44JkDXD7Ji87k/g==:',
+        },
+      },
+      userError: null,
+      isUserLoading: false,
+    } as ReturnType<typeof useGetCurrentUser>);
+
+    renderEditPage();
+
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Korisničko ime')).toHaveValue(currentUser.username)
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Rod'), {
+      target: {
+        value: 'Nebinarno',
+      },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Spremi' }));
+
+    await waitFor(() =>
+      expect(updateUserMutation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          gender: 'Nebinarno',
+          favoriteSong: 'v1:K021IGuB8Dx6r12B:yk7KAGG44JkDXD7Ji87k/g==:',
+        })
+      )
+    );
+  });
+
   it('shows validation errors and does not save invalid profile values', async () => {
     renderEditPage();
 

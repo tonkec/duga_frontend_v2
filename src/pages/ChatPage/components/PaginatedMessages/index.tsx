@@ -1,14 +1,17 @@
 import { useLayoutEffect, useRef } from 'react';
 import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
 import { debounceScroll } from '@app/utils/debounceScroll';
+import type { IImage } from '@app/components/Photos';
 
 const PaginatedMessages = ({
   otherUserName,
   currentUserName,
   otherUserId,
   otherUserPublicId,
+  otherUserProfilePhoto,
   receivedMessages,
   currentUserId,
+  currentUserProfilePhoto,
   isCurrentUserLoading,
   messages,
   fetchNextPage,
@@ -19,10 +22,12 @@ const PaginatedMessages = ({
   currentUserName: string;
   otherUserId: number | undefined;
   otherUserPublicId?: string;
+  otherUserProfilePhoto?: Partial<IImage>;
   receivedMessages: IMessage[];
   messages: IMessage[];
   fetchNextPage: () => void;
   currentUserId: number;
+  currentUserProfilePhoto?: Partial<IImage>;
   isCurrentUserLoading: boolean;
   onReactionToggle: (message: IMessage, emoji: string, hasReacted: boolean) => void;
   messageSearchQuery?: string;
@@ -103,10 +108,12 @@ const PaginatedMessages = ({
             otherUserName={otherUserName}
             currentUserName={currentUserName}
             currentUserId={currentUserId}
+            currentUserProfilePhoto={currentUserProfilePhoto}
             key={message.id ?? `${message.createdAt}-${index}`}
             message={message}
             otherUserId={otherUserId}
             otherUserPublicId={otherUserPublicId}
+            otherUserProfilePhoto={otherUserProfilePhoto}
             messagePhotoUrl={
               message.type === 'gif'
                 ? message.messagePhotoUrl

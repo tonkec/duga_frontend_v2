@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BiSmile } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
+import type { IImage } from '@app/components/Photos';
 
 export type MessageType = 'text' | 'file' | 'gif';
 
@@ -28,6 +29,7 @@ interface BaseMessageTemplateProps {
   messageType: MessageType;
   chatMessage: IMessage;
   currentUserId: number;
+  currentUserProfilePhoto?: Partial<IImage>;
   onReactionToggle: (message: IMessage, emoji: string, hasReacted: boolean) => void;
 }
 
@@ -70,9 +72,11 @@ interface IMessageProps {
   currentUserName: string;
   otherUserId?: number;
   otherUserPublicId?: string;
+  otherUserProfilePhoto?: Partial<IImage>;
   messagePhotoUrl: string;
   showAvatar: boolean;
   currentUserId: number;
+  currentUserProfilePhoto?: Partial<IImage>;
   isCurrentUserLoading: boolean;
   onReactionToggle: (message: IMessage, emoji: string, hasReacted: boolean) => void;
 }
@@ -80,11 +84,13 @@ interface IMessageProps {
 interface OtherUserMessageTemplateProps extends BaseMessageTemplateProps {
   otherUserId?: number;
   otherUserPublicId?: string;
+  otherUserProfilePhoto?: Partial<IImage>;
 }
 
 interface CurrentUserMessageTemplateProps extends BaseMessageTemplateProps {
   currentUserId: number;
   isCurrentUserLoading: boolean;
+  currentUserProfilePhoto?: Partial<IImage>;
 }
 
 interface IMessageContentProps {
@@ -181,12 +187,13 @@ const CurrentUserMessageTemplate = ({
   messageType,
   chatMessage,
   currentUserId,
+  currentUserProfilePhoto,
   onReactionToggle,
 }: CurrentUserMessageTemplateProps) => {
   return (
     <div className={`flex w-full flex-col items-end ${showAvatar ? '' : 'pr-11'}`}>
-      <div className="flex max-w-[min(85%,20rem)] items-end gap-2">
-        <div className="flex min-w-0 items-center gap-2">
+      <div className="flex w-full items-end justify-end gap-2">
+        <div className="flex max-w-[min(85%,20rem)] min-w-0 items-center justify-end gap-2">
           <MessageReactionPicker
             message={chatMessage}
             currentUserId={currentUserId}
@@ -213,6 +220,7 @@ const CurrentUserMessageTemplate = ({
             userId={String(currentUserId)}
             color="#eef3ff"
             fgColor="#2D46B9"
+            profilePhoto={currentUserProfilePhoto}
           />
         )}
       </div>
@@ -233,6 +241,7 @@ const OtherUserMessageTemplate = ({
   message,
   otherUserId,
   otherUserPublicId,
+  otherUserProfilePhoto,
   createdAt,
   messagePhotoUrl,
   showAvatar,
@@ -245,7 +254,7 @@ const OtherUserMessageTemplate = ({
 
   return (
     <div className={`flex w-full flex-col items-start ${!showAvatar ? 'pl-11' : ''}`}>
-      <div className="flex max-w-[min(85%,20rem)] items-end gap-2">
+      <div className="flex w-full items-end gap-2">
         {showAvatar && (
           <button
             type="button"
@@ -260,10 +269,11 @@ const OtherUserMessageTemplate = ({
               avatarFallbackName={userName}
               userId={String(otherUserId)}
               className="h-9 w-9 rounded-full border border-[#dce4ff]"
+              profilePhoto={otherUserProfilePhoto}
             />
           </button>
         )}
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex max-w-[min(85%,20rem)] min-w-0 items-center gap-2">
           <div
             className={`${bubbleBase} chat-bubble-other max-w-full rounded-2xl rounded-bl-sm border border-[#dce4ff] bg-[#f0f4ff] text-gray-900`}
           >
@@ -422,10 +432,12 @@ const Message = ({
   currentUserName,
   otherUserId,
   otherUserPublicId,
+  otherUserProfilePhoto,
   messagePhotoUrl,
   showAvatar,
   currentUserId,
   isCurrentUserLoading,
+  currentUserProfilePhoto,
   onReactionToggle,
 }: IMessageProps) => {
   const senderId = getMessageSenderId(message);
@@ -445,6 +457,7 @@ const Message = ({
             avatarFallbackName={currentUserName}
             userId={String(currentUserId)}
             color="#2D46B9"
+            profilePhoto={currentUserProfilePhoto}
           />
         )}
       </div>
@@ -464,6 +477,7 @@ const Message = ({
       chatMessage={message}
       currentUserId={currentUserId}
       isCurrentUserLoading={isCurrentUserLoading}
+      currentUserProfilePhoto={currentUserProfilePhoto}
       onReactionToggle={onReactionToggle}
     />
   ) : (
@@ -472,6 +486,7 @@ const Message = ({
       message={message.message}
       otherUserId={senderId || otherUserId}
       otherUserPublicId={senderId === Number(otherUserId) ? otherUserPublicId : undefined}
+      otherUserProfilePhoto={otherUserProfilePhoto}
       createdAt={message.createdAt}
       messagePhotoUrl={messagePhotoUrl}
       showAvatar={showAvatar}

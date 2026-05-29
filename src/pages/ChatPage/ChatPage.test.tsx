@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import ChatPage from '.';
 import { useGetCurrentUser } from '../../hooks/useGetCurrentUser';
+import { useGetAllImages } from '../../hooks/useGetAllImages';
 import { useGetUserById } from '../../hooks/useGetUserById';
 import { useSocket } from '../../context/useSocket';
 import {
@@ -21,8 +22,16 @@ jest.mock('@app/components/AppLayout', () => ({
 
 jest.mock('@app/components/UserAvatar', () => ({
   __esModule: true,
-  default: ({ avatarFallbackName }: { avatarFallbackName: string }) => (
-    <span aria-label={`${avatarFallbackName} avatar`} />
+  default: ({
+    avatarFallbackName,
+    profilePhoto,
+  }: {
+    avatarFallbackName: string;
+    profilePhoto?: { securePhotoUrl?: string };
+  }) => (
+    <span aria-label={`${avatarFallbackName} avatar`}>
+      {profilePhoto?.securePhotoUrl || avatarFallbackName}
+    </span>
   ),
 }));
 
@@ -70,6 +79,10 @@ jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
 }));
 
+jest.mock('@app/hooks/useGetAllImages', () => ({
+  useGetAllImages: jest.fn(),
+}));
+
 jest.mock('@app/hooks/useGetUserById', () => ({
   useGetUserById: jest.fn(),
 }));
@@ -103,6 +116,7 @@ jest.mock('@app/pages/ChatPage/hooks', () => ({
 }));
 
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
+const mockUseGetAllImages = jest.mocked(useGetAllImages);
 const mockUseGetUserById = jest.mocked(useGetUserById);
 const mockUseSocket = jest.mocked(useSocket);
 const mockUseDeleteCurrentChat = jest.mocked(useDeleteCurrentChat);
@@ -184,6 +198,11 @@ describe('ChatPage integration', () => {
       userError: null,
       isUserLoading: false,
     } as ReturnType<typeof useGetCurrentUser>);
+    mockUseGetAllImages.mockReturnValue({
+      allImages: undefined,
+      allImagesError: null,
+      allImagesLoading: false,
+    } as ReturnType<typeof useGetAllImages>);
 
     mockUseGetUserById.mockReturnValue({
       user: {
@@ -237,6 +256,62 @@ describe('ChatPage integration', () => {
     expect(screen.getByText('Thanks, happy to be here.')).toBeVisible();
     expect(screen.getByTestId('send-message')).toBeVisible();
     expect(screen.queryByText('Nema poruka u ovom razgovoru')).not.toBeInTheDocument();
+  });
+
+  it('passes the current user profile photo to own message avatars', () => {
+    mockUseGetAllImages.mockReturnValue({
+      allImages: {
+        data: {
+          images: [
+            { id: 1, isProfilePhoto: false, securePhotoUrl: '/uploads/other-photo.png' },
+            { id: 2, isProfilePhoto: true, securePhotoUrl: '/uploads/current-profile.png' },
+          ],
+        },
+      },
+      allImagesError: null,
+      allImagesLoading: false,
+    } as ReturnType<typeof useGetAllImages>);
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [message(2, currentUser.id, 'Own message', '2026-05-23T08:01:00.000Z')],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    expect(screen.getByLabelText('current_user avatar')).toHaveTextContent(
+      '/uploads/current-profile.png'
+    );
+  });
+
+  it('passes the other user profile photo to chat header and message avatars', () => {
+    mockUseGetUserById.mockReturnValue({
+      user: {
+        data: {
+          ...otherUser,
+          profilePhoto: {
+            securePhotoUrl: '/uploads/other-profile.png',
+          },
+        },
+      },
+      userError: null,
+      isUserLoading: false,
+    } as ReturnType<typeof useGetUserById>);
+    mockUseGetAllMessages.mockReturnValue({
+      messages: [message(1, otherUser.id, 'Friend message', '2026-05-23T08:00:00.000Z')],
+      allMessagesError: null,
+      isAllMessagesLoading: false,
+      isAllMessagesSuccess: true,
+      fetchNextPage: jest.fn(),
+    } as ReturnType<typeof useGetAllMessages>);
+
+    renderChatPage();
+
+    screen
+      .getAllByLabelText('chat_friend avatar')
+      .forEach((avatar) => expect(avatar).toHaveTextContent('/uploads/other-profile.png'));
   });
 
   it('renders gif messages from their gif URL', () => {

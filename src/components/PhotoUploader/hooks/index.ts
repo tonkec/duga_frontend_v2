@@ -18,6 +18,9 @@ export const useUploadPhotos = () => {
       queryClient.invalidateQueries({
         queryKey: ['uploads'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['profilePhoto'],
+      });
     },
     onError: (error) => {
       toast.error(getApiErrorMessage(error, 'Fotografije nije moguće spremiti.'), toastConfig);

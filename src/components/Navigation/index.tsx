@@ -12,6 +12,8 @@ import { markAppSessionLoggedOut } from '@app/api/appSession';
 import { useGetAllNotifcations } from './hooks';
 import NotificationDropdown from './components/Notifications';
 import UserAvatar from '../UserAvatar';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import type { IImage } from '../Photos';
 
 type NotificationSummary = {
   isRead: boolean;
@@ -26,6 +28,9 @@ const Navigation = () => {
   const { user: currentUser } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const username = currentUser?.data?.username || 'Korisnik';
+  const { allImages } = useGetAllImages(userId ? String(userId) : '');
+  const userImages = Array.isArray(allImages?.data?.images) ? allImages.data.images : [];
+  const profilePhoto = userImages.find((image: IImage) => image.isProfilePhoto);
   const { allNotifications } = useGetAllNotifcations();
   const unreadNotificationsCount = ((allNotifications?.data ?? []) as NotificationSummary[]).filter(
     (notification) => !notification.isRead
@@ -123,6 +128,7 @@ const Navigation = () => {
                   userId={userId ? String(userId) : undefined}
                   avatarFallbackName={username}
                   className="h-10 w-10 rounded-full border border-white/20"
+                  profilePhoto={profilePhoto}
                 />
               </Link>
             </div>
@@ -141,6 +147,7 @@ const Navigation = () => {
                   userId={userId ? String(userId) : undefined}
                   avatarFallbackName={username}
                   className="h-9 w-9 rounded-full border border-white/20"
+                  profilePhoto={profilePhoto}
                 />
               </Link>
               <Link

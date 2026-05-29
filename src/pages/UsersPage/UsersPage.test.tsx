@@ -20,8 +20,16 @@ jest.mock('@app/api/uploads', () => ({
 
 jest.mock('@app/components/UserAvatar', () => ({
   __esModule: true,
-  default: ({ avatarFallbackName }: { avatarFallbackName: string }) => (
-    <span aria-label={`${avatarFallbackName} avatar`} />
+  default: ({
+    avatarFallbackName,
+    profilePhoto,
+  }: {
+    avatarFallbackName: string;
+    profilePhoto?: { securePhotoUrl?: string };
+  }) => (
+    <span aria-label={`${avatarFallbackName} avatar`}>
+      {profilePhoto?.securePhotoUrl || avatarFallbackName}
+    </span>
   ),
 }));
 
@@ -172,6 +180,28 @@ describe('UsersPage dating flow integration', () => {
     expect(screen.getByText('Offline')).toBeVisible();
     expect(screen.queryByRole('heading', { name: 'current_user' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'unverified_user' })).not.toBeInTheDocument();
+  });
+
+  it('passes user profile photo fields to user card avatars', () => {
+    mockUseGetAllUsers.mockReturnValue({
+      allUsers: {
+        data: [
+          apiUser({
+            id: 2,
+            username: 'user_with_card_photo',
+            avatar: 'development/user/2/profile.png',
+          }),
+        ],
+      },
+      allUsersError: null,
+      isAllUsersLoading: false,
+    } as ReturnType<typeof useGetAllUsers>);
+
+    renderUsersPage();
+
+    expect(screen.getByLabelText('user_with_card_photo avatar')).toHaveTextContent(
+      'development/user/2/profile.png'
+    );
   });
 
   it('filters users by profile photo', async () => {

@@ -7,7 +7,7 @@ export const useGetAllImages = (id: string) => {
     error: allImagesError,
     isPending: allImagesLoading,
   } = useQuery({
-    queryKey: ['uploads'],
+    queryKey: ['uploads', id],
     queryFn: () => getAllImages(id),
     enabled: !!id && id !== 'undefined' && id !== 'null',
   });
