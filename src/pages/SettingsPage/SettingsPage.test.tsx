@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import SettingsPage from '.';
 import { useDeleteUser } from '../EditMyProfilePage/hooks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 
 jest.mock('@app/components/AppLayout', () => ({
   __esModule: true,
@@ -43,8 +44,16 @@ jest.mock('@app/components/Navigation/components/OnlineStatus', () => ({
 
 jest.mock('@app/components/UserAvatar', () => ({
   __esModule: true,
-  default: ({ avatarFallbackName }: { avatarFallbackName: string }) => (
-    <span aria-label={`${avatarFallbackName} avatar`} />
+  default: ({
+    avatarFallbackName,
+    profilePhoto,
+  }: {
+    avatarFallbackName: string;
+    profilePhoto?: { securePhotoUrl?: string };
+  }) => (
+    <span aria-label={`${avatarFallbackName} avatar`}>
+      {profilePhoto?.securePhotoUrl || avatarFallbackName}
+    </span>
   ),
 }));
 
@@ -63,11 +72,16 @@ jest.mock('@app/hooks/useGetCurrentUser', () => ({
   useGetCurrentUser: jest.fn(),
 }));
 
+jest.mock('@app/hooks/useGetAllImages', () => ({
+  useGetAllImages: jest.fn(),
+}));
+
 jest.mock('../EditMyProfilePage/hooks', () => ({
   useDeleteUser: jest.fn(),
 }));
 
 const mockUseGetCurrentUser = jest.mocked(useGetCurrentUser);
+const mockUseGetAllImages = jest.mocked(useGetAllImages);
 const mockUseDeleteUser = jest.mocked(useDeleteUser);
 const deleteUserMutation = jest.fn();
 
@@ -84,6 +98,11 @@ describe('SettingsPage integration', () => {
       userError: null,
       isUserLoading: false,
     } as ReturnType<typeof useGetCurrentUser>);
+    mockUseGetAllImages.mockReturnValue({
+      allImages: undefined,
+      allImagesError: null,
+      allImagesLoading: false,
+    } as ReturnType<typeof useGetAllImages>);
     mockUseDeleteUser.mockReturnValue({
       deleteUserMutation,
       isUserPending: false,
@@ -110,5 +129,26 @@ describe('SettingsPage integration', () => {
 
     expect(deleteUserMutation).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('passes the current user profile photo from uploads to the avatar', () => {
+    mockUseGetAllImages.mockReturnValue({
+      allImages: {
+        data: {
+          images: [
+            { id: 1, isProfilePhoto: false, securePhotoUrl: '/uploads/other-photo.png' },
+            { id: 2, isProfilePhoto: true, securePhotoUrl: '/uploads/settings-profile.png' },
+          ],
+        },
+      },
+      allImagesError: null,
+      allImagesLoading: false,
+    } as ReturnType<typeof useGetAllImages>);
+
+    render(<SettingsPage />);
+
+    expect(screen.getByLabelText('settings_user avatar')).toHaveTextContent(
+      '/uploads/settings-profile.png'
+    );
   });
 });

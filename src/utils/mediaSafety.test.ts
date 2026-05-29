@@ -32,6 +32,14 @@ describe('mediaSafety', () => {
     expect(getSafeBackendMediaPath('/chat/123/photo.jpg')).toBe('/chat/123/photo.jpg');
   });
 
+  it('normalizes local absolute backend media URLs', () => {
+    expect(
+      getSafeBackendMediaPath(
+        'http://localhost:8080/uploads/files/development%2Fuser%2F54%2Fphoto.png'
+      )
+    ).toBe('/uploads/files/development%2Fuser%2F54%2Fphoto.png');
+  });
+
   it('rejects absolute, protocol-relative, and non-media backend paths', () => {
     expect(getSafeBackendMediaPath('https://example.com/uploads/photo.jpg')).toBe('');
     expect(getSafeBackendMediaPath('http://example.com/uploads/photo.jpg')).toBe('');

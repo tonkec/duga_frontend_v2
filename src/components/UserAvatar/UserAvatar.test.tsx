@@ -133,6 +133,41 @@ describe('UserAvatar integration', () => {
     );
   });
 
+  it('uses an explicitly provided profile photo before fetched profile data', () => {
+    const profileBlob = new Blob(['profile image'], { type: 'image/png' });
+    mockUseGetProfilePhoto.mockReturnValue({
+      profilePhoto: {
+        data: {
+          securePhotoUrl: '/uploads/profile-photo-from-endpoint',
+        },
+      },
+      profilePhotoError: null,
+      isProfilePhotoLoading: false,
+    } as ReturnType<typeof useGetProfilePhoto>);
+    mockUseGetImageBlob.mockReturnValue({
+      data: profileBlob,
+      error: null,
+      isLoading: false,
+    } as ReturnType<typeof useGetImageBlob>);
+
+    render(
+      <UserAvatar
+        avatarFallbackName="Override User"
+        color="#2D46B9"
+        userId="123"
+        size="160"
+        profilePhoto={{ securePhotoUrl: '/uploads/profile-photo-from-images' }}
+      />
+    );
+
+    expect(mockUseGetImageBlob).toHaveBeenNthCalledWith(1, '/uploads/profile-photo-from-images');
+    expect(mockUseGetImageBlob).not.toHaveBeenCalledWith('/uploads/profile-photo-from-endpoint');
+    expect(screen.getByRole('img', { name: 'Avatar' })).toHaveAttribute(
+      'src',
+      'blob:uploaded-profile-image'
+    );
+  });
+
   it('falls back to the profile placeholder when the uploaded image is missing', () => {
     mockUseGetProfilePhoto.mockReturnValue({
       profilePhoto: {

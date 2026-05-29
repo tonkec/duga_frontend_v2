@@ -15,12 +15,13 @@ interface IUpload {
 const LatestUploads = () => {
   const navigate = useNavigate();
   const { latestUploads, isLatestUploadsLoading } = useGetLatestUploads();
+  const uploadsCount = latestUploads?.data.length ?? 0;
 
   if (isLatestUploadsLoading) {
     return null;
   }
 
-  if (!latestUploads?.data.length) {
+  if (!uploadsCount) {
     return (
       <section className="mt-8">
         <div className="mb-4">
@@ -91,7 +92,7 @@ const LatestUploads = () => {
         </div>
         <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#dce4ff] bg-white px-4 py-2 text-sm font-semibold text-blue-dark shadow-sm">
           <BiImages />
-          {latestUploads.data.length} novih
+          {uploadsCount} {uploadsCount === 1 ? 'nova' : 'novih'}
         </span>
       </div>
 

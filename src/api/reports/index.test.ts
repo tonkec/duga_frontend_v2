@@ -13,12 +13,12 @@ describe('submitProblemReport', () => {
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
 
     await submitProblemReport({
-      problemType: 'abuse',
+      problemType: 'harassment',
       message: 'Neprimjerena poruka u chatu.',
     });
 
     expect(post).toHaveBeenCalledWith('/reports', {
-      problemType: 'abuse',
+      problemType: 'harassment',
       message: 'Neprimjerena poruka u chatu.',
     });
   });

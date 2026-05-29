@@ -1,5 +1,5 @@
 import { apiClient } from '..';
-import { clearAccessTokenGetter, setAccessTokenGetter } from '../authToken';
+import { clearAccessTokenGetter, clearCachedAccessToken, setAccessTokenGetter } from '../authToken';
 import { register } from './register';
 
 jest.mock('..', () => ({
@@ -13,11 +13,13 @@ describe('register', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     clearAccessTokenGetter();
+    clearCachedAccessToken();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
   });
 
   afterEach(() => {
     clearAccessTokenGetter();
+    clearCachedAccessToken();
   });
 
   it('registers with the Auth0 token getter', async () => {
@@ -41,5 +43,18 @@ describe('register', () => {
     await register('auth0|user', 'user@example.com', 'generated-user', true, 'explicit-token');
 
     expect(mockApiClient).toHaveBeenCalledWith('explicit-token');
+  });
+
+  it('rejects when no Auth0 token is available', async () => {
+    await expect(
+      register('auth0|user', 'user@example.com', 'generated-user', true)
+    ).rejects.toMatchObject({
+      response: {
+        status: 401,
+        data: { message: 'Not authenticated: Auth0 token missing' },
+      },
+    });
+
+    expect(mockApiClient).not.toHaveBeenCalled();
   });
 });

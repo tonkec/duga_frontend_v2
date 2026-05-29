@@ -9,7 +9,16 @@ export const register = async (
   token?: string | null
 ) => {
   const auth0AccessToken = token ?? (await resolveAuth0AccessToken());
-  const client = apiClient(auth0AccessToken ?? undefined);
+  if (!auth0AccessToken) {
+    return Promise.reject({
+      response: {
+        status: 401,
+        data: { message: 'Not authenticated: Auth0 token missing' },
+      },
+    });
+  }
+
+  const client = apiClient(auth0AccessToken);
   return client.post(`/register`, {
     email,
     username,

@@ -80,7 +80,7 @@ describe('LoginPage redirects', () => {
     } as unknown as ReturnType<typeof useAuth0>);
   });
 
-  it('redirects to Auth0 with the current app origin', () => {
+  it('redirects to Auth0 with configured auth params', () => {
     renderLoginPage();
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Prijavi se' })[0]);
@@ -90,7 +90,8 @@ describe('LoginPage redirects', () => {
         returnTo: '/post-login',
       },
       authorizationParams: {
-        redirect_uri: window.location.origin,
+        redirect_uri: 'http://localhost/callback',
+        audience: 'test-auth0-audience',
         scope: 'openid profile email',
       },
     });

@@ -2,8 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
 import { uploadPhotos } from '@app/api/uploads';
-import { AxiosError } from 'axios';
-import { BackendError } from '@app/pages/ChatPage/components/SendMessage/hooks';
+import { getApiErrorMessage } from '@app/utils/apiErrorMessage';
 
 export const useUploadPhotos = () => {
   const queryClient = useQueryClient();
@@ -19,10 +18,12 @@ export const useUploadPhotos = () => {
       queryClient.invalidateQueries({
         queryKey: ['uploads'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['profilePhoto'],
+      });
     },
-    onError: (error: AxiosError<BackendError>) => {
-      const errors = error?.response?.data?.errors;
-      toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, 'Fotografije nije moguće spremiti.'), toastConfig);
     },
   });
 

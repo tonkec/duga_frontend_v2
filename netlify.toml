@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build"
+  command = "bash ./netlify-build.sh"
   publish = "dist"
 
-[context.production.environment]
+[build.environment]
   NODE_VERSION = "20"

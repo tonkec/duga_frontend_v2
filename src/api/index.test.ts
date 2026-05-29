@@ -1,13 +1,16 @@
 import { apiClient } from '.';
-import { clearAccessTokenGetter } from './authToken';
+import { clearAppSessionCredentials } from './appSession';
+import { clearAccessTokenGetter, setAccessTokenGetter } from './authToken';
 
 describe('apiClient URL safety', () => {
   beforeEach(() => {
     clearAccessTokenGetter();
+    clearAppSessionCredentials();
   });
 
   afterEach(() => {
     clearAccessTokenGetter();
+    clearAppSessionCredentials();
   });
 
   it('rejects absolute request URLs before sending a request', async () => {
@@ -40,7 +43,7 @@ describe('apiClient URL safety', () => {
     expect(adapter).not.toHaveBeenCalled();
   });
 
-  it('sends API requests with credentials and no session header', async () => {
+  it('sends API requests with credentials when no app session is stored', async () => {
     const adapter = jest.fn(async (config) => ({
       config,
       data: {},
@@ -55,9 +58,46 @@ describe('apiClient URL safety', () => {
     const headers = adapter.mock.calls[0][0].headers;
     expect(config.withCredentials).toBe(true);
     expect(headers.Authorization).toBeUndefined();
+    expect(headers['x-duga-session-id']).toBeUndefined();
+  });
+
+  it('does not attach stale app session storage values as headers', async () => {
+    localStorage.setItem('dugaSessionId', 'stale-session-id');
+    sessionStorage.setItem('dugaApiToken', 'stale-api-token');
+    const adapter = jest.fn(async (config) => ({
+      config,
+      data: {},
+      headers: {},
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    await apiClient().get('/users/current-user', { adapter });
+
+    const headers = adapter.mock.calls[0][0].headers;
+    expect(headers.Authorization).toBeUndefined();
+    expect(headers['x-duga-session-id']).toBeUndefined();
+  });
+
+  it('attaches the Auth0 token from the token getter when available', async () => {
+    setAccessTokenGetter(async () => 'auth0-access-token');
+    const adapter = jest.fn(async (config) => ({
+      config,
+      data: {},
+      headers: {},
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    await apiClient().get('/users/current-user', { adapter });
+
+    const headers = adapter.mock.calls[0][0].headers;
+    expect(headers.Authorization).toBe('Bearer auth0-access-token');
+    expect(headers['x-duga-session-id']).toBeUndefined();
   });
 
   it('attaches an explicit bootstrap bearer token without a session header', async () => {
+    localStorage.setItem('dugaSessionId', 'stale-session-id');
     const adapter = jest.fn(async (config) => ({
       config,
       data: {},
@@ -70,10 +110,11 @@ describe('apiClient URL safety', () => {
 
     const headers = adapter.mock.calls[0][0].headers;
     expect(headers.Authorization).toBe('Bearer api-token');
+    expect(headers['x-duga-session-id']).toBeUndefined();
   });
 
   it('attaches a CSRF header for unsafe methods when the CSRF cookie exists', async () => {
-    document.cookie = `duga_csrf=${encodeURIComponent('csrf-token')};path=/`;
+    document.cookie = `duga_csrf=${encodeURIComponent('csrf=token')};path=/`;
     const adapter = jest.fn(async (config) => ({
       config,
       data: {},
@@ -85,8 +126,43 @@ describe('apiClient URL safety', () => {
     await apiClient().post('/users/update-user', {}, { adapter });
 
     const headers = adapter.mock.calls[0][0].headers;
-    expect(headers['x-csrf-token']).toBe('csrf-token');
+    expect(headers['x-csrf-token']).toBe('csrf=token');
 
     document.cookie = 'duga_csrf=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+  });
+
+  it('prefers the stored CSRF token over the readable CSRF cookie', async () => {
+    sessionStorage.setItem('dugaCsrfToken', 'stored-csrf-token');
+    document.cookie = `duga_csrf=${encodeURIComponent('cookie-csrf-token')};path=/`;
+    const adapter = jest.fn(async (config) => ({
+      config,
+      data: {},
+      headers: {},
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    await apiClient().delete('/uploads/delete-photo', { adapter });
+
+    const headers = adapter.mock.calls[0][0].headers;
+    expect(headers['x-csrf-token']).toBe('stored-csrf-token');
+
+    document.cookie = 'duga_csrf=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+  });
+
+  it('falls back to the stored CSRF token when the cookie is not readable', async () => {
+    sessionStorage.setItem('dugaCsrfToken', 'stored-csrf-token');
+    const adapter = jest.fn(async (config) => ({
+      config,
+      data: {},
+      headers: {},
+      status: 200,
+      statusText: 'OK',
+    }));
+
+    await apiClient().post('/uploads/photos', new FormData(), { adapter });
+
+    const headers = adapter.mock.calls[0][0].headers;
+    expect(headers['x-csrf-token']).toBe('stored-csrf-token');
   });
 });

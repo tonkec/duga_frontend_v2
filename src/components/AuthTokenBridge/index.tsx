@@ -1,14 +1,17 @@
-import { useLayoutEffect, ReactNode } from 'react';
+import { useLayoutEffect, ReactNode, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { clearAccessTokenGetter, setAccessTokenGetter } from '@app/api/authToken';
 import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
 import { getEnv } from '@app/configs/env';
 
 const AuthTokenBridge = ({ children }: { children: ReactNode }) => {
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+  const { getAccessTokenSilently, isLoading } = useAuth0();
+  const [isTokenGetterReady, setIsTokenGetterReady] = useState(false);
 
   useLayoutEffect(() => {
-    if (!isAuthenticated) {
+    setIsTokenGetterReady(false);
+
+    if (isLoading) {
       clearAccessTokenGetter();
       return;
     }
@@ -22,11 +25,17 @@ const AuthTokenBridge = ({ children }: { children: ReactNode }) => {
       });
       return token;
     });
+    setIsTokenGetterReady(true);
 
     return () => {
       clearAccessTokenGetter();
+      setIsTokenGetterReady(false);
     };
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isLoading, getAccessTokenSilently]);
+
+  if (isLoading || !isTokenGetterReady) {
+    return null;
+  }
 
   return <>{children}</>;
 };

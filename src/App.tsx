@@ -366,7 +366,7 @@ function App() {
   );
   const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser();
   const navigate = useNavigate();
-  const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const { allUsers, isAllUsersLoading } = useGetAllUsers({ enabled: Boolean(currentUser) });
   const { userChats, isUserChatsLoading } = useGetAllUserChats();
 
   if (isAllUsersLoading || isUserLoading) {

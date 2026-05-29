@@ -8,12 +8,13 @@ import { FaEnvelopesBulk, FaPeopleGroup, FaPhotoFilm } from 'react-icons/fa6';
 import CookieBanner from '@app/components/CookieBanner';
 import { BiHeart, BiStopwatch, BiMessage, BiSolidCircle } from 'react-icons/bi';
 import { useRef } from 'react';
-import Image from '@app/components/Image';
+import ThemedSvgImage from '@app/components/ThemedSvgImage';
 import { Link } from 'react-router';
 import FadeInSection from '@app/components/FadeIn';
 import Accordion from './components/Accordion';
-import { clearAppSessionRevoked } from '@app/api/appSession';
+import { clearAppSessionCredentials, clearAppSessionRevoked } from '@app/api/appSession';
 import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
+import { getEnv } from '@app/configs/env';
 
 const howItWorksItems = [
   {
@@ -80,7 +81,7 @@ const forumItems = [
   },
   {
     value: 'Odgovori',
-    title: 'Dobij konkretne odgovore',
+    title: 'Pronađi konkretne odgovore',
     text: 'Članovi_ce mogu odgovoriti, dodati slike i pomoći iz vlastitog iskustva.',
   },
   {
@@ -138,13 +139,15 @@ const LoginPage = () => {
   const learnMoreRef = useRef<HTMLDivElement>(null);
 
   const onLogin = () => {
+    clearAppSessionCredentials();
     clearAppSessionRevoked();
     loginWithRedirect({
       appState: {
         returnTo: '/post-login',
       },
       authorizationParams: {
-        redirect_uri: window.location.origin,
+        redirect_uri: getEnv('VITE_AUTH0_CALLBACK_URL'),
+        audience: getEnv('VITE_AUTH0_AUDIENCE'),
         scope: AUTH0_IDENTITY_SCOPE,
       },
     });
@@ -229,7 +232,7 @@ const LoginPage = () => {
               <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
               <div className="absolute -right-8 bottom-8 h-48 w-48 rounded-full bg-white/20 blur-3xl" />
               <div className="relative rounded-[2rem] border border-white/20 bg-white/15 p-8 shadow-2xl backdrop-blur">
-                <Image src={Love1} alt="Dvije osobe sjede zajedno" className="w-full" />
+                <ThemedSvgImage src={Love1} alt="Dvije osobe sjede zajedno" className="w-full" />
               </div>
             </div>
           </div>
@@ -405,7 +408,7 @@ const LoginPage = () => {
               </Button>
             </div>
             <div className="landing-illustration-card rounded-[2rem] bg-[#f7f8ff] p-8 shadow-sm">
-              <Image src={AI} alt="AI sigurnost" className="w-full h-auto" />
+              <ThemedSvgImage src={AI} alt="AI sigurnost" className="w-full h-auto" />
             </div>
           </div>
         </section>
@@ -415,7 +418,7 @@ const LoginPage = () => {
         <section className="gradient overflow-hidden px-5 pt-16 md:px-8">
           <div className="container mx-auto grid items-end gap-8 lg:grid-cols-[0.65fr_1fr]">
             <div className="-mb-16 hidden lg:block">
-              {<Image src={Guy} alt="Osoba s mobitelom" className="block h-auto w-full" />}
+              {<ThemedSvgImage src={Guy} alt="Osoba s mobitelom" className="block h-auto w-full" />}
             </div>
             <div className="max-w-2xl py-16 text-white">
               <h2 className="text-4xl font-black tracking-tight md:text-5xl">
@@ -521,7 +524,7 @@ const LoginPage = () => {
             </div>
 
             <div className="rounded-[2rem] bg-white/10 p-6">
-              <Image src={Girl} alt="Contributor ilustracija" className="w-full h-auto" />
+              <ThemedSvgImage src={Girl} alt="Contributor ilustracija" className="w-full h-auto" />
             </div>
           </div>
         </section>

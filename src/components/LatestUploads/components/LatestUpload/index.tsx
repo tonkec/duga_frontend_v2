@@ -1,25 +1,70 @@
 import { useNavigate } from 'react-router';
 import { useGetUserById } from '@app/hooks/useGetUserById';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import { useGetImageBlob } from '../../hooks';
 import UserAvatar from '@app/components/UserAvatar';
 import { BiImage } from 'react-icons/bi';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
 import { useObjectUrl } from '@app/hooks/useObjectUrl';
+import type { IImage } from '@app/components/Photos';
+
+type UserWithAvatar = {
+  avatar?: string | null;
+  picture?: string | null;
+  profilePhoto?: {
+    securePhotoUrl?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  } | null;
+  publicId?: string;
+  securePhotoUrl?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+};
 
 interface IUpload {
   id: string;
-  url: string;
+  url?: string;
   userId: string;
   userPublicId?: string;
-  securePhotoUrl: string;
+  securePhotoUrl?: string;
+  User?: UserWithAvatar;
+  user?: UserWithAvatar;
 }
+
+const getAvatarSource = (user: UserWithAvatar | undefined) =>
+  user?.profilePhoto?.securePhotoUrl ||
+  user?.profilePhoto?.imageUrl ||
+  user?.profilePhoto?.url ||
+  user?.securePhotoUrl ||
+  user?.imageUrl ||
+  user?.avatar ||
+  user?.picture ||
+  '';
+
+const getProfilePhotoOverride = (user: UserWithAvatar | undefined): Partial<IImage> | undefined => {
+  const avatarSource = getAvatarSource(user);
+
+  if (!avatarSource) return undefined;
+
+  return {
+    securePhotoUrl: avatarSource,
+    imageUrl: avatarSource,
+    url: avatarSource,
+  };
+};
 
 const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const navigate = useNavigate();
   const { user } = useGetUserById(upload.userId);
-  const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl);
+  const { allImages } = useGetAllImages(upload.userId);
+  const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl || upload.url || '');
   const imageBlobUrl = useObjectUrl(imageBlob);
   const username = user?.data.username || 'Korisnik';
+  const uploadUser = upload.User || upload.user;
+  const userImages = Array.isArray(allImages?.data?.images) ? allImages.data.images : [];
+  const galleryProfilePhoto = userImages.find((image: IImage) => image.isProfilePhoto);
+  const profilePhoto = galleryProfilePhoto || getProfilePhotoOverride(uploadUser || user?.data);
 
   return (
     <article className="group overflow-hidden rounded-3xl border border-[#dce4ff] bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -59,6 +104,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
           userId={upload.userId}
           className="h-11 w-11 rounded-full"
           fgColor="#1f2937"
+          profilePhoto={profilePhoto}
         />
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue">Dodao_la</p>

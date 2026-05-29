@@ -1,5 +1,5 @@
 import AppLayout from '@app/components/AppLayout';
-import { getProfilePhoto } from '@app/api/uploads';
+import { getAllImages } from '@app/api/uploads';
 import Loader from '@app/components/Loader';
 import Paginated from '@app/components/Paginated';
 import UserCard, { IUser } from '@app/components/UserCard';
@@ -28,9 +28,12 @@ type ProfilePhotoResponse = {
   securePhotoUrl?: string | null;
   imageUrl?: string | null;
   url?: string | null;
+  isProfilePhoto?: boolean | null;
 };
 
 const hasRenderableProfilePhoto = (profilePhoto: ProfilePhotoResponse | null | undefined) => {
+  if (!profilePhoto?.isProfilePhoto) return false;
+
   const imageSource = profilePhoto?.securePhotoUrl || profilePhoto?.imageUrl || profilePhoto?.url;
   return Boolean(
     getSafeBackendMediaPath(imageSource) ||
@@ -41,7 +44,7 @@ const hasRenderableProfilePhoto = (profilePhoto: ProfilePhotoResponse | null | u
 
 const UsersPage = () => {
   const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser();
-  const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const { allUsers, isAllUsersLoading } = useGetAllUsers({ enabled: Boolean(currentUser) });
   const windowSize = useGetWindowSize();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -54,8 +57,8 @@ const UsersPage = () => {
   const profilePhotoQueries = useQueries({
     queries: showOnlyWithProfilePhoto
       ? visibleUsers.map((user) => ({
-          queryKey: ['profilePhoto', String(user.id)],
-          queryFn: () => getProfilePhoto(String(user.id)),
+          queryKey: ['uploads', String(user.id), 'profile-photo-filter'],
+          queryFn: () => getAllImages(String(user.id)),
           staleTime: 1000 * 60 * 5,
           refetchOnMount: false,
           retry: false,
@@ -67,9 +70,14 @@ const UsersPage = () => {
     () =>
       new Set(
         profilePhotoQueries
-          .map((query, index) =>
-            hasRenderableProfilePhoto(query.data?.data) ? visibleUsers[index].id : null
-          )
+          .map((query, index) => {
+            const images = query.data?.data?.images;
+            const profilePhoto = Array.isArray(images)
+              ? images.find((image: ProfilePhotoResponse) => hasRenderableProfilePhoto(image))
+              : undefined;
+
+            return profilePhoto ? visibleUsers[index].id : null;
+          })
           .filter((userId): userId is number => userId !== null)
       ),
     [profilePhotoQueries, visibleUsers]
@@ -165,7 +173,7 @@ const UsersPage = () => {
         )}
 
         <Paginated<IUser>
-          gridClassName="grid xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          gridClassName="users-page-grid"
           data={renderedUsers}
           itemsPerPage={itemsPerPage}
           getItemKey={(user) => user.id}

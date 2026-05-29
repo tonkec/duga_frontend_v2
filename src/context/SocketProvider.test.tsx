@@ -1,17 +1,12 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { useAuth0 } from '@auth0/auth0-react';
 import { io } from 'socket.io-client';
 import { SocketProvider } from './SocketProvider';
 import { useSocket } from './useSocket';
 import { AppSessionContext, AppSessionStatus } from './AppSessionContext';
 import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { register } from '@app/api/auth/register';
-
-jest.mock('@auth0/auth0-react', () => ({
-  useAuth0: jest.fn(),
-}));
 
 jest.mock('socket.io-client', () => ({
   io: jest.fn(),
@@ -29,7 +24,6 @@ jest.mock('@app/api/auth/register', () => ({
   register: jest.fn(),
 }));
 
-const mockUseAuth0 = jest.mocked(useAuth0);
 const mockIo = jest.mocked(io);
 const mockUseCurrentBackendUser = jest.mocked(useCurrentBackendUser);
 const mockRegister = jest.mocked(register);
@@ -58,9 +52,6 @@ const renderSocketProvider = (status: AppSessionStatus = 'active') =>
 describe('SocketProvider session authorization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseAuth0.mockReturnValue({
-      isAuthenticated: true,
-    } as ReturnType<typeof useAuth0>);
     mockUseCurrentBackendUser.mockReturnValue({
       data: { id: 1, username: 'current_user' },
       isLoading: false,
@@ -71,7 +62,10 @@ describe('SocketProvider session authorization', () => {
   it('connects sockets from a read-only current-user check without registering again', async () => {
     renderSocketProvider('active');
 
-    expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({ enabled: true });
+    expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({
+      enabled: true,
+      requireAuth0: false,
+    });
     await waitFor(() => expect(mockIo).toHaveBeenCalledTimes(1));
     expect(mockRegister).not.toHaveBeenCalled();
     expect(mockIo).toHaveBeenCalledWith(
@@ -88,7 +82,10 @@ describe('SocketProvider session authorization', () => {
   it('does not resolve tokens or connect sockets before the app session is active', () => {
     renderSocketProvider('loading');
 
-    expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({ enabled: false });
+    expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({
+      enabled: false,
+      requireAuth0: false,
+    });
     expect(mockIo).not.toHaveBeenCalled();
     expect(mockRegister).not.toHaveBeenCalled();
     expect(screen.getByTestId('socket-state')).toHaveTextContent('disconnected');

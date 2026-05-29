@@ -1,4 +1,5 @@
 import { apiClient } from '.';
+import { clearAppSessionCredentials } from './appSession';
 import { clearAccessTokenGetter, setAccessTokenGetter } from './authToken';
 import { startSession } from './sessions';
 
@@ -12,12 +13,14 @@ const post = jest.fn();
 describe('startSession', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    clearAppSessionCredentials();
     clearAccessTokenGetter();
     mockApiClient.mockReturnValue({ post } as unknown as ReturnType<typeof apiClient>);
     post.mockResolvedValue({ data: {} });
   });
 
   afterEach(() => {
+    clearAppSessionCredentials();
     clearAccessTokenGetter();
   });
 
@@ -38,7 +41,19 @@ describe('startSession', () => {
     expect(post).toHaveBeenCalledWith('/sessions/start', {});
   });
 
-  it('ignores any session credentials returned from session start', async () => {
+  it('stores the CSRF token returned from session start', async () => {
+    post.mockResolvedValue({
+      data: { csrfToken: 'csrf-token' },
+    });
+    setAccessTokenGetter(async () => 'auth0-access-token');
+
+    await startSession();
+
+    expect(post).toHaveBeenCalledWith('/sessions/start', {});
+    expect(sessionStorage.getItem('dugaCsrfToken')).toBe('csrf-token');
+  });
+
+  it('ignores legacy session credentials returned from session start', async () => {
     post.mockResolvedValue({
       data: { token: 'backend-api-token', sessionId: 'server-session-id' },
     });
@@ -47,5 +62,7 @@ describe('startSession', () => {
     await startSession();
 
     expect(post).toHaveBeenCalledWith('/sessions/start', {});
+    expect(localStorage.getItem('dugaSessionId')).toBeNull();
+    expect(sessionStorage.getItem('dugaApiToken')).toBeNull();
   });
 });

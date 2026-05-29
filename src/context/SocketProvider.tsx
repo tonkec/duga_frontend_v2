@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
-import { useAuth0 } from '@auth0/auth0-react';
 import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { markSessionRevoked } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
@@ -57,8 +56,8 @@ const createCypressSocket = () => {
 
 const getBackendUrl = () => {
   const { hostname } = window.location;
-  if (hostname.includes('staging--dugaprod.netlify.app')) {
-    return 'https://dugastaging-394ccba7a9ef.herokuapp.com';
+  if (hostname.includes('staging.duga.chat')) {
+    return 'https://api-staging.duga.chat';
   }
   if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
     return 'https://duga-backend-c67896e8029c.herokuapp.com/';
@@ -71,17 +70,17 @@ const CypressSocketProvider = ({ children }: { children: ReactNode }) => (
 );
 
 const RealSocketProvider = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAuth0();
   const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const appSessionStatus = useAppSessionStatus();
   const isAppSessionActive = appSessionStatus === 'active';
   const { data: currentUser, isLoading: isUserLoading } = useCurrentBackendUser({
     enabled: isAppSessionActive,
+    requireAuth0: false,
   });
 
   useEffect(() => {
-    if (!isAuthenticated || !isAppSessionActive || isUserLoading || !currentUser) {
+    if (!isAppSessionActive || isUserLoading || !currentUser) {
       socketRef.current?.disconnect();
       socketRef.current = null;
       setSocket(null);
@@ -122,7 +121,7 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
         setSocket(null);
       }
     };
-  }, [isAuthenticated, isAppSessionActive, isUserLoading, currentUser]);
+  }, [isAppSessionActive, isUserLoading, currentUser]);
 
   return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
 };

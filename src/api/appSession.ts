@@ -1,5 +1,10 @@
+import { clearCachedAccessToken } from './authToken';
+
 const SESSION_REVOKED_KEY = 'dugaSessionRevoked';
 const SESSION_REVOKED_NOTICE_KEY = 'dugaSessionRevokedNotice';
+const APP_SESSION_ID_KEY = 'dugaSessionId';
+const APP_SESSION_TOKEN_KEY = 'dugaApiToken';
+const APP_CSRF_TOKEN_KEY = 'dugaCsrfToken';
 
 export const SESSION_REVOKED_EVENT = 'duga:session-revoked';
 export const SESSION_REVOKED_CODE = 'SESSION_REVOKED';
@@ -7,6 +12,24 @@ export const SESSION_CONFLICT_CODE = 'SESSION_CONFLICT';
 
 export const clearAppSessionRevoked = () => {
   sessionStorage.removeItem(SESSION_REVOKED_KEY);
+};
+
+export const clearAppSessionCredentials = () => {
+  localStorage.removeItem(APP_SESSION_ID_KEY);
+  sessionStorage.removeItem(APP_SESSION_TOKEN_KEY);
+  sessionStorage.removeItem(APP_CSRF_TOKEN_KEY);
+  clearCachedAccessToken();
+};
+
+export const getAppCsrfToken = () => sessionStorage.getItem(APP_CSRF_TOKEN_KEY);
+
+export const setAppCsrfToken = (csrfToken: string) => {
+  sessionStorage.setItem(APP_CSRF_TOKEN_KEY, csrfToken);
+};
+
+export const markAppSessionLoggedOut = () => {
+  clearAppSessionCredentials();
+  sessionStorage.setItem(SESSION_REVOKED_KEY, 'true');
 };
 
 export const consumeAppSessionRevokedNotice = () => {
@@ -33,6 +56,10 @@ type AppSessionApiError = {
 };
 
 export const isAppSessionConflictError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
   const apiError = error as AppSessionApiError;
   const status = apiError.response?.status;
   const code = apiError.response?.data?.code;
@@ -45,6 +72,7 @@ export const isAppSessionConflictError = (error: unknown) => {
 };
 
 export const markSessionRevoked = () => {
+  clearAppSessionCredentials();
   sessionStorage.setItem(SESSION_REVOKED_KEY, 'true');
   sessionStorage.setItem(SESSION_REVOKED_NOTICE_KEY, 'true');
   window.dispatchEvent(new Event(SESSION_REVOKED_EVENT));

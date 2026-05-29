@@ -5,8 +5,18 @@ import { useSocket } from '@app/context/useSocket';
 import { useEffect, useState } from 'react';
 import UserAvatar from '../UserAvatar';
 import Button from '../Button';
+import type { IImage } from '../Photos';
 export interface IUser {
   avatar: string;
+  picture?: string | null;
+  profilePhoto?: {
+    securePhotoUrl?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  } | null;
+  securePhotoUrl?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
   email: string;
   lastName: string;
   firstName: string;
@@ -63,9 +73,30 @@ const getUserAge = ({ age }: { age: number }) => {
   );
 };
 
+const getUserProfilePhoto = (user: IUser): Partial<IImage> | undefined => {
+  const imageSource =
+    user.profilePhoto?.securePhotoUrl ||
+    user.profilePhoto?.imageUrl ||
+    user.profilePhoto?.url ||
+    user.securePhotoUrl ||
+    user.imageUrl ||
+    user.avatar ||
+    user.picture ||
+    '';
+
+  if (!imageSource) return undefined;
+
+  return {
+    securePhotoUrl: imageSource,
+    imageUrl: imageSource,
+    url: imageSource,
+  };
+};
+
 const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
   const socket = useSocket();
   const [isOnlineState, setIsOnlineState] = useState(isOnline);
+  const profilePhoto = getUserProfilePhoto(user);
 
   useEffect(() => {
     if (!socket || !user.id) return;
@@ -99,6 +130,7 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
           userId={String(user.id)}
           className="aspect-[16/10] w-full transition-transform duration-300 group-hover:scale-105"
           fgColor="#1f2937"
+          profilePhoto={profilePhoto}
         />
         <span
           className={clsx(

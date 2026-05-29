@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiMenu, FiSidebar, FiX } from 'react-icons/fi';
 import { BiBell } from 'react-icons/bi';
-import Loader from '@app/components/Loader';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useWindowSize } from '@uidotdev/usehooks';
 import { Link } from 'react-router-dom';
@@ -9,10 +8,12 @@ import { NavigationItems } from '../NavigationLinks';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
 import { useSocket } from '@app/context/useSocket';
 import { setOfflineStatus } from '@app/utils/setOfflineStatus';
-import { clearAppSessionRevoked } from '@app/api/appSession';
+import { markAppSessionLoggedOut } from '@app/api/appSession';
 import { useGetAllNotifcations } from './hooks';
 import NotificationDropdown from './components/Notifications';
 import UserAvatar from '../UserAvatar';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
+import type { IImage } from '../Photos';
 
 type NotificationSummary = {
   isRead: boolean;
@@ -24,9 +25,12 @@ const Navigation = () => {
   const { width } = useWindowSize();
   const isMobile = width! < 1000;
   const { logout } = useAuth0();
-  const { user: currentUser, isUserLoading } = useGetCurrentUser();
+  const { user: currentUser } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
   const username = currentUser?.data?.username || 'Korisnik';
+  const { allImages } = useGetAllImages(userId ? String(userId) : '');
+  const userImages = Array.isArray(allImages?.data?.images) ? allImages.data.images : [];
+  const profilePhoto = userImages.find((image: IImage) => image.isProfilePhoto);
   const { allNotifications } = useGetAllNotifcations();
   const unreadNotificationsCount = ((allNotifications?.data ?? []) as NotificationSummary[]).filter(
     (notification) => !notification.isRead
@@ -76,15 +80,13 @@ const Navigation = () => {
     if (socket) {
       await setOfflineStatus(socket);
     }
-    clearAppSessionRevoked();
+    markAppSessionLoggedOut();
     logout({
       logoutParams: {
         returnTo: window.location.origin,
       },
     });
   };
-
-  if (isUserLoading) return <Loader />;
 
   return (
     <>
@@ -126,6 +128,7 @@ const Navigation = () => {
                   userId={userId ? String(userId) : undefined}
                   avatarFallbackName={username}
                   className="h-10 w-10 rounded-full border border-white/20"
+                  profilePhoto={profilePhoto}
                 />
               </Link>
             </div>
@@ -144,6 +147,7 @@ const Navigation = () => {
                   userId={userId ? String(userId) : undefined}
                   avatarFallbackName={username}
                   className="h-9 w-9 rounded-full border border-white/20"
+                  profilePhoto={profilePhoto}
                 />
               </Link>
               <Link

@@ -1,16 +1,21 @@
 import { useLayoutEffect, useRef } from 'react';
 import Message, { IMessage } from '@app/pages/ChatPage/components/Message';
 import { debounceScroll } from '@app/utils/debounceScroll';
+import type { IImage } from '@app/components/Photos';
+import Loader from '@app/components/Loader';
 
 const PaginatedMessages = ({
   otherUserName,
   currentUserName,
   otherUserId,
   otherUserPublicId,
+  otherUserProfilePhoto,
   receivedMessages,
   currentUserId,
+  currentUserProfilePhoto,
   isCurrentUserLoading,
   messages,
+  isMessagesLoading,
   fetchNextPage,
   onReactionToggle,
   messageSearchQuery = '',
@@ -19,10 +24,13 @@ const PaginatedMessages = ({
   currentUserName: string;
   otherUserId: number | undefined;
   otherUserPublicId?: string;
+  otherUserProfilePhoto?: Partial<IImage>;
   receivedMessages: IMessage[];
   messages: IMessage[];
+  isMessagesLoading?: boolean;
   fetchNextPage: () => void;
   currentUserId: number;
+  currentUserProfilePhoto?: Partial<IImage>;
   isCurrentUserLoading: boolean;
   onReactionToggle: (message: IMessage, emoji: string, hasReacted: boolean) => void;
   messageSearchQuery?: string;
@@ -58,6 +66,14 @@ const PaginatedMessages = ({
       prevScrollHeightRef.current = scrollHeight;
     }
   }, [messages.length, receivedMessages.length, visibleMessages.length]);
+
+  if (isMessagesLoading) {
+    return (
+      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+        <Loader variant="inline" label="Učitavanje poruka..." />
+      </div>
+    );
+  }
 
   if (!messages.length && !receivedMessages.length) {
     return (
@@ -103,10 +119,12 @@ const PaginatedMessages = ({
             otherUserName={otherUserName}
             currentUserName={currentUserName}
             currentUserId={currentUserId}
+            currentUserProfilePhoto={currentUserProfilePhoto}
             key={message.id ?? `${message.createdAt}-${index}`}
             message={message}
             otherUserId={otherUserId}
             otherUserPublicId={otherUserPublicId}
+            otherUserProfilePhoto={otherUserProfilePhoto}
             messagePhotoUrl={
               message.type === 'gif'
                 ? message.messagePhotoUrl

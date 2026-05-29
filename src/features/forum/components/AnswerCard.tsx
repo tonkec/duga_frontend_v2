@@ -33,6 +33,7 @@ import {
   validateForumImages,
 } from '../utils/forumValidation';
 import { getForumImageItems } from '../utils/forumImages';
+import { getForumUserAvatarProfilePhoto } from '../utils/forumUserAvatar';
 import { getUserProfilePath } from '@app/utils/userProfilePath';
 import { useObjectUrls } from '@app/hooks/useObjectUrl';
 
@@ -123,6 +124,7 @@ const AnswerCard = ({
   const authorId = getAuthorId(answer);
   const authorPublicId = getAuthorPublicId(answer);
   const authorName = getAuthorName(answer);
+  const authorProfilePhoto = getForumUserAvatarProfilePhoto(answer.User || answer.user);
   const actionsDropdownRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isActionsOpen, setIsActionsOpen] = useState(false);
@@ -295,6 +297,7 @@ const AnswerCard = ({
               userId={String(authorId)}
               size="40"
               className="h-10 w-10 rounded-full border border-[#dce4ff]"
+              profilePhoto={authorProfilePhoto}
             />
           </Link>
           <div>
@@ -426,15 +429,17 @@ const AnswerCard = ({
                   </div>
                 </div>
 
-                <Link
-                  to="/report"
-                  role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
-                  onClick={() => setIsActionsOpen(false)}
-                >
-                  <BiFlag size={20} />
-                  Prijavi
-                </Link>
+                {!isOwnAnswer && (
+                  <Link
+                    to="/report"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red transition-colors hover:bg-red/10"
+                    onClick={() => setIsActionsOpen(false)}
+                  >
+                    <BiFlag size={20} />
+                    Prijavi
+                  </Link>
+                )}
               </div>
             )}
           </div>

@@ -8,7 +8,9 @@ import OnlineStatus from '@app/components/Navigation/components/OnlineStatus';
 import { useCookies } from 'react-cookie';
 import { useCookieConsent } from '@app/hooks/useCookieConsent';
 import { useGetCurrentUser } from '@app/hooks/useGetCurrentUser';
+import { useGetAllImages } from '@app/hooks/useGetAllImages';
 import UserAvatar from '@app/components/UserAvatar';
+import type { IImage } from '@app/components/Photos';
 import { useThemePreference } from '@app/hooks/useThemePreference';
 
 interface IDeleteProfileModalProp {
@@ -59,6 +61,9 @@ const SettingsSection = ({
 const SettingsPage = () => {
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const userId = currentUser?.data?.id;
+  const { allImages } = useGetAllImages(userId ? String(userId) : '');
+  const userImages = Array.isArray(allImages?.data?.images) ? allImages.data.images : [];
+  const profilePhoto = userImages.find((image: IImage) => image.isProfilePhoto);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isRejectCookiesModalOpen, setIsRejectCookiesModalOpen] = useState(false);
   const { isDarkMode, toggleTheme } = useThemePreference();
@@ -131,6 +136,7 @@ const SettingsPage = () => {
               avatarFallbackName={currentUser.data.username}
               className="h-[88px] w-[88px] rounded-2xl"
               fgColor="#ffffff"
+              profilePhoto={profilePhoto}
             />
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue">

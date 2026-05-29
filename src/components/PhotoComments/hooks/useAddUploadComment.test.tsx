@@ -136,4 +136,24 @@ describe('useAddUploadComment', () => {
     expect(socketEmit).not.toHaveBeenCalled();
     expect(mockToast.success).not.toHaveBeenCalled();
   });
+
+  it('shows string API errors without emitting the photo comment', async () => {
+    mockAddUploadComment.mockRejectedValue({
+      response: {
+        data: {
+          errors: ['csrf_failed'],
+        },
+      },
+    });
+
+    renderAddUploadComment();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add photo comment' }));
+
+    await waitFor(() =>
+      expect(mockToast.error).toHaveBeenCalledWith('csrf_failed', expect.any(Object))
+    );
+    expect(socketEmit).not.toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
 });

@@ -48,7 +48,15 @@ const normalizeUser = (user: Question['User'] | Question['user']) => {
   return {
     ...user,
     name: user.name || fullName || user.username,
-    picture: user.picture || user.avatar,
+    picture:
+      user.picture ||
+      user.avatar ||
+      user.securePhotoUrl ||
+      user.imageUrl ||
+      user.url ||
+      user.profilePhoto?.securePhotoUrl ||
+      user.profilePhoto?.imageUrl ||
+      user.profilePhoto?.url,
   };
 };
 

@@ -2,11 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { uploadMessagePhotos } from '@app/api/uploads';
 import { toast } from 'react-toastify';
 import { toastConfig } from '@app/configs/toast.config';
-import { AxiosError } from 'axios';
-
-export type BackendError = {
-  errors: { reason: string }[];
-};
+import { getApiErrorMessage } from '@app/utils/apiErrorMessage';
 
 export const useUploadMessageImage = (
   emitImageToSockets: () => void,
@@ -23,9 +19,8 @@ export const useUploadMessageImage = (
       emitImageToSockets();
       clearSelectedFiles();
     },
-    onError: (error: AxiosError<BackendError>) => {
-      const errors = error?.response?.data?.errors;
-      toast.error(errors?.map((err: { reason: string }) => err.reason).join(' '), toastConfig);
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, 'Fotografiju nije moguće poslati.'), toastConfig);
       clearSelectedFiles();
     },
   });

@@ -61,7 +61,7 @@ describe('AuthGuard protected route redirects', () => {
     mockUseCurrentBackendUser.mockReturnValue({
       data: undefined,
       isLoading: false,
-    } as ReturnType<typeof useCurrentBackendUser>);
+    } as unknown as ReturnType<typeof useCurrentBackendUser>);
   });
 
   it('redirects unauthenticated users from protected pages to login', async () => {
@@ -83,7 +83,7 @@ describe('AuthGuard protected route redirects', () => {
         isVerified: true,
       },
       isLoading: false,
-    } as ReturnType<typeof useCurrentBackendUser>);
+    } as unknown as ReturnType<typeof useCurrentBackendUser>);
 
     renderProtectedRoute();
 
@@ -148,6 +148,33 @@ describe('AuthGuard protected route redirects', () => {
 
     expect(await screen.findByText('Protected settings')).toBeVisible();
     expect(screen.getByTestId('location')).toHaveTextContent('/settings');
+  });
+
+  it('redirects to login instead of verify email when the backend session is revoked', async () => {
+    mockUseAuth0.mockReturnValue(
+      auth0State({
+        isAuthenticated: true,
+        user: {
+          email_verified: false,
+        },
+      })
+    );
+    mockUseCurrentBackendUser.mockReturnValue({
+      data: undefined,
+      error: {
+        response: {
+          status: 401,
+          data: { code: 'SESSION_REVOKED' },
+        },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useCurrentBackendUser>);
+
+    renderProtectedRoute();
+
+    expect(await screen.findByText('Login page')).toBeVisible();
+    expect(screen.queryByText('Verify email')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
   });
 
   it('redirects authenticated users to login when the app session is not active', async () => {

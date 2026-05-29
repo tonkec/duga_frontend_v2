@@ -170,7 +170,7 @@ describe('authorization API contracts', () => {
       acceptTerms: true,
     });
     await deleteUser();
-    await submitProblemReport({ problemType: 'abuse', message: 'Problem report message.' });
+    await submitProblemReport({ problemType: 'harassment', message: 'Problem report message.' });
     await markAsReadNotification('99');
     await markAllAsReadNotifications();
 

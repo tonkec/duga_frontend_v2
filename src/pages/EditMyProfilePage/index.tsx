@@ -31,7 +31,7 @@ import {
   searchEmojiNatives,
 } from '@app/utils/emojis';
 import { getImdbTitleUrl, isImdbTitleUrl } from '@app/utils/imdb';
-import { getYouTubeEmbedUrl } from '@app/utils/youtube';
+import { getYouTubeEmbedUrl, isYouTubeUrl } from '@app/utils/youtube';
 import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
 
 const lookingForOptions = [
@@ -164,16 +164,8 @@ const schema = z.object({
     .refine(
       (val) => {
         if (val === '') return true;
-        try {
-          const url = new URL(val);
-          return (
-            url.hostname === 'www.youtube.com' ||
-            url.hostname === 'youtube.com' ||
-            url.hostname === 'youtu.be'
-          );
-        } catch {
-          return false;
-        }
+        if (val.startsWith('v1:')) return true;
+        return isYouTubeUrl(val);
       },
       {
         message: 'Mora biti YouTube link (youtube.com ili youtu.be)',
@@ -534,7 +526,11 @@ const EditMyProfilePage = () => {
         ...lifestyleFields,
         age: data.age || currentUser?.data?.age || '',
         favoriteDay: data.favoriteDay || currentUser?.data?.favoriteDayOfWeek || '',
-        favoriteSong: data.favoriteSong ? getYouTubeEmbedUrl(data.favoriteSong) || '' : '',
+        favoriteSong: dirtyFields.favoriteSong
+          ? data.favoriteSong
+            ? getYouTubeEmbedUrl(data.favoriteSong) || ''
+            : ''
+          : currentUser?.data?.favoriteSong || '',
         favoriteMovie: data.favoriteMovie ? getImdbTitleUrl(data.favoriteMovie) || '' : '',
       });
     }

@@ -58,7 +58,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
   const [groupName, setGroupName] = useState('');
   const navigate = useNavigate();
   const socket = useSocket();
-  const { allUsers, isAllUsersLoading } = useGetAllUsers();
+  const { allUsers, isAllUsersLoading } = useGetAllUsers({ enabled: isOpen });
   const { user: currentUser, isUserLoading } = useGetCurrentUser();
   const { userChats, isUserChatsLoading } = useGetAllUserChats(isOpen);
   const { onCreateChat, isCreatingChat } = useCreateNewChat();

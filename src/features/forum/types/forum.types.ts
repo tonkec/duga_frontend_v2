@@ -3,8 +3,16 @@ export interface ForumUser {
   publicId?: string;
   name?: string;
   username?: string;
-  picture?: string;
-  avatar?: string;
+  picture?: string | null;
+  avatar?: string | null;
+  securePhotoUrl?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+  profilePhoto?: {
+    securePhotoUrl?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  } | null;
   firstName?: string | null;
   lastName?: string | null;
 }

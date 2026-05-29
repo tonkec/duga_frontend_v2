@@ -72,7 +72,7 @@ describe('ReportPage', () => {
     renderReportPage();
 
     fireEvent.change(screen.getByLabelText('Odaberi vrstu problema'), {
-      target: { value: 'abuse' },
+      target: { value: 'harassment' },
     });
     fireEvent.change(screen.getByPlaceholderText('Opiši problem što detaljnije...'), {
       target: { value: 'Korisnik šalje uznemirujuće poruke.' },
@@ -81,7 +81,7 @@ describe('ReportPage', () => {
 
     await waitFor(() =>
       expect(mockSubmitProblemReport).toHaveBeenCalledWith({
-        problemType: 'abuse',
+        problemType: 'harassment',
         message: 'Korisnik šalje uznemirujuće poruke.',
       })
     );
@@ -94,7 +94,7 @@ describe('ReportPage', () => {
     renderReportPage();
 
     fireEvent.change(screen.getByLabelText('Odaberi vrstu problema'), {
-      target: { value: 'bug' },
+      target: { value: 'bug_ui' },
     });
     fireEvent.change(screen.getByPlaceholderText('Opiši problem što detaljnije...'), {
       target: { value: 'Stranica javlja grešku kod spremanja profila.' },

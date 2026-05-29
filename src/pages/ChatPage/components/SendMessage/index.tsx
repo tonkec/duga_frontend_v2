@@ -134,12 +134,7 @@ const getMentionIds = (message: string, mentionableUsers: MentionableUser[]) => 
   );
 };
 
-const SendMessage = ({
-  chatId,
-  otherUserId,
-  otherUserIds,
-  mentionableUsers = [],
-}: ISendMessageProps) => {
+const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
   init({ data });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -154,15 +149,6 @@ const SendMessage = ({
   const currentUserId = currentUser?.data?.id;
   const { userChats } = useGetAllUserChats();
   const chat = userChats?.data?.find((chat: IChat) => Number(chat.id) === Number(chatId));
-  const recipientIds = useMemo(
-    () =>
-      otherUserIds?.length && otherUserIds.length > 0
-        ? otherUserIds
-        : chat?.Users?.filter((user: IUser) => !!user?.id && user.id !== Number(currentUserId)).map(
-            (user: IUser) => user.id
-          ) || (otherUserId ? [otherUserId] : []),
-    [chat?.Users, currentUserId, otherUserId, otherUserIds]
-  );
   const [currentUploadableImage, setCurrentUploadableImage] = useState<File[] | null>(null);
   const currentUploadableImageRef = useRef<File[] | null>(null);
   const currentUploadableImageUrls = useObjectUrls(currentUploadableImage);
@@ -302,6 +288,14 @@ const SendMessage = ({
   };
 
   const onMessageSubmit = (data: Inputs) => {
+    if (!socket) {
+      toast.error(
+        'Poruku trenutno nije moguće poslati. Pokušaj ponovno za nekoliko sekundi.',
+        toastConfig
+      );
+      return;
+    }
+
     const message = data.content?.trim() ?? '';
     const mentions = getMentionIds(message, mentionableUsers);
     const msg = {
@@ -311,10 +305,8 @@ const SendMessage = ({
       mentions,
     };
 
-    if (recipientIds.length) {
-      socket?.emit('message', msg);
-      refreshUserChatsList();
-    }
+    socket.emit('message', msg);
+    refreshUserChatsList();
 
     emitStopTyping();
     setMentionQuery(undefined);
