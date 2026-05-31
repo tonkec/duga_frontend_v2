@@ -109,6 +109,8 @@ const UsersPage = () => {
     : filteredUsers;
   const hasVisibleUsers = visibleUsers.length > 0;
   const itemsPerPage = windowSize.width < 1024 ? 4 : 8;
+  const hasSearchTerm = Boolean(search.trim());
+  const hasActiveFilters = hasSearchTerm || showOnlyWithProfilePhoto;
 
   return (
     <AppLayout>
@@ -143,26 +145,29 @@ const UsersPage = () => {
           <section className="mx-auto mt-8 max-w-2xl rounded-3xl border border-dashed border-[#b9c6ff] bg-white px-6 py-10 text-center shadow-sm">
             <div className="mx-auto flex max-w-md flex-col items-center">
               <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-white text-blue shadow-lg shadow-blue/10">
-                {search.trim() ? <BiSearch size={34} /> : <BiGroup size={34} />}
+                {hasActiveFilters ? <BiSearch size={34} /> : <BiGroup size={34} />}
               </div>
               <span className="mb-3 rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
                 Nema rezultata
               </span>
               <h2 className="text-2xl font-bold tracking-tight text-gray-950">
-                {search.trim() ? 'Nema korisnika za ovaj upit' : 'Nema dostupnih korisnika'}
+                {hasActiveFilters ? 'Nema korisnika za ovaj upit' : 'Nema dostupnih korisnika'}
               </h2>
               <p className="mt-3 text-sm leading-7 text-gray-600">
-                {search.trim()
+                {hasSearchTerm
                   ? `Nismo pronašli nikoga za "${search}" prema kriteriju ${selectValue.label.toLowerCase()}. Pokušaj s kraćim pojmom ili drugim kriterijem.`
-                  : 'Trenutno nema drugih verificiranih profila za prikaz. Navrati ponovno kasnije.'}
+                  : showOnlyWithProfilePhoto
+                    ? 'Nema korisnika koji odgovaraju odabranim filtrima. Pokušaj promijeniti pretragu ili prikazati sve profile.'
+                    : 'Trenutno nema drugih verificiranih profila za prikaz. Navrati ponovno kasnije.'}
               </p>
-              {search.trim() && (
+              {hasActiveFilters && (
                 <button
                   type="button"
                   className="mt-6 rounded-full bg-blue px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue/15 transition-colors hover:bg-blue-dark"
                   onClick={() => {
                     setSelectValue(defaultSelectValue);
                     setSearch('');
+                    setShowOnlyWithProfilePhoto(false);
                   }}
                 >
                   Očisti pretragu
