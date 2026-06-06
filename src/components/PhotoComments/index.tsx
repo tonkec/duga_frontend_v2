@@ -390,6 +390,7 @@ const PhotoComments = () => {
                               accept={ALLOWED_FILE_TYPES}
                               ref={fileInputRef}
                               className="hidden"
+                              data-testid="photo-comment-file-input"
                               onChange={(e) => {
                                 if (!e.target.files) {
                                   return;

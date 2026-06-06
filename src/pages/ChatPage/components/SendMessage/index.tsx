@@ -355,6 +355,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
           className="hidden"
           accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
+          data-testid="chat-photo-file-input"
           onChange={(e) => {
             emitTyping();
             const files = e.target.files as FileList;
