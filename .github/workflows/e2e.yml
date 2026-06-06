@@ -1,0 +1,45 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+  push:
+    branches:
+      - main
+      - staging
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cypress:
+    name: Cypress E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.20.7
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Cypress E2E
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          start: npm run dev -- --host 127.0.0.1
+          wait-on: http://127.0.0.1:5173
+          wait-on-timeout: 120
+          command: npm run cy:run
+        env:
+          VITE_BASE_URL: http://localhost:8080
