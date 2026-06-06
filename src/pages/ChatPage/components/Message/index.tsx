@@ -521,35 +521,39 @@ const Message = ({
 
   if (currentUserId == null) return null;
 
-  return isFromCurrentUser ? (
-    <CurrentUserMessageTemplate
-      userName={currentUserName}
-      message={message.message}
-      createdAt={message.createdAt}
-      messagePhotoUrl={messagePhotoUrl}
-      showAvatar={showAvatar}
-      messageType={message.type}
-      chatMessage={message}
-      currentUserId={currentUserId}
-      isCurrentUserLoading={isCurrentUserLoading}
-      currentUserProfilePhoto={currentUserProfilePhoto}
-      onReactionToggle={onReactionToggle}
-    />
-  ) : (
-    <OtherUserMessageTemplate
-      userName={senderName}
-      message={message.message}
-      otherUserId={senderId || otherUserId}
-      otherUserPublicId={senderId === Number(otherUserId) ? otherUserPublicId : undefined}
-      otherUserProfilePhoto={otherUserProfilePhoto}
-      createdAt={message.createdAt}
-      messagePhotoUrl={messagePhotoUrl}
-      showAvatar={showAvatar}
-      messageType={message.type}
-      chatMessage={message}
-      currentUserId={currentUserId}
-      onReactionToggle={onReactionToggle}
-    />
+  return (
+    <div data-testid="chat-message">
+      {isFromCurrentUser ? (
+        <CurrentUserMessageTemplate
+          userName={currentUserName}
+          message={message.message}
+          createdAt={message.createdAt}
+          messagePhotoUrl={messagePhotoUrl}
+          showAvatar={showAvatar}
+          messageType={message.type}
+          chatMessage={message}
+          currentUserId={currentUserId}
+          isCurrentUserLoading={isCurrentUserLoading}
+          currentUserProfilePhoto={currentUserProfilePhoto}
+          onReactionToggle={onReactionToggle}
+        />
+      ) : (
+        <OtherUserMessageTemplate
+          userName={senderName}
+          message={message.message}
+          otherUserId={senderId || otherUserId}
+          otherUserPublicId={senderId === Number(otherUserId) ? otherUserPublicId : undefined}
+          otherUserProfilePhoto={otherUserProfilePhoto}
+          createdAt={message.createdAt}
+          messagePhotoUrl={messagePhotoUrl}
+          showAvatar={showAvatar}
+          messageType={message.type}
+          chatMessage={message}
+          currentUserId={currentUserId}
+          onReactionToggle={onReactionToggle}
+        />
+      )}
+    </div>
   );
 };
 

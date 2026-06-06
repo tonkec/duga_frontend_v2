@@ -342,45 +342,47 @@ const OtherUserPage = () => {
 
   return (
     <AppLayout>
-      <Tabs
-        selectedIndex={selectedTabIndex}
-        onSelect={handleTabSelect}
-        selectedTabClassName={selectedTabClassName}
-      >
-        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{otherUser?.data?.username}</h1>
+      <div data-testid="other-profile-page">
+        <Tabs
+          selectedIndex={selectedTabIndex}
+          onSelect={handleTabSelect}
+          selectedTabClassName={selectedTabClassName}
+        >
+          <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{otherUser?.data?.username}</h1>
+            </div>
+
+            <label className="block lg:hidden">
+              <span className="sr-only">Odaberi sekciju profila</span>
+              <Select
+                value={profileTabOptions[selectedTabIndex]}
+                onChange={(option) => {
+                  if (option) {
+                    handleTabSelect(option.value);
+                  }
+                }}
+                options={profileTabOptions}
+                styles={profileTabSelectStyles}
+                classNamePrefix="react-select"
+                isSearchable={false}
+              />
+            </label>
+
+            <TabList className="hidden w-full max-w-full flex-nowrap gap-2 overflow-x-auto rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm lg:flex lg:w-auto lg:flex-wrap">
+              {profileTabs.map((tab) => (
+                <Tab key={tab.id} className={tabClassName}>
+                  {tab.tab}
+                </Tab>
+              ))}
+            </TabList>
           </div>
 
-          <label className="block lg:hidden">
-            <span className="sr-only">Odaberi sekciju profila</span>
-            <Select
-              value={profileTabOptions[selectedTabIndex]}
-              onChange={(option) => {
-                if (option) {
-                  handleTabSelect(option.value);
-                }
-              }}
-              options={profileTabOptions}
-              styles={profileTabSelectStyles}
-              classNamePrefix="react-select"
-              isSearchable={false}
-            />
-          </label>
-
-          <TabList className="hidden w-full max-w-full flex-nowrap gap-2 overflow-x-auto rounded-2xl border border-[#dce4ff] bg-white p-2 shadow-sm lg:flex lg:w-auto lg:flex-wrap">
-            {profileTabs.map((tab) => (
-              <Tab key={tab.id} className={tabClassName}>
-                {tab.tab}
-              </Tab>
-            ))}
-          </TabList>
-        </div>
-
-        {profileTabs.map((tab) => (
-          <TabPanel key={tab.id}>{tab.panel}</TabPanel>
-        ))}
-      </Tabs>
+          {profileTabs.map((tab) => (
+            <TabPanel key={tab.id}>{tab.panel}</TabPanel>
+          ))}
+        </Tabs>
+      </div>
     </AppLayout>
   );
 };

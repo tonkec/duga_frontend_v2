@@ -1,0 +1,28 @@
+{
+  "empty": [],
+  "profileImages": [
+    {
+      "id": 7001,
+      "userId": 2,
+      "isProfilePhoto": true,
+      "securePhotoUrl": "/uploads/files/development/user/2/profile.png",
+      "description": "Profile photo"
+    }
+  ],
+  "photo": {
+    "id": 7002,
+    "userId": 2,
+    "name": "gallery-photo.png",
+    "isProfilePhoto": false,
+    "securePhotoUrl": "/uploads/files/development/user/2/gallery-photo.png",
+    "description": "Gallery photo with @mira_sun mention",
+    "taggedUsers": [
+      {
+        "id": 3,
+        "publicId": "user-mira",
+        "username": "mira_sun"
+      }
+    ]
+  },
+  "latest": []
+}

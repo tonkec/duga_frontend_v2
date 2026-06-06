@@ -50,7 +50,7 @@ const PhotoPage = () => {
   if (!singleImage) {
     return (
       <AppLayout>
-        <Card>
+        <Card data-testid="photo-not-found-state">
           <div className="mx-auto flex max-w-lg flex-col items-center justify-center px-6 py-10 text-center">
             <div className="mb-4 grid h-16 w-16 place-items-center rounded-3xl bg-blue/10 text-blue">
               <BiImageAlt size={34} />
@@ -106,7 +106,7 @@ const PhotoPage = () => {
 
   return (
     <AppLayout>
-      <div className="grid gap-6">
+      <div className="grid gap-6" data-testid="photo-page">
         <Card className="rounded-2xl p-4 md:p-5">
           <div>
             {imageBlobUrl ? (

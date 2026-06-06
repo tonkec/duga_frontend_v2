@@ -4,6 +4,7 @@ export {};
 
 const currentUser = {
   id: 1,
+  publicId: 'user-current',
   username: 'cypress_chatter',
   age: '30',
   onboarding_done: true,
@@ -13,6 +14,7 @@ const currentUser = {
 
 const existingRecipient = {
   id: 2,
+  publicId: 'user-existing-chat-friend',
   username: 'existing_chat_friend',
   isVerified: true,
   status: 'offline',
@@ -20,6 +22,7 @@ const existingRecipient = {
 
 const newRecipient = {
   id: 3,
+  publicId: 'user-new-chat-friend',
   username: 'new_chat_friend',
   isVerified: true,
   status: 'offline',
@@ -28,8 +31,9 @@ const newRecipient = {
 const existingChat = {
   id: 201,
   type: 'private',
+  name: existingRecipient.username,
   createdAt: '2026-05-23T07:01:00.000Z',
-  Users: [existingRecipient],
+  Users: [existingRecipient, currentUser],
   Messages: [
     {
       id: 5001,
@@ -55,8 +59,9 @@ const existingChat = {
 const newChat = {
   id: 202,
   type: 'private',
+  name: newRecipient.username,
   createdAt: '2026-05-23T07:02:00.000Z',
-  Users: [newRecipient],
+  Users: [newRecipient, currentUser],
   Messages: [],
   ChatUser: {
     userId: String(currentUser.id),
@@ -72,22 +77,14 @@ const setupChatMocks = () => {
   cy.clearLocalStorage();
   cy.clearCookies();
 
-  cy.intercept('POST', '**/register', {
-    statusCode: 201,
-    body: currentUser,
-  }).as('register');
+  cy.mockAuthenticatedSession({ currentUser });
 
-  cy.intercept('POST', '**/sessions/start', {
-    statusCode: 201,
-    body: { active: true },
-  }).as('startSession');
-
-  cy.intercept('GET', '**/users/current-user/**', {
+  cy.intercept('GET', /\/users\/current-user\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: currentUser,
   }).as('getCurrentUser');
 
-  cy.intercept('GET', '**/users/get-users/**', {
+  cy.intercept('GET', /\/users\/get-users\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: [existingRecipient, newRecipient],
   }).as('getUsers');
@@ -110,7 +107,7 @@ const setupChatMocks = () => {
   }).as('getChats');
 
   cy.intercept('POST', '**/chats/create', (req) => {
-    expect(req.body).to.deep.equal({ partnerId: newRecipient.id });
+    expect(req.body).to.deep.equal({ partnerPublicId: newRecipient.publicId });
     hasCreatedChat = true;
 
     req.reply({
@@ -129,7 +126,7 @@ const setupChatMocks = () => {
     body: [{ userId: currentUser.id }, { userId: newRecipient.id }],
   }).as('getNewChat');
 
-  cy.intercept('GET', '**/chats/messages/**', {
+  cy.intercept('GET', /\/chats\/messages\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: {
       messages: [],
@@ -140,35 +137,29 @@ const setupChatMocks = () => {
     },
   }).as('getMessages');
 
-  cy.intercept('GET', '**/messages/is-read/**', {
+  cy.intercept('GET', /\/messages\/is-read\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: { is_read: true },
   });
 
-  cy.intercept('GET', '**/uploads/profile-photo/**', {
+  cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
     statusCode: 404,
     body: {},
   });
 
-  cy.intercept('GET', '**/uploads/user-photos/**', {
+  cy.intercept('GET', /\/uploads\/user-photos\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: [],
   });
 
-  cy.intercept('GET', '**/notifications**', {
+  cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: [],
   });
 };
 
 const loginAndOpenMessages = () => {
-  cy.setCookie('cookieAccepted', 'true');
-  cy.visit('/login');
-  cy.contains('button', 'Prijavi se').first().click();
-
-  cy.wait('@register');
-  cy.wait('@startSession');
-  cy.visit('/new-chat');
+  cy.visitAsAuthenticated('/new-chat');
 };
 
 describe('user creates and continues chat', () => {

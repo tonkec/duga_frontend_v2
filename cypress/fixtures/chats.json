@@ -1,0 +1,157 @@
+{
+  "empty": [],
+  "existing": [
+    {
+      "id": 201,
+      "type": "private",
+      "name": "alex_rain",
+      "createdAt": "2026-06-03T09:00:00.000Z",
+      "Users": [
+        {
+          "id": 2,
+          "publicId": "user-alex",
+          "username": "alex_rain",
+          "isVerified": true,
+          "status": "offline"
+        },
+        {
+          "id": 1,
+          "publicId": "user-current",
+          "username": "cypress_user",
+          "isVerified": true,
+          "status": "online"
+        }
+      ],
+      "Messages": [
+        {
+          "id": 5001,
+          "message": "Bok iz postojećeg razgovora.",
+          "content": "Bok iz postojećeg razgovora.",
+          "createdAt": "2026-06-03T09:01:00.000Z",
+          "User": {
+            "id": 2,
+            "publicId": "user-alex",
+            "username": "alex_rain"
+          },
+          "fromUserId": 2,
+          "chatId": 201,
+          "type": "text",
+          "securePhotoUrl": "",
+          "messagePhotoUrl": ""
+        }
+      ],
+      "ChatUser": {
+        "userId": "1",
+        "chatId": 201,
+        "createdAt": "2026-06-03T09:00:00.000Z",
+        "updatedAt": "2026-06-03T09:00:00.000Z"
+      }
+    }
+  ],
+  "created": {
+    "id": 202,
+    "type": "private",
+    "name": "mira_sun",
+    "createdAt": "2026-06-04T10:00:00.000Z",
+    "Users": [
+      {
+        "id": 3,
+        "publicId": "user-mira",
+        "username": "mira_sun",
+        "isVerified": true,
+        "status": "online"
+      },
+      {
+        "id": 1,
+        "publicId": "user-current",
+        "username": "cypress_user",
+        "isVerified": true,
+        "status": "online"
+      }
+    ],
+    "Messages": [],
+    "ChatUser": {
+      "userId": "1",
+      "chatId": 202,
+      "createdAt": "2026-06-04T10:00:00.000Z",
+      "updatedAt": "2026-06-04T10:00:00.000Z"
+    }
+  },
+  "details": {
+    "existing": {
+      "id": 201,
+      "type": "private",
+      "name": "alex_rain",
+      "createdAt": "2026-06-03T09:00:00.000Z",
+      "Users": [
+        {
+          "id": 1,
+          "publicId": "user-current",
+          "username": "cypress_user",
+          "isVerified": true,
+          "status": "online"
+        },
+        {
+          "id": 2,
+          "publicId": "user-alex",
+          "username": "alex_rain",
+          "isVerified": true,
+          "status": "offline"
+        }
+      ],
+      "Messages": [
+        {
+          "id": 5001,
+          "message": "Bok iz postojećeg razgovora.",
+          "content": "Bok iz postojećeg razgovora.",
+          "createdAt": "2026-06-03T09:01:00.000Z",
+          "User": {
+            "id": 2,
+            "publicId": "user-alex",
+            "username": "alex_rain"
+          },
+          "fromUserId": 2,
+          "chatId": 201,
+          "type": "text",
+          "securePhotoUrl": "",
+          "messagePhotoUrl": ""
+        }
+      ],
+      "ChatUser": {
+        "userId": "1",
+        "chatId": 201,
+        "createdAt": "2026-06-03T09:00:00.000Z",
+        "updatedAt": "2026-06-03T09:00:00.000Z"
+      }
+    },
+    "created": {
+      "id": 202,
+      "type": "private",
+      "name": "mira_sun",
+      "createdAt": "2026-06-04T10:00:00.000Z",
+      "Users": [
+        {
+          "id": 1,
+          "publicId": "user-current",
+          "username": "cypress_user",
+          "isVerified": true,
+          "status": "online"
+        },
+        {
+          "id": 3,
+          "publicId": "user-mira",
+          "username": "mira_sun",
+          "isVerified": true,
+          "status": "online"
+        }
+      ],
+      "Messages": [],
+      "ChatUser": {
+        "userId": "1",
+        "chatId": 202,
+        "createdAt": "2026-06-04T10:00:00.000Z",
+        "updatedAt": "2026-06-04T10:00:00.000Z"
+      }
+    }
+  }
+}

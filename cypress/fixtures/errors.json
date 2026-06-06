@@ -1,0 +1,19 @@
+{
+  "unauthorized": {
+    "code": "UNAUTHORIZED",
+    "message": "Not authenticated"
+  },
+  "sessionRevoked": {
+    "code": "SESSION_REVOKED",
+    "message": "Session has been opened somewhere else."
+  },
+  "notFound": {
+    "message": "Record not found"
+  },
+  "networkError": {
+    "message": "Network error"
+  },
+  "validation": {
+    "message": "Invalid request"
+  }
+}

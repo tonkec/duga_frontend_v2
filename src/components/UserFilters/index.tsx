@@ -59,6 +59,7 @@ const UserFilters = ({ selectValue, setSelectValue, search, setSearch }: IUserFi
           value={search}
           onChange={(e: SyntheticEvent) => setSearch((e.target as HTMLInputElement).value)}
           className="h-12 w-full rounded-2xl border-[#dce4ff] bg-white pl-11 text-sm shadow-sm disabled:bg-gray-50"
+          data-testid="users-search-input"
         />
 
         <div className="flex flex-wrap gap-2" role="group" aria-label="Kriterij pretrage">

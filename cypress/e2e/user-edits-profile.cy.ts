@@ -3,7 +3,8 @@
 export {};
 
 const currentUser = {
-  id: 'user-cypress-edit-profile',
+  id: 1,
+  publicId: 'user-cypress-edit-profile',
   username: 'cypress_editor',
   age: '29',
   onboarding_done: true,
@@ -36,17 +37,9 @@ describe('user edits profile', () => {
     cy.clearLocalStorage();
     cy.clearCookies();
 
-    cy.intercept('POST', '**/register', {
-      statusCode: 201,
-      body: profileUser,
-    }).as('register');
+    cy.mockAuthenticatedSession({ currentUser: profileUser });
 
-    cy.intercept('POST', '**/sessions/start', {
-      statusCode: 201,
-      body: { active: true },
-    }).as('startSession');
-
-    cy.intercept('GET', '**/users/current-user/**', (req) => {
+    cy.intercept('GET', /\/users\/current-user\/?(?:\?.*)?$/, (req) => {
       req.reply({
         statusCode: 200,
         body: profileUser,
@@ -74,23 +67,17 @@ describe('user edits profile', () => {
       });
     }).as('updateUser');
 
-    cy.intercept('GET', '**/uploads/profile-photo/**', {
+    cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
       statusCode: 404,
       body: {},
     }).as('getProfilePhoto');
 
-    cy.intercept('GET', '**/uploads/user/**', {
+    cy.intercept('GET', /\/uploads\/user\/[^/?]+(?:\?.*)?$/, {
       statusCode: 200,
       body: { images: [] },
     }).as('getUserPhotos');
 
-    cy.setCookie('cookieAccepted', 'true');
-    cy.visit('/login');
-    cy.contains('button', 'Prijavi se').first().click();
-
-    cy.wait('@register');
-    cy.wait('@startSession');
-    cy.visit('/edit');
+    cy.visitAsAuthenticated('/edit');
 
     cy.contains('h1', 'Uredi profil').should('be.visible');
     cy.get('input[name="bio"]').clear().type('Updated Cypress bio');

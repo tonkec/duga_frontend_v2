@@ -873,177 +873,183 @@ const ChatPage = () => {
   return (
     <ChatGuard>
       <AppLayout>
-        {canAddMembers && isAddMembersModalOpen && (
-          <AddChatMembersModal
-            isOpen={isAddMembersModalOpen}
-            memberIds={memberIds}
-            onClose={() => setIsAddMembersModalOpen(false)}
-            onAddMembers={handleAddMembers}
-          />
-        )}
-        <DeleteChatModal
-          isDeleteModalVisible={isDeleteModalVisible}
-          setIsDeleteModalVisible={setIsDeleteModalVisible}
-          onDeleteChat={() => {
-            if (!chatId) return;
-            deletedBySelfRef.current = true;
-            deleteChat({ chatId });
-            setIsDeleteModalVisible(false);
-          }}
-        />
-        <LeaveChatModal
-          isLeaveModalVisible={isLeaveModalVisible}
-          setIsLeaveModalVisible={setIsLeaveModalVisible}
-          onLeaveChat={handleLeaveChat}
-          isLeavingChat={isLeavingChat}
-        />
-        <Card className="!overflow-hidden !rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
-          <header className="flex items-center justify-between gap-3 border-b border-[#e8eeff] px-4 py-3">
-            <button
-              type="button"
-              className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-80 disabled:cursor-default disabled:hover:opacity-100"
-              onClick={() => {
-                if (!isGroupChat && otherUserId) {
-                  navigate(
-                    getUserProfilePath({ id: otherUserId, publicId: otherUser?.data?.publicId })
-                  );
-                }
-              }}
-              disabled={Boolean(isGroupChat)}
-            >
-              {isGroupChat ? (
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dce4ff] bg-[#eef3ff] text-blue-dark">
-                  <BiGroup size={22} />
-                </span>
-              ) : (
-                <UserAvatar
-                  color="#eef3ff"
-                  fgColor="#2D46B9"
-                  avatarFallbackName={chatTitle}
-                  userId={String(otherUserId ?? '')}
-                  className="h-11 w-11 shrink-0 rounded-full border border-[#dce4ff]"
-                  profilePhoto={otherUserProfilePhoto}
-                />
-              )}
-              <div className="min-w-0">
-                <h1 className="truncate text-lg font-semibold text-gray-900">{chatTitle}</h1>
-                <p className="text-xs text-gray-500">
-                  {isGroupChat
-                    ? `${otherMembers.length + 1} članova`
-                    : isOnlineState
-                      ? 'Na mreži'
-                      : 'Offline'}
-                </p>
-              </div>
-            </button>
-            <div className="flex shrink-0 items-center gap-2">
-              {canAddMembers && (
-                <Button
-                  type="blue"
-                  className="!py-1.5 !px-3 !text-xs"
-                  onClick={(e) => {
-                    e?.preventDefault();
-                    setIsAddMembersModalOpen(true);
-                  }}
-                >
-                  Dodaj osobe
-                </Button>
-              )}
-              {isGroupChat && (
-                <Button
-                  type="danger"
-                  className="!py-1.5 !px-3 !text-xs"
-                  onClick={(e) => {
-                    e?.preventDefault();
-                    setIsLeaveModalVisible(true);
-                  }}
-                  disabled={isLeavingChat}
-                >
-                  Izađi
-                </Button>
-              )}
-              {hasMessages && (!isGroupChat || isCurrentUserGroupAdmin) && (
-                <Button
-                  type="danger"
-                  className="!py-1.5 !px-3 !text-xs"
-                  onClick={(e) => {
-                    e?.preventDefault();
-                    setIsDeleteModalVisible(true);
-                  }}
-                >
-                  Izbriši
-                </Button>
-              )}
-            </div>
-          </header>
-
-          <section className="border-b border-[#e8eeff] bg-white px-4 py-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
-                Članovi
-              </span>
-              {chatMembers.map((member) => (
-                <Link
-                  key={member.id}
-                  to={getUserProfilePath(member)}
-                  className="rounded-full bg-[#f0f4ff] px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-blue hover:text-white"
-                >
-                  {member.label}
-                </Link>
-              ))}
-            </div>
-            <label className="relative mt-3 block">
-              <span className="sr-only">Pretraži poruke u razgovoru</span>
-              <BiSearch
-                aria-hidden
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="search"
-                value={messageSearchQuery}
-                onChange={(event) => setMessageSearchQuery(event.currentTarget.value)}
-                placeholder="Pretraži tekst poruka..."
-                className="block w-full rounded-full border border-[#dce4ff] bg-[#f7f9ff] py-2.5 pl-10 pr-4 text-sm font-medium text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
-              />
-            </label>
-          </section>
-
-          <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
-            <PaginatedMessages
-              currentUserName={currentUserName}
-              otherUserName={otherUserName}
-              otherUserId={otherUserId as number}
-              otherUserPublicId={otherUser?.data?.publicId}
-              otherUserProfilePhoto={otherUserProfilePhoto}
-              receivedMessages={receivedMessages}
-              messages={messages}
-              isMessagesLoading={isAllMessagesLoading}
-              fetchNextPage={fetchNextPage}
-              currentUserId={currentUserId as number}
-              currentUserProfilePhoto={currentUserProfilePhoto}
-              isCurrentUserLoading={isCurrentUserLoading}
-              onReactionToggle={handleReactionToggle}
-              messageSearchQuery={messageSearchQuery}
+        <div data-testid="chat-page">
+          {canAddMembers && isAddMembersModalOpen && (
+            <AddChatMembersModal
+              isOpen={isAddMembersModalOpen}
+              memberIds={memberIds}
+              onClose={() => setIsAddMembersModalOpen(false)}
+              onAddMembers={handleAddMembers}
             />
-            {isTyping && (
-              <div className="px-4 pb-2">
-                <ChatBubble />
+          )}
+          <DeleteChatModal
+            isDeleteModalVisible={isDeleteModalVisible}
+            setIsDeleteModalVisible={setIsDeleteModalVisible}
+            onDeleteChat={() => {
+              if (!chatId) return;
+              deletedBySelfRef.current = true;
+              deleteChat({ chatId });
+              setIsDeleteModalVisible(false);
+            }}
+          />
+          <LeaveChatModal
+            isLeaveModalVisible={isLeaveModalVisible}
+            setIsLeaveModalVisible={setIsLeaveModalVisible}
+            onLeaveChat={handleLeaveChat}
+            isLeavingChat={isLeavingChat}
+          />
+          <Card className="!overflow-hidden !rounded-xl !border-[#dce4ff] !bg-white !p-0 !shadow-md">
+            <header
+              className="flex items-center justify-between gap-3 border-b border-[#e8eeff] px-4 py-3"
+              data-testid="chat-header"
+            >
+              <button
+                type="button"
+                className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-80 disabled:cursor-default disabled:hover:opacity-100"
+                onClick={() => {
+                  if (!isGroupChat && otherUserId) {
+                    navigate(
+                      getUserProfilePath({ id: otherUserId, publicId: otherUser?.data?.publicId })
+                    );
+                  }
+                }}
+                disabled={Boolean(isGroupChat)}
+              >
+                {isGroupChat ? (
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dce4ff] bg-[#eef3ff] text-blue-dark">
+                    <BiGroup size={22} />
+                  </span>
+                ) : (
+                  <UserAvatar
+                    color="#eef3ff"
+                    fgColor="#2D46B9"
+                    avatarFallbackName={chatTitle}
+                    userId={String(otherUserId ?? '')}
+                    className="h-11 w-11 shrink-0 rounded-full border border-[#dce4ff]"
+                    profilePhoto={otherUserProfilePhoto}
+                  />
+                )}
+                <div className="min-w-0">
+                  <h1 className="truncate text-lg font-semibold text-gray-900">{chatTitle}</h1>
+                  <p className="text-xs text-gray-500">
+                    {isGroupChat
+                      ? `${otherMembers.length + 1} članova`
+                      : isOnlineState
+                        ? 'Na mreži'
+                        : 'Offline'}
+                  </p>
+                </div>
+              </button>
+              <div className="flex shrink-0 items-center gap-2">
+                {canAddMembers && (
+                  <Button
+                    type="blue"
+                    className="!py-1.5 !px-3 !text-xs"
+                    onClick={(e) => {
+                      e?.preventDefault();
+                      setIsAddMembersModalOpen(true);
+                    }}
+                  >
+                    Dodaj osobe
+                  </Button>
+                )}
+                {isGroupChat && (
+                  <Button
+                    type="danger"
+                    className="!py-1.5 !px-3 !text-xs"
+                    onClick={(e) => {
+                      e?.preventDefault();
+                      setIsLeaveModalVisible(true);
+                    }}
+                    disabled={isLeavingChat}
+                  >
+                    Izađi
+                  </Button>
+                )}
+                {hasMessages && (!isGroupChat || isCurrentUserGroupAdmin) && (
+                  <Button
+                    type="danger"
+                    className="!py-1.5 !px-3 !text-xs"
+                    onClick={(e) => {
+                      e?.preventDefault();
+                      setIsDeleteModalVisible(true);
+                    }}
+                  >
+                    Izbriši
+                  </Button>
+                )}
+              </div>
+            </header>
+
+            <section className="border-b border-[#e8eeff] bg-white px-4 py-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
+                  Članovi
+                </span>
+                {chatMembers.map((member) => (
+                  <Link
+                    key={member.id}
+                    to={getUserProfilePath(member)}
+                    className="rounded-full bg-[#f0f4ff] px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-blue hover:text-white"
+                  >
+                    {member.label}
+                  </Link>
+                ))}
+              </div>
+              <label className="relative mt-3 block">
+                <span className="sr-only">Pretraži poruke u razgovoru</span>
+                <BiSearch
+                  aria-hidden
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  type="search"
+                  value={messageSearchQuery}
+                  onChange={(event) => setMessageSearchQuery(event.currentTarget.value)}
+                  placeholder="Pretraži tekst poruka..."
+                  className="block w-full rounded-full border border-[#dce4ff] bg-[#f7f9ff] py-2.5 pl-10 pr-4 text-sm font-medium text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue"
+                  data-testid="chat-message-search"
+                />
+              </label>
+            </section>
+
+            <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
+              <PaginatedMessages
+                currentUserName={currentUserName}
+                otherUserName={otherUserName}
+                otherUserId={otherUserId as number}
+                otherUserPublicId={otherUser?.data?.publicId}
+                otherUserProfilePhoto={otherUserProfilePhoto}
+                receivedMessages={receivedMessages}
+                messages={messages}
+                isMessagesLoading={isAllMessagesLoading}
+                fetchNextPage={fetchNextPage}
+                currentUserId={currentUserId as number}
+                currentUserProfilePhoto={currentUserProfilePhoto}
+                isCurrentUserLoading={isCurrentUserLoading}
+                onReactionToggle={handleReactionToggle}
+                messageSearchQuery={messageSearchQuery}
+              />
+              {isTyping && (
+                <div className="px-4 pb-2">
+                  <ChatBubble />
+                </div>
+              )}
+            </div>
+
+            {chatId && (
+              <div className="border-t border-[#e8eeff] bg-white px-4 py-3">
+                <SendMessage
+                  otherUserId={otherUserId}
+                  otherUserIds={otherMemberIds}
+                  chatId={chatId}
+                  mentionableUsers={mentionableUsers}
+                />
               </div>
             )}
-          </div>
-
-          {chatId && (
-            <div className="border-t border-[#e8eeff] bg-white px-4 py-3">
-              <SendMessage
-                otherUserId={otherUserId}
-                otherUserIds={otherMemberIds}
-                chatId={chatId}
-                mentionableUsers={mentionableUsers}
-              />
-            </div>
-          )}
-        </Card>
+          </Card>
+        </div>
       </AppLayout>
     </ChatGuard>
   );

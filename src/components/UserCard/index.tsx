@@ -122,6 +122,7 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
     <Card
       className="user-card group flex h-full flex-col rounded-3xl !bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
       onClick={onButtonClick}
+      data-testid="user-card"
     >
       <div className="user-card-avatar-wrap relative w-full overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#f7f9ff] to-[#eef3ff]">
         <UserAvatar
@@ -157,6 +158,7 @@ const UserCard = ({ user, onButtonClick, isOnline }: IUserCardProps) => {
             className="user-card-button mt-5 w-full rounded-full px-5 py-3 font-semibold shadow-md shadow-blue/15"
             onClick={onButtonClick}
             type="blue"
+            data-testid="user-card-open-profile"
           >
             Pogledaj profil
           </Button>

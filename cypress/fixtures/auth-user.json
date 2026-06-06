@@ -1,0 +1,6 @@
+{
+  "sub": "auth0|cypress-user",
+  "email": "cypress-user@example.com",
+  "email_verified": true,
+  "name": "Cypress User"
+}

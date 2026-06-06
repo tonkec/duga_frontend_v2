@@ -18,6 +18,7 @@ interface MentionInputProps {
   rows?: number;
   maxLength?: number;
   disabled?: boolean;
+  'data-testid'?: string;
 }
 
 const MentionInput = ({
@@ -31,6 +32,7 @@ const MentionInput = ({
   rows = 3,
   maxLength,
   disabled = false,
+  'data-testid': dataTestId,
 }: MentionInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
@@ -136,6 +138,7 @@ const MentionInput = ({
         disabled={disabled}
         className={`min-h-28 w-full resize-y rounded-2xl border border-[#dce4ff] bg-white px-4 py-3 text-base leading-6 shadow-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue ${textareaClassName}`}
         placeholder={placeholder}
+        data-testid={dataTestId}
       />
 
       {showSuggestions && suggestions.length > 0 && (

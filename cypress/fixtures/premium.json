@@ -1,0 +1,18 @@
+{
+  "free": {
+    "isPremium": false,
+    "plan": "free"
+  },
+  "premium": {
+    "isPremium": true,
+    "plan": "premium",
+    "renewsAt": "2026-07-06T10:00:00.000Z"
+  },
+  "checkoutSession": {
+    "id": "cs_test_duga",
+    "url": "https://stripe.test/checkout/session"
+  },
+  "portalSession": {
+    "url": "https://stripe.test/customer-portal"
+  }
+}

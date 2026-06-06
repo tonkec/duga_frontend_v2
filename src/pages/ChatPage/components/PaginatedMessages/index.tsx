@@ -69,7 +69,10 @@ const PaginatedMessages = ({
 
   if (isMessagesLoading) {
     return (
-      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+      <div
+        className="flex min-h-[280px] flex-1 items-center justify-center px-4"
+        data-testid="chat-messages-loading"
+      >
         <Loader variant="inline" label="Učitavanje poruka..." />
       </div>
     );
@@ -77,7 +80,10 @@ const PaginatedMessages = ({
 
   if (!messages.length && !receivedMessages.length) {
     return (
-      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+      <div
+        className="flex min-h-[280px] flex-1 items-center justify-center px-4"
+        data-testid="chat-messages-empty"
+      >
         <p className="text-center text-sm text-gray-500">Nema poruka u ovom razgovoru</p>
       </div>
     );
@@ -95,7 +101,10 @@ const PaginatedMessages = ({
 
   if (normalizedSearchQuery && visibleMessages.length === 0) {
     return (
-      <div className="flex min-h-[280px] flex-1 items-center justify-center px-4">
+      <div
+        className="flex min-h-[280px] flex-1 items-center justify-center px-4"
+        data-testid="chat-messages-no-results"
+      >
         <p className="text-center text-sm text-gray-500">Nema poruka koje odgovaraju pretrazi.</p>
       </div>
     );
@@ -108,6 +117,7 @@ const PaginatedMessages = ({
         fetchNextPage();
       }, 500)}
       className="flex min-h-[min(420px,calc(100vh-22rem))] max-h-[min(560px,calc(100vh-18rem))] flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
+      data-testid="chat-messages-list"
     >
       {visibleMessages.map((message, index) => {
         const previousMessage = visibleMessages[index - 1];

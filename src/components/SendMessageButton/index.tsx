@@ -55,6 +55,7 @@ const SendMessageButton = ({
         }
       }}
       type={buttonType}
+      data-testid="profile-send-message-button"
     >
       {hasChatWithUser || existingChatId ? 'Nastavi razgovor' : 'Započni razgovor'}
     </Button>

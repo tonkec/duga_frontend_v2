@@ -15,7 +15,10 @@ const EmptyChats = () => {
 
   return (
     <>
-      <section className="mx-auto mt-8 flex min-h-[28rem] w-full max-w-4xl items-center justify-center rounded-3xl border border-[#dce4ff] bg-white px-6 py-14 text-center shadow-sm">
+      <section
+        className="mx-auto mt-8 flex min-h-[28rem] w-full max-w-4xl items-center justify-center rounded-3xl border border-[#dce4ff] bg-white px-6 py-14 text-center shadow-sm"
+        data-testid="messages-empty-state"
+      >
         <div className="flex max-w-xl flex-col items-center">
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-4xl shadow-md shadow-blue/10">
             <span role="img" aria-hidden>
@@ -39,6 +42,7 @@ const EmptyChats = () => {
               type="blue"
               className="w-full rounded-full px-6 py-3 font-semibold shadow-lg shadow-blue/20 sm:w-auto"
               onClick={() => setIsNewMessageModalOpen(true)}
+              data-testid="new-message-button"
             >
               Pronađi korisnike
             </Button>
@@ -93,7 +97,9 @@ const NewChatPage = () => {
     return (
       <PageTitle title="Poruke">
         <AppLayout>
-          <CookiesRejectedNotice />
+          <div data-testid="messages-page">
+            <CookiesRejectedNotice />
+          </div>
         </AppLayout>
       </PageTitle>
     );
@@ -103,7 +109,9 @@ const NewChatPage = () => {
     return (
       <PageTitle title="Poruke">
         <AppLayout>
-          <EmptyChats />
+          <div data-testid="messages-page">
+            <EmptyChats />
+          </div>
         </AppLayout>
       </PageTitle>
     );
@@ -111,7 +119,11 @@ const NewChatPage = () => {
 
   return (
     <PageTitle title="Poruke">
-      <AppLayout>{visibleChats.length > 0 && <AllUserChats userChats={visibleChats} />}</AppLayout>
+      <AppLayout>
+        <div data-testid="messages-page">
+          {visibleChats.length > 0 && <AllUserChats userChats={visibleChats} />}
+        </div>
+      </AppLayout>
     </PageTitle>
   );
 };

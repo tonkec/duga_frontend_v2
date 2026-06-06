@@ -49,7 +49,7 @@ const setupAuthenticatedUser = () => {
     body: {},
   });
 
-  cy.intercept('GET', '**/notifications/**', {
+  cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: [],
   });
