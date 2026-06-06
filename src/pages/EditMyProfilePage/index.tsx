@@ -33,6 +33,7 @@ import {
 import { getImdbTitleUrl, isImdbTitleUrl } from '@app/utils/imdb';
 import { getYouTubeEmbedUrl, isYouTubeUrl } from '@app/utils/youtube';
 import { getSafeRemoteImageUrl } from '@app/utils/mediaSafety';
+import { useSearchParams } from 'react-router-dom';
 
 const lookingForOptions = [
   { value: 'friendship', label: 'Prijateljstvo' },
@@ -192,6 +193,14 @@ const editProfileTabs = [
   { label: 'Općenito', icon: <BiSolidFile fontSize={20} /> },
   { label: 'Fotografije', icon: <BiSolidCamera fontSize={20} /> },
 ];
+
+const getTabIndexFromSearchParams = (searchParams: URLSearchParams) => {
+  const tabIndex = Number(searchParams.get('tab'));
+
+  return Number.isInteger(tabIndex) && tabIndex >= 0 && tabIndex < editProfileTabs.length
+    ? tabIndex
+    : 0;
+};
 
 const ImdbMovieSearch = ({
   value,
@@ -457,9 +466,12 @@ const EditMyProfilePage = () => {
 
   const { user: currentUser } = useGetCurrentUser();
   const { updateUserMutation } = useUpdateUser();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeEmojiField, setActiveEmojiField] = useState<EmojiFieldName | null>(null);
   const [currentEmojis, setCurrentEmojis] = useState<string[]>([]);
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(() =>
+    getTabIndexFromSearchParams(searchParams)
+  );
   const {
     register,
     handleSubmit,
@@ -474,6 +486,10 @@ const EditMyProfilePage = () => {
   });
   const favoriteSong = watch('favoriteSong') || '';
   const favoriteMovie = watch('favoriteMovie') || '';
+
+  useEffect(() => {
+    setSelectedTabIndex(getTabIndexFromSearchParams(searchParams));
+  }, [searchParams]);
 
   useEffect(() => {
     if (currentUser) {
@@ -646,7 +662,20 @@ const EditMyProfilePage = () => {
     <AppLayout>
       <Tabs
         selectedIndex={selectedTabIndex}
-        onSelect={(index) => setSelectedTabIndex(index)}
+        onSelect={(index) => {
+          setSelectedTabIndex(index);
+          setSearchParams((currentSearchParams) => {
+            const nextSearchParams = new URLSearchParams(currentSearchParams);
+
+            if (index === 0) {
+              nextSearchParams.delete('tab');
+            } else {
+              nextSearchParams.set('tab', String(index));
+            }
+
+            return nextSearchParams;
+          });
+        }}
         selectedTabClassName={selectedTabClassName}
       >
         <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

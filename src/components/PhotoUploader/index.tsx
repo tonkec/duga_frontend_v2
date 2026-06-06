@@ -135,6 +135,7 @@ const PhotoActionButtons = ({
             }
             checked={isChecked}
             className="h-4 w-4 rounded border-[#b9c6ff] accent-blue"
+            data-testid="profile-photo-checkbox"
           />
           <span>{isChecked ? 'Odabrana profilna fotografija' : 'Postavi kao profilnu'}</span>
         </label>
@@ -149,6 +150,7 @@ const PhotoActionButtons = ({
             setIsDeleteModalOpen(true);
           }}
           disabled={disabled}
+          data-testid="profile-photo-delete-button"
         >
           <span>Obriši</span>
           <BiTrash fontSize={20} />
@@ -407,7 +409,7 @@ const PhotoUploader = () => {
       )}
       {shouldShowEditable && (
         <Card className="mb-6 rounded-2xl p-5 md:p-6">
-          <form onSubmit={onSubmitUpdatePhotos}>
+          <form onSubmit={onSubmitUpdatePhotos} data-testid="profile-photo-edit-form">
             <div className="mb-5">
               <h2 className="text-2xl font-bold text-gray-900">Tvoje fotografije</h2>
               <p className="mt-1 text-gray-600">Uredi opise i odaberi profilnu fotografiju.</p>
@@ -421,6 +423,7 @@ const PhotoUploader = () => {
                 return (
                   <div
                     key={`${image.name}-editable`}
+                    data-testid="profile-photo-edit-card"
                     className="overflow-hidden rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-3 shadow-sm transition-shadow hover:shadow-lg hover:shadow-blue/10"
                   >
                     <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
@@ -548,6 +551,7 @@ const PhotoUploader = () => {
                 type="blue"
                 className="w-full rounded-full px-6 py-3 font-semibold shadow-md shadow-blue/15 md:w-auto"
                 disabled={hasDescriptionError || isUploadingPhotos}
+                data-testid="profile-photo-save-changes"
               >
                 <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi promjene'}</span>
               </Button>
@@ -556,7 +560,7 @@ const PhotoUploader = () => {
         </Card>
       )}
       <Card className="rounded-2xl p-5 md:p-6">
-        <form onSubmit={onSubmitHandler}>
+        <form onSubmit={onSubmitHandler} data-testid="profile-photo-upload-form">
           <div className="mb-4">
             <h2 className="text-2xl font-bold text-gray-900">Dodaj nove fotografije</h2>
             <p className="mt-1 text-gray-600">
@@ -628,6 +632,7 @@ const PhotoUploader = () => {
               accept={ALLOWED_FILE_TYPES}
               label="Odaberi fotografije"
               helperText={`Dozvoljeni formati su ${ALLOWED_FILE_TYPES}. Maksimalno ${MAXIMUM_NUMBER_OF_IMAGES} fotografija, do ${MAX_IMAGE_FILE_SIZE_MB} MB po slici.`}
+              data-testid="profile-photo-file-input"
               onChange={(e) => {
                 if (e.target.files) {
                   const files = e.target.files;
@@ -676,6 +681,7 @@ const PhotoUploader = () => {
               type="blue"
               className="w-full md:w-auto"
               disabled={hasDescriptionError || isUploadingPhotos}
+              data-testid="profile-photo-upload-submit"
             >
               <span>{isUploadingPhotos ? 'Spremanje...' : 'Spremi'}</span>
             </Button>

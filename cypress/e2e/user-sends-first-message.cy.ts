@@ -144,7 +144,7 @@ describe('user sends first message', () => {
 
     cy.window()
       .its('__dugaCypressSocketEvents')
-      .should((events) => {
+      .should((events: Array<{ event: string; payload: Record<string, unknown> }>) => {
         const messageEvent = events.find((event) => event.event === 'message');
 
         expect(messageEvent?.payload).to.deep.include({

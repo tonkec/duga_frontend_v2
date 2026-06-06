@@ -229,7 +229,7 @@ declare global {
         url: string,
         options?: Partial<VisitOptions> &
           MockAuthenticatedSessionOptions
-      ): Chainable<Window>;
+      ): Chainable<AUTWindow>;
       mockAuthenticatedSession(options?: MockAuthenticatedSessionOptions): Chainable<void>;
       mockDefaultApi(options?: MockDefaultApiOptions): Chainable<void>;
       assertSocketEvent(
