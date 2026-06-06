@@ -506,21 +506,23 @@ const ChatPage = () => {
   const otherMember = otherMembers.find((user) => Number(user.id) === Number(otherUserId));
   const otherUserProfilePhoto =
     getProfilePhotoOverride(otherUser?.data) ?? getProfilePhotoOverride(otherMember);
-  const otherUserName = otherUser?.data.username;
+  const otherUserName = otherUser?.data?.username;
+  const otherUserDisplayName = otherUserName ?? otherMember?.username ?? 'Korisnik';
   const chatTitle = getChatTitle({
     isGroup: Boolean(isGroupChat),
     chat: !Array.isArray(currentChatData) ? currentChatData : undefined,
     otherUserName,
     otherMembers,
   });
-  const currentUserName = currentUser?.data.username;
+  const currentUserName = currentUser?.data?.username;
+  const currentUserDisplayName = currentUserName ?? 'Ti';
   const chatMembers = useMemo<ChatMemberLink[]>(() => {
     const members = chatUsers.flatMap((user) => {
       const userId = Number(user.id);
       const username =
         user.username ||
-        (userId === Number(currentUserId) ? currentUserName : undefined) ||
-        (userId === Number(otherUserId) ? otherUserName : undefined);
+        (userId === Number(currentUserId) ? currentUserDisplayName : undefined) ||
+        (userId === Number(otherUserId) ? otherUserDisplayName : undefined);
 
       if (!Number.isFinite(userId)) return [];
 
@@ -535,7 +537,7 @@ const ChatPage = () => {
     });
 
     return Array.from(new Map(members.map((member) => [member.id, member])).values());
-  }, [chatUsers, currentUserId, currentUserName, otherUserId, otherUserName]);
+  }, [chatUsers, currentUserId, currentUserDisplayName, otherUserId, otherUserDisplayName]);
   const mentionableUsers = useMemo(
     () =>
       chatMembers
@@ -821,7 +823,8 @@ const ChatPage = () => {
         return;
       }
 
-      setIsOnlineState(otherUser?.data.status === 'online');
+      const fallbackStatus = otherUser?.data?.status;
+      setIsOnlineState(fallbackStatus === 'online');
     };
 
     socket.on('status-update', handleStatusUpdate);
@@ -833,7 +836,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (otherUser?.data?.status) {
-      setIsOnlineState(otherUser.data.status === 'online');
+      setIsOnlineState(otherUser.data?.status === 'online');
     }
   }, [otherUser?.data?.status]);
 
@@ -1016,8 +1019,8 @@ const ChatPage = () => {
 
             <div className="flex min-h-[360px] flex-col bg-[#f7f9ff]">
               <PaginatedMessages
-                currentUserName={currentUserName}
-                otherUserName={otherUserName}
+                currentUserName={currentUserDisplayName}
+                otherUserName={otherUserDisplayName}
                 otherUserId={otherUserId as number}
                 otherUserPublicId={otherUser?.data?.publicId}
                 otherUserProfilePhoto={otherUserProfilePhoto}

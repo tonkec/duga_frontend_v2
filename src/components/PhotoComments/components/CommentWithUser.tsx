@@ -193,7 +193,7 @@ const CommentWithUser: React.FC<{
     );
   };
 
-  const username = user?.data.username || 'Korisnik';
+  const username = user?.data?.username || 'Korisnik';
   const isOwnComment = String(currentUserId) === String(comment.userId);
 
   return (
