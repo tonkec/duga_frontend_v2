@@ -4,6 +4,7 @@ export {};
 
 const currentUser = {
   id: 1,
+  publicId: 'user-cypress-logout',
   username: 'cypress_logout',
   age: '30',
   onboarding_done: true,
@@ -24,27 +25,19 @@ const setupAuthenticatedUser = () => {
   cy.clearLocalStorage();
   cy.clearCookies();
 
-  cy.intercept('POST', '**/register', {
-    statusCode: 201,
-    body: currentUser,
-  }).as('register');
+  cy.mockAuthenticatedSession({ authUser, currentUser });
 
-  cy.intercept('POST', '**/sessions/start', {
-    statusCode: 201,
-    body: { active: true },
-  }).as('startSession');
-
-  cy.intercept('GET', '**/users/current-user/**', {
+  cy.intercept('GET', /\/users\/current-user\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: currentUser,
   }).as('getCurrentUser');
 
-  cy.intercept('GET', '**/users/online-status/**', {
+  cy.intercept('GET', /\/users\/online-status\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: { status: 'online' },
   });
 
-  cy.intercept('GET', '**/uploads/profile-photo/**', {
+  cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
     statusCode: 404,
     body: {},
   });
@@ -54,17 +47,9 @@ const setupAuthenticatedUser = () => {
     body: [],
   });
 
-  cy.setCookie('cookieAccepted', 'true');
-  cy.visit('/settings', {
-    onBeforeLoad(win) {
-      win.localStorage.clear();
-      win.sessionStorage.clear();
-      (win as typeof win & { __dugaCypressAuthUser?: typeof authUser }).__dugaCypressAuthUser =
-        authUser;
-      win.localStorage.setItem('duga:cypress-auth-user', JSON.stringify(authUser));
-      win.localStorage.setItem('duga:cypress-skip-session-start', 'true');
-      win.localStorage.setItem('dugaSessionId', sessionId);
-    },
+  cy.visitAsAuthenticated('/settings', { authUser });
+  cy.window().then((win) => {
+    win.localStorage.setItem('dugaSessionId', sessionId);
   });
 };
 
@@ -101,5 +86,21 @@ describe('logout and session conflict handling', () => {
     cy.location('pathname').should('eq', '/login');
     cy.contains('Odjavljeni ste jer je račun otvoren u drugoj sesiji.').should('be.visible');
     cy.getCookie('token').should('be.null');
+  });
+
+  it('logs the user out when the socket reports a session opened elsewhere', () => {
+    setupAuthenticatedUser();
+
+    cy.contains('h1', 'Postavke').should('be.visible');
+    cy.receiveSocketEvent('session-revoked');
+
+    cy.location('pathname').should('eq', '/login');
+    cy.contains('Odjavljeni ste jer je račun otvoren u drugoj sesiji.').should('be.visible');
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem('duga:cypress-auth-user')).to.equal(null);
+      expect(win.localStorage.getItem('dugaSessionId')).to.equal(null);
+      expect(win.sessionStorage.getItem('dugaApiToken')).to.equal(null);
+      expect(win.sessionStorage.getItem('dugaCsrfToken')).to.equal(null);
+    });
   });
 });

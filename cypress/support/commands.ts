@@ -201,6 +201,17 @@ Cypress.Commands.add('assertSocketEvent', (eventName, expectedPayload = {}) => {
     });
 });
 
+Cypress.Commands.add('receiveSocketEvent', (eventName, payload) => {
+  cy.window().then((win) => {
+    const receiveSocketEvent = (
+      win as Window & { __dugaCypressReceiveSocketEvent?: (event: string, payload?: unknown) => void }
+    ).__dugaCypressReceiveSocketEvent;
+
+    expect(Boolean(receiveSocketEvent), 'Cypress socket receiver').to.equal(true);
+    receiveSocketEvent?.(eventName, payload);
+  });
+});
+
 declare global {
   // Cypress custom command typing is exposed through its global namespace.
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -225,6 +236,7 @@ declare global {
         eventName: string,
         expectedPayload?: Record<string, unknown>
       ): Chainable<void>;
+      receiveSocketEvent(eventName: string, payload?: unknown): Chainable<void>;
     }
   }
 }

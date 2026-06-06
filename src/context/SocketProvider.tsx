@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
@@ -16,10 +16,16 @@ type CypressWindow = Window &
     Cypress?: unknown;
     __dugaCypressE2E?: boolean;
     __dugaCypressSocketEvents?: CypressSocketEvent[];
+    __dugaCypressReceiveSocketEvent?: (event: string, payload?: unknown) => void;
   };
 
 const createCypressSocket = () => {
   const handlers = new Map<string, Set<(payload: unknown) => void>>();
+  const cypressWindow = window as CypressWindow;
+
+  cypressWindow.__dugaCypressReceiveSocketEvent = (event: string, payload?: unknown) => {
+    handlers.get(event)?.forEach((handler) => handler(payload));
+  };
 
   return {
     on: (event: string, handler: (payload: unknown) => void) => {
@@ -36,7 +42,6 @@ const createCypressSocket = () => {
       handlers.get(event)?.delete(handler);
     },
     emit: (event: string, payload: unknown) => {
-      const cypressWindow = window as CypressWindow;
       cypressWindow.__dugaCypressSocketEvents = [
         ...(cypressWindow.__dugaCypressSocketEvents ?? []),
         { event, payload },
@@ -93,9 +98,18 @@ const getBackendUrl = () => {
   return 'http://localhost:8080/';
 };
 
-const CypressSocketProvider = ({ children }: { children: ReactNode }) => (
-  <SocketContext.Provider value={createCypressSocket()}>{children}</SocketContext.Provider>
-);
+const CypressSocketProvider = ({ children }: { children: ReactNode }) => {
+  const socket = useMemo(() => createCypressSocket(), []);
+
+  useEffect(() => {
+    socket.on('session-revoked', markSessionRevoked);
+    return () => {
+      socket.off('session-revoked', markSessionRevoked);
+    };
+  }, [socket]);
+
+  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+};
 
 const RealSocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
