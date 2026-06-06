@@ -52,7 +52,10 @@ const StatusDropdown = () => {
   const inactiveOptionClassName = 'border-[#dce4ff] bg-white text-gray-800';
 
   return (
-    <form className="mb-6 rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm">
+    <form
+      className="mb-6 rounded-3xl border border-[#dce4ff] bg-gradient-to-br from-white via-[#fbfcff] to-[#f7f9ff] p-4 shadow-sm"
+      data-testid="settings-online-status-form"
+    >
       <div className="mb-4">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue">Status</p>
         <p className="mt-1 text-base font-bold text-gray-950">
@@ -69,6 +72,7 @@ const StatusDropdown = () => {
           className="sr-only"
           checked={status === 'online'}
           onChange={handleChange}
+          data-testid="settings-status-online"
         />
         <label
           htmlFor="online"
@@ -94,6 +98,7 @@ const StatusDropdown = () => {
           className="sr-only"
           checked={status === 'offline'}
           onChange={handleChange}
+          data-testid="settings-status-offline"
         />
         <label
           htmlFor="offline"

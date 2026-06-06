@@ -133,14 +133,18 @@ const OtherUserPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { userId } = useParams();
   const isLegacyNumericProfileUrl = isNumericProfileIdentifier(userId);
+  const { user: currentUser, isUserLoading: isCurrentUserLoading } = useGetCurrentUser();
+  const isOwnPublicProfile =
+    Boolean(currentUser?.data?.publicId) && currentUser?.data?.publicId === userId;
   const { user: otherUser, isUserLoading } = useGetUserById(
-    !isLegacyNumericProfileUrl ? (userId as string) : ''
+    !isLegacyNumericProfileUrl && !isOwnPublicProfile ? (userId as string) : ''
   );
-  const otherUserInternalId = otherUser?.data?.id;
+  const profileUserData = isOwnPublicProfile ? currentUser?.data : otherUser?.data;
+  const otherUserInternalId = profileUserData?.id;
+  const isProfileLoading = isOwnPublicProfile ? isCurrentUserLoading : isUserLoading;
   const { allImages, allImagesLoading } = useGetAllImages(
     otherUserInternalId !== undefined ? String(otherUserInternalId) : ''
   );
-  const { user: currentUser } = useGetCurrentUser();
   const { userChats } = useGetAllUserChats();
   const existingChat = getChatWithUser(
     userChats?.data,
@@ -172,8 +176,7 @@ const OtherUserPage = () => {
     ? getUserForumAnswers(forumQuestionsWithDetails, numericUserId)
     : [];
   const isOwnSharedProfile =
-    Number(currentUser?.data?.id) === Number(otherUserInternalId ?? userId) ||
-    (!!currentUser?.data?.publicId && currentUser.data.publicId === userId);
+    Number(currentUser?.data?.id) === Number(otherUserInternalId ?? userId) || isOwnPublicProfile;
 
   const profileTabs = [
     {
@@ -191,7 +194,7 @@ const OtherUserPage = () => {
         >
           <div className="min-w-0">
             <UserProfileCard
-              user={otherUser?.data}
+              user={profileUserData}
               allImages={profileImages}
               allImagesLoading={allImagesLoading}
             />
@@ -202,7 +205,7 @@ const OtherUserPage = () => {
               <Cta subtitle="Pošalji poruku ovoj osobici." title="Pošalji poruku!">
                 <SendMessageButton
                   sendMessageToId={String(otherUserInternalId ?? userId)}
-                  sendMessageToPublicId={otherUser?.data?.publicId}
+                  sendMessageToPublicId={profileUserData?.publicId}
                   buttonType="blue"
                   buttonClasses="w-full rounded-full py-3 font-semibold shadow-md shadow-blue/15"
                   hasChatWithUser={Boolean(existingChat)}
@@ -299,8 +302,8 @@ const OtherUserPage = () => {
     panel: (
       <ProfileSharePanel
         userId={otherUserInternalId ?? userId}
-        publicId={otherUser?.data?.publicId}
-        username={otherUser?.data?.username}
+        publicId={profileUserData?.publicId}
+        username={profileUserData?.username}
       />
     ),
   });
@@ -326,7 +329,7 @@ const OtherUserPage = () => {
     );
   }
 
-  if (isUserLoading) {
+  if (isProfileLoading) {
     return (
       <AppLayout>
         <Loader />
@@ -334,7 +337,7 @@ const OtherUserPage = () => {
     );
   }
 
-  if (!otherUser) {
+  if (!profileUserData) {
     return (
       <ProfileNotFoundState onBack={() => navigate(-1)} onBrowseUsers={() => navigate('/users')} />
     );
@@ -350,7 +353,7 @@ const OtherUserPage = () => {
         >
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{otherUser?.data?.username}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{profileUserData?.username}</h1>
             </div>
 
             <label className="block lg:hidden">

@@ -28,6 +28,7 @@ const createCypressSocket = () => {
   };
 
   return {
+    connected: true,
     on: (event: string, handler: (payload: unknown) => void) => {
       const eventHandlers = handlers.get(event) ?? new Set();
       eventHandlers.add(handler);

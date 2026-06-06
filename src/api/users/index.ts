@@ -81,6 +81,8 @@ type SingleUserResponse =
       user?: RawUser;
     };
 
+const PUBLIC_PROFILE_ENDPOINTS = ['/users/public', '/users/public-id', '/users/profile'];
+
 const getNormalizedVerification = (user: RawUser) =>
   user.isVerified ??
   user.is_verified ??
@@ -110,6 +112,8 @@ const getProfileRecord = (user: RawUser) => {
     ? (profile as Record<string, unknown>)
     : {};
 };
+
+const isPublicProfileIdentifier = (value: string) => Boolean(value && !/^\d+$/.test(value));
 
 const normalizeProfileUser = (user: RawUser): RawUser => {
   const profile = getProfileRecord(user);
@@ -218,13 +222,30 @@ export const getCurrentUser = () => {
 
 export const getUserById = async (id: string) => {
   const client = apiClient();
-  const response = await client.get<SingleUserResponse>(`/users/${id}`, {
-    skipGlobalErrorHandler: true,
-  });
+  const endpointCandidates = [
+    ...(isPublicProfileIdentifier(id)
+      ? PUBLIC_PROFILE_ENDPOINTS.map((endpoint) => `${endpoint}/${id}`)
+      : []),
+    `/users/${id}`,
+  ];
+  let response: Awaited<ReturnType<typeof client.get<SingleUserResponse>>> | undefined;
+
+  for (const endpoint of endpointCandidates) {
+    try {
+      response = await client.get<SingleUserResponse>(endpoint, {
+        skipGlobalErrorHandler: true,
+      });
+      break;
+    } catch (error) {
+      if (endpoint === endpointCandidates[endpointCandidates.length - 1]) {
+        throw error;
+      }
+    }
+  }
 
   return {
-    ...response,
-    data: getUserFromResponse(response.data),
+    ...response!,
+    data: getUserFromResponse(response!.data),
   };
 };
 

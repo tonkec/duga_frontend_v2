@@ -104,7 +104,7 @@ describe('getUserById', () => {
     mockApiClient.mockReturnValue({ get } as unknown as ReturnType<typeof apiClient>);
   });
 
-  it('requests a shared public profile identifier', async () => {
+  it('requests a shared public profile identifier from the public profile endpoint first', async () => {
     get.mockResolvedValue({
       data: {
         id: 48,
@@ -115,7 +115,7 @@ describe('getUserById', () => {
 
     const response = await getUserById('d821efd0-1b6a-468b-b61d-7634836f45d6');
 
-    expect(get).toHaveBeenCalledWith('/users/d821efd0-1b6a-468b-b61d-7634836f45d6', {
+    expect(get).toHaveBeenCalledWith('/users/public/d821efd0-1b6a-468b-b61d-7634836f45d6', {
       skipGlobalErrorHandler: true,
     });
     expect(response.data).toEqual(
@@ -126,6 +126,36 @@ describe('getUserById', () => {
         isVerified: true,
       })
     );
+  });
+
+  it('falls back to the legacy user endpoint when public profile endpoints are unavailable', async () => {
+    get
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockResolvedValueOnce({
+        data: {
+          id: 48,
+          publicId: 'fallback-public-id',
+          username: 'fallback_user',
+        },
+      });
+
+    const response = await getUserById('fallback-public-id');
+
+    expect(get).toHaveBeenNthCalledWith(1, '/users/public/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(get).toHaveBeenNthCalledWith(2, '/users/public-id/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(get).toHaveBeenNthCalledWith(3, '/users/profile/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(get).toHaveBeenNthCalledWith(4, '/users/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(response.data?.username).toBe('fallback_user');
   });
 
   it('unwraps nested single-user API responses', async () => {
@@ -142,6 +172,9 @@ describe('getUserById', () => {
 
     const response = await getUserById('nested-public-id');
 
+    expect(get).toHaveBeenCalledWith('/users/public/nested-public-id', {
+      skipGlobalErrorHandler: true,
+    });
     expect(response.data).toEqual(
       expect.objectContaining({
         id: 49,
