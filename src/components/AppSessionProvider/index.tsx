@@ -31,21 +31,6 @@ const SESSION_REVOKED_MESSAGE = 'Odjavljeni ste jer je račun otvoren u drugoj s
 
 const isCypressRuntime = (windowObject: CypressWindow) => {
   if (windowObject.Cypress || windowObject.__dugaCypressE2E) return true;
-  const isLocalhost =
-    windowObject.location.hostname === 'localhost' ||
-    windowObject.location.hostname === '127.0.0.1';
-
-  if (isLocalhost && windowObject.parent !== windowObject) return true;
-
-  try {
-    return Boolean(
-      windowObject.localStorage.getItem('duga:cypress-auth-user') ||
-        windowObject.localStorage.getItem(CYPRESS_SKIP_SESSION_START_KEY) === 'true' ||
-        windowObject.sessionStorage.getItem('dugaAuth0AccessToken')
-    );
-  } catch {
-    // Continue with parent-window detection below.
-  }
 
   try {
     const parentWindow = windowObject.parent as CypressWindow | undefined;

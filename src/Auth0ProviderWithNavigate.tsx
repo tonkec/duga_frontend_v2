@@ -16,27 +16,10 @@ type CypressWindow = Window &
   };
 
 const CYPRESS_AUTH_USER_KEY = 'duga:cypress-auth-user';
-const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
-const CYPRESS_AUTH0_ACCESS_TOKEN_KEY = 'dugaAuth0AccessToken';
 const DEFAULT_AUTH_REDIRECT_PATH = '/';
 export const AUTH0_IDENTITY_SCOPE = 'openid profile email';
 const isCypressRuntime = (windowObject: CypressWindow) => {
   if (windowObject.Cypress || windowObject.__dugaCypressE2E) return true;
-  const isLocalhost =
-    windowObject.location.hostname === 'localhost' ||
-    windowObject.location.hostname === '127.0.0.1';
-
-  if (isLocalhost && windowObject.parent !== windowObject) return true;
-
-  try {
-    return Boolean(
-      windowObject.localStorage.getItem(CYPRESS_AUTH_USER_KEY) ||
-        windowObject.localStorage.getItem(CYPRESS_SKIP_SESSION_START_KEY) === 'true' ||
-        windowObject.sessionStorage.getItem(CYPRESS_AUTH0_ACCESS_TOKEN_KEY)
-    );
-  } catch {
-    // Continue with parent-window detection below.
-  }
 
   try {
     const parentWindow = windowObject.parent as CypressWindow | undefined;

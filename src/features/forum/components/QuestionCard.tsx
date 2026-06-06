@@ -52,6 +52,7 @@ const QuestionCard = ({ question, currentUserId }: QuestionCardProps) => {
     <article
       role="link"
       tabIndex={0}
+      data-testid="forum-question-card"
       onClick={() => navigate(`/forum/questions/${question.id}`)}
       onKeyDown={(event) => {
         if (event.key === 'Enter') {
