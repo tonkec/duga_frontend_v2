@@ -6,14 +6,20 @@ STAGING_BASE_URL="${VITE_STAGING_BASE_URL:-https://api-staging.duga.chat}"
 PREVIEW_BASE_URL="${VITE_PREVIEW_BASE_URL:-$STAGING_BASE_URL}"
 
 if [[ "${CONTEXT:-}" == "deploy-preview" ]]; then
+  export STAGING="true"
+  export PRODUCTION="false"
   export VITE_APP_ENV="preview"
   export VITE_S3_ENVIRONMENT="preview"
   export VITE_BASE_URL="$PREVIEW_BASE_URL"
 elif [[ "${BRANCH:-}" == "staging" || "${CONTEXT:-}" == "branch-deploy" ]]; then
+  export STAGING="true"
+  export PRODUCTION="false"
   export VITE_APP_ENV="staging"
   export VITE_S3_ENVIRONMENT="staging"
   export VITE_BASE_URL="$STAGING_BASE_URL"
 else
+  export STAGING="false"
+  export PRODUCTION="true"
   export VITE_APP_ENV="production"
   export VITE_S3_ENVIRONMENT="production"
   export VITE_BASE_URL="$PRODUCTION_BASE_URL"
