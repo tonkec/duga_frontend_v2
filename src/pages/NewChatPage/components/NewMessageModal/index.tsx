@@ -175,7 +175,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
       style={modalStyles}
       contentLabel="Nova poruka"
     >
-      <div className="flex max-h-[inherit] flex-col bg-white">
+      <div className="flex max-h-[inherit] flex-col bg-white" data-testid="new-message-modal">
         <div className="border-b border-[#e8eeff] bg-gradient-to-br from-[#f7f9ff] to-white px-5 py-5 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -251,6 +251,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
             className="w-full rounded-xl border-[#dce4ff] bg-[#f7f9ff] py-3 pl-10"
+            data-testid="new-message-search"
           />
 
           <ul
@@ -280,6 +281,7 @@ const NewMessageModal = ({ isOpen, onClose }: INewMessageModalProps) => {
                       aria-selected={isSelected}
                       disabled={isDisabled}
                       onClick={() => handleSelectUser(user.id)}
+                      data-testid="new-message-user-option"
                       className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all hover:border-[#dce4ff] hover:bg-[#f7f9ff] hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue disabled:cursor-not-allowed disabled:opacity-50 ${
                         isSelected ? 'border-blue bg-blue/10' : 'border-transparent bg-white'
                       }`}

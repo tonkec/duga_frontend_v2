@@ -18,6 +18,7 @@ interface IButtonProps {
   type: ButtonType;
   htmlType?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  'data-testid'?: string;
 }
 
 const defaultStyles = `rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200`;

@@ -4,6 +4,7 @@ export {};
 
 const currentUser = {
   id: 1,
+  publicId: 'user-cypress-sender',
   username: 'cypress_sender',
   age: '30',
   onboarding_done: true,
@@ -13,6 +14,7 @@ const currentUser = {
 
 const recipient = {
   id: 2,
+  publicId: 'user-cypress-recipient',
   username: 'cypress_recipient',
   age: 31,
   onboarding_done: true,
@@ -42,8 +44,9 @@ const recipient = {
 const chat = {
   id: 101,
   type: 'private',
+  name: recipient.username,
   createdAt: '2026-05-23T06:57:00.000Z',
-  Users: [recipient],
+  Users: [recipient, currentUser],
   Messages: [],
   ChatUser: {
     userId: String(currentUser.id),
@@ -61,22 +64,14 @@ describe('user sends first message', () => {
     cy.clearLocalStorage();
     cy.clearCookies();
 
-    cy.intercept('POST', '**/register', {
-      statusCode: 201,
-      body: currentUser,
-    }).as('register');
+    cy.mockAuthenticatedSession({ currentUser });
 
-    cy.intercept('POST', '**/sessions/start', {
-      statusCode: 201,
-      body: { active: true },
-    }).as('startSession');
-
-    cy.intercept('GET', '**/users/current-user/**', {
+    cy.intercept('GET', /\/users\/current-user\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: currentUser,
     }).as('getCurrentUser');
 
-    cy.intercept('GET', '**/users/2', {
+    cy.intercept('GET', '**/users/user-cypress-recipient', {
       statusCode: 200,
       body: recipient,
     }).as('getRecipient');
@@ -89,7 +84,7 @@ describe('user sends first message', () => {
     }).as('getChats');
 
     cy.intercept('POST', '**/chats/create', (req) => {
-      expect(req.body).to.deep.equal({ partnerId: recipient.id });
+      expect(req.body).to.deep.equal({ partnerPublicId: recipient.publicId });
       hasCreatedChat = true;
 
       req.reply({
@@ -103,7 +98,7 @@ describe('user sends first message', () => {
       body: [{ userId: currentUser.id }, { userId: recipient.id }],
     }).as('getCurrentChat');
 
-    cy.intercept('GET', '**/chats/messages/**', {
+    cy.intercept('GET', /\/chats\/messages\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: {
         messages: [],
@@ -114,33 +109,27 @@ describe('user sends first message', () => {
       },
     }).as('getMessages');
 
-    cy.intercept('GET', '**/uploads/profile-photo/**', {
+    cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
       statusCode: 404,
       body: {},
     });
 
-    cy.intercept('GET', '**/uploads/user/**', {
+    cy.intercept('GET', /\/uploads\/user\/[^/?]+(?:\?.*)?$/, {
       statusCode: 200,
       body: { images: [] },
     });
 
-    cy.intercept('GET', '**/uploads/user-photos/**', {
+    cy.intercept('GET', /\/uploads\/user-photos\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: [],
     });
 
-    cy.intercept('GET', '**/notifications**', {
+    cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: [],
     });
 
-    cy.setCookie('cookieAccepted', 'true');
-    cy.visit('/login');
-    cy.contains('button', 'Prijavi se').first().click();
-
-    cy.wait('@register');
-    cy.wait('@startSession');
-    cy.visit('/user/2');
+    cy.visitAsAuthenticated('/user/user-cypress-recipient');
 
     cy.contains('h1', recipient.username).should('be.visible');
     cy.contains('button', 'Započni razgovor').click();
@@ -155,16 +144,14 @@ describe('user sends first message', () => {
 
     cy.window()
       .its('__dugaCypressSocketEvents')
-      .should((events) => {
+      .should((events: Array<{ event: string; payload: Record<string, unknown> }>) => {
         const messageEvent = events.find((event) => event.event === 'message');
 
         expect(messageEvent?.payload).to.deep.include({
           type: 'text',
-          fromUserId: currentUser.id,
           chatId: String(chat.id),
           message: firstMessage,
         });
-        expect(messageEvent?.payload).to.have.property('toUserId').deep.equal([recipient.id]);
       });
 
     cy.contains(firstMessage).should('be.visible');

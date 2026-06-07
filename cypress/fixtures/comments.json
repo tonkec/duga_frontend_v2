@@ -1,0 +1,24 @@
+{
+  "empty": [],
+  "latest": [],
+  "photoComments": [
+    {
+      "id": 9001,
+      "comment": "Predivna fotografija!",
+      "userId": "3",
+      "userPublicId": "user-mira",
+      "uploadId": "7002",
+      "createdAt": "2026-06-05T08:30:00.000Z",
+      "taggedUsers": []
+    }
+  ],
+  "created": {
+    "id": 9002,
+    "comment": "Komentar iz Cypress testa.",
+    "userId": "1",
+    "userPublicId": "user-current",
+    "uploadId": "7002",
+    "createdAt": "2026-06-05T08:35:00.000Z",
+    "taggedUsers": []
+  }
+}

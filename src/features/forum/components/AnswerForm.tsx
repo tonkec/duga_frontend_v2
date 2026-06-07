@@ -104,6 +104,7 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
     <form
       onSubmit={handleSubmit}
       className="rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm"
+      data-testid="forum-answer-form"
     >
       <label htmlFor="answer-body" className="text-sm font-bold text-gray-950">
         Tvoj odgovor
@@ -118,6 +119,7 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
         className="mt-2"
         textareaClassName="text-sm"
         placeholder="Napiši odgovor... Upiši @ za označavanje osobe ili : za brzi emoji."
+        data-testid="forum-answer-body"
       />
       <p className="mt-1 text-right text-xs text-gray-400">
         {body.length}/{ANSWER_MAX_LENGTH}
@@ -187,6 +189,7 @@ const AnswerForm = ({ isSubmitting, onSubmit }: AnswerFormProps) => {
           htmlType="submit"
           className="rounded-full px-6 py-3 font-semibold"
           disabled={isSubmitting}
+          data-testid="forum-answer-submit"
         >
           {isSubmitting ? 'Šaljem...' : 'Pošalji odgovor'}
         </Button>

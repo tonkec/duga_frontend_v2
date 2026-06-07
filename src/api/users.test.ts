@@ -1,5 +1,5 @@
 import { apiClient } from '.';
-import { getAllUsers } from './users';
+import { getAllUsers, getUserById } from './users';
 
 jest.mock('.', () => ({
   apiClient: jest.fn(),
@@ -95,5 +95,133 @@ describe('getAllUsers', () => {
         isVerified: false,
       }),
     ]);
+  });
+});
+
+describe('getUserById', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockApiClient.mockReturnValue({ get } as unknown as ReturnType<typeof apiClient>);
+  });
+
+  it('requests a shared public profile identifier from the public profile endpoint first', async () => {
+    get.mockResolvedValue({
+      data: {
+        id: 48,
+        publicId: 'd821efd0-1b6a-468b-b61d-7634836f45d6',
+        username: 'lakotako',
+      },
+    });
+
+    const response = await getUserById('d821efd0-1b6a-468b-b61d-7634836f45d6');
+
+    expect(get).toHaveBeenCalledWith('/users/public/d821efd0-1b6a-468b-b61d-7634836f45d6', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(response.data).toEqual(
+      expect.objectContaining({
+        id: 48,
+        publicId: 'd821efd0-1b6a-468b-b61d-7634836f45d6',
+        username: 'lakotako',
+        isVerified: true,
+      })
+    );
+  });
+
+  it('falls back to the legacy user endpoint when public profile endpoints are unavailable', async () => {
+    get
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockResolvedValueOnce({
+        data: {
+          id: 48,
+          publicId: 'fallback-public-id',
+          username: 'fallback_user',
+        },
+      });
+
+    const response = await getUserById('fallback-public-id');
+
+    expect(get).toHaveBeenNthCalledWith(1, '/users/public/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(get).toHaveBeenNthCalledWith(2, '/users/public-id/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(get).toHaveBeenNthCalledWith(3, '/users/profile/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(get).toHaveBeenNthCalledWith(4, '/users/fallback-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(response.data?.username).toBe('fallback_user');
+  });
+
+  it('unwraps nested single-user API responses', async () => {
+    get.mockResolvedValue({
+      data: {
+        data: {
+          id: 49,
+          publicId: 'nested-public-id',
+          username: 'nested_user',
+          is_verified: true,
+        },
+      },
+    });
+
+    const response = await getUserById('nested-public-id');
+
+    expect(get).toHaveBeenCalledWith('/users/public/nested-public-id', {
+      skipGlobalErrorHandler: true,
+    });
+    expect(response.data).toEqual(
+      expect.objectContaining({
+        id: 49,
+        publicId: 'nested-public-id',
+        username: 'nested_user',
+        isVerified: true,
+      })
+    );
+  });
+
+  it('merges nested profile fields for shared profile pages', async () => {
+    get.mockResolvedValue({
+      data: {
+        id: 50,
+        publicId: 'shared-public-id',
+        username: 'jazovski',
+        profile: {
+          bio: 'Shared profile bio',
+          location: 'Zagreb',
+          gender: 'Nebinarna osoba',
+          sexuality: 'Queer',
+          looking_for: 'friendship',
+          relationship_status: 'single',
+          favorite_day: 'friday',
+          makes_my_day: 'Coffee and good tests.',
+          sports: true,
+        },
+      },
+    });
+
+    const response = await getUserById('shared-public-id');
+
+    expect(response.data).toEqual(
+      expect.objectContaining({
+        id: 50,
+        publicId: 'shared-public-id',
+        username: 'jazovski',
+        bio: 'Shared profile bio',
+        location: 'Zagreb',
+        gender: 'Nebinarna osoba',
+        sexuality: 'Queer',
+        lookingFor: 'friendship',
+        relationshipStatus: 'single',
+        favoriteDayOfWeek: 'friday',
+        makesMyDay: 'Coffee and good tests.',
+        sport: true,
+      })
+    );
   });
 });

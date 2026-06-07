@@ -23,10 +23,22 @@ import { toastConfig } from '@app/configs/toast.config';
 type CypressWindow = Window &
   typeof globalThis & {
     Cypress?: unknown;
+    __dugaCypressE2E?: boolean;
   };
 
 const CYPRESS_SKIP_SESSION_START_KEY = 'duga:cypress-skip-session-start';
 const SESSION_REVOKED_MESSAGE = 'Odjavljeni ste jer je račun otvoren u drugoj sesiji.';
+
+const isCypressRuntime = (windowObject: CypressWindow) => {
+  if (windowObject.Cypress || windowObject.__dugaCypressE2E) return true;
+
+  try {
+    const parentWindow = windowObject.parent as CypressWindow | undefined;
+    return Boolean(parentWindow && parentWindow !== windowObject && parentWindow.Cypress);
+  } catch {
+    return false;
+  }
+};
 
 const getBootstrapSessionKey = (userSub: string) => userSub;
 
@@ -81,7 +93,7 @@ const AppSessionProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (
-      (window as CypressWindow).Cypress &&
+      isCypressRuntime(window as CypressWindow) &&
       localStorage.getItem(CYPRESS_SKIP_SESSION_START_KEY) === 'true'
     ) {
       setStatus('active');

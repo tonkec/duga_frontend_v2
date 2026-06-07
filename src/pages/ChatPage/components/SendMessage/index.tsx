@@ -346,7 +346,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
   }
 
   return (
-    <div>
+    <div data-testid="chat-composer">
       <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-2">
         <input
           name="avatars"
@@ -355,6 +355,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
           className="hidden"
           accept={ALLOWED_FILE_TYPES}
           ref={fileInputRef}
+          data-testid="chat-photo-file-input"
           onChange={(e) => {
             emitTyping();
             const files = e.target.files as FileList;
@@ -382,6 +383,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
             onClick={handleIconClick}
             disabled={isUploadingMessageImage}
             aria-label="Priloži datoteku"
+            data-testid="chat-attach-file"
           >
             <BiPaperclip fontSize={20} style={{ transform: 'rotate(90deg)' }} />
           </button>
@@ -395,6 +397,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
             }}
             disabled={isUploadingMessageImage}
             aria-label="Odaberi GIF"
+            data-testid="chat-open-gif"
           >
             <BiSolidFileGif fontSize={20} />
           </button>
@@ -409,6 +412,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
             }}
             disabled={isUploadingMessageImage}
             aria-label="Odaberi emoji"
+            data-testid="chat-open-emoji"
           >
             <BiSmile fontSize={20} />
           </button>
@@ -438,6 +442,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
                     className="!rounded-full !border-[#dce4ff] py-2.5"
                     type="text"
                     placeholder="Napiši poruku… ( @ za mention, : za emoji )"
+                    data-testid="chat-message-input"
                     {...field}
                     onChange={(e: SyntheticEvent) => {
                       const value = (e.target as HTMLInputElement).value;
@@ -517,6 +522,7 @@ const SendMessage = ({ chatId, mentionableUsers = [] }: ISendMessageProps) => {
           className="order-1 shrink-0 !rounded-full !p-2.5 sm:order-none"
           htmlType="submit"
           disabled={isUploadingMessageImage}
+          data-testid="chat-message-submit"
         >
           {isUploadingMessageImage ? (
             <span className="block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />

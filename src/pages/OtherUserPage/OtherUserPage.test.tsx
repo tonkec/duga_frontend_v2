@@ -17,7 +17,12 @@ jest.mock('@app/components/AppLayout', () => ({
 
 jest.mock('@app/components/UserProfileCard', () => ({
   __esModule: true,
-  default: ({ user }: { user: { username: string } }) => <h1>{user.username}</h1>,
+  default: ({ user }: { user: { username: string; bio?: string } }) => (
+    <div>
+      <h1>{user.username}</h1>
+      {user.bio && <p>{user.bio}</p>}
+    </div>
+  ),
 }));
 
 jest.mock('@app/components/Photos', () => ({
@@ -77,14 +82,14 @@ const existingChat = {
   Messages: [],
 };
 
-const renderOtherUserPage = () => {
+const renderOtherUserPage = (initialEntry = '/user/user-42-public-id') => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/user/user-42-public-id']}>
+      <MemoryRouter initialEntries={[initialEntry]}>
         <LocationProbe />
         <Routes>
           <Route path="/user/:userId" element={<OtherUserPage />} />
@@ -114,6 +119,7 @@ describe('OtherUserPage existing chat integration', () => {
           id: 1,
           publicId: 'current-user-public-id',
           username: 'current_user',
+          bio: 'Current user full profile bio',
         },
       },
       userError: null,
@@ -169,5 +175,26 @@ describe('OtherUserPage existing chat integration', () => {
 
     expect(screen.getByRole('button', { name: 'Započni razgovor' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Nastavi razgovor' })).not.toBeInTheDocument();
+  });
+
+  it('uses current-user profile data when opening the logged-in user public link', () => {
+    mockUseGetUserById.mockReturnValue({
+      user: undefined,
+      userError: null,
+      isUserLoading: true,
+    } as ReturnType<typeof useGetUserById>);
+    mockUseGetAllUserChats.mockReturnValue({
+      userChats: {
+        data: [],
+      },
+      userChatsError: null,
+      isUserChatsLoading: false,
+    } as ReturnType<typeof useGetAllUserChats>);
+
+    renderOtherUserPage('/user/current-user-public-id');
+
+    expect(screen.getAllByRole('heading', { name: 'current_user' }).length).toBeGreaterThan(0);
+    expect(screen.getByText('Current user full profile bio')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Započni razgovor' })).not.toBeInTheDocument();
   });
 });

@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "publicId": "user-current",
+    "username": "cypress_user",
+    "age": 30,
+    "onboarding_done": true,
+    "isVerified": true,
+    "status": "online",
+    "bio": "Current user bio",
+    "location": "Zagreb"
+  },
+  {
+    "id": 2,
+    "publicId": "user-alex",
+    "username": "alex_rain",
+    "age": 31,
+    "onboarding_done": true,
+    "isVerified": true,
+    "status": "offline",
+    "bio": "Open to thoughtful conversations.",
+    "location": "Rijeka",
+    "sexuality": "Queer",
+    "gender": "Nebinarna osoba",
+    "lookingFor": "friendship",
+    "relationshipStatus": "single",
+    "interests": "books, hiking",
+    "languages": "hrvatski, english"
+  },
+  {
+    "id": 3,
+    "publicId": "user-mira",
+    "username": "mira_sun",
+    "age": 28,
+    "onboarding_done": true,
+    "isVerified": true,
+    "status": "online",
+    "bio": "Coffee, art, and long walks.",
+    "location": "Split",
+    "sexuality": "Bisexual",
+    "gender": "Žena",
+    "lookingFor": "relationship",
+    "relationshipStatus": "single",
+    "interests": "art, coffee",
+    "languages": "hrvatski"
+  },
+  {
+    "id": 4,
+    "publicId": "user-hidden",
+    "username": "hidden_unverified",
+    "age": 34,
+    "onboarding_done": true,
+    "isVerified": false,
+    "status": "offline",
+    "bio": "This user should not appear in the verified directory.",
+    "location": "Osijek"
+  }
+]

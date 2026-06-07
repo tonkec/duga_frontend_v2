@@ -335,6 +335,7 @@ const PhotoComments = () => {
             <form
               className="mb-5 rounded-3xl border border-[#dce4ff] bg-[#f7f9ff] p-4 shadow-sm"
               onSubmit={handleSubmit(onSubmit)}
+              data-testid="photo-comment-form"
             >
               <div className="grid w-full gap-3">
                 <Controller
@@ -364,6 +365,7 @@ const PhotoComments = () => {
                         onTagUsersChange={setTaggedUsers}
                         placeholder="Dodaj komentar"
                         className="min-w-0"
+                        data-testid="photo-comment-input"
                       />
                     );
                   }}
@@ -388,6 +390,7 @@ const PhotoComments = () => {
                               accept={ALLOWED_FILE_TYPES}
                               ref={fileInputRef}
                               className="hidden"
+                              data-testid="photo-comment-file-input"
                               onChange={(e) => {
                                 if (!e.target.files) {
                                   return;
@@ -460,6 +463,7 @@ const PhotoComments = () => {
                     type="blue"
                     className="w-full rounded-2xl py-4 text-base font-semibold sm:w-auto sm:px-8"
                     disabled={isAddingUploadComment}
+                    data-testid="photo-comment-submit"
                   >
                     {isAddingUploadComment ? (
                       <span className="flex items-center justify-center gap-2">
@@ -553,7 +557,10 @@ const PhotoComments = () => {
               )}
 
               {!areCommentsLoading && !sortedComments.length && (
-                <div className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600">
+                <div
+                  className="rounded-2xl border border-dashed border-[#dce4ff] bg-white p-6 text-center text-gray-600"
+                  data-testid="photo-comments-empty"
+                >
                   Još nema komentara.
                 </div>
               )}

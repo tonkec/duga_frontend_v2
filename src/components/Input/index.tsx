@@ -15,6 +15,7 @@ interface InputProps {
   error?: string;
   label?: string | React.ReactNode;
   disabled?: boolean;
+  'data-testid'?: string;
 }
 
 const inputStyles = `bg-white focus:outline-none focus:shadow-outline border border-gray-200 rounded px-4 block w-full appearance-none leading-normal focus:border-blue`;

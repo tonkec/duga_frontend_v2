@@ -11,12 +11,24 @@ type AppState = {
 type CypressWindow = Window &
   typeof globalThis & {
     Cypress?: unknown;
+    __dugaCypressE2E?: boolean;
     __dugaCypressAuthUser?: ReturnType<typeof createCypressUser>;
   };
 
 const CYPRESS_AUTH_USER_KEY = 'duga:cypress-auth-user';
 const DEFAULT_AUTH_REDIRECT_PATH = '/';
 export const AUTH0_IDENTITY_SCOPE = 'openid profile email';
+const isCypressRuntime = (windowObject: CypressWindow) => {
+  if (windowObject.Cypress || windowObject.__dugaCypressE2E) return true;
+
+  try {
+    const parentWindow = windowObject.parent as CypressWindow | undefined;
+    return Boolean(parentWindow && parentWindow !== windowObject && parentWindow.Cypress);
+  } catch {
+    return false;
+  }
+};
+
 export const getSafeAuthReturnTo = (returnTo: string | undefined, fallbackPath: string) => {
   if (!returnTo) return fallbackPath || DEFAULT_AUTH_REDIRECT_PATH;
   if (!returnTo.startsWith('/') || returnTo.startsWith('//') || returnTo.includes('\\')) {
@@ -78,7 +90,8 @@ const CypressAuth0Provider = ({ children }: { children: ReactNode }) => {
 export const Auth0ProviderWithNavigate = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
-  if ((window as CypressWindow).Cypress) {
+  const cypressWindow = window as CypressWindow;
+  if (isCypressRuntime(cypressWindow)) {
     return <CypressAuth0Provider>{children}</CypressAuth0Provider>;
   }
 

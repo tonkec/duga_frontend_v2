@@ -248,6 +248,34 @@ describe('UsersPage dating flow integration', () => {
     );
   });
 
+  it('shows search filter empty copy when profile-photo filter has no matches', async () => {
+    mockUseGetAllUsers.mockReturnValue({
+      allUsers: {
+        data: [
+          apiUser({
+            id: 2,
+            username: 'user_without_profile_photo',
+          }),
+        ],
+      },
+      allUsersError: null,
+      isAllUsersLoading: false,
+    } as ReturnType<typeof useGetAllUsers>);
+
+    renderUsersPage();
+
+    fireEvent.click(screen.getByLabelText('Prikaži samo korisnike s profilnom'));
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          'Nema korisnika koji odgovaraju odabranim filtrima. Pokušaj promijeniti pretragu ili prikazati sve profile.'
+        )
+      ).toBeVisible()
+    );
+    expect(screen.getByRole('button', { name: 'Očisti pretragu' })).toBeVisible();
+  });
+
   it('opens a user profile when a rendered card is clicked', () => {
     mockUseGetAllUsers.mockReturnValue({
       allUsers: {

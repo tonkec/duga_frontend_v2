@@ -5,8 +5,9 @@ import { io } from 'socket.io-client';
 import { SocketProvider } from './SocketProvider';
 import { useSocket } from './useSocket';
 import { AppSessionContext, AppSessionStatus } from './AppSessionContext';
-import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { register } from '@app/api/auth/register';
+import { register } from '../api/auth/register';
+import { useCurrentBackendUser } from '../hooks/useEnsureBackendUser';
+import { setOfflineStatus } from '../utils/setOfflineStatus';
 
 jest.mock('socket.io-client', () => ({
   io: jest.fn(),
@@ -24,9 +25,14 @@ jest.mock('@app/api/auth/register', () => ({
   register: jest.fn(),
 }));
 
+jest.mock('@app/utils/setOfflineStatus', () => ({
+  setOfflineStatus: jest.fn(),
+}));
+
 const mockIo = jest.mocked(io);
 const mockUseCurrentBackendUser = jest.mocked(useCurrentBackendUser);
 const mockRegister = jest.mocked(register);
+const mockSetOfflineStatus = jest.mocked(setOfflineStatus);
 
 const socket = {
   id: 'socket-1',
@@ -52,6 +58,7 @@ const renderSocketProvider = (status: AppSessionStatus = 'active') =>
 describe('SocketProvider session authorization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSetOfflineStatus.mockResolvedValue(undefined);
     mockUseCurrentBackendUser.mockReturnValue({
       data: { id: 1, username: 'current_user' },
       isLoading: false,
@@ -89,5 +96,27 @@ describe('SocketProvider session authorization', () => {
     expect(mockIo).not.toHaveBeenCalled();
     expect(mockRegister).not.toHaveBeenCalled();
     expect(screen.getByTestId('socket-state')).toHaveTextContent('disconnected');
+  });
+
+  it('marks the user offline before disconnecting on unmount', async () => {
+    const { unmount } = renderSocketProvider('active');
+
+    await waitFor(() => expect(mockIo).toHaveBeenCalledTimes(1));
+
+    unmount();
+
+    expect(mockSetOfflineStatus).toHaveBeenCalledWith(socket, { waitForAck: true });
+    await waitFor(() => expect(socket.disconnect).toHaveBeenCalledTimes(1));
+  });
+
+  it('marks the user offline immediately when the tab is closing', async () => {
+    renderSocketProvider('active');
+
+    await waitFor(() => expect(mockIo).toHaveBeenCalledTimes(1));
+
+    window.dispatchEvent(new Event('beforeunload'));
+
+    expect(mockSetOfflineStatus).toHaveBeenCalledWith(socket, { waitForAck: false });
+    await waitFor(() => expect(socket.disconnect).toHaveBeenCalledTimes(1));
   });
 });

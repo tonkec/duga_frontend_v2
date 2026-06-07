@@ -158,6 +158,7 @@ const QuestionForm = ({
     <form
       onSubmit={handleSubmit}
       className="rounded-3xl border border-[#dce4ff] bg-white p-5 shadow-sm md:p-6"
+      data-testid="forum-question-form"
     >
       <div>
         <label htmlFor="question-title" className="text-sm font-bold text-gray-950">
@@ -170,6 +171,7 @@ const QuestionForm = ({
           className="mt-2 w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
           maxLength={120}
           placeholder="Ukratko opiši pitanje"
+          data-testid="forum-question-title"
         />
         {errors.title && <p className="mt-2 text-sm font-medium text-red">{errors.title}</p>}
       </div>
@@ -188,6 +190,7 @@ const QuestionForm = ({
           className="mt-2"
           textareaClassName="text-sm"
           placeholder="Dodaj kontekst, što si već pokušao_la i kakvu pomoć trebaš. Upiši @ za označavanje osobe ili : za brzi emoji."
+          data-testid="forum-question-body"
         />
         <p className="mt-1 text-right text-xs text-gray-400">
           {body.length}/{FORUM_MAX_BODY_LENGTH}

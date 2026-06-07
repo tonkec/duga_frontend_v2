@@ -60,7 +60,7 @@ const LatestUpload = ({ upload }: { upload: IUpload }) => {
   const { allImages } = useGetAllImages(upload.userId);
   const { data: imageBlob } = useGetImageBlob(upload.securePhotoUrl || upload.url || '');
   const imageBlobUrl = useObjectUrl(imageBlob);
-  const username = user?.data.username || 'Korisnik';
+  const username = user?.data?.username || 'Korisnik';
   const uploadUser = upload.User || upload.user;
   const userImages = Array.isArray(allImages?.data?.images) ? allImages.data.images : [];
   const galleryProfilePhoto = userImages.find((image: IImage) => image.isProfilePhoto);

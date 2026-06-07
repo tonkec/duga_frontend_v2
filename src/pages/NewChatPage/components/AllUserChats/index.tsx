@@ -80,7 +80,12 @@ const AllUserChats = ({ userChats }: IAllUserChats) => {
                   : `${sortedChats.length} aktivnih razgovora`}
             </p>
           </div>
-          <Button type="blue" className="shrink-0" onClick={() => setIsNewMessageModalOpen(true)}>
+          <Button
+            type="blue"
+            className="shrink-0"
+            onClick={() => setIsNewMessageModalOpen(true)}
+            data-testid="new-message-button"
+          >
             Nova poruka
           </Button>
         </div>

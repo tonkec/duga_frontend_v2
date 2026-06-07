@@ -257,6 +257,7 @@ const AnswerCard = ({
 
   return (
     <article
+      data-testid="forum-answer-card"
       className={`rounded-3xl border p-5 shadow-sm ${
         answer.isAccepted
           ? 'border-green/40 bg-green/5 ring-2 ring-green/10'

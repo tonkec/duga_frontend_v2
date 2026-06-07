@@ -1,0 +1,53 @@
+{
+  "empty": {
+    "messages": [],
+    "pagination": {
+      "page": 1,
+      "totalPages": 1
+    }
+  },
+  "existingChat": {
+    "messages": [
+      {
+        "id": 5001,
+        "message": "Bok iz postojećeg razgovora.",
+        "content": "Bok iz postojećeg razgovora.",
+        "createdAt": "2026-06-03T09:01:00.000Z",
+        "User": {
+          "id": 2,
+          "publicId": "user-alex",
+          "username": "alex_rain"
+        },
+        "fromUserId": 2,
+        "chatId": 201,
+        "type": "text",
+        "securePhotoUrl": "",
+        "messagePhotoUrl": "",
+        "reactions": [],
+        "userReactions": []
+      },
+      {
+        "id": 5002,
+        "message": "Drago mi je da test radi.",
+        "content": "Drago mi je da test radi.",
+        "createdAt": "2026-06-03T09:02:00.000Z",
+        "User": {
+          "id": 1,
+          "publicId": "user-current",
+          "username": "cypress_user"
+        },
+        "fromUserId": 1,
+        "chatId": 201,
+        "type": "text",
+        "securePhotoUrl": "",
+        "messagePhotoUrl": "",
+        "reactions": [],
+        "userReactions": []
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "totalPages": 1
+    }
+  }
+}

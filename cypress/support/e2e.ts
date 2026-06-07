@@ -14,4 +14,8 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
+
+Cypress.on('window:before:load', (win) => {
+  (win as Window & { __dugaCypressE2E?: boolean }).__dugaCypressE2E = true;
+});

@@ -379,7 +379,7 @@ const ForumQuestionsPage = () => {
 
   return (
     <AppLayout>
-      <section className="mx-auto max-w-5xl">
+      <section className="mx-auto max-w-5xl" data-testid="forum-questions-page">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">Forum</p>
@@ -409,6 +409,7 @@ const ForumQuestionsPage = () => {
                 maxLength={SEARCH_MAX_LENGTH}
                 className="w-full rounded-2xl border border-[#dce4ff] px-4 py-3 text-sm outline-none transition-colors focus:border-blue"
                 placeholder="Pretraži pitanja..."
+                data-testid="forum-search-input"
               />
               {filterErrors.search && (
                 <p className="text-sm font-medium text-red">{filterErrors.search}</p>
@@ -588,6 +589,7 @@ const ForumQuestionsPage = () => {
                 ? 'border-blue/20 bg-white'
                 : 'border-[#dce4ff] bg-gradient-to-br from-[#f7f9ff] via-white to-[#eef3ff]'
             }`}
+            data-testid="forum-empty-state"
           >
             <span className="mx-auto mb-4 inline-flex rounded-full bg-blue/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-dark">
               {hasActiveFilters ? 'Nema rezultata' : 'Forum'}

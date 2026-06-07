@@ -105,7 +105,11 @@ const CommentWithUser: React.FC<{
   const renderContent = () => {
     if (isEditing) {
       return (
-        <form className="flex flex-col gap-3 w-full" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="flex flex-col gap-3 w-full"
+          onSubmit={handleSubmit(onSubmit)}
+          data-testid="photo-comment-edit-form"
+        >
           <div className="flex flex-col w-full">
             <Controller
               name="comment"
@@ -119,16 +123,27 @@ const CommentWithUser: React.FC<{
                   }}
                   placeholder="Izmijeni komentar"
                   initialTaggedUsers={taggedUsers}
+                  data-testid="photo-comment-edit-input"
                 />
               )}
             />
             {errors.comment && <FieldError message="Komentar je obavezan." />}
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="transparent" htmlType="button" onClick={() => setIsEditing(false)}>
+            <Button
+              type="transparent"
+              htmlType="button"
+              onClick={() => setIsEditing(false)}
+              data-testid="photo-comment-edit-cancel"
+            >
               Otkaži
             </Button>
-            <Button type="blue" htmlType="submit" disabled={comment.comment === watch('comment')}>
+            <Button
+              type="blue"
+              htmlType="submit"
+              disabled={comment.comment === watch('comment')}
+              data-testid="photo-comment-edit-save"
+            >
               Spremi
             </Button>
           </div>
@@ -159,6 +174,7 @@ const CommentWithUser: React.FC<{
               htmlType="button"
               className="rounded-full px-4 py-2 font-semibold shadow-sm shadow-blue/15"
               onClick={() => setIsEditing(true)}
+              data-testid="photo-comment-edit-button"
             >
               Izmijeni
             </Button>
@@ -167,6 +183,7 @@ const CommentWithUser: React.FC<{
               htmlType="button"
               className="rounded-full px-4 py-2 font-semibold"
               onClick={() => setIsDeleteModalOpen(true)}
+              data-testid="photo-comment-delete-button"
             >
               Obriši
             </Button>
@@ -176,7 +193,7 @@ const CommentWithUser: React.FC<{
     );
   };
 
-  const username = user?.data.username || 'Korisnik';
+  const username = user?.data?.username || 'Korisnik';
   const isOwnComment = String(currentUserId) === String(comment.userId);
 
   return (
@@ -195,7 +212,10 @@ const CommentWithUser: React.FC<{
         </div>
       </ConfirmModal>
 
-      <div className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm">
+      <div
+        className="rounded-2xl border border-[#dce4ff] bg-white p-4 shadow-sm"
+        data-testid="photo-comment-card"
+      >
         <div className="mb-3 flex items-center justify-between gap-3">
           <button
             type="button"

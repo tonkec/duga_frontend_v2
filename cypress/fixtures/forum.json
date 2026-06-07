@@ -1,0 +1,112 @@
+{
+  "author": {
+    "id": 2,
+    "publicId": "user-forum-author",
+    "username": "forum_author",
+    "name": "Forum Author"
+  },
+  "currentUser": {
+    "id": 1,
+    "publicId": "user-current",
+    "username": "cypress_user",
+    "name": "Cypress User"
+  },
+  "category": {
+    "id": 1,
+    "name": "Odnosi",
+    "slug": "odnosi"
+  },
+  "question": {
+    "id": 101,
+    "userId": 2,
+    "title": "Kako započeti razgovor na Dugi?",
+    "body": "Volio_la bih čuti savjete zajednice za prvi razgovor i kako postaviti dobro pitanje.",
+    "categoryId": 1,
+    "isResolved": false,
+    "createdAt": "2026-06-05T10:00:00.000Z",
+    "updatedAt": "2026-06-05T10:00:00.000Z",
+    "User": {
+      "id": 2,
+      "publicId": "user-forum-author",
+      "username": "forum_author",
+      "name": "Forum Author"
+    },
+    "Category": {
+      "id": 1,
+      "name": "Odnosi",
+      "slug": "odnosi"
+    },
+    "Answers": [
+      {
+        "id": 201,
+        "questionId": 101,
+        "userId": 3,
+        "body": "Kreni s nečim konkretnim i toplim, na primjer pitanjem o interesima.",
+        "isAccepted": false,
+        "createdAt": "2026-06-05T10:15:00.000Z",
+        "updatedAt": "2026-06-05T10:15:00.000Z",
+        "User": {
+          "id": 3,
+          "publicId": "user-answerer",
+          "username": "helpful_answerer",
+          "name": "Helpful Answerer"
+        },
+        "reactions": [],
+        "replies": []
+      }
+    ],
+    "answerCount": 1,
+    "voteScore": 2,
+    "reactions": []
+  },
+  "createdQuestion": {
+    "id": 102,
+    "userId": 1,
+    "title": "Kako testirati forum kroz Cypress?",
+    "body": "Zanima me kako najbolje pokriti forum pitanja i odgovore kroz E2E testove.",
+    "categoryId": null,
+    "isResolved": false,
+    "createdAt": "2026-06-06T11:00:00.000Z",
+    "updatedAt": "2026-06-06T11:00:00.000Z",
+    "User": {
+      "id": 1,
+      "publicId": "user-current",
+      "username": "cypress_user",
+      "name": "Cypress User"
+    },
+    "Answers": [],
+    "answerCount": 0,
+    "voteScore": 0
+  },
+  "createdAnswer": {
+    "id": 202,
+    "questionId": 101,
+    "userId": 1,
+    "body": "Cypress odgovor s dovoljno konteksta za forum pitanje.",
+    "isAccepted": false,
+    "createdAt": "2026-06-06T11:10:00.000Z",
+    "updatedAt": "2026-06-06T11:10:00.000Z",
+    "User": {
+      "id": 1,
+      "publicId": "user-current",
+      "username": "cypress_user",
+      "name": "Cypress User"
+    },
+    "reactions": [],
+    "replies": []
+  },
+  "listResponse": {
+    "data": [],
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  },
+  "emptyResponse": {
+    "data": [],
+    "total": 0,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}

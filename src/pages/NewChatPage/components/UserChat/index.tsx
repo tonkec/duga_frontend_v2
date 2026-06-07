@@ -65,6 +65,7 @@ const UserChat = ({
     <button
       type="button"
       onClick={handleClick}
+      data-testid="chat-list-row"
       className={clsx(
         'user-chat-item group flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors duration-150',
         'hover:bg-[#eef3ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue',

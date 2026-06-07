@@ -3,29 +3,44 @@
 export {};
 
 const currentUser = {
-  id: 'user-cypress-signup',
+  id: 1,
+  publicId: 'user-cypress-signup',
   username: 'cypress_signup',
   onboarding_done: false,
+  isVerified: true,
+  status: 'online',
 };
 
 describe('user signup', () => {
   it('creates an account and completes onboarding', () => {
     let onboardingDone = false;
+    let hasRegistered = false;
 
     cy.clearLocalStorage();
     cy.clearCookies();
 
-    cy.intercept('POST', '**/register', {
-      statusCode: 201,
-      body: { data: currentUser },
+    cy.intercept('POST', '**/register', (req) => {
+      hasRegistered = true;
+      req.reply({
+        statusCode: 201,
+        body: currentUser,
+      });
     }).as('register');
 
     cy.intercept('POST', '**/sessions/start', {
       statusCode: 201,
-      body: { data: { active: true } },
+      body: { csrfToken: 'cypress-csrf-token' },
     }).as('startSession');
 
-    cy.intercept('GET', '**/users/current-user/**', (req) => {
+    cy.intercept('GET', /\/users\/current-user\/?(?:\?.*)?$/, (req) => {
+      if (!hasRegistered) {
+        req.reply({
+          statusCode: 401,
+          body: { message: 'Not authenticated' },
+        });
+        return;
+      }
+
       req.reply({
         statusCode: 200,
         body: {
@@ -56,15 +71,45 @@ describe('user signup', () => {
       });
     }).as('completeOnboarding');
 
-    cy.intercept('GET', '**/users/get-users/**', {
+    cy.intercept('GET', /\/users\/get-users\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: [],
     }).as('getUsers');
 
-    cy.intercept('GET', '**/uploads/latest', {
+    cy.intercept('GET', /\/chats\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getChats');
+
+    cy.intercept('GET', /\/uploads\/latest\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: [],
     }).as('getLatestUploads');
+
+    cy.intercept('GET', /\/comments\/latest\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getLatestComments');
+
+    cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getNotifications');
+
+    cy.intercept('GET', '**/uploads/profile-photo/*', {
+      statusCode: 200,
+      body: {},
+    }).as('getProfilePhoto');
+
+    cy.intercept('GET', '**/uploads/user/*', {
+      statusCode: 200,
+      body: { images: [] },
+    }).as('getUserUploads');
+
+    cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: [], pagination: { page: 1, totalPages: 1 } },
+    }).as('getForumQuestions');
 
     cy.setCookie('cookieAccepted', 'true');
     cy.visit('/login');
@@ -83,7 +128,7 @@ describe('user signup', () => {
 
     cy.wait('@completeOnboarding');
     cy.location('pathname').should('eq', '/');
-    cy.contains('Zadnji online korisnici').should('be.visible');
-    cy.contains('Nema korisnika').should('be.visible');
+    cy.contains('Ljudeki koje možeš upoznati').should('be.visible');
+    cy.contains('Još nema korisnika').should('be.visible');
   });
 });

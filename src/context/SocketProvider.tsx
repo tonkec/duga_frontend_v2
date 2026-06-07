@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState, ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './SocketContext';
 import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
 import { markSessionRevoked } from '@app/api/appSession';
 import { useAppSessionStatus } from './AppSessionContext';
+import { setOfflineStatus } from '@app/utils/setOfflineStatus';
 
 type CypressSocketEvent = {
   event: string;
@@ -13,13 +14,21 @@ type CypressSocketEvent = {
 type CypressWindow = Window &
   typeof globalThis & {
     Cypress?: unknown;
+    __dugaCypressE2E?: boolean;
     __dugaCypressSocketEvents?: CypressSocketEvent[];
+    __dugaCypressReceiveSocketEvent?: (event: string, payload?: unknown) => void;
   };
 
 const createCypressSocket = () => {
   const handlers = new Map<string, Set<(payload: unknown) => void>>();
+  const cypressWindow = window as CypressWindow;
+
+  cypressWindow.__dugaCypressReceiveSocketEvent = (event: string, payload?: unknown) => {
+    handlers.get(event)?.forEach((handler) => handler(payload));
+  };
 
   return {
+    connected: true,
     on: (event: string, handler: (payload: unknown) => void) => {
       const eventHandlers = handlers.get(event) ?? new Set();
       eventHandlers.add(handler);
@@ -34,7 +43,6 @@ const createCypressSocket = () => {
       handlers.get(event)?.delete(handler);
     },
     emit: (event: string, payload: unknown) => {
-      const cypressWindow = window as CypressWindow;
       cypressWindow.__dugaCypressSocketEvents = [
         ...(cypressWindow.__dugaCypressSocketEvents ?? []),
         { event, payload },
@@ -54,20 +62,40 @@ const createCypressSocket = () => {
   } as unknown as Socket;
 };
 
+const isCypressRuntime = (windowObject: CypressWindow) => {
+  if (windowObject.Cypress || windowObject.__dugaCypressE2E) return true;
+
+  try {
+    const parentWindow = windowObject.parent as CypressWindow | undefined;
+    return Boolean(parentWindow && parentWindow !== windowObject && parentWindow.Cypress);
+  } catch {
+    return false;
+  }
+};
+
 const getBackendUrl = () => {
   const { hostname } = window.location;
   if (hostname.includes('staging.duga.chat')) {
     return 'https://api-staging.duga.chat';
   }
   if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
-    return 'https://duga-backend-c67896e8029c.herokuapp.com/';
+    return 'https://api.duga.chat/';
   }
   return 'http://localhost:8080/';
 };
 
-const CypressSocketProvider = ({ children }: { children: ReactNode }) => (
-  <SocketContext.Provider value={createCypressSocket()}>{children}</SocketContext.Provider>
-);
+const CypressSocketProvider = ({ children }: { children: ReactNode }) => {
+  const socket = useMemo(() => createCypressSocket(), []);
+
+  useEffect(() => {
+    socket.on('session-revoked', markSessionRevoked);
+    return () => {
+      socket.off('session-revoked', markSessionRevoked);
+    };
+  }, [socket]);
+
+  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+};
 
 const RealSocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -86,26 +114,28 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
       setSocket(null);
       return;
     }
-    let newSocket: Socket;
+    let newSocket: Socket | null = null;
+    let didRequestOffline = false;
 
     const connectSocket = async () => {
       try {
-        newSocket = io(getBackendUrl(), {
+        const createdSocket = io(getBackendUrl(), {
           withCredentials: true,
         });
 
-        socketRef.current = newSocket;
-        setSocket(newSocket);
+        newSocket = createdSocket;
+        socketRef.current = createdSocket;
+        setSocket(createdSocket);
 
-        newSocket.on('connect', () => {
-          newSocket.emit('join');
+        createdSocket.on('connect', () => {
+          createdSocket.emit('join');
         });
 
-        newSocket.on('connect_error', () => undefined);
+        createdSocket.on('connect_error', () => undefined);
 
-        newSocket.on('session-revoked', () => {
+        createdSocket.on('session-revoked', () => {
           markSessionRevoked();
-          newSocket.disconnect();
+          void setOfflineStatus(createdSocket).finally(() => createdSocket.disconnect());
         });
       } catch {
         // Socket auth is cookie-backed; avoid logging handshake details client-side.
@@ -114,8 +144,34 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
 
     connectSocket();
 
+    const disconnectOffline = (waitForAck: boolean) => {
+      const socketToDisconnect = newSocket;
+      if (!socketToDisconnect) return;
+      if (didRequestOffline) {
+        socketToDisconnect.disconnect();
+        return;
+      }
+
+      didRequestOffline = true;
+      void setOfflineStatus(socketToDisconnect, { waitForAck }).finally(() =>
+        socketToDisconnect.disconnect()
+      );
+    };
+
+    const handlePageHide = (event: PageTransitionEvent) => {
+      if (event.persisted) return;
+
+      disconnectOffline(false);
+    };
+    const handleBeforeUnload = () => disconnectOffline(false);
+
+    window.addEventListener('pagehide', handlePageHide);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
-      newSocket?.disconnect();
+      window.removeEventListener('pagehide', handlePageHide);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      disconnectOffline(true);
       if (socketRef.current === newSocket) {
         socketRef.current = null;
         setSocket(null);
@@ -127,7 +183,8 @@ const RealSocketProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  if ((window as CypressWindow).Cypress) {
+  const cypressWindow = window as CypressWindow;
+  if (isCypressRuntime(cypressWindow)) {
     return <CypressSocketProvider>{children}</CypressSocketProvider>;
   }
 

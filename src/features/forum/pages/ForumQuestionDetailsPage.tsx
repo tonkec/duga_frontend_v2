@@ -252,7 +252,7 @@ const ForumQuestionDetailsPage = () => {
 
   return (
     <AppLayout>
-      <article className="mx-auto max-w-4xl">
+      <article className="mx-auto max-w-4xl" data-testid="forum-question-details-page">
         <Link to="/forum" className="mb-5 inline-flex text-sm font-semibold text-blue underline">
           Povratak na forum
         </Link>
@@ -441,7 +441,7 @@ const ForumQuestionDetailsPage = () => {
           </section>
         )}
 
-        <section className="mt-8">
+        <section className="mt-8" data-testid="forum-answers-section">
           <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue">
