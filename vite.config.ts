@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import path from 'path';
 
+const isEnabled = (value: string | undefined) => value === 'true';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -29,7 +31,7 @@ export default defineConfig({
     sourcemap: false,
   },
   define: {
-    'import.meta.env.STAGING': JSON.stringify(Boolean(process.env.STAGING)),
-    'import.meta.env.PRODUCTION': JSON.stringify(Boolean(process.env.PRODUCTION)),
+    'import.meta.env.STAGING': JSON.stringify(isEnabled(process.env.STAGING)),
+    'import.meta.env.PRODUCTION': JSON.stringify(isEnabled(process.env.PRODUCTION)),
   },
 });
