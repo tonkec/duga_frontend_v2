@@ -2,7 +2,7 @@ import { useLayoutEffect, ReactNode, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { clearAccessTokenGetter, setAccessTokenGetter } from '@app/api/authToken';
 import { AUTH0_IDENTITY_SCOPE } from '@app/Auth0ProviderWithNavigate';
-import { getEnv } from '@app/configs/env';
+import { getAuth0Audience } from '@app/configs/auth0Env';
 
 const AuthTokenBridge = ({ children }: { children: ReactNode }) => {
   const { getAccessTokenSilently, isLoading } = useAuth0();
@@ -19,7 +19,7 @@ const AuthTokenBridge = ({ children }: { children: ReactNode }) => {
     setAccessTokenGetter(async () => {
       const token = await getAccessTokenSilently({
         authorizationParams: {
-          audience: getEnv('VITE_AUTH0_AUDIENCE'),
+          audience: getAuth0Audience(),
           scope: AUTH0_IDENTITY_SCOPE,
         },
       });

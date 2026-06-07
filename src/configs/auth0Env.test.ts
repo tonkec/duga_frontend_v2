@@ -6,12 +6,12 @@ describe('getAuth0Config', () => {
     resetTestEnvFlags();
   });
 
-  it('uses default Auth0 config when no deploy environment flag is enabled', () => {
+  it('uses production Auth0 config when no staging flag is enabled', () => {
     expect(getAuth0Config()).toEqual({
-      audience: 'test-auth0-audience',
-      clientId: 'test-auth0-client-id',
-      domain: 'test.auth0.com',
-      redirectUri: 'http://localhost/callback',
+      audience: 'test-production-auth0-audience',
+      clientId: 'test-production-auth0-client-id',
+      domain: 'production.test.auth0.com',
+      redirectUri: 'http://production.localhost/callback',
     });
   });
 

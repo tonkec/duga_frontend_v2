@@ -90,8 +90,8 @@ describe('LoginPage redirects', () => {
         returnTo: '/post-login',
       },
       authorizationParams: {
-        redirect_uri: 'http://localhost/callback',
-        audience: 'test-auth0-audience',
+        redirect_uri: 'http://production.localhost/callback',
+        audience: 'test-production-auth0-audience',
         scope: 'openid profile email',
       },
     });
