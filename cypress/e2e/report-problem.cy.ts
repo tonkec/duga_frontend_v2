@@ -28,8 +28,8 @@ describe('report problem', () => {
       cy.visitAsAuthenticated('/report');
 
       cy.contains('h1', 'Prijavi problem').should('be.visible');
-      cy.contains('Odaberi vrstu problema').click();
-      cy.contains('Uznemiravanje, prijetnje ili govor mržnje').click();
+      cy.get('#report-problem-type').click({ force: true }).type('Uznemiravanje{enter}');
+      cy.contains('Uznemiravanje, prijetnje ili govor mržnje').should('be.visible');
       cy.get('textarea[placeholder="Opiši problem što detaljnije..."]').type(
         'Korisnik mi salje prijetece poruke u chatu.'
       );

@@ -117,13 +117,19 @@ export default function ReportPage() {
         <Card className="rounded-2xl p-5 md:p-7">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <div className="rounded-2xl border border-[#dce4ff] bg-[#f7f9ff] p-4">
-              <label className="mb-2 block text-sm font-bold text-gray-700">Vrsta problema</label>
+              <label
+                htmlFor="report-problem-type"
+                className="mb-2 block text-sm font-bold text-gray-700"
+              >
+                Vrsta problema
+              </label>
               <Controller
                 name="problem_type"
                 control={control}
                 render={({ field }) => (
                   <>
                     <Select
+                      inputId="report-problem-type"
                       options={problemOptions}
                       value={problemOptions.find((opt) => opt.value === field.value) ?? null}
                       onChange={(opt) => field.onChange((opt as Option | null)?.value ?? '')}
