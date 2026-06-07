@@ -1,8 +1,4 @@
 type EnvKey =
-  | 'VITE_AUTH0_AUDIENCE'
-  | 'VITE_AUTH0_CALLBACK_URL'
-  | 'VITE_AUTH0_CLIENT_ID'
-  | 'VITE_AUTH0_DOMAIN'
   | 'VITE_AUTH0_PRODUCTION_AUDIENCE'
   | 'VITE_AUTH0_PRODUCTION_CALLBACK_URL'
   | 'VITE_AUTH0_PRODUCTION_CLIENT_ID'
@@ -19,10 +15,6 @@ type EnvKey =
 type EnvFlagKey = 'PRODUCTION' | 'STAGING';
 
 const testEnv: Partial<Record<EnvKey, string>> = {
-  VITE_AUTH0_AUDIENCE: 'test-auth0-audience',
-  VITE_AUTH0_CALLBACK_URL: 'http://localhost/callback',
-  VITE_AUTH0_CLIENT_ID: 'test-auth0-client-id',
-  VITE_AUTH0_DOMAIN: 'test.auth0.com',
   VITE_AUTH0_PRODUCTION_AUDIENCE: 'test-production-auth0-audience',
   VITE_AUTH0_PRODUCTION_CALLBACK_URL: 'http://production.localhost/callback',
   VITE_AUTH0_PRODUCTION_CLIENT_ID: 'test-production-auth0-client-id',

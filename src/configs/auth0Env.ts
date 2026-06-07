@@ -14,13 +14,6 @@ type Auth0EnvKeys = {
   redirectUri: EnvKey;
 };
 
-const defaultAuth0EnvKeys: Auth0EnvKeys = {
-  audience: 'VITE_AUTH0_AUDIENCE',
-  clientId: 'VITE_AUTH0_CLIENT_ID',
-  domain: 'VITE_AUTH0_DOMAIN',
-  redirectUri: 'VITE_AUTH0_CALLBACK_URL',
-};
-
 const productionAuth0EnvKeys: Auth0EnvKeys = {
   audience: 'VITE_AUTH0_PRODUCTION_AUDIENCE',
   clientId: 'VITE_AUTH0_PRODUCTION_CLIENT_ID',
@@ -37,9 +30,8 @@ const stagingAuth0EnvKeys: Auth0EnvKeys = {
 
 const resolveAuth0EnvKeys = () => {
   if (getEnvFlag('STAGING')) return stagingAuth0EnvKeys;
-  if (getEnvFlag('PRODUCTION')) return productionAuth0EnvKeys;
 
-  return defaultAuth0EnvKeys;
+  return productionAuth0EnvKeys;
 };
 
 export const getAuth0Config = (): Auth0EnvConfig => {
