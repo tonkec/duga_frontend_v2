@@ -5,9 +5,9 @@ import { io } from 'socket.io-client';
 import { SocketProvider } from './SocketProvider';
 import { useSocket } from './useSocket';
 import { AppSessionContext, AppSessionStatus } from './AppSessionContext';
-import { useCurrentBackendUser } from '@app/hooks/useEnsureBackendUser';
-import { register } from '@app/api/auth/register';
-import { setOfflineStatus } from '@app/utils/setOfflineStatus';
+import { register } from '../api/auth/register';
+import { useCurrentBackendUser } from '../hooks/useEnsureBackendUser';
+import { setOfflineStatus } from '../utils/setOfflineStatus';
 
 jest.mock('socket.io-client', () => ({
   io: jest.fn(),
