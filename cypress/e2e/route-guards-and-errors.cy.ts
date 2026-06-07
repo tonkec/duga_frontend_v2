@@ -2,6 +2,14 @@
 
 export {};
 
+const ignoreExpectedAxiosStatus = (status: number) => {
+  cy.on('uncaught:exception', (error) => {
+    if (error.message.includes(`Request failed with status code ${status}`)) {
+      return false;
+    }
+  });
+};
+
 describe('route guards and error states', () => {
   beforeEach(() => {
     cy.clearLocalStorage();
@@ -89,6 +97,8 @@ describe('route guards and error states', () => {
   });
 
   it('redirects to the broken page when a guarded page receives a server error', () => {
+    ignoreExpectedAxiosStatus(500);
+
     cy.fixture('current-user').then((currentUser) => {
       cy.mockAuthenticatedSession({ currentUser });
       cy.mockDefaultApi();
@@ -107,6 +117,8 @@ describe('route guards and error states', () => {
   });
 
   it('redirects to record-not-found when a guarded page receives a not-found response', () => {
+    ignoreExpectedAxiosStatus(404);
+
     cy.fixture('current-user').then((currentUser) => {
       cy.mockAuthenticatedSession({ currentUser });
       cy.mockDefaultApi();

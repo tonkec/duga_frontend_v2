@@ -40,6 +40,12 @@ type MockDefaultApiOptions = {
   forumQuestions?: unknown[];
 };
 
+const isDocumentNavigation = (req: { headers: Record<string, string | string[] | undefined> }) => {
+  const acceptHeader = req.headers.accept;
+  const accept = Array.isArray(acceptHeader) ? acceptHeader.join(',') : acceptHeader ?? '';
+  return accept.includes('text/html');
+};
+
 const DEFAULT_AUTH_USER: DugaAuthUser = {
   sub: 'auth0|cypress-user',
   email: 'cypress-user@example.com',
@@ -199,9 +205,16 @@ Cypress.Commands.add('mockDefaultApi', (options = {}) => {
     body: latestComments,
   });
 
-  cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
-    statusCode: 200,
-    body: notifications,
+  cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, (req) => {
+    if (isDocumentNavigation(req)) {
+      req.continue();
+      return;
+    }
+
+    req.reply({
+      statusCode: 200,
+      body: notifications,
+    });
   });
 
   cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {

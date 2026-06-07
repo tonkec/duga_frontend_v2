@@ -33,6 +33,12 @@ const makeNotification = (
   ...overrides,
 });
 
+const isDocumentNavigation = (req: { headers: Record<string, string | string[] | undefined> }) => {
+  const acceptHeader = req.headers.accept;
+  const accept = Array.isArray(acceptHeader) ? acceptHeader.join(',') : acceptHeader ?? '';
+  return accept.includes('text/html');
+};
+
 describe('notifications page', () => {
   beforeEach(() => {
     cy.clearLocalStorage();
@@ -68,6 +74,11 @@ describe('notifications page', () => {
       cy.mockAuthenticatedSession({ currentUser });
       cy.mockDefaultApi();
       cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, (req) => {
+        if (isDocumentNavigation(req)) {
+          req.continue();
+          return;
+        }
+
         req.reply({
           statusCode: 200,
           body: notifications,
