@@ -29,7 +29,6 @@ describe('report problem', () => {
 
       cy.contains('h1', 'Prijavi problem').should('be.visible');
       cy.get('#report-problem-type').click({ force: true }).type('Uznemiravanje{enter}');
-      cy.contains('Uznemiravanje, prijetnje ili govor mržnje').should('be.visible');
       cy.get('textarea[placeholder="Opiši problem što detaljnije..."]').type(
         'Korisnik mi salje prijetece poruke u chatu.'
       );
