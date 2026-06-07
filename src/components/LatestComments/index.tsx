@@ -29,7 +29,7 @@ export const LatestComment = ({ comment, onClick }: { comment: IComment; onClick
   const { user } = useGetUserById(comment.userId.toString());
   const { data: imageBlob } = useGetImageBlob(comment.securePhotoUrl || comment.imageUrl);
   const imageBlobUrl = useObjectUrl(imageBlob);
-  const username = user?.data.username || 'Korisnik';
+  const username = user?.data?.username || 'Korisnik';
 
   const renderFormattedComment = (text: string) => {
     const cleanText = DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).trim();
