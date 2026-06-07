@@ -12,7 +12,7 @@ interface IAuthGuardProps {
 export const AuthGuard = ({ children }: IAuthGuardProps) => {
   const { isAuthenticated, isLoading, user } = useAuth0();
   const appSessionStatus = useAppSessionStatus();
-  const shouldLoadBackendUser = appSessionStatus === 'active';
+  const shouldLoadBackendUser = appSessionStatus === 'active' && isAuthenticated;
   const {
     data: backendUser,
     error: backendUserError,
@@ -21,7 +21,6 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
     enabled: shouldLoadBackendUser,
     requireAuth0: false,
   });
-  const hasBackendSession = Boolean(backendUser);
   const isUserVerified = Boolean(user?.email_verified || backendUser?.isVerified);
   const isBackendSessionRevoked = isAppSessionConflictError(backendUserError);
 
@@ -33,14 +32,14 @@ export const AuthGuard = ({ children }: IAuthGuardProps) => {
     return <Navigate to="/login" />;
   }
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
   if (shouldLoadBackendUser && isBackendUserLoading) return <Loader />;
 
   if (isBackendSessionRevoked) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (!isAuthenticated && !hasBackendSession) {
-    return <Navigate to="/login" />;
   }
 
   if (!isUserVerified) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PRODUCTION_BASE_URL="${VITE_PRODUCTION_BASE_URL:-https://duga-backend-c67896e8029c.herokuapp.com/}"
+PRODUCTION_BASE_URL="${VITE_PRODUCTION_BASE_URL:-https://api.duga.chat}"
 STAGING_BASE_URL="${VITE_STAGING_BASE_URL:-https://api-staging.duga.chat}"
 PREVIEW_BASE_URL="${VITE_PREVIEW_BASE_URL:-$STAGING_BASE_URL}"
 
@@ -16,7 +16,7 @@ elif [[ "${BRANCH:-}" == "staging" || "${CONTEXT:-}" == "branch-deploy" ]]; then
 else
   export VITE_APP_ENV="production"
   export VITE_S3_ENVIRONMENT="production"
-  export VITE_BASE_URL="${VITE_BASE_URL:-$PRODUCTION_BASE_URL}"
+  export VITE_BASE_URL="$PRODUCTION_BASE_URL"
 fi
 
 echo "Netlify build env: CONTEXT=${CONTEXT:-} BRANCH=${BRANCH:-} VITE_APP_ENV=$VITE_APP_ENV VITE_S3_ENVIRONMENT=$VITE_S3_ENVIRONMENT VITE_BASE_URL=$VITE_BASE_URL"

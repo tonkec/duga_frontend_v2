@@ -72,9 +72,13 @@ describe('AuthGuard protected route redirects', () => {
     expect(await screen.findByText('Login page')).toBeVisible();
     expect(screen.queryByText('Protected settings')).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
+    expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({
+      enabled: false,
+      requireAuth0: false,
+    });
   });
 
-  it('allows a valid backend cookie session after Auth0 memory state is lost on refresh', async () => {
+  it('redirects to login even if a backend cookie session exists without Auth0 state', async () => {
     mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
     mockUseCurrentBackendUser.mockReturnValue({
       data: {
@@ -87,10 +91,11 @@ describe('AuthGuard protected route redirects', () => {
 
     renderProtectedRoute();
 
-    expect(await screen.findByText('Protected settings')).toBeVisible();
-    expect(screen.getByTestId('location')).toHaveTextContent('/settings');
+    expect(await screen.findByText('Login page')).toBeVisible();
+    expect(screen.queryByText('Protected settings')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
     expect(mockUseCurrentBackendUser).toHaveBeenCalledWith({
-      enabled: true,
+      enabled: false,
       requireAuth0: false,
     });
   });
@@ -194,7 +199,7 @@ describe('AuthGuard protected route redirects', () => {
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/login'));
   });
 
-  it('waits while checking the backend cookie session', async () => {
+  it('does not wait on backend cookie session checks for unauthenticated users', async () => {
     mockUseAuth0.mockReturnValue(auth0State({ isAuthenticated: false }));
     mockUseCurrentBackendUser.mockReturnValue({
       data: undefined,
@@ -203,7 +208,7 @@ describe('AuthGuard protected route redirects', () => {
 
     renderProtectedRoute();
 
-    expect(await screen.findByText('Učitavanje...')).toBeVisible();
-    expect(screen.queryByText('Login page')).not.toBeInTheDocument();
+    expect(await screen.findByText('Login page')).toBeVisible();
+    expect(screen.queryByText('Učitavanje...')).not.toBeInTheDocument();
   });
 });
