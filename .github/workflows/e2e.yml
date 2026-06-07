@@ -43,3 +43,19 @@ jobs:
           command: npm run cy:run
         env:
           VITE_BASE_URL: http://localhost:8080
+
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          if-no-files-found: ignore
