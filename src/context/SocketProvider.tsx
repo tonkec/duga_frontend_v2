@@ -79,7 +79,7 @@ const getBackendUrl = () => {
     return 'https://api-staging.duga.chat';
   }
   if (hostname.includes('duga.chat') || hostname.includes('dugaprod.netlify.app')) {
-    return 'https://duga-backend-c67896e8029c.herokuapp.com/';
+    return 'https://api.duga.chat/';
   }
   return 'http://localhost:8080/';
 };
