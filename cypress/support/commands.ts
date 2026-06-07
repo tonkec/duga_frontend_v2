@@ -126,6 +126,26 @@ Cypress.Commands.add('mockAuthenticatedSession', (options = {}) => {
     body: { status: currentUser.status ?? 'online' },
   });
 
+  cy.intercept('GET', '**/uploads/profile-photo/*', {
+    statusCode: 200,
+    body: {},
+  }).as('getProfilePhoto');
+
+  cy.intercept('GET', '**/uploads/user/*', {
+    statusCode: 200,
+    body: { images: [] },
+  }).as('getUserUploads');
+
+  cy.intercept('GET', '**/messages/is-read*', {
+    statusCode: 200,
+    body: { is_read: true },
+  }).as('getIsMessageRead');
+
+  cy.intercept('POST', '**/messages/read-message*', {
+    statusCode: 200,
+    body: {},
+  }).as('markMessageAsRead');
+
   cy.setCookie('cookieAccepted', 'true');
 
   if (!skipSessionStart) {

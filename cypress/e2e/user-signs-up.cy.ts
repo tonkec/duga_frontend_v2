@@ -96,6 +96,16 @@ describe('user signup', () => {
       body: [],
     }).as('getNotifications');
 
+    cy.intercept('GET', '**/uploads/profile-photo/*', {
+      statusCode: 200,
+      body: {},
+    }).as('getProfilePhoto');
+
+    cy.intercept('GET', '**/uploads/user/*', {
+      statusCode: 200,
+      body: { images: [] },
+    }).as('getUserUploads');
+
     cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
       statusCode: 200,
       body: { data: [], pagination: { page: 1, totalPages: 1 } },
