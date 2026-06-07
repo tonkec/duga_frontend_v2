@@ -109,10 +109,12 @@ describe('notifications page', () => {
 
   it('updates notifications from socket events', () => {
     cy.fixture('current-user').then((currentUser) => {
-      const initialNotification = makeNotification({
-        id: 503,
-        content: 'Početna obavijest.',
-      });
+      let notifications = [
+        makeNotification({
+          id: 503,
+          content: 'Početna obavijest.',
+        }),
+      ];
       const socketNotification = makeNotification({
         id: 504,
         content: 'Nova socket obavijest.',
@@ -120,10 +122,27 @@ describe('notifications page', () => {
       });
 
       cy.mockAuthenticatedSession({ currentUser });
-      cy.mockDefaultApi({ notifications: [initialNotification] });
-      cy.intercept('PUT', /\/notifications\/503\/read\/?(?:\?.*)?$/, {
-        statusCode: 200,
-        body: { ok: true },
+      cy.mockDefaultApi();
+      cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, (req) => {
+        if (isDocumentNavigation(req)) {
+          req.continue();
+          return;
+        }
+
+        req.reply({
+          statusCode: 200,
+          body: notifications,
+        });
+      });
+      cy.intercept('PUT', /\/notifications\/503\/read\/?(?:\?.*)?$/, (req) => {
+        notifications = notifications.map((notification) =>
+          notification.id === 503 ? { ...notification, isRead: true } : notification
+        );
+
+        req.reply({
+          statusCode: 200,
+          body: { ok: true },
+        });
       }).as('markNotificationRead');
 
       cy.visitAsAuthenticated('/notifications');
