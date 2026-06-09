@@ -110,7 +110,7 @@ describe('user sends first message', () => {
     }).as('getMessages');
 
     cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
-      statusCode: 404,
+      statusCode: 200,
       body: {},
     });
 

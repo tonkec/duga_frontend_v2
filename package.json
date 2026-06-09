@@ -8,23 +8,27 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:coverage": "CYPRESS_COVERAGE=true vite --port 5174 --strictPort",
     "build": "tsc -b && npm rebuild esbuild && vite build",
     "lint": "eslint .",
     "test": "npm run test:unit",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
-    "test:e2e": "cypress run",
-    "test:e2e:open": "cypress open",
+    "test:e2e": "cypress run --expose coverage=false",
+    "test:e2e:coverage": "start-server-and-test dev:coverage http://localhost:5174 \"cypress run --config baseUrl=http://localhost:5174 --expose coverage=true\"",
+    "test:e2e:coverage:summary": "nyc report --reporter=text-summary --report-dir coverage/e2e",
+    "test:e2e:open": "cypress open --expose coverage=false",
     "test:all": "npm run test:unit && npm run test:e2e",
     "preview": "vite preview",
     "prepare": "husky",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:open": "cypress open --expose coverage=false",
+    "cy:run": "cypress run --expose coverage=false"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
     "@emoji-mart/data": "^1.2.1",
     "@hookform/resolvers": "^3.9.1",
+    "@sentry/react": "^10.56.0",
     "@tanstack/react-query": "^5.62.9",
     "@tanstack/react-query-devtools": "^5.62.9",
     "@uidotdev/usehooks": "^2.4.1",
@@ -53,6 +57,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^4.0.3",
     "@eslint/js": "^9.17.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -74,13 +79,16 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "lint-staged": "^15.2.11",
+    "nyc": "^18.0.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
+    "start-server-and-test": "^3.0.9",
     "tailwindcss": "^3.4.17",
     "ts-jest": "^29.4.11",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.1",
-    "vite": "^6.0.3"
+    "vite": "^6.0.3",
+    "vite-plugin-istanbul": "^7.2.1"
   },
   "lint-staged": {
     "src/**/*.(ts|tsx|js|jsx)": [
@@ -95,5 +103,27 @@
   "overrides": {
     "qs": "6.15.2",
     "uuid": "11.1.1"
+  },
+  "nyc": {
+    "all": true,
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**/*.{ts,tsx}"
+    ],
+    "exclude": [
+      "src/**/*.test.{ts,tsx}",
+      "src/test/**",
+      "src/**/*.d.ts"
+    ],
+    "reporter": [
+      "text",
+      "text-summary",
+      "lcov"
+    ],
+    "report-dir": "coverage/e2e",
+    "temp-dir": ".nyc_output"
   }
 }

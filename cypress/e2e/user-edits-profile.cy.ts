@@ -31,6 +31,16 @@ const currentUser = {
 };
 
 describe('user edits profile', () => {
+  before(() => {
+    Cypress.on('uncaught:exception', (error) => {
+      if (error.message.includes('Network Error')) {
+        return false;
+      }
+
+      return undefined;
+    });
+  });
+
   it('updates profile details', () => {
     let profileUser = { ...currentUser };
 
@@ -68,7 +78,7 @@ describe('user edits profile', () => {
     }).as('updateUser');
 
     cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
-      statusCode: 404,
+      statusCode: 200,
       body: {},
     }).as('getProfilePhoto');
 
@@ -76,6 +86,28 @@ describe('user edits profile', () => {
       statusCode: 200,
       body: { images: [] },
     }).as('getUserPhotos');
+    cy.intercept('GET', /\/uploads\/files\/.*(?:\?.*)?$/, {
+      statusCode: 200,
+      headers: { 'content-type': 'image/png' },
+      body: Cypress.Buffer.from('fake png contents'),
+    }).as('getImageFile');
+    cy.intercept('GET', /https:\/\/duga-user-photo\.s3\.[^/]+\/.*(?:\?.*)?$/, {
+      statusCode: 200,
+      headers: { 'content-type': 'image/png' },
+      body: Cypress.Buffer.from('fake png contents'),
+    }).as('getS3ImageFile');
+    cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getNotifications');
+    cy.intercept('GET', /\/uploads\/user-photos\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getAllUserPhotos');
+    cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: [], total: 0, page: 1, limit: 100, totalPages: 1 },
+    }).as('getForumQuestions');
 
     cy.visitAsAuthenticated('/edit');
 

@@ -181,7 +181,7 @@ Cypress.Commands.add('mockDefaultApi', (options = {}) => {
   }).as('getChats');
 
   cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
-    statusCode: 404,
+    statusCode: 200,
     body: {},
   });
 
