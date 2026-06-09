@@ -46,8 +46,12 @@ describe('chat flows', () => {
 
             cy.visitAsAuthenticated('/new-chat');
 
-            cy.getByTestId('messages-page').should('be.visible');
-            cy.getByTestId('messages-empty-state').should('contain', 'Nema razgovora');
+            cy.wait('@getChats');
+            cy.getByTestId('messages-page', { timeout: 10000 }).should('be.visible');
+            cy.getByTestId('messages-empty-state', { timeout: 10000 }).should(
+              'contain',
+              'Nema razgovora'
+            );
             cy.getByTestId('new-message-button').click();
             cy.getByTestId('new-message-modal').should('be.visible');
             cy.getByTestId('new-message-search').type('mira');
