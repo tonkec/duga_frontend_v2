@@ -339,16 +339,24 @@ describe('browser module branch coverage probes', () => {
   it('covers API response normalizers and request helper branches in the browser', () => {
     cy.visit('/login');
 
-    cy.intercept('GET', /\/users\/get-users\/?(?:\?.*)?$/, {
-      statusCode: 200,
-      body: {
-        data: {
-          users: [
-            { id: 1, username: 'verified', is_verified: true, emailVerified: false },
-            { id: 2, username: 'unverified', verified: false },
-          ],
-        },
-      },
+    cy.intercept('GET', /\/users\/get-users\/?(?:\?.*)?$/, (req) => {
+      const page = String(req.query.page ?? '1');
+      const users = [
+        { id: 1, username: 'verified', is_verified: true, emailVerified: false },
+        { id: 2, username: 'unverified', verified: false },
+      ];
+      const bodyByPage: Record<string, unknown> = {
+        '1': { data: { users } },
+        '2': users,
+        '3': { data: users },
+        '4': { data: { data: users } },
+        '5': { data: { rows: users } },
+        '6': { rows: users },
+        '7': { items: users },
+        '8': { data: { items: users } },
+      };
+
+      req.reply({ statusCode: 200, body: bodyByPage[page] ?? { data: { users } } });
     }).as('getUsersWrapped');
 
     cy.intercept('GET', /\/users\/current-user\/?(?:\?.*)?$/, {
@@ -360,6 +368,24 @@ describe('browser module branch coverage probes', () => {
       statusCode: 200,
       body: { user: { id: 2, username: 'public', publicId: 'public-user', verified: true } },
     }).as('getPublicUser');
+    cy.intercept('GET', /\/users\/7(?:\?.*)?$/, {
+      statusCode: 200,
+      body: {
+        data: {
+          data: {
+            id: 7,
+            username: 'numeric',
+            Profile: {
+              about: 'Nested bio',
+              city: 'Rijeka',
+              favorite_day: 'monday',
+              sports: true,
+            },
+            isVerified: true,
+          },
+        },
+      },
+    }).as('getNumericUser');
 
     cy.intercept('GET', /\/users\/profile-views(?:\?.*)?$/, {
       statusCode: 200,
@@ -427,6 +453,36 @@ describe('browser module branch coverage probes', () => {
         ],
       },
     }).as('youtubeSearch');
+    cy.intercept('GET', /https:\/\/v3\.sg\.media-imdb\.com\/suggestion\/.*/, (req) => {
+      const url = req.url;
+      if (url.includes('/f/fail')) {
+        req.reply({ statusCode: 500, body: {} });
+        return;
+      }
+
+      if (url.includes('/a/array')) {
+        req.reply({
+          statusCode: 200,
+          body: [
+            { id: 'tt0000001', l: 'Array title', y: 1901, image: { url: 'https://img.test/a.jpg' } },
+            { id: 'nm0000001', l: 'Ignored person' },
+          ],
+        });
+        return;
+      }
+
+      const itemByQuery = url.includes('/r/results')
+        ? { results: [{ imdbId: 'tt0000002', title: 'Results title', year: 1902 }] }
+        : url.includes('/t/titles')
+          ? { titles: [{ titleId: 'tt0000003', name: 'Titles name', releaseYear: { year: 1903 } }] }
+          : url.includes('/n/nested')
+            ? { data: { titles: [{ tconst: 'tt0000004', primaryTitle: 'Nested title' }] } }
+            : url.includes('/s/search')
+              ? { data: { search: { titles: [{ id: 'tt0000005', titleText: { text: 'Search title' } }] } } }
+              : { d: [{ id: 'tt0000006', l: 'Default title', i: { imageUrl: 'https://img.test/d.jpg' } }] };
+
+      req.reply({ statusCode: 200, body: itemByQuery });
+    }).as('imdbApiSearch');
     const forumQuestion = {
       id: 501,
       userId: '2',
@@ -583,7 +639,7 @@ describe('browser module branch coverage probes', () => {
 
     cy.window().then(async (win) => {
       const usersApi = await importFromApp<{
-        getAllUsers: () => Promise<{ data: unknown[] }>;
+        getAllUsers: (params?: { page?: number; limit?: number }) => Promise<{ data: unknown[] }>;
         getCurrentUser: () => Promise<{ data: Record<string, unknown> }>;
         getUserById: (id: string) => Promise<{ data: Record<string, unknown> }>;
         getProfileViews: (params: { page?: number; limit?: number }) => Promise<unknown>;
@@ -613,6 +669,9 @@ describe('browser module branch coverage probes', () => {
       const youtubeApi = await importFromApp<{
         searchYouTubeVideos: (query: string) => Promise<unknown[]>;
       }>(win, '/src/api/youtube/index.ts');
+      const imdbApi = await importFromApp<{
+        searchImdbTitles: (query: string) => Promise<unknown[]>;
+      }>(win, '/src/api/imdb/index.ts');
       const forumApi = await importFromApp<{
         getQuestions: (params?: Record<string, unknown>) => Promise<Record<string, unknown>>;
         getQuestion: (id: number | string) => Promise<Record<string, unknown>>;
@@ -641,10 +700,19 @@ describe('browser module branch coverage probes', () => {
       const users = await usersApi.getAllUsers();
       expect(users.data[0]).to.include({ id: 1, isVerified: true });
       expect(users.data[1]).to.include({ id: 2, isVerified: false });
+      await usersApi.getAllUsers({ page: 2 });
+      await usersApi.getAllUsers({ page: 3 });
+      await usersApi.getAllUsers({ page: 4 });
+      await usersApi.getAllUsers({ page: 5 });
+      await usersApi.getAllUsers({ page: 6 });
+      await usersApi.getAllUsers({ page: 7 });
+      await usersApi.getAllUsers({ page: 8 });
       const currentUser = await usersApi.getCurrentUser();
       expect(currentUser.data.data).to.include({ id: 1, username: 'current' });
       const publicUser = await usersApi.getUserById('public-user');
       expect(publicUser.data).to.include({ publicId: 'public-user', isVerified: true });
+      const numericUser = await usersApi.getUserById('7');
+      expect(numericUser.data).to.include({ bio: 'Nested bio', location: 'Rijeka', sport: true });
       await usersApi.getProfileViews({ page: 1, limit: 5 });
 
       expect(
@@ -681,6 +749,18 @@ describe('browser module branch coverage probes', () => {
           url: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
         },
       ]);
+      expect(await imdbApi.searchImdbTitles('array')).to.have.length(1);
+      expect(await imdbApi.searchImdbTitles('results')).to.have.length(1);
+      expect(await imdbApi.searchImdbTitles('titles')).to.have.length(1);
+      expect(await imdbApi.searchImdbTitles('nested')).to.have.length(1);
+      expect(await imdbApi.searchImdbTitles('search')).to.have.length(1);
+      expect(await imdbApi.searchImdbTitles('default')).to.have.length(1);
+      try {
+        await imdbApi.searchImdbTitles('fail');
+        throw new Error('Expected IMDb failure');
+      } catch (error) {
+        expect((error as Error).message).to.equal('IMDb pretraga trenutno nije dostupna.');
+      }
 
       const forumImage = new win.File(['forum'], 'forum.png', { type: 'image/png' });
       const questions = await forumApi.getQuestions({ page: 2, limit: 2 });
