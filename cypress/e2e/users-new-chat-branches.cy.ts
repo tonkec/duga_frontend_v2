@@ -109,7 +109,7 @@ const setupDirectoryAndChats = () => {
     });
   }).as('getUserImages');
   cy.intercept('GET', /\/uploads\/profile-photo\/[^/?]+(?:\?.*)?$/, {
-    statusCode: 404,
+    statusCode: 200,
     body: {},
   });
   cy.intercept('GET', /\/uploads\/files\/.*(?:\?.*)?$/, {
