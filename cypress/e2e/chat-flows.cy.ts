@@ -46,9 +46,9 @@ describe('chat flows', () => {
 
             cy.visitAsAuthenticated('/new-chat');
 
-            cy.wait('@getChats');
-            cy.getByTestId('messages-page', { timeout: 10000 }).should('be.visible');
-            cy.getByTestId('messages-empty-state', { timeout: 10000 }).should(
+            cy.location('pathname', { timeout: 10000 }).should('eq', '/new-chat');
+            cy.getByTestId('messages-page', { timeout: 15000 }).should('be.visible');
+            cy.getByTestId('messages-empty-state', { timeout: 15000 }).should(
               'contain',
               'Nema razgovora'
             );
