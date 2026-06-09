@@ -347,6 +347,16 @@ const Harness = () =>
           text: '@alex običan tekst',
           taggedUsers: [{ id: 2, username: 'alex' }],
         }),
+        h(ContentFormatter, {
+          text: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ https://media0.giphy.com/media/demo/giphy.gif /uploads/files/development/user/inline.png',
+          renderRichContent: false,
+        }),
+        h(ContentFormatter, {
+          text: 'https://duga-user-photo.s3.eu-north-1.amazonaws.com/development/user/s3.png https://evil.test/image.png https://example.com/page /user/123e4567-e89b-12d3-a456-426614174000',
+          renderRichContent: true,
+        }),
+        h(ContentFormatter, { text: '😀 🎉' }),
+        h(ContentFormatter, { text: null }),
         h(VoteControls, {
           item: { voteScore: 0, currentUserVote: null },
           isPending: false,
