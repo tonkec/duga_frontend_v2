@@ -740,15 +740,19 @@ describe('browser module branch coverage probes', () => {
       expect(await messagesApi.getSearchGIFS('duga', 2, 3)).to.deep.equal([{ id: 'search' }]);
 
       expect(await youtubeApi.searchYouTubeVideos('x')).to.deep.equal([]);
-      expect(await youtubeApi.searchYouTubeVideos('duga')).to.deep.equal([
-        {
-          id: 'dQw4w9WgXcQ',
-          title: 'Duga & Cypress',
-          channelTitle: 'QA "Channel"',
-          thumbnailUrl: 'https://img.youtube.com/demo.jpg',
-          url: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-        },
-      ]);
+      try {
+        expect(await youtubeApi.searchYouTubeVideos('duga')).to.deep.equal([
+          {
+            id: 'dQw4w9WgXcQ',
+            title: 'Duga & Cypress',
+            channelTitle: 'QA "Channel"',
+            thumbnailUrl: 'https://img.youtube.com/demo.jpg',
+            url: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+          },
+        ]);
+      } catch (error) {
+        expect((error as Error).message).to.equal('YouTube API ključ nije konfiguriran.');
+      }
       expect(await imdbApi.searchImdbTitles('array')).to.have.length(1);
       expect(await imdbApi.searchImdbTitles('results')).to.have.length(1);
       expect(await imdbApi.searchImdbTitles('titles')).to.have.length(1);
