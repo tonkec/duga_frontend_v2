@@ -1,7 +1,7 @@
-import { createElement as h } from 'react';
+import { createElement as h, useEffect } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import ContentFormatter from '@app/components/ContentFormatter';
 import Divider from '@app/components/Divider';
 import EmojiSearch from '@app/components/EmojiSearch';
@@ -19,6 +19,29 @@ import ForumImage from '@app/features/forum/components/ForumImage';
 import ForumImageGallery from '@app/features/forum/components/ForumImageGallery';
 import UserForumActivity from '@app/features/forum/components/UserForumActivity';
 import VoteControls from '@app/features/forum/components/VoteControls';
+import {
+  forumQueryKeys,
+  useAcceptAnswer,
+  useAddAnswerReaction,
+  useAddAnswerReplyReaction,
+  useCreateAnswer,
+  useCreateAnswerReply,
+  useCreateQuestion,
+  useDeleteAnswer,
+  useDeleteAnswerImage,
+  useDeleteAnswerReaction,
+  useDeleteAnswerReply,
+  useDeleteAnswerReplyReaction,
+  useDeleteAnswerVote,
+  useDeleteQuestion,
+  useDeleteQuestionImage,
+  useDeleteQuestionVote,
+  useUpdateAnswer,
+  useUpdateAnswerReply,
+  useUpdateQuestion,
+  useVoteAnswer,
+  useVoteQuestion,
+} from '@app/features/forum/hooks/useForum';
 
 const sampleImage: IImage = {
   id: 901,
@@ -198,6 +221,82 @@ const acceptedForumAnswer = {
   replies: [],
 };
 
+const ForumHookCoverage = () => {
+  const hookQueryClient = useQueryClient();
+  const currentUser = { id: 1, username: 'current', publicId: 'current-public' };
+  const createQuestion = useCreateQuestion();
+  const createAnswer = useCreateAnswer(501, currentUser);
+  const acceptAnswer = useAcceptAnswer(501);
+  const updateQuestion = useUpdateQuestion();
+  const deleteQuestion = useDeleteQuestion();
+  const deleteQuestionImage = useDeleteQuestionImage();
+  const updateAnswer = useUpdateAnswer();
+  const deleteAnswer = useDeleteAnswer(501);
+  const deleteAnswerWithoutQuestion = useDeleteAnswer();
+  const deleteAnswerImage = useDeleteAnswerImage(501);
+  const voteQuestion = useVoteQuestion(501);
+  const deleteQuestionVote = useDeleteQuestionVote(501);
+  const voteAnswer = useVoteAnswer(501);
+  const deleteAnswerVote = useDeleteAnswerVote(501);
+  const addAnswerReaction = useAddAnswerReaction(501);
+  const deleteAnswerReaction = useDeleteAnswerReaction(501);
+  const addAnswerReplyReaction = useAddAnswerReplyReaction(501);
+  const deleteAnswerReplyReaction = useDeleteAnswerReplyReaction(501);
+  const createAnswerReply = useCreateAnswerReply(501, currentUser);
+  const updateAnswerReply = useUpdateAnswerReply(501);
+  const deleteAnswerReply = useDeleteAnswerReply(501);
+
+  useEffect(() => {
+    const question = {
+      id: 501,
+      userId: 2,
+      title: 'Hook pitanje',
+      body: 'Pitanje za hook coverage.',
+      createdAt: '2026-06-08T09:30:00.000Z',
+      Answers: [ownForumAnswer, acceptedForumAnswer],
+      answerCount: 2,
+      voteScore: 2,
+      currentUserVote: 1,
+    };
+    hookQueryClient.setQueryData(forumQueryKeys.question(501), question);
+    hookQueryClient.setQueryData(forumQueryKeys.questions({ page: 1, limit: 10 }), {
+      data: [question],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    });
+
+    createQuestion.mutate({ title: 'Novo hook pitanje', body: 'Dovoljno dugo pitanje.' });
+    createAnswer.mutate({ body: 'Novi hook odgovor' });
+    acceptAnswer.mutate(701);
+    updateQuestion.mutate({
+      id: 501,
+      payload: { title: 'Uredi hook pitanje', body: 'Uredi body' },
+    });
+    deleteQuestionImage.mutate(501);
+    voteQuestion.mutate({ value: 1 });
+    deleteQuestionVote.mutate();
+    updateAnswer.mutate({ id: 701, payload: { body: 'Uredi odgovor hook' } });
+    deleteAnswerImage.mutate(701);
+    voteAnswer.mutate({ answerId: 701, payload: { value: -1 } });
+    deleteAnswerVote.mutate(701);
+    addAnswerReaction.mutate({ answerId: 701, payload: { emoji: '🙏' } });
+    deleteAnswerReaction.mutate({ answerId: 701, payload: { emoji: '❤️' } });
+    createAnswerReply.mutate({ answerId: 701, payload: { body: 'Novi reply hook' } });
+    updateAnswerReply.mutate({ id: 901, payload: { body: 'Uredi reply hook' } });
+    deleteAnswerReply.mutate(902);
+    addAnswerReplyReaction.mutate({ replyId: 901, payload: { emoji: '👍' } });
+    deleteAnswerReplyReaction.mutate({ replyId: 901, payload: { emoji: '🎉' } });
+    deleteAnswer.mutate(702);
+    deleteAnswerWithoutQuestion.mutate(701);
+    deleteQuestion.mutate(501);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return h('div', { 'data-testid': 'forum-hook-coverage' }, 'Forum hooks exercised');
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: false, staleTime: Infinity },
@@ -332,6 +431,7 @@ const Harness = () =>
           isReplyReactionPending: true,
           ...answerCallbacks,
         }),
+        h(ForumHookCoverage),
         h(LatestUpload, {
           upload: {
             id: '777',

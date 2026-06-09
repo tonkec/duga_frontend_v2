@@ -850,7 +850,161 @@ describe('browser module branch coverage probes', () => {
     }).as('markHarnessNotificationRead');
     cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
       statusCode: 200,
-      body: { data: [], total: 0, page: 1, limit: 100, totalPages: 1 },
+      body: {
+        data: [
+          {
+            id: 501,
+            userId: 2,
+            title: 'Hook pitanje',
+            body: 'Pitanje za hook coverage.',
+            createdAt: '2026-06-08T09:30:00.000Z',
+            Answers: [
+              {
+                id: 701,
+                questionId: 501,
+                userId: 1,
+                body: 'Moj odgovor s postojećom slikom i odgovorima.',
+                createdAt: '2026-06-08T09:30:00.000Z',
+                User: { id: 1, username: 'current' },
+                replies: [{ id: 901, answerId: 701, userId: 1, body: 'Reply hook' }],
+              },
+            ],
+            answerCount: 1,
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 100,
+        totalPages: 1,
+      },
+    });
+    cy.intercept('GET', /\/forum\/questions\/501\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: {
+        data: {
+          id: 501,
+          userId: 2,
+          title: 'Hook pitanje',
+          body: 'Pitanje za hook coverage.',
+          createdAt: '2026-06-08T09:30:00.000Z',
+          Answers: [
+            {
+              id: 701,
+              questionId: 501,
+              userId: 1,
+              body: 'Moj odgovor s postojećom slikom i odgovorima.',
+              createdAt: '2026-06-08T09:30:00.000Z',
+              User: { id: 1, username: 'current' },
+              replies: [{ id: 901, answerId: 701, userId: 1, body: 'Reply hook' }],
+            },
+          ],
+          answerCount: 1,
+        },
+      },
+    });
+    cy.intercept('POST', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 201,
+      body: { data: { id: 501, title: 'Hook pitanje', body: 'Pitanje', Answers: [] } },
+    });
+    cy.intercept('PATCH', /\/forum\/questions\/501\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: { id: 501, title: 'Hook pitanje uređeno', body: 'Pitanje', Answers: [] } },
+    });
+    cy.intercept('DELETE', /\/forum\/questions\/501\/image\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('DELETE', /\/forum\/questions\/501\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('POST', /\/forum\/questions\/501\/answers\/?(?:\?.*)?$/, {
+      statusCode: 201,
+      body: {
+        data: {
+          id: 703,
+          questionId: 501,
+          userId: 1,
+          body: 'Novi hook odgovor',
+          createdAt: '2026-06-08T09:45:00.000Z',
+          User: { id: 1, username: 'current' },
+          replies: [],
+        },
+      },
+    });
+    cy.intercept('PATCH', /\/forum\/questions\/501\/answers\/701\/accept\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: { id: 501, title: 'Hook pitanje', body: 'Pitanje', Answers: [] } },
+    });
+    cy.intercept('PATCH', /\/forum\/answers\/701\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: { id: 701, questionId: 501, userId: 1, body: 'Uredi odgovor hook' } },
+    });
+    cy.intercept('DELETE', /\/forum\/answers\/701\/image\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('DELETE', /\/forum\/answers\/(?:701|702)\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('POST', /\/forum\/questions\/501\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: { id: 501, title: 'Hook pitanje', body: 'Pitanje', Answers: [] } },
+    });
+    cy.intercept('DELETE', /\/forum\/questions\/501\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('POST', /\/forum\/answers\/701\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: { id: 701, questionId: 501, userId: 1, body: 'Vote odgovor hook' } },
+    });
+    cy.intercept('DELETE', /\/forum\/answers\/701\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('POST', /\/forum\/answers\/701\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: {
+        data: {
+          id: 701,
+          questionId: 501,
+          userId: 1,
+          body: 'Reaction odgovor hook',
+          reactions: [{ emoji: '🙏', count: 1, reactedByCurrentUser: true }],
+        },
+      },
+    });
+    cy.intercept('DELETE', /\/forum\/answers\/701\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 204,
+    });
+    cy.intercept('POST', /\/forum\/answers\/701\/replies\/?(?:\?.*)?$/, {
+      statusCode: 201,
+      body: { data: { id: 903, answerId: 701, userId: 1, body: 'Novi reply hook' } },
+    });
+    cy.intercept('PATCH', /\/forum\/answer-replies\/901\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: { id: 901, answerId: 701, userId: 1, body: 'Uredi reply hook' } },
+    });
+    cy.intercept('DELETE', /\/forum\/answer-replies\/902\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    });
+    cy.intercept('POST', /\/forum\/answer-replies\/901\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: {
+        data: {
+          id: 901,
+          answerId: 701,
+          userId: 1,
+          body: 'Reply hook',
+          reactions: [{ emoji: '👍', count: 1, reactedByCurrentUser: true }],
+        },
+      },
+    });
+    cy.intercept('DELETE', /\/forum\/answer-replies\/901\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 204,
     });
 
     cy.window().then(async (win) => {
