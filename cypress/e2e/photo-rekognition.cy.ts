@@ -15,6 +15,12 @@ type BackendUser = {
   [key: string]: unknown;
 };
 
+type ChatFixture = {
+  existing: Array<{
+    Users?: BackendUser[];
+  }>;
+};
+
 const REKOGNITION_REJECTION_MESSAGE =
   'Fotografija nije prošla sigurnosnu provjeru sadržaja.';
 
@@ -107,11 +113,22 @@ const setupProfilePhotoEditor = (
 
 const setupExistingChat = (
   currentUser: BackendUser,
-  chats: { existing: unknown[] },
+  chats: ChatFixture,
   messages: Record<string, unknown>
 ) => {
+  const otherUser = chats.existing[0]?.Users?.find(
+    (user) => Number(user.id) !== Number(currentUser.id)
+  );
+
   cy.mockAuthenticatedSession({ currentUser });
   cy.mockDefaultApi({ chats: chats.existing, uploads: [] });
+
+  if (otherUser) {
+    cy.intercept('GET', `**/users/${otherUser.id}**`, {
+      statusCode: 200,
+      body: otherUser,
+    }).as('getOtherChatUser');
+  }
 
   cy.intercept('GET', /\/chats\/messages\/?(?:\?.*)?$/, {
     statusCode: 200,
