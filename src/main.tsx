@@ -23,6 +23,9 @@ Sentry.init({
   // To disable sending user data, uncomment the line below. For more info visit:
   // https://docs.sentry.io/platforms/javascript/guides/react/configuration/options/#dataCollection
   // dataCollection: { userInfo: false },
+  integrations: [Sentry.replayIntegration()],
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
 });
 
 const queryClient = new QueryClient({
