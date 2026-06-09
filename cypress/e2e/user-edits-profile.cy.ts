@@ -96,6 +96,18 @@ describe('user edits profile', () => {
       headers: { 'content-type': 'image/png' },
       body: Cypress.Buffer.from('fake png contents'),
     }).as('getS3ImageFile');
+    cy.intercept('GET', /\/notifications\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getNotifications');
+    cy.intercept('GET', /\/uploads\/user-photos\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [],
+    }).as('getAllUserPhotos');
+    cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: [], total: 0, page: 1, limit: 100, totalPages: 1 },
+    }).as('getForumQuestions');
 
     cy.visitAsAuthenticated('/edit');
 
