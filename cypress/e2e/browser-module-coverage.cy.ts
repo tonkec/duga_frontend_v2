@@ -427,6 +427,159 @@ describe('browser module branch coverage probes', () => {
         ],
       },
     }).as('youtubeSearch');
+    const forumQuestion = {
+      id: 501,
+      userId: '2',
+      title: 'Forum API pitanje',
+      body: 'Pitanje iz API normalizer testa.',
+      createdAt: '2026-06-08T09:30:00.000Z',
+      updatedAt: '2026-06-08T09:30:00.000Z',
+      voteScore: '3',
+      voteCount: '4',
+      category: { id: 1, name: 'Odnosi', slug: 'odnosi' },
+      user: {
+        id: 2,
+        firstName: 'Alex',
+        lastName: 'Rain',
+        username: 'alex_rain',
+        profilePhoto: { imageUrl: 'development/user/alex.png' },
+      },
+      taggedUsers: [null, { id: 3, username: 'mira_sun' }],
+      answers: [
+        {
+          id: 701,
+          questionId: 501,
+          userId: '',
+          body: 'Odgovor s reakcijama.',
+          createdAt: '2026-06-08T09:35:00.000Z',
+          voteScore: '2',
+          user: { id: 4, username: 'zora', avatar: 'development/user/zora.png' },
+          Reactions: [
+            { emoji: '👍', count: '2', users: [{ id: 1 }, { id: 2 }], hasReacted: true },
+            { emoji: '👍', count: 1, userIds: ['3'] },
+            { emoji: null, count: 5 },
+          ],
+          myReactions: ['❤️'],
+          Replies: [
+            {
+              id: 801,
+              answerId: '701',
+              userId: null,
+              body: 'Reply body',
+              User: { id: 5, username: 'reply_user' },
+              Reactions: [
+                { emoji: '🎉', count: '2', currentUserHasReacted: true },
+                { emoji: '', count: 5 },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const forumAnswer = {
+      id: 702,
+      questionId: 501,
+      userId: 1,
+      body: 'Novi API odgovor',
+      createdAt: '2026-06-08T09:45:00.000Z',
+      User: { id: 1, username: 'current' },
+      reactions: [{ emoji: '🙏', count: 1, reactedByCurrentUser: true }],
+      replies: [],
+    };
+    const forumReply = {
+      id: 802,
+      answerId: 702,
+      userId: 1,
+      body: 'API reply',
+      User: { id: 1, username: 'current' },
+      reactions: [{ emoji: '❤️', count: 1, isMine: true }],
+    };
+    cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: [forumQuestion],
+    }).as('forumApiGetQuestions');
+    cy.intercept('GET', /\/forum\/questions\/501\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: forumQuestion,
+    }).as('forumApiGetQuestion');
+    cy.intercept('POST', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 201,
+      body: { data: forumQuestion },
+    }).as('forumApiCreateQuestion');
+    cy.intercept('PATCH', /\/forum\/questions\/501\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: forumQuestion,
+    }).as('forumApiUpdateQuestion');
+    cy.intercept('DELETE', /\/forum\/questions\/501\/image\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteQuestionImage');
+    cy.intercept('DELETE', /\/forum\/questions\/501\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteQuestion');
+    cy.intercept('POST', /\/forum\/questions\/501\/answers\/?(?:\?.*)?$/, {
+      statusCode: 201,
+      body: { data: forumAnswer },
+    }).as('forumApiCreateAnswer');
+    cy.intercept('PATCH', /\/forum\/answers\/702\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: forumAnswer,
+    }).as('forumApiUpdateAnswer');
+    cy.intercept('DELETE', /\/forum\/answers\/702\/image\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteAnswerImage');
+    cy.intercept('DELETE', /\/forum\/answers\/702\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteAnswer');
+    cy.intercept('PATCH', /\/forum\/questions\/501\/answers\/702\/accept\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: forumQuestion },
+    }).as('forumApiAcceptAnswer');
+    cy.intercept('POST', /\/forum\/questions\/501\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: forumQuestion,
+    }).as('forumApiVoteQuestion');
+    cy.intercept('DELETE', /\/forum\/questions\/501\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteQuestionVote');
+    cy.intercept('POST', /\/forum\/answers\/702\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: forumAnswer },
+    }).as('forumApiVoteAnswer');
+    cy.intercept('DELETE', /\/forum\/answers\/702\/votes\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteAnswerVote');
+    cy.intercept('POST', /\/forum\/answers\/702\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: forumAnswer },
+    }).as('forumApiAddAnswerReaction');
+    cy.intercept('DELETE', /\/forum\/answers\/702\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 204,
+    }).as('forumApiDeleteAnswerReaction');
+    cy.intercept('POST', /\/forum\/answers\/702\/replies\/?(?:\?.*)?$/, {
+      statusCode: 201,
+      body: { data: forumReply },
+    }).as('forumApiCreateAnswerReply');
+    cy.intercept('PATCH', /\/forum\/answer-replies\/802\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: forumReply,
+    }).as('forumApiUpdateAnswerReply');
+    cy.intercept('DELETE', /\/forum\/answer-replies\/802\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('forumApiDeleteAnswerReply');
+    cy.intercept('POST', /\/forum\/answer-replies\/802\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: forumReply },
+    }).as('forumApiAddAnswerReplyReaction');
+    cy.intercept('DELETE', /\/forum\/answer-replies\/802\/reactions\/?(?:\?.*)?$/, {
+      statusCode: 204,
+    }).as('forumApiDeleteAnswerReplyReaction');
 
     cy.window().then(async (win) => {
       const usersApi = await importFromApp<{
@@ -460,6 +613,30 @@ describe('browser module branch coverage probes', () => {
       const youtubeApi = await importFromApp<{
         searchYouTubeVideos: (query: string) => Promise<unknown[]>;
       }>(win, '/src/api/youtube/index.ts');
+      const forumApi = await importFromApp<{
+        getQuestions: (params?: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        getQuestion: (id: number | string) => Promise<Record<string, unknown>>;
+        createQuestion: (payload: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        updateQuestion: (id: number, payload: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        deleteQuestion: (id: number) => Promise<void>;
+        deleteQuestionImage: (id: number) => Promise<void>;
+        createAnswer: (questionId: number, payload: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        updateAnswer: (id: number, payload: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        deleteAnswer: (id: number) => Promise<void>;
+        deleteAnswerImage: (id: number) => Promise<void>;
+        acceptAnswer: (questionId: number, answerId: number) => Promise<Record<string, unknown>>;
+        voteQuestion: (id: number, payload: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        deleteQuestionVote: (id: number) => Promise<void>;
+        voteAnswer: (id: number, payload: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        deleteAnswerVote: (id: number) => Promise<void>;
+        addAnswerReaction: (id: number, payload: Record<string, unknown>) => Promise<unknown>;
+        deleteAnswerReaction: (id: number, payload: Record<string, unknown>) => Promise<unknown>;
+        createAnswerReply: (answerId: number, payload: Record<string, unknown>) => Promise<unknown>;
+        updateAnswerReply: (id: number, payload: Record<string, unknown>) => Promise<unknown>;
+        deleteAnswerReply: (id: number) => Promise<void>;
+        addAnswerReplyReaction: (id: number, payload: Record<string, unknown>) => Promise<unknown>;
+        deleteAnswerReplyReaction: (id: number, payload: Record<string, unknown>) => Promise<unknown>;
+      }>(win, '/src/features/forum/api/forumApi.ts');
 
       const users = await usersApi.getAllUsers();
       expect(users.data[0]).to.include({ id: 1, isVerified: true });
@@ -504,6 +681,54 @@ describe('browser module branch coverage probes', () => {
           url: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
         },
       ]);
+
+      const forumImage = new win.File(['forum'], 'forum.png', { type: 'image/png' });
+      const questions = await forumApi.getQuestions({ page: 2, limit: 2 });
+      expect(questions.data).to.have.length(1);
+      expect(questions.page).to.equal(2);
+      const question = await forumApi.getQuestion(501);
+      expect(question.User).to.include({ id: 2, name: 'Alex Rain' });
+      expect(question.Answers[0].reactions).to.have.length(2);
+      expect(question.Answers[0].replies[0].reactions).to.have.length(1);
+      await forumApi.createQuestion({
+        title: 'Novo pitanje',
+        body: 'Novo tijelo',
+        categoryId: 1,
+        taggedUserIds: [2, 3],
+        image: forumImage,
+        images: [forumImage],
+      });
+      await forumApi.updateQuestion(501, {
+        title: 'Uredi pitanje',
+        body: 'Uredi tijelo',
+        categoryId: null,
+        images: [forumImage],
+        removeImage: true,
+      });
+      await forumApi.deleteQuestionImage(501);
+      await forumApi.deleteQuestion(501);
+      const answer = await forumApi.createAnswer(501, {
+        body: 'Novi odgovor',
+        taggedUserIds: [2],
+        image: forumImage,
+        images: [forumImage],
+      });
+      expect(answer.reactions).to.have.length(1);
+      await forumApi.updateAnswer(702, { body: 'Uredi odgovor', images: [forumImage], removeImage: true });
+      await forumApi.deleteAnswerImage(702);
+      await forumApi.deleteAnswer(702);
+      await forumApi.acceptAnswer(501, 702);
+      await forumApi.voteQuestion(501, { value: 1 });
+      await forumApi.deleteQuestionVote(501);
+      await forumApi.voteAnswer(702, { value: -1 });
+      await forumApi.deleteAnswerVote(702);
+      await forumApi.addAnswerReaction(702, { emoji: '🙏' });
+      expect(await forumApi.deleteAnswerReaction(702, { emoji: '🙏' })).to.equal(undefined);
+      await forumApi.createAnswerReply(702, { body: 'Reply' });
+      await forumApi.updateAnswerReply(802, { body: 'Updated reply' });
+      await forumApi.deleteAnswerReply(802);
+      await forumApi.addAnswerReplyReaction(802, { emoji: '❤️' });
+      expect(await forumApi.deleteAnswerReplyReaction(802, { emoji: '❤️' })).to.equal(undefined);
     });
   });
 
@@ -580,6 +805,32 @@ describe('browser module branch coverage probes', () => {
                 createdAt: '2026-06-08T09:30:00.000Z',
                 User: { id: 2, username: 'alex' },
               },
+              {
+                id: 502,
+                chatId: 44,
+                fromUserId: 1,
+                type: 'gif',
+                message: 'https://media0.giphy.com/media/demo/giphy.gif',
+                createdAt: '2026-06-08T09:35:00.000Z',
+                User: { id: 1, username: 'current' },
+              },
+              {
+                id: 503,
+                chatId: 44,
+                fromUserId: 2,
+                type: 'text',
+                securePhotoUrl: 'development/chat/photo.png',
+                createdAt: '2026-06-08T09:40:00.000Z',
+                User: { id: 2, username: 'alex' },
+              },
+              {
+                id: 504,
+                chatId: 44,
+                fromUserId: 2,
+                type: 'text',
+                message: 'Bez datuma',
+                User: { id: 2, username: 'alex' },
+              },
             ],
           },
         ],
@@ -593,6 +844,14 @@ describe('browser module branch coverage probes', () => {
       statusCode: 200,
       body: { ok: true },
     }).as('markHarnessMessageRead');
+    cy.intercept('PUT', /\/notifications\/\d+\/read\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { ok: true },
+    }).as('markHarnessNotificationRead');
+    cy.intercept('GET', /\/forum\/questions\/?(?:\?.*)?$/, {
+      statusCode: 200,
+      body: { data: [], total: 0, page: 1, limit: 100, totalPages: 1 },
+    });
 
     cy.window().then(async (win) => {
       const reactRefresh = await importFromApp<{
@@ -629,6 +888,15 @@ describe('browser module branch coverage probes', () => {
       $body.find('button').filter((_, button) => button.textContent === 'Zatvori').first().trigger('click');
       $body.find('button').filter((_, button) => button.textContent?.includes('Sheraj sliku') ?? false).first().trigger('click');
       $body.find('*').filter((_, element) => element.textContent?.includes('Zadnja poruka') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Nova poruka u chatu') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Netko je lajkao tvoju fotku.') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Netko je dao glas tvom pitanju.') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Netko je odgovorio na tvoje pitanje.') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Netko je odgovorio na tvoj odgovor.') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Obična obavijest') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Sakrij odgovore (2)') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Reakcije') ?? false).first().trigger('click');
+      $body.find('button').filter((_, button) => button.textContent?.includes('Akcije') ?? false).first().trigger('click');
     });
   });
 });

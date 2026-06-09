@@ -257,6 +257,24 @@ const setupForumActions = (initialQuestion: ForumQuestion) => {
     },
   }).as('addAnswerReaction');
 
+  cy.intercept('POST', new RegExp(`/forum/questions/${question.id}/answers/?(?:\\?.*)?$`), {
+    statusCode: 201,
+    body: {
+      data: {
+        id: 503,
+        questionId: question.id,
+        userId: currentUser.id,
+        body: 'Valjani odgovor iz forme https://media0.giphy.com/media/forum-original/giphy.gif',
+        isAccepted: false,
+        createdAt: '2026-06-08T09:40:00.000Z',
+        updatedAt: '2026-06-08T09:40:00.000Z',
+        User: currentUser,
+        reactions: [],
+        replies: [],
+      },
+    },
+  }).as('createAnswerFromForm');
+
   cy.intercept('DELETE', /\/forum\/answers\/502\/reactions\/?(?:\?.*)?$/, {
     statusCode: 200,
     body: { data: { ...question.Answers[1], reactions: [], userReactions: [] } },
@@ -417,6 +435,42 @@ describe('forum branch-heavy actions', () => {
     cy.contains('button', 'Obriši pitanje').click();
     cy.contains('Obrisati pitanje?').should('be.visible');
     cy.contains('button', 'Natrag').click();
+  });
+
+  it('validates answer form and submits an answer with image and GIF content', () => {
+    setupForumActions(makeQuestion({ owner: alex }));
+
+    cy.visitAsAuthenticated('/forum/questions/401');
+    cy.getByTestId('forum-question-details-page').should('be.visible');
+    cy.getByTestId('forum-answer-form').within(() => {
+      cy.getByTestId('forum-answer-submit').click();
+    });
+    cy.contains('Odgovor je obavezan.').should('be.visible');
+
+    cy.getByTestId('forum-answer-body').type('a');
+    cy.getByTestId('forum-answer-submit').click();
+    cy.contains('Odgovor mora imati barem 2 znaka.').should('be.visible');
+
+    cy.get('#answer-image').selectFile(imageFile('answer.txt', 'text/plain'), { force: true });
+    cy.contains('Možeš dodati samo slike').should('be.visible');
+    cy.get('#answer-image').selectFile(imageFile('answer-form.png'), { force: true });
+    cy.get('img[alt="Pregled slike odgovora 1"]').should('be.visible');
+    cy.getByTestId('forum-answer-form').within(() => {
+      cy.contains('button', 'Makni').click();
+    });
+    cy.get('img[alt="Pregled slike odgovora 1"]').should('not.exist');
+    cy.get('#answer-image').selectFile(imageFile('answer-form.png'), { force: true });
+
+    cy.getByTestId('forum-answer-body').clear().type('Valjani odgovor iz forme');
+    cy.getByTestId('forum-answer-form').within(() => {
+      cy.contains('button', 'GIF').click();
+    });
+    cy.wait('@getForumGifs');
+    cy.get('img[alt="Forum GIF"]').parent('button').click();
+    cy.get('img[alt="Odabrani GIF"]').should('be.visible');
+    cy.getByTestId('forum-answer-submit').click();
+    cy.wait('@createAnswerFromForm');
+    cy.contains('Valjani odgovor iz forme').should('be.visible');
   });
 
   it('accepts answers, edits own answer and reply, and toggles reactions', () => {
