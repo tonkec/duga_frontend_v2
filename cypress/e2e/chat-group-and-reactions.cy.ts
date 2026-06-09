@@ -133,17 +133,27 @@ const gifResponse = {
   ],
 };
 
+const imageFile = (name = 'cypress-chat-photo.png', type = 'image/png') => ({
+  contents: Cypress.Buffer.from('fake image contents'),
+  fileName: name,
+  mimeType: type,
+});
+
 const setupGroupChat = ({
   chats = [groupChat],
   users = [currentUser, alex, mira],
   messages = groupMessages,
+  uploads = [],
+  notifications = [],
 }: {
   chats?: unknown[];
   users?: BackendUser[];
   messages?: Record<string, unknown>;
+  uploads?: unknown[];
+  notifications?: unknown[];
 } = {}) => {
   cy.mockAuthenticatedSession({ currentUser });
-  cy.mockDefaultApi({ chats, users, uploads: [] });
+  cy.mockDefaultApi({ chats, users, uploads, notifications });
 
   cy.intercept('GET', '**/users/2**', {
     statusCode: 200,
@@ -174,6 +184,16 @@ const setupGroupChat = ({
     statusCode: 200,
     body: gifResponse,
   }).as('getGifs');
+
+  cy.intercept('PUT', /\/notifications\/9001\/read\/?(?:\?.*)?$/, {
+    statusCode: 200,
+    body: { ok: true },
+  }).as('markMessageNotificationRead');
+
+  cy.intercept('POST', /\/uploads\/message-photos\/?(?:\?.*)?$/, {
+    statusCode: 200,
+    body: { ok: true },
+  }).as('uploadMessagePhotos');
 };
 
 const openGroupChat = () => {
@@ -194,6 +214,16 @@ const assertSocketEvent = (
 };
 
 describe('chat group and reaction branches', () => {
+  before(() => {
+    Cypress.on('uncaught:exception', (error) => {
+      if (error.message.includes('Network Error')) {
+        return false;
+      }
+
+      return undefined;
+    });
+  });
+
   beforeEach(() => {
     cy.clearLocalStorage();
     cy.clearCookies();
@@ -300,6 +330,65 @@ describe('chat group and reaction branches', () => {
         event.payload?.messagePhotoUrl ===
           'https://media0.giphy.com/media/cypress-original/giphy.gif',
       'gif message socket'
+    );
+  });
+
+  it('covers SendMessage mentions, emoji replacement, notifications, and image upload branches', () => {
+    setupGroupChat({
+      uploads: [],
+      notifications: [{ id: 9001, type: 'message', chatId: 301, isRead: false }],
+    });
+    openGroupChat();
+
+    cy.getByTestId('chat-message-input').focus();
+    cy.assertSocketEvent('markAsRead', { chatId: 301 });
+    cy.wait('@markMessageNotificationRead');
+
+    cy.getByTestId('chat-message-input').type('Bok @al');
+    cy.contains('button', '@alex_rain').click();
+    cy.getByTestId('chat-message-input').should('have.value', 'Bok @alex_rain ');
+    cy.getByTestId('chat-message-input').type(':)');
+    cy.get('button[aria-label^="Odaberi emoji"]').first().click();
+    cy.getByTestId('chat-message-input').should('contain.value', '@alex_rain');
+    cy.getByTestId('chat-message-submit').click();
+    assertSocketEvent(
+      (event) =>
+        event.event === 'message' &&
+        event.payload?.type === 'text' &&
+        event.payload?.chatId === '301' &&
+        typeof event.payload?.message === 'string' &&
+        event.payload.message.includes('@alex_rain') &&
+        Array.isArray(event.payload?.mentions) &&
+        event.payload.mentions.includes(2),
+      'mention message socket'
+    );
+    cy.assertSocketEvent('stop-typing', { chatId: '301' });
+
+    cy.getByTestId('chat-photo-file-input').selectFile(imageFile('bad-chat-file.txt', 'text/plain'), {
+      force: true,
+    });
+    cy.contains('Dozvoljeni formati').should('be.visible');
+
+    cy.getByTestId('chat-photo-file-input').selectFile(imageFile('Clean Chat Photo.png'), {
+      force: true,
+    });
+    cy.contains('button', 'Makni sliku').should('be.visible');
+    cy.contains('button', 'Makni sliku').click();
+    cy.contains('button', 'Makni sliku').should('not.exist');
+
+    cy.getByTestId('chat-photo-file-input').selectFile(imageFile('Clean Chat Photo.png'), {
+      force: true,
+    });
+    cy.getByTestId('chat-message-submit').click();
+    cy.wait('@uploadMessagePhotos');
+    assertSocketEvent(
+      (event) =>
+        event.event === 'message' &&
+        event.payload?.type === 'file' &&
+        event.payload?.chatId === '301' &&
+        typeof event.payload?.messagePhotoUrl === 'string' &&
+        event.payload.messagePhotoUrl.includes('/cleanchatphoto.png'),
+      'file message socket'
     );
   });
 

@@ -39,6 +39,11 @@ export default defineConfig({
   build: {
     sourcemap: shouldCollectCoverage,
   },
+  server: {
+    watch: {
+      ignored: ['**/coverage/**', '**/.nyc_output/**'],
+    },
+  },
   define: {
     'import.meta.env.STAGING': JSON.stringify(isEnabled(process.env.STAGING)),
     'import.meta.env.PRODUCTION': JSON.stringify(isEnabled(process.env.PRODUCTION)),
