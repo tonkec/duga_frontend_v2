@@ -61,4 +61,53 @@ describe('settings online status', () => {
       expectSocketStatusEvent('offline');
     });
   });
+
+  it('toggles theme, updates cookie consent, and confirms profile deletion', () => {
+    cy.fixture('current-user').then((currentUser) => {
+      cy.mockAuthenticatedSession({
+        currentUser: {
+          ...currentUser,
+          status: 'online',
+        },
+      });
+      cy.mockDefaultApi({ uploads: [] });
+
+      cy.intercept('GET', /\/users\/online-status\/?(?:\?.*)?$/, {
+        statusCode: 200,
+        body: { status: 'online' },
+      });
+
+      cy.intercept('DELETE', /\/delete-user\/?(?:\?.*)?$/, {
+        statusCode: 200,
+        body: { ok: true },
+      }).as('deleteUser');
+
+      cy.visitAsAuthenticated('/settings');
+
+      cy.contains('h1', 'Postavke').should('be.visible');
+      cy.get('[role="switch"]').should('have.attr', 'aria-checked', 'false').click();
+      cy.get('[role="switch"]').should('have.attr', 'aria-checked', 'true');
+      cy.get('html').should('have.attr', 'data-theme', 'dark');
+      cy.get('[role="switch"]').click();
+      cy.get('[role="switch"]').should('have.attr', 'aria-checked', 'false');
+      cy.get('html').should('have.attr', 'data-theme', 'light');
+
+      cy.contains('button', 'Odbij kolačiće').click();
+      cy.contains('Odbiti kolačiće?').should('be.visible');
+      cy.contains('button', 'Natrag').click();
+      cy.contains('button', 'Odbij kolačiće').click();
+      cy.contains('button', 'Potvrđujem').click();
+      cy.contains('Neke funkcije neće raditi jer ste odbili kolačiće.').should('be.visible');
+      cy.contains('button', 'Prihvati kolačiće').click();
+      cy.contains('Kolačići su prihvaćeni.').should('be.visible');
+
+      cy.contains('button', 'Obriši profil').click();
+      cy.contains('Obrisati profil?').should('be.visible');
+      cy.contains('button', 'Natrag').click();
+      cy.contains('button', 'Obriši profil').click();
+      cy.contains('button', 'Potvrđujem').click();
+      cy.wait('@deleteUser');
+      cy.location('pathname').should('eq', '/login');
+    });
+  });
 });

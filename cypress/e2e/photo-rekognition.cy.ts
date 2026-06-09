@@ -134,6 +134,12 @@ const setupExistingChat = (
     statusCode: 200,
     body: messages.existingChat,
   }).as('getMessages');
+
+  cy.intercept('GET', /\/chat\/[^/]+\/[^/]+\/.*chat\.png(?:\?.*)?$/, {
+    statusCode: 200,
+    headers: { 'content-type': 'image/png' },
+    body: Cypress.Buffer.from('fake png contents'),
+  }).as('getUploadedChatPhoto');
 };
 
 const expectNoSocketEvent = (

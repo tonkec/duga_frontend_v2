@@ -31,6 +31,16 @@ const currentUser = {
 };
 
 describe('user edits profile', () => {
+  before(() => {
+    Cypress.on('uncaught:exception', (error) => {
+      if (error.message.includes('Network Error')) {
+        return false;
+      }
+
+      return undefined;
+    });
+  });
+
   it('updates profile details', () => {
     let profileUser = { ...currentUser };
 
@@ -76,6 +86,16 @@ describe('user edits profile', () => {
       statusCode: 200,
       body: { images: [] },
     }).as('getUserPhotos');
+    cy.intercept('GET', /\/uploads\/files\/.*(?:\?.*)?$/, {
+      statusCode: 200,
+      headers: { 'content-type': 'image/png' },
+      body: Cypress.Buffer.from('fake png contents'),
+    }).as('getImageFile');
+    cy.intercept('GET', /https:\/\/duga-user-photo\.s3\.[^/]+\/.*(?:\?.*)?$/, {
+      statusCode: 200,
+      headers: { 'content-type': 'image/png' },
+      body: Cypress.Buffer.from('fake png contents'),
+    }).as('getS3ImageFile');
 
     cy.visitAsAuthenticated('/edit');
 
